@@ -1,14 +1,5 @@
 [![Gitizens](docs/banner.svg)](https://ordinary9843.github.io/gitizens/)
 
-<!-- WORLD-STATE-START -->
-![Era](https://img.shields.io/badge/Era-Founding_Era-e3b341?style=flat-square&logo=github)
-![Population](https://img.shields.io/badge/Population-1000-3fb950?style=flat-square)
-![Treasury](https://img.shields.io/badge/Treasury-1000_GC-388bfd?style=flat-square)
-![Stability](https://img.shields.io/badge/Stability-70%2F100-bc8cff?style=flat-square)
-![Pollution](https://img.shields.io/badge/Pollution-5%2F100-f85149?style=flat-square)
-![Laws](https://img.shields.io/badge/Laws-0_enacted-8b949e?style=flat-square)
-<!-- WORLD-STATE-END -->
-
 ---
 
 ## What is Gitizens?
@@ -23,6 +14,15 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 ---
 
 ## Current World Status
+
+<!-- WORLD-STATE-START -->
+![Era](https://img.shields.io/badge/Era-Founding_Era-e3b341?style=flat-square&logo=github)
+![Population](https://img.shields.io/badge/Population-1000-3fb950?style=flat-square)
+![Treasury](https://img.shields.io/badge/Treasury-1000_GC-388bfd?style=flat-square)
+![Stability](https://img.shields.io/badge/Stability-70%2F100-bc8cff?style=flat-square)
+![Pollution](https://img.shields.io/badge/Pollution-5%2F100-f85149?style=flat-square)
+![Laws](https://img.shields.io/badge/Laws-0_enacted-8b949e?style=flat-square)
+<!-- WORLD-STATE-END -->
 
 [![Gitizens Dashboard](world/stats.svg)](https://ordinary9843.github.io/gitizens/)
 
