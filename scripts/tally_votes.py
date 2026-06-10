@@ -89,15 +89,11 @@ RARITY_WEIGHTS = {"common": 60, "uncommon": 25, "rare": 10, "legendary": 5}
 
 def run(cmd: list[str]) -> str:
     result = subprocess.run(cmd, capture_output=True, encoding="utf-8", errors="replace")
-    if result.stderr.strip():
-        print(f"  [stderr] {' '.join(cmd[:3])}: {result.stderr.strip()[:200]}", flush=True)
     return result.stdout.strip()
 
 
 def gh_json(cmd: list[str]) -> list | dict:
     out = run(["gh", *cmd])
-    if not out:
-        print(f"  [warn] gh {' '.join(cmd[:3])} returned empty", flush=True)
     return json.loads(out) if out else []
 
 
