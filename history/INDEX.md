@@ -10,3 +10,4 @@
 | 6 | [law-006](../world/laws/law-006.md) | [#25](https://github.com/ordinary9843/gitizens/issues/25) Expand Educational Excellence | 1+1 0-1 | 2026-06-10 |
 | 7 | [law-007](../world/laws/law-007.md) | [#26](https://github.com/ordinary9843/gitizens/issues/26) Deepen Welfare Commitments | 1+1 0-1 | 2026-06-10 |
 | 8 | [law-008](../world/laws/law-008.md) | [#27](https://github.com/ordinary9843/gitizens/issues/27) Invest in Nature Conservation | 1+1 0-1 | 2026-06-10 |
+| 1 | [law-001](../world/laws/law-001.md) | [#1](https://github.com/ordinary9843/gitizens/issues/1) Declare Open Source the Founding Principle | 1+1 0-1 | 2026-06-10 |

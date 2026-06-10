@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-10*
+*Last updated: 2026-06-10 — [Law 001](laws/law-001.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Founding Era |
-| Laws enacted | 0 |
-| Last enacted | — |
-| Treasury | 1000 Git Coins |
+| Laws enacted | 1 |
+| Last enacted | 2026-06-10 |
+| Treasury | 1,004 Git Coins |
 
 ### Policy
 
@@ -22,13 +22,29 @@
 | Welfare | 25/100 |
 | Green Policy | 30/100 |
 | Defense | 20/100 |
-| Pollution | 5/100 |
+| Pollution *(derived)* | 5/100 |
 
 ---
 
 ## Entities
 
-*(No structures built yet. Propose a law to build the first one.)*
+### Institutions
+
+*(none yet)*
+
+### Districts
+
+*(none yet)*
+
+### Buildings
+
+| ID | Name | Built by | Trigger |
+|----|------|----------|---------|
+| `bld-001` | Public School | [Law 001](laws/law-001.md) | education >= 25 |
+
+### Sectors
+
+*(none yet)*
 
 ---
 

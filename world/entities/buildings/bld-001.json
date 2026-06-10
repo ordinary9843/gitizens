@@ -1,0 +1,7 @@
+{
+  "id": "bld-001",
+  "name": "Public School",
+  "built_law": 1,
+  "built_at": "2026-06-10T15:36:12.177453+00:00",
+  "auto_trigger": "education >= 25"
+}

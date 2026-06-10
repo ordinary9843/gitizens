@@ -7,47 +7,47 @@
   <line x1="24" y1="70" x2="736" y2="70" stroke="#30363d" stroke-width="1"/>
 
   <text x="24"  y="90"  fill="#484f58" font-family="monospace" font-size="10">LAWS ENACTED</text>
-  <text x="24"  y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">0</text>
+  <text x="24"  y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">1</text>
 
   <text x="210" y="90"  fill="#484f58" font-family="monospace" font-size="10">STRUCTURES</text>
-  <text x="210" y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">0</text>
+  <text x="210" y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">1</text>
 
   <text x="396" y="90"  fill="#484f58" font-family="monospace" font-size="10">TREASURY</text>
-  <text x="396" y="116" fill="#e3b341" font-family="monospace" font-size="26" font-weight="bold">1000</text>
+  <text x="396" y="116" fill="#e3b341" font-family="monospace" font-size="26" font-weight="bold">1,004</text>
 
   <text x="582" y="90"  fill="#484f58" font-family="monospace" font-size="10">PASS RATE</text>
-  <text x="582" y="116" fill="#8b949e" font-family="monospace" font-size="26" font-weight="bold">—</text>
+  <text x="582" y="116" fill="#3fb950" font-family="monospace" font-size="26" font-weight="bold">100%</text>
 
   <line x1="24" y1="132" x2="736" y2="132" stroke="#30363d" stroke-width="1"/>
 
   <text x="24"  y="150" fill="#484f58" font-family="monospace" font-size="10">POLICY METRICS</text>
-  <text x="700" y="150" fill="#e3b341" font-family="monospace" font-size="10" text-anchor="end">POLLUTION 5/100</text>
+  <text x="700" y="150" fill="#3fb950" font-family="monospace" font-size="10" text-anchor="end">POLLUTION 5/100</text>
 
   <text x="24"  y="168" fill="#8b949e" font-family="monospace" font-size="10">EDU</text>
   <rect x="56"  y="158" width="42" height="12" rx="2" fill="#e3b341"/>
   <text x="102" y="168" fill="#e3b341" font-family="monospace" font-size="10">30</text>
 
   <text x="24"  y="186" fill="#8b949e" font-family="monospace" font-size="10">IND</text>
-  <rect x="56"  y="176" width="28" height="12" rx="2" fill="#f85149"/>
-  <text x="88"  y="186" fill="#f85149" font-family="monospace" font-size="10">20</text>
+  <rect x="56"  y="176" width="28" height="12" rx="2" fill="#484f58"/>
+  <text x="88" y="186" fill="#484f58" font-family="monospace" font-size="10">20</text>
 
   <text x="24"  y="204" fill="#8b949e" font-family="monospace" font-size="10">WEL</text>
-  <rect x="56"  y="194" width="35" height="12" rx="2" fill="#e3b341"/>
-  <text x="95"  y="204" fill="#e3b341" font-family="monospace" font-size="10">25</text>
+  <rect x="56"  y="194" width="35" height="12" rx="2" fill="#484f58"/>
+  <text x="95" y="204" fill="#484f58" font-family="monospace" font-size="10">25</text>
 
   <text x="400" y="168" fill="#8b949e" font-family="monospace" font-size="10">GRN</text>
   <rect x="432" y="158" width="42" height="12" rx="2" fill="#e3b341"/>
   <text x="478" y="168" fill="#e3b341" font-family="monospace" font-size="10">30</text>
 
   <text x="400" y="186" fill="#8b949e" font-family="monospace" font-size="10">DEF</text>
-  <rect x="432" y="176" width="28" height="12" rx="2" fill="#f85149"/>
-  <text x="464" y="186" fill="#f85149" font-family="monospace" font-size="10">20</text>
+  <rect x="432" y="176" width="28" height="12" rx="2" fill="#484f58"/>
+  <text x="464" y="186" fill="#484f58" font-family="monospace" font-size="10">20</text>
 
   <line x1="24" y1="218" x2="736" y2="218" stroke="#30363d" stroke-width="1"/>
 
   <text x="24" y="238" fill="#8b949e" font-family="monospace" font-size="11">Passed  </text>
-  <rect x="100" y="225" width="0" height="20" rx="3" fill="#3fb950"/>
-  <text x="108" y="240" fill="#3fb950" font-family="monospace" font-size="11">0</text>
+  <rect x="100" y="225" width="580" height="20" rx="3" fill="#3fb950"/>
+  <text x="688" y="240" fill="#3fb950" font-family="monospace" font-size="11">1</text>
 
   <text x="24" y="274" fill="#8b949e" font-family="monospace" font-size="11">Rejected</text>
   <rect x="100" y="261" width="0" height="20" rx="3" fill="#f85149"/>
@@ -60,8 +60,8 @@
   <text x="536" y="314" fill="#484f58" font-family="monospace" font-size="10">STABILITY</text>
 
   <text x="24"  y="334" fill="#c9d1d9" font-family="monospace" font-size="18" font-weight="bold">1,000</text>
-  <text x="280" y="334" fill="#e3b341" font-family="monospace" font-size="18" font-weight="bold">5/100</text>
-  <text x="536" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">70/100</text>
+  <text x="280" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">5/100</text>
+  <text x="536" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">69/100</text>
 
-  <text x="24" y="358" fill="#484f58" font-family="monospace" font-size="10">Total proposals: 0 | Founded: 2026-06-10</text>
+  <text x="24" y="358" fill="#484f58" font-family="monospace" font-size="10">Total proposals: 1 | Updated: 2026-06-10</text>
 </svg>
