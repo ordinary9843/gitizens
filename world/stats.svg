@@ -13,7 +13,7 @@
   <text x="210" y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">2</text>
 
   <text x="396" y="90"  fill="#484f58" font-family="monospace" font-size="10">TREASURY</text>
-  <text x="396" y="116" fill="#e3b341" font-family="monospace" font-size="26" font-weight="bold">808</text>
+  <text x="396" y="116" fill="#e3b341" font-family="monospace" font-size="26" font-weight="bold">812</text>
 
   <text x="582" y="90"  fill="#484f58" font-family="monospace" font-size="10">PASS RATE</text>
   <text x="582" y="116" fill="#3fb950" font-family="monospace" font-size="26" font-weight="bold">100%</text>
@@ -59,9 +59,9 @@
   <text x="280" y="314" fill="#484f58" font-family="monospace" font-size="10">POLLUTION</text>
   <text x="536" y="314" fill="#484f58" font-family="monospace" font-size="10">STABILITY</text>
 
-  <text x="24"  y="334" fill="#c9d1d9" font-family="monospace" font-size="18" font-weight="bold">1,050</text>
+  <text x="24"  y="334" fill="#c9d1d9" font-family="monospace" font-size="18" font-weight="bold">1,100</text>
   <text x="280" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">5/100</text>
-  <text x="536" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">68/100</text>
+  <text x="536" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">67/100</text>
 
   <text x="24" y="358" fill="#484f58" font-family="monospace" font-size="10">Total proposals: 3 | Updated: 2026-06-10</text>
 </svg>
