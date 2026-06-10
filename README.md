@@ -26,20 +26,37 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 
 ---
 
+## Current World Status
+
+> *Updated every 4 hours automatically · [View world history](world/WORLD.md)*
+
+| | |
+|---|---|
+| **Era** | Founding Era |
+| **Laws enacted** | — |
+| **Population** | — |
+| **Treasury** | — Git Coins |
+| **Stability** | — / 100 |
+| **Pollution** | — / 100 |
+
+*Live values always shown in the badges above and in [WORLD.md](world/WORLD.md)*
+
+---
+
 ## Become a Citizen
 
 1. **Star this repo** — each star earns the treasury 10 Git Coins
-2. **React to open proposals** — 👍 to pass, 👎 to reject. Find them in [Issues](../../issues?q=label%3Aproposal+is%3Aopen)
+2. **React to open proposals** — 👍 to pass, 👎 to reject · [Open proposals](../../issues?q=label%3Aproposal+is%3Aopen)
 3. **Propose a law** — install [claude-gitizens](https://github.com/ordinary9843/claude-gitizens) and run `/gitizens:propose` in Claude Code
 
-That's it. No signup. No account. Just a GitHub account and an opinion.
+No signup. No account. Just a GitHub account and an opinion.
 
 ---
 
 ## How to Play
 
 ### 1. Watch the world
-Open the [GitHub Pages city](https://ordinary9843.github.io/gitizens/). Every building reflects a real metric. The world ticks every 4 hours — even when no one is online.
+Open the [live city dashboard](https://ordinary9843.github.io/gitizens/). Every building reflects a real policy metric. The world ticks every 4 hours — even when no one is online.
 
 ### 2. Vote on proposals
 Open any [Issue labeled `proposal`](../../issues?q=label%3Aproposal+is%3Aopen). React with 👍 to vote for, 👎 to vote against. Voting closes in 24 hours.
@@ -61,9 +78,9 @@ Claude will show you the current world state, guide you through writing the prop
 | **Idle growth** | World ticks every 4h regardless of votes — population grows, pollution drifts, stability shifts |
 | **Random events** | 15% chance per tick — drought, stock crash, alien signal, pandemic, and 47 more |
 | **Era progression** | Founding → Industrial → Modern → Golden Age (or Crisis Age if things go wrong) |
-| **Treasury** | Earned from GitHub ⭐ stars (×10 GC) + industrial output + population tax |
+| **Treasury** | Earned from GitHub stars (×10 GC) + industrial output + population tax |
 | **Buildings** | Auto-created/removed by the world engine based on metric thresholds |
 
 ---
 
-*The world ticks every 4 hours · [View commit history](../../commits/master) · Built on GitHub Actions*
+*World ticks every 4 hours · [Commit history](../../commits/master) · MIT License · Built on GitHub Actions*

@@ -41,3 +41,11 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           SKIP_TIMING_CHECK: ${{ inputs.skip_timing }}
         run: python scripts/tally_votes.py
+
+      - name: Update README badges
+        run: |
+          git pull origin master
+          python scripts/update_readme.py
+          git add README.md
+          git diff --cached --quiet || git commit -m "[SYSTEM] update world state badges [skip ci]"
+          git push origin master || true
