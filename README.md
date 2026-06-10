@@ -1,6 +1,4 @@
-# GITIZENS
-
-**A civilization that lives inside a GitHub repo.**
+[![Gitizens](docs/banner.svg)](https://ordinary9843.github.io/gitizens/)
 
 <!-- WORLD-STATE-START -->
 ![Era](https://img.shields.io/badge/Era-Founding_Era-e3b341?style=flat-square&logo=github)
@@ -83,4 +81,4 @@ Claude will show you the current world state, guide you through writing the prop
 
 ---
 
-*World ticks every 4 hours · [Commit history](../../commits/master) · MIT License · Built on GitHub Actions*
+*World ticks every 4 hours · MIT License*
