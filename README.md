@@ -9,8 +9,6 @@
 ![Laws](https://img.shields.io/badge/Laws-0_enacted-8b949e?style=flat-square)
 <!-- WORLD-STATE-END -->
 
-[![Gitizens Dashboard](world/stats.svg)](https://ordinary9843.github.io/gitizens/)
-
 ---
 
 ## What is Gitizens?
@@ -26,18 +24,9 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 
 ## Current World Status
 
+[![Gitizens Dashboard](world/stats.svg)](https://ordinary9843.github.io/gitizens/)
+
 > *Updated every 4 hours automatically · [View world history](world/WORLD.md)*
-
-| | |
-|---|---|
-| **Era** | Founding Era |
-| **Laws enacted** | — |
-| **Population** | — |
-| **Treasury** | — Git Coins |
-| **Stability** | — / 100 |
-| **Pollution** | — / 100 |
-
-*Live values always shown in the badges above and in [WORLD.md](world/WORLD.md)*
 
 ---
 
