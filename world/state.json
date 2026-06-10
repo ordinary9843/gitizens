@@ -1,13 +1,13 @@
 {
   "era": "Founding Era",
-  "laws_count": 4,
+  "laws_count": 5,
   "last_enacted": "2026-06-10",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Founding Era, Gitizens prioritize education and welfare, boasting a stable population of 1,150 and a treasury of 716 Git Coins.",
-  "treasury": 716,
+  "world_summary": "In the Founding Era, Gitizens focus on education and welfare, maintaining stability with a population of 1,150 and a treasury of 716 Git Coins.",
+  "treasury": 616,
   "currency": "Git Coins",
   "stars_last_counted": 0,
-  "education": 45,
+  "education": 55,
   "industry": 20,
   "welfare": 55,
   "green_policy": 30,
@@ -16,6 +16,7 @@
   "pollution": 5,
   "stability": 66,
   "tags_applied": [
-    "era/founding-era"
+    "era/founding-era",
+    "milestone/educated-society"
   ]
 }
