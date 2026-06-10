@@ -13,3 +13,4 @@
 | 1 | [law-001](../world/laws/law-001.md) | [#1](https://github.com/ordinary9843/gitizens/issues/1) Declare Open Source the Founding Principle | 1+1 0-1 | 2026-06-10 |
 | 2 | [law-002](../world/laws/law-002.md) | [#2](https://github.com/ordinary9843/gitizens/issues/2) Fund the National Education Initiative | 1+1 0-1 | 2026-06-10 |
 | 3 | [law-003](../world/laws/law-003.md) | [#3](https://github.com/ordinary9843/gitizens/issues/3) Launch the Social Welfare Program | 1+1 0-1 | 2026-06-10 |
+| 4 | [law-004](../world/laws/law-004.md) | [#3](https://github.com/ordinary9843/gitizens/issues/3) Launch the Social Welfare Program | 1+1 0-1 | 2026-06-10 |
