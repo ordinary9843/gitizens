@@ -1,0 +1,32 @@
+name: "[CI] Tests"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "scripts/**"
+      - "tests/**"
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "tests/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pytest openai pyyaml
+
+      - name: Run tests
+        env:
+          GITHUB_TOKEN: placeholder
+          GITHUB_REPOSITORY: ordinary9843/gitizens
+        run: python -m pytest tests/ -v

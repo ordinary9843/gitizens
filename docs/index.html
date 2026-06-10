@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GITIZENS — Civilization Simulator</title>
+  <style>
+    :root {
+      --bg:      #0d1117;
+      --surface: #161b22;
+      --border:  #30363d;
+      --text:    #c9d1d9;
+      --muted:   #8b949e;
+      --dim:     #484f58;
+      --blue:    #388bfd;
+      --green:   #3fb950;
+      --yellow:  #e3b341;
+      --purple:  #bc8cff;
+      --red:     #f85149;
+      --orange:  #f0883e;
+      --teal:    #2dd4bf;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      background: var(--bg); color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+
+    #header {
+      padding: 14px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    }
+    #header h1 { font-size: 20px; font-weight: bold; letter-spacing: 4px; }
+    #era-day   { font-size: 13px; color: var(--muted); }
+    #world-summary {
+      margin-left: auto; font-size: 11px; color: var(--dim);
+      max-width: 420px; text-align: right; font-style: italic;
+    }
+
+    #city-container {
+      width: 100%; border-bottom: 1px solid var(--border);
+      background: #0d1117; position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    #city { width: 100%; display: block; height: 320px; }
+    #loading {
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--dim); font-size: 13px;
+    }
+
+    #panels {
+      display: grid;
+      grid-template-columns: 200px 200px 1fr;
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel { padding: 18px 20px; border-right: 1px solid var(--border); }
+    .panel:last-child { border-right: none; }
+    .panel h2 { font-size: 10px; color: var(--dim); letter-spacing: 2px; margin-bottom: 14px; }
+
+    .metric-row { display: flex; align-items: center; margin-bottom: 9px; gap: 8px; }
+    .metric-label { font-size: 10px; width: 30px; flex-shrink: 0; }
+    .metric-bar-bg { flex: 1; height: 9px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .metric-bar-fill { height: 100%; border-radius: 3px; transition: width 0.7s ease; }
+    .metric-value { font-size: 10px; width: 26px; text-align: right; flex-shrink: 0; }
+
+    .stat-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 12px; margin-bottom: 9px; gap: 8px;
+    }
+    .stat-label { color: var(--muted); }
+    .stat-value { font-weight: bold; }
+
+    #structures-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px 20px;
+    }
+    .mg-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10px; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 4px;
+    }
+    .mg-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 8px; overflow: hidden; }
+    .mg-bar-fill { height: 100%; border-radius: 2px; transition: width 0.7s ease; }
+    .struct-row {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 10px; padding: 2px 0; line-height: 1.4;
+    }
+    .struct-row.locked { opacity: 0.3; }
+    .struct-check { font-size: 9px; width: 10px; flex-shrink: 0; }
+    .struct-name  { flex: 1; }
+    .struct-threshold { color: var(--dim); font-size: 9px; flex-shrink: 0; }
+
+    #footer {
+      padding: 10px 24px; display: flex; align-items: center; gap: 14px;
+      font-size: 11px; color: var(--dim); margin-top: auto;
+    }
+    #footer a { color: var(--blue); text-decoration: none; }
+    #footer a:hover { text-decoration: underline; }
+    #refresh-btn {
+      margin-left: auto; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-size: 11px;
+      padding: 4px 12px; cursor: pointer; border-radius: 4px;
+    }
+    #refresh-btn:hover { background: var(--border); }
+
+    @keyframes smokePulse  { 0%,100%{opacity:var(--sop,.45)} 50%{opacity:.05} }
+    @keyframes treeSway    { 0%,100%{transform:rotate(-2deg);transform-origin:50% 100%} 50%{transform:rotate(2deg);transform-origin:50% 100%} }
+    @keyframes starTwinkle { 0%,100%{opacity:.85} 50%{opacity:.2} }
+    .smoke  { animation: smokePulse 2.2s ease-in-out infinite; }
+    .smoke2 { animation: smokePulse 2.2s ease-in-out infinite; animation-delay:-.8s; }
+    .smoke3 { animation: smokePulse 2.2s ease-in-out infinite; animation-delay:-1.5s; }
+    .tree   { animation: treeSway   3.5s ease-in-out infinite; }
+    .tree2  { animation: treeSway   3.5s ease-in-out infinite; animation-delay:-1.2s; }
+    .tree3  { animation: treeSway   3.5s ease-in-out infinite; animation-delay:-2.4s; }
+    .star   { animation: starTwinkle 2.5s ease-in-out infinite; }
+    .star2  { animation: starTwinkle 2.5s ease-in-out infinite; animation-delay:-.9s; }
+    .star3  { animation: starTwinkle 2.5s ease-in-out infinite; animation-delay:-1.8s; }
+
+    /* ── Landing sections ── */
+    .landing-section {
+      padding: 28px 24px; border-bottom: 1px solid var(--border);
+    }
+    .landing-section h2 { font-size: 12px; color: var(--dim); letter-spacing: 2px; margin-bottom: 16px; }
+
+    .intro-text { font-size: 13px; color: var(--text); line-height: 1.8; max-width: 700px; }
+    .how-cards { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+    .how-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 7px; padding: 16px 18px; flex: 1; min-width: 200px;
+    }
+    .how-card .step { font-size: 22px; margin-bottom: 6px; }
+    .how-card h3 { font-size: 12px; color: var(--text); margin-bottom: 5px; }
+    .how-card p  { font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .how-card code { background: #21262d; padding: 2px 6px; border-radius: 3px; font-size: 10px; color: var(--yellow); }
+
+    .proposal-item {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid #21262d; font-size: 12px;
+    }
+    .proposal-item:last-child { border-bottom: none; }
+    .proposal-votes { color: var(--green); font-size: 11px; flex-shrink: 0; }
+    .proposal-title { flex: 1; color: var(--text); }
+    .proposal-link  { color: var(--blue); font-size: 10px; flex-shrink: 0; text-decoration: none; }
+    .proposal-link:hover { text-decoration: underline; }
+    .no-data { color: var(--dim); font-size: 11px; font-style: italic; }
+
+    #history-svg { width: 100%; display: block; }
+    .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+    .legend-item  { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+    .legend-dot   { width: 10px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+
+    @media (max-width: 780px) {
+      #panels { grid-template-columns: 1fr; }
+      .panel  { border-right: none; border-bottom: 1px solid var(--border); }
+      #world-summary { display: none; }
+      #structures-list { grid-template-columns: 1fr 1fr; }
+      .how-cards { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <h1>GITIZENS</h1>
+  <span id="era-day">Loading…</span>
+  <span id="world-summary"></span>
+</div>
+<div id="city-container">
+  <div id="loading">Fetching world state…</div>
+  <svg id="city" viewBox="0 0 900 320"></svg>
+</div>
+<div id="panels">
+  <div class="panel">
+    <h2>POLICY METRICS</h2>
+    <div id="policy-bars"></div>
+  </div>
+  <div class="panel">
+    <h2>WORLD STATE</h2>
+    <div id="world-stats"></div>
+  </div>
+  <div class="panel">
+    <h2>STRUCTURES  ·  POLICY → CIVILIZATION</h2>
+    <div id="structures-list"></div>
+  </div>
+</div>
+<!-- What is Gitizens -->
+<div class="landing-section">
+  <h2>WHAT IS GITIZENS</h2>
+  <p class="intro-text">
+    A civilization that lives inside a GitHub repo. Citizens propose laws as GitHub Issues,
+    vote with 👍 reactions, and watch their world evolve in real time.<br>
+    The world runs on its own every 4 hours — random events strike, eras rise and fall,
+    buildings emerge from policy. No one controls it. Everyone shapes it.
+  </p>
+  <div class="how-cards" style="margin-top:18px">
+    <div class="how-card">
+      <div class="step">01</div>
+      <h3>Watch</h3>
+      <p>See the city above. Every building reflects a real policy metric. The sky changes with pollution.</p>
+    </div>
+    <div class="how-card">
+      <div class="step">02</div>
+      <h3>Vote</h3>
+      <p>Open any proposal below. React with 👍 to vote for, 👎 to vote against. Voting closes in 24h.</p>
+    </div>
+    <div class="how-card">
+      <div class="step">03</div>
+      <h3>Propose</h3>
+      <p>Open Claude Code and type <code>/gitizens:propose</code>. It will guide you through writing and submitting a law.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Open Proposals -->
+<div class="landing-section">
+  <h2>OPEN PROPOSALS</h2>
+  <div id="proposals-list"><p class="no-data">Loading proposals…</p></div>
+</div>
+
+<!-- Recent Laws -->
+<div class="landing-section">
+  <h2>RECENT LAWS</h2>
+  <div id="recent-laws-list"><p class="no-data">Loading history…</p></div>
+</div>
+
+<!-- History Chart -->
+<div class="landing-section">
+  <h2>WORLD HISTORY</h2>
+  <svg id="history-svg" viewBox="0 0 900 180" preserveAspectRatio="none" style="height:180px"></svg>
+  <div class="chart-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#388bfd"></div>Education</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#bc8cff"></div>Industry</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div>Welfare</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2dd4bf"></div>Green Policy</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f85149"></div>Pollution</div>
+  </div>
+</div>
+
+<div id="footer">
+  <span id="last-updated">—</span>
+  <a href="https://github.com/ordinary9843/gitizens" target="_blank">ordinary9843/gitizens</a>
+  <span id="countdown"></span>
+  <button id="refresh-btn" onclick="load()">↻ Refresh</button>
+</div>
+
+<script>
+// ── Config ───────────────────────────────────────────────────────────────────
+
+const RAW = 'https://raw.githubusercontent.com/ordinary9843/gitizens/master';
+
+const METRIC_META = {
+  education:    { abbr:'EDU', label:'EDUCATION',    color:'#388bfd' },
+  industry:     { abbr:'IND', label:'INDUSTRY',     color:'#bc8cff' },
+  welfare:      { abbr:'WEL', label:'WELFARE',      color:'#3fb950' },
+  green_policy: { abbr:'GRN', label:'GREEN POLICY', color:'#2dd4bf' },
+  defense:      { abbr:'DEF', label:'DEFENSE',      color:'#f0883e' },
+  pollution:    { abbr:'POL', label:'POLLUTION',    color:'#f85149' },
+};
+
+const RULES = [
+  { m:'education',    t:25, name:'Public School'           },
+  { m:'education',    t:55, name:'National University'     },
+  { m:'education',    t:80, name:'Academy of Sciences'     },
+  { m:'industry',     t:25, name:'Manufacturing District'  },
+  { m:'industry',     t:55, name:'Industrial Complex'      },
+  { m:'industry',     t:80, name:'Heavy Industry Zone'     },
+  { m:'welfare',      t:30, name:'Community Center'        },
+  { m:'welfare',      t:60, name:'Social Housing District' },
+  { m:'green_policy', t:35, name:'City Park'               },
+  { m:'green_policy', t:65, name:'Nature Reserve'          },
+  { m:'green_policy', t:85, name:'Eco-Research Center'     },
+  { m:'defense',      t:30, name:'Military Barracks'       },
+  { m:'defense',      t:65, name:'Defense Ministry'        },
+  { m:'pollution',    t:60, name:'Smog Zone'               },
+];
+
+function activeStructures(s) { return RULES.filter(r => (s[r.m] || 0) >= r.t); }
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+async function fetchState() {
+  for (const url of ['../world/state.json', `${RAW}/world/state.json`]) {
+    try { const r = await fetch(url,{cache:'no-cache'}); if (r.ok) return r.json(); } catch(_) {}
+  }
+  throw new Error('Cannot load state.json');
+}
+
+function lerp(a, b, t) {
+  const h = s => parseInt(s,16);
+  const [r1,g1,b1]=[h(a.slice(1,3)),h(a.slice(3,5)),h(a.slice(5,7))];
+  const [r2,g2,b2]=[h(b.slice(1,3)),h(b.slice(3,5)),h(b.slice(5,7))];
+  return `rgb(${~~(r1+(r2-r1)*t)},${~~(g1+(g2-g1)*t)},${~~(b1+(b2-b1)*t)})`;
+}
+
+// Deterministic per-pixel "random" for window states (same position = same result)
+function wHash(a, b) { return ((a * 17 + b * 31) % 97); }
+
+// ── Shared render state (buildings read from this) ───────────────────────────
+
+let _S = {};
+
+// ── Buildings ────────────────────────────────────────────────────────────────
+
+const BUILDINGS = {
+
+  'City Park': { w:90, order:0,
+    draw(x,gy) {
+      const lush = Math.min((_S.green_policy || 35) / 85, 1);
+      const darkGreen = lerp('#1a3012','#0d2208', lush);
+      const T = [[10,58,'tree'],[26,74,'tree2'],[46,66,'tree3'],[64,72,'tree'],[80,56,'tree2']];
+      return T.map(([px,h,c]) => {
+        const h2 = h * (0.85 + lush * 0.3);
+        return `
+          <line x1="${x+px+6}" y1="${gy}" x2="${x+px+6}" y2="${gy-h2*.36}" stroke="#2a4522" stroke-width="4"/>
+          <ellipse cx="${x+px+6}" cy="${gy-h2*.36-h2*.42}" rx="${h2*.3}" ry="${h2*.44}" fill="${darkGreen}" class="${c}"/>
+        `;
+      }).join('');
+    }},
+
+  'Nature Reserve': { w:124, order:1,
+    draw(x,gy) {
+      const lush = Math.min((_S.green_policy || 65) / 100, 1);
+      const col1 = lerp('#162410','#0d1a08', lush);
+      const col2 = lerp('#1a2e14','#112210', lush);
+      return `
+        <polygon points="${x},${gy} ${x+32},${gy-90} ${x+64},${gy}" fill="${col1}"/>
+        <polygon points="${x+44},${gy} ${x+78},${gy-108} ${x+118},${gy}" fill="${col2}"/>
+        <polygon points="${x+32},${gy-90} ${x+36},${gy-100} ${x+40},${gy-90}" fill="#e3b341" opacity=".7"/>
+        ${[[12,42,'tree'],[94,48,'tree2'],[112,38,'tree3']].map(([px,h,c])=>`
+          <line x1="${x+px}" y1="${gy}" x2="${x+px}" y2="${gy-h*.42}" stroke="#2a4522" stroke-width="3"/>
+          <ellipse cx="${x+px}" cy="${gy-h*.42-h*.42}" rx="${h*.3}" ry="${h*.44}" fill="#1f4016" class="${c}"/>
+        `).join('')}
+      `;
+    }},
+
+  'Community Center': { w:82, order:2,
+    draw(x,gy) {
+      return `
+        <rect x="${x}" y="${gy-47}" width="82" height="47" fill="#1f481f"/>
+        <rect x="${x}" y="${gy-54}" width="82" height="8" fill="#3fb950"/>
+        ${[6,19,32,45,58,70].map(wx=>`<rect x="${x+wx}" y="${gy-40}" width="10" height="13" fill="#0d1e0d" stroke="#3fb950" stroke-width=".6"/>`).join('')}
+        <rect x="${x+34}" y="${gy-22}" width="14" height="22" fill="#0d1e0d"/>
+      `;
+    }},
+
+  'Social Housing District': { w:114, order:3,
+    draw(x,gy) {
+      const wel = _S.welfare || 50;
+      const blocks = [[0,72,30],[38,92,30],[78,66,30]];
+      return blocks.map(([bx,bh,bw]) => `
+        <rect x="${x+bx}" y="${gy-bh}" width="${bw}" height="${bh}" fill="#1a3a1a"/>
+        ${Array.from({length:~~(bh/17)},(_,row) =>
+          [4,13,22].map(col => {
+            const lit = wHash(bx + col, row) < wel;
+            return `<rect x="${x+bx+col}" y="${gy-bh+7+row*17}" width="7" height="9"
+              fill="${lit ? '#c8a830' : '#0d1117'}" opacity=".85"/>`;
+          }).join('')
+        ).join('')}
+      `).join('');
+    }},
+
+  'Public School': { w:72, order:4,
+    draw(x,gy) {
+      return `
+        <rect x="${x+5}" y="${gy-58}" width="62" height="58" fill="#3a2e10"/>
+        <polygon points="${x},${gy-58} ${x+36},${gy-80} ${x+72},${gy-58}" fill="#e3b341"/>
+        ${[8,21,34,47].map(wx=>`<rect x="${x+wx}" y="${gy-48}" width="11" height="14" fill="#0d1117" stroke="#e3b341" stroke-width=".7"/>`).join('')}
+        <rect x="${x+28}" y="${gy-22}" width="16" height="22" fill="#0d1117"/>
+        <line x1="${x+36}" y1="${gy-80}" x2="${x+36}" y2="${gy-97}" stroke="#c9d1d9" stroke-width="1.5"/>
+        <polygon points="${x+36},${gy-97} ${x+48},${gy-89} ${x+36},${gy-81}" fill="#e3b341"/>
+      `;
+    }},
+
+  'National University': { w:82, order:5,
+    draw(x,gy) {
+      const edu = _S.education || 60;
+      return `
+        <rect x="${x+11}" y="${gy-98}" width="60" height="98" fill="#0e2240"/>
+        <ellipse cx="${x+41}" cy="${gy-98}" rx="33" ry="19" fill="#163460"/>
+        <rect x="${x}" y="${gy-68}" width="82" height="7" fill="#388bfd" opacity=".5"/>
+        ${Array.from({length:5},(_,i) =>
+          [15,32,49].map((jx,j) => {
+            const lit = wHash(i*3+j, 7) < edu;
+            return `<rect x="${x+jx}" y="${gy-91+i*18}" width="11" height="13"
+              fill="${lit ? '#0d2a50' : '#07141f'}" stroke="#388bfd" stroke-width=".5"/>`;
+          }).join('')
+        ).join('')}
+        <line x1="${x+41}" y1="${gy-117}" x2="${x+41}" y2="${gy-131}" stroke="#c9d1d9" stroke-width="2"/>
+        <circle cx="${x+41}" cy="${gy-134}" r="5" fill="#388bfd"/>
+      `;
+    }},
+
+  'Academy of Sciences': { w:76, order:6,
+    draw(x,gy) {
+      const edu = _S.education || 80;
+      return `
+        <rect x="${x+10}" y="${gy-115}" width="56" height="115" fill="#0a1928"/>
+        <polygon points="${x+5},${gy-115} ${x+38},${gy-140} ${x+71},${gy-115}" fill="#0f2840"/>
+        ${Array.from({length:6},(_,i) => `
+          <rect x="${x+15}" y="${gy-107+i*17}" width="13" height="12"
+            fill="${wHash(i,2) < edu ? '#0e2038':'#07111e'}" stroke="#388bfd" stroke-width=".6"/>
+          <rect x="${x+48}" y="${gy-107+i*17}" width="13" height="12"
+            fill="${wHash(i,5) < edu ? '#0e2038':'#07111e'}" stroke="#388bfd" stroke-width=".6"/>
+        `).join('')}
+        <line x1="${x+38}" y1="${gy-140}" x2="${x+38}" y2="${gy-162}" stroke="#c9d1d9" stroke-width="1.5"/>
+        <circle cx="${x+38}" cy="${gy-164}" r="4" fill="none" stroke="#388bfd" stroke-width="2"/>
+        <line x1="${x+26}" y1="${gy-156}" x2="${x+50}" y2="${gy-156}" stroke="#388bfd" stroke-width="1" opacity=".5"/>
+      `;
+    }},
+
+  'Military Barracks': { w:88, order:7,
+    draw(x,gy) {
+      return `
+        <rect x="${x}" y="${gy-56}" width="88" height="56" fill="#29200a"/>
+        <rect x="${x}" y="${gy-60}" width="88" height="5" fill="#f0883e" opacity=".65"/>
+        ${[5,20,36,52,68].map(wx=>`<rect x="${x+wx}" y="${gy-49}" width="13" height="13" fill="#0d1117" stroke="#f0883e" stroke-width=".5" opacity=".8"/>`).join('')}
+        <rect x="${x+35}" y="${gy-24}" width="18" height="24" fill="#0d1117"/>
+        <line x1="${x}" y1="${gy-56}" x2="${x}" y2="${gy}" stroke="#f0883e" stroke-width="1.5" opacity=".4"/>
+        <line x1="${x+88}" y1="${gy-56}" x2="${x+88}" y2="${gy}" stroke="#f0883e" stroke-width="1.5" opacity=".4"/>
+      `;
+    }},
+
+  'Defense Ministry': { w:102, order:8,
+    draw(x,gy) {
+      return `
+        <rect x="${x+16}" y="${gy-112}" width="70" height="112" fill="#1a0f05"/>
+        <rect x="${x}" y="${gy-72}" width="16" height="72" fill="#241406"/>
+        <rect x="${x+86}" y="${gy-72}" width="16" height="72" fill="#241406"/>
+        <rect x="${x+16}" y="${gy-118}" width="70" height="7" fill="#f0883e"/>
+        ${Array.from({length:5},(_,i) =>
+          [22,40,58].map(jx=>`<rect x="${x+jx}" y="${gy-108+i*21}" width="14" height="16" fill="#0d1117" stroke="#f0883e" stroke-width=".5"/>`).join('')
+        ).join('')}
+        <rect x="${x+42}" y="${gy-30}" width="18" height="30" fill="#0d1117"/>
+        <line x1="${x+51}" y1="${gy-118}" x2="${x+51}" y2="${gy-136}" stroke="#f0883e" stroke-width="2"/>
+        <polygon points="${x+43},${gy-136} ${x+51},${gy-152} ${x+59},${gy-136}" fill="#f0883e"/>
+      `;
+    }},
+
+  'Manufacturing District': { w:98, order:9,
+    draw(x,gy) {
+      const ind = _S.industry || 35;
+      const sop = (0.15 + ind / 100 * 0.55).toFixed(2);
+      const sr  = (6 + ind * 0.06).toFixed(1);
+      const CH  = [[18,28],[44,34],[70,25]];
+      return `
+        <rect x="${x}" y="${gy-62}" width="98" height="62" fill="#1a1020"/>
+        <rect x="${x}" y="${gy-67}" width="98" height="6" fill="#bc8cff" opacity=".5"/>
+        ${[6,22,38,54,70,84].map(wx=>`<rect x="${x+wx}" y="${gy-55}" width="12" height="19" fill="#0d1117" stroke="#bc8cff" stroke-width=".4"/>`).join('')}
+        ${CH.map(([cx,ch]) => `
+          <rect x="${x+cx-5}" y="${gy-ch-62}" width="10" height="${ch}" fill="#2a1a30"/>
+          <ellipse cx="${x+cx}" cy="${gy-ch-64}" rx="${sr}" ry="${(sr*.8).toFixed(1)}"
+            fill="#6a6a6a" opacity="${sop}" class="smoke"/>
+        `).join('')}
+      `;
+    }},
+
+  'Industrial Complex': { w:122, order:10,
+    draw(x,gy) {
+      const ind = _S.industry || 55;
+      const sop = (0.2 + ind / 100 * 0.5).toFixed(2);
+      return `
+        <rect x="${x}" y="${gy-82}" width="122" height="82" fill="#150f1e"/>
+        <rect x="${x+62}" y="${gy-88}" width="36" height="88" fill="#1c1530"/>
+        <rect x="${x}" y="${gy-90}" width="122" height="6" fill="#bc8cff" opacity=".6"/>
+        ${[8,25,42].map(cx => `
+          <rect x="${x+cx-4}" y="${gy-118}" width="9" height="34" fill="#22182e"/>
+          <ellipse cx="${x+cx}" cy="${gy-118}" rx="8" ry="10"
+            fill="#8a8aaa" opacity="${sop}" class="smoke2"/>
+        `).join('')}
+        ${[72,88,104].map(cx => `
+          <rect x="${x+cx-4}" y="${gy-124}" width="9" height="40" fill="#22182e"/>
+          <ellipse cx="${x+cx}" cy="${gy-124}" rx="8" ry="11"
+            fill="#8a8aaa" opacity="${sop}" class="smoke3"/>
+        `).join('')}
+        ${Array.from({length:4},(_,i) =>
+          [5,27,49].map(jx=>`<rect x="${x+jx}" y="${gy-74+i*19}" width="16" height="13" fill="#0a0810" stroke="#bc8cff" stroke-width=".4"/>`).join('')
+        ).join('')}
+      `;
+    }},
+
+  'Heavy Industry Zone': { w:142, order:11,
+    draw(x,gy) {
+      const ind = _S.industry || 80;
+      const sop = (0.3 + ind / 100 * 0.55).toFixed(2);
+      return `
+        <rect x="${x}" y="${gy-97}" width="142" height="97" fill="#12091a"/>
+        <rect x="${x+42}" y="${gy-108}" width="52" height="108" fill="#18102a"/>
+        <rect x="${x}" y="${gy-103}" width="142" height="7" fill="#bc8cff" opacity=".7"/>
+        ${[10,30,52,92,112,132].map(cx => `
+          <rect x="${x+cx-5}" y="${gy-140}" width="10" height="44" fill="#1e1228"/>
+          <ellipse cx="${x+cx}" cy="${gy-140}" rx="9" ry="12"
+            fill="#999" opacity="${sop}" class="smoke"/>
+        `).join('')}
+        ${Array.from({length:4},(_,i) => `
+          <rect x="${x+5}" y="${gy-88+i*22}" width="32" height="16" fill="#0d0a14" stroke="#bc8cff" stroke-width=".4"/>
+          <rect x="${x+105}" y="${gy-88+i*22}" width="32" height="16" fill="#0d0a14" stroke="#bc8cff" stroke-width=".4"/>
+        `).join('')}
+      `;
+    }},
+
+  'Eco-Research Center': { w:80, order:12,
+    draw(x,gy) {
+      return `
+        <rect x="${x+10}" y="${gy-87}" width="60" height="87" fill="#0a2010"/>
+        <ellipse cx="${x+40}" cy="${gy-87}" rx="35" ry="22" fill="#123018"/>
+        <rect x="${x}" y="${gy-62}" width="80" height="5" fill="#3fb950" opacity=".45"/>
+        ${Array.from({length:4},(_,i) =>
+          [16,46].map(jx=>`<rect x="${x+jx}" y="${gy-80+i*20}" width="16" height="15" fill="#071510" stroke="#3fb950" stroke-width=".6"/>`).join('')
+        ).join('')}
+        <line x1="${x+40}" y1="${gy-109}" x2="${x+40}" y2="${gy-126}" stroke="#3fb950" stroke-width="2"/>
+        <circle cx="${x+40}" cy="${gy-128}" r="5" fill="none" stroke="#3fb950" stroke-width="1.5"/>
+      `;
+    }},
+
+  'Smog Zone': { w:112, order:13,
+    draw(x,gy) {
+      return `
+        <g opacity=".65">
+          <ellipse cx="${x+32}" cy="${gy-32}" rx="44" ry="26" fill="#2a1e18"/>
+          <ellipse cx="${x+74}" cy="${gy-44}" rx="48" ry="30" fill="#251812"/>
+          <ellipse cx="${x+54}" cy="${gy-60}" rx="52" ry="24" fill="#1a1208"/>
+        </g>
+      `;
+    }},
+};
+
+// ── Walker animation ─────────────────────────────────────────────────────────
+
+const _walkers = [];
+let _wFrame = null;
+let _wW = 900, _wGY = 240;
+
+function _initWalkers(pop, W, GY) {
+  const target = Math.min(~~(pop / 55), 28);
+  // Remove excess
+  while (_walkers.length > target) _walkers.pop();
+  // Add new ones spread across width
+  const COLS = ['#c9d1d9','#8b949e','#e3b341','#3fb950','#388bfd','#bc8cff','#f0883e','#2dd4bf'];
+  while (_walkers.length < target) {
+    const i = _walkers.length;
+    _walkers.push({
+      x:     Math.random() * W,
+      dir:   Math.random() > 0.5 ? 1 : -1,
+      speed: 0.22 + Math.random() * 0.44,
+      color: COLS[i % COLS.length],
+      sz:    0.82 + Math.random() * 0.36,
+      phase: Math.random() * Math.PI * 2,
+    });
+  }
+  _wW = W; _wGY = GY;
+}
+
+function _personSVG(w) {
+  const { x, dir, color, sz, phase } = w;
+  const GY = _wGY;
+  const leg = Math.sin(phase) * 4 * sz;
+  const arm = Math.cos(phase) * 2.5 * sz;
+  // scale(-1,1) mirrors left-right for leftward walkers
+  return `<g transform="translate(${~~x},0) scale(${dir},1)">
+    <circle cx="0" cy="${(GY - 16*sz).toFixed(1)}" r="${(2.8*sz).toFixed(1)}" fill="${color}" opacity=".92"/>
+    <line x1="${(arm*.6).toFixed(1)}" y1="${(GY-13*sz).toFixed(1)}"
+          x2="${(arm).toFixed(1)}"   y2="${(GY-7*sz).toFixed(1)}"
+          stroke="${color}" stroke-width="${(1.6*sz).toFixed(1)}" stroke-linecap="round"/>
+    <line x1="${(-arm*.6).toFixed(1)}" y1="${(GY-13*sz).toFixed(1)}"
+          x2="${(-arm).toFixed(1)}"    y2="${(GY-8*sz).toFixed(1)}"
+          stroke="${color}" stroke-width="${(1.6*sz).toFixed(1)}" stroke-linecap="round"/>
+    <line x1="0" y1="${(GY-13*sz).toFixed(1)}" x2="0" y2="${(GY-5*sz).toFixed(1)}"
+          stroke="${color}" stroke-width="${(2*sz).toFixed(1)}" stroke-linecap="round"/>
+    <line x1="0" y1="${(GY-5*sz).toFixed(1)}"
+          x2="${(leg+2*sz).toFixed(1)}" y2="${GY}"
+          stroke="${color}" stroke-width="${(1.5*sz).toFixed(1)}" stroke-linecap="round"/>
+    <line x1="0" y1="${(GY-5*sz).toFixed(1)}"
+          x2="${(-leg+2*sz).toFixed(1)}" y2="${GY}"
+          stroke="${color}" stroke-width="${(1.5*sz).toFixed(1)}" stroke-linecap="round"/>
+  </g>`;
+}
+
+function _tickWalkers() {
+  const layer = document.getElementById('wlk');
+  if (!layer) { _wFrame = null; return; }
+  _walkers.forEach(w => {
+    w.x    += w.speed * w.dir;
+    w.phase = (w.phase + w.speed * 0.09) % (Math.PI * 2);
+    if (w.x > _wW + 24) w.x = -24;
+    if (w.x < -24)      w.x = _wW + 24;
+  });
+  layer.innerHTML = _walkers.map(_personSVG).join('');
+  _wFrame = requestAnimationFrame(_tickWalkers);
+}
+
+function startWalkers(pop, W, GY) {
+  if (_wFrame) cancelAnimationFrame(_wFrame);
+  _initWalkers(pop, W, GY);
+  _tickWalkers();
+}
+
+// ── City renderer ─────────────────────────────────────────────────────────────
+
+let lastState = null;
+
+function renderCity(state) {
+  _S = state;   // make state available to building draw functions
+  const svg       = document.getElementById('city');
+  const container = document.getElementById('city-container');
+  const W  = Math.max(container.clientWidth || 900, 500);
+  const H  = 320, GY = 240;
+  const pol = state.pollution  || 0;
+  const stb = state.stability  || 79;
+  const pt  = Math.min(pol / 100, 1);
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
+
+  const skyTop  = lerp('#1c3a5c', '#3a1a0a', pt);
+  const skyBot  = lerp('#0d1117', '#180e0a', pt);
+  const gndCol  = lerp('#1a2a18', '#2a1a0a', pt * 0.7);
+  const gndLine = lerp('#3a5a30', '#4a2a10', pt);
+
+  // Stability glow colour
+  const stabClr = stb >= 70 ? '#3fb950' : stb >= 40 ? '#e3b341' : '#f85149';
+  const stabOp  = (0.08 + stb / 100 * 0.18).toFixed(3);
+
+  let parts = [`
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${skyTop}"/>
+        <stop offset="100%" stop-color="${skyBot}"/>
+      </linearGradient>
+      <linearGradient id="stabGlow" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="${stabClr}" stop-opacity="${stabOp}"/>
+        <stop offset="100%" stop-color="${stabClr}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="url(#sky)"/>
+  `];
+
+  // Stars spread across full W
+  const starOp = Math.max(0, (50 - pol) / 50 * 0.85);
+  if (starOp > 0.05) {
+    [[.05,.4],[.14,.15],[.24,.75],[.35,.25],[.46,.08],[.55,.65],[.64,.18],[.73,.72],
+     [.83,.35],[.93,.08],[.10,.65],[.29,.55],[.42,.28],[.61,.48],[.76,.68]
+    ].forEach(([fx, fy], i) => {
+      const cls = ['star','star2','star3'][i % 3];
+      parts.push(`<circle cx="${~~(fx*W)}" cy="${~~(fy*60+7)}" r="1.4" fill="white" opacity="${starOp}" class="${cls}"/>`);
+    });
+  }
+
+  // Moon
+  if (pol < 70) {
+    const mOp = Math.max(0, (70-pol)/70 * 0.85);
+    const mx  = ~~(W * 0.88);
+    parts.push(`
+      <circle cx="${mx}" cy="36" r="20" fill="#dfd8b8" opacity="${(mOp*.9).toFixed(2)}"/>
+      <circle cx="${mx+12}" cy="30" r="19" fill="${skyTop}" opacity="${mOp.toFixed(2)}"/>
+    `);
+  }
+
+  // Smog haze overlay
+  if (pol > 30) {
+    const haze = Math.min((pol-30)/70 * 0.28, 0.28);
+    parts.push(`<rect width="${W}" height="${GY}" fill="#4a2810" opacity="${haze.toFixed(3)}"/>`);
+  }
+
+  // Stability glow at horizon
+  parts.push(`<rect x="0" y="${GY-44}" width="${W}" height="44" fill="url(#stabGlow)"/>`);
+
+  // Ground
+  parts.push(`
+    <rect x="0" y="${GY}" width="${W}" height="${H-GY}" fill="${gndCol}"/>
+    <line x1="0" y1="${GY}" x2="${W}" y2="${GY}" stroke="${gndLine}" stroke-width="1.5"/>
+  `);
+
+  // Buildings
+  const active = activeStructures(state)
+    .map(s => ({ ...s, b: BUILDINGS[s.name] }))
+    .filter(s => s.b)
+    .sort((a, b) => a.b.order - b.b.order);
+
+  if (active.length === 0) {
+    parts.push(`<text x="${W/2}" y="${GY-30}" fill="#484f58" font-family="monospace"
+      font-size="12" text-anchor="middle">No structures yet — pass policy laws to develop the civilization</text>`);
+  } else {
+    const GAP  = 16;
+    const totW = active.reduce((s,a) => s + a.b.w + GAP, -GAP);
+    let cx = Math.max(20, (W - totW) / 2);
+    active.forEach(({ b, m }) => {
+      parts.push(b.draw(cx, GY));
+      const mm = METRIC_META[m];
+      if (mm) {
+        parts.push(`
+          <rect x="${cx}" y="${GY}" width="${b.w}" height="3" fill="${mm.color}" opacity="0.55"/>
+          <text x="${cx + b.w/2}" y="${GY+15}" fill="${mm.color}"
+            font-size="8" font-family="monospace" text-anchor="middle"
+            opacity="0.82" letter-spacing="0.5">${mm.abbr}</text>
+        `);
+      }
+      cx += b.w + GAP;
+    });
+  }
+
+  // Walker layer (populated by animation loop)
+  parts.push('<g id="wlk"></g>');
+
+  svg.innerHTML = parts.join('');
+  svg.style.display = 'block';
+  document.getElementById('loading').style.display = 'none';
+
+  // Start people walking (population → count)
+  startWalkers(state.population || 0, W, GY);
+}
+
+// ── Panels ────────────────────────────────────────────────────────────────────
+
+function renderPolicy(state) {
+  const metrics = [
+    { key:'education',    label:'EDU', color:'#388bfd' },
+    { key:'industry',     label:'IND', color:'#bc8cff' },
+    { key:'welfare',      label:'WEL', color:'#3fb950' },
+    { key:'green_policy', label:'GRN', color:'#2dd4bf' },
+    { key:'defense',      label:'DEF', color:'#f0883e' },
+  ];
+  const pol    = state.pollution || 0;
+  const polClr = pol >= 60 ? '#f85149' : pol >= 30 ? '#e3b341' : '#3fb950';
+  document.getElementById('policy-bars').innerHTML =
+    [...metrics, { key:'pollution', label:'POL', color: polClr }]
+    .map(({ key, label, color }) => {
+      const val = state[key] || 0;
+      return `
+        <div class="metric-row">
+          <span class="metric-label" style="color:${color}">${label}</span>
+          <div class="metric-bar-bg">
+            <div class="metric-bar-fill" style="width:${val}%;background:${color}"></div>
+          </div>
+          <span class="metric-value" style="color:${color}">${val}</span>
+        </div>`;
+    }).join('');
+}
+
+function renderWorldStats(state) {
+  const stb    = state.stability  || 0;
+  const stbClr = stb >= 60 ? '#3fb950' : stb >= 40 ? '#e3b341' : '#f85149';
+  const pop    = (state.population || 0).toLocaleString();
+  const trs    = (state.treasury   || 0).toLocaleString();
+  document.getElementById('world-stats').innerHTML = [
+    { label:'Population', value: pop,               color:'#c9d1d9' },
+    { label:'Stability',  value: `${stb}/100`,      color: stbClr   },
+    { label:'Treasury',   value: `${trs} GC`,       color:'#e3b341' },
+    { label:'Laws',       value: state.laws_count || 0, color:'#c9d1d9' },
+    { label:'Era',        value: state.era || '—',  color:'#8b949e' },
+  ].map(({ label, value, color }) => `
+    <div class="stat-row">
+      <span class="stat-label">${label}</span>
+      <span class="stat-value" style="color:${color}">${value}</span>
+    </div>`).join('');
+}
+
+function renderStructures(state) {
+  const GROUPS = [
+    'education','industry','welfare','green_policy','defense','pollution'
+  ].map(key => ({ key, rules: RULES.filter(r => r.m === key) }));
+
+  document.getElementById('structures-list').innerHTML = GROUPS.map(g => {
+    const mm  = METRIC_META[g.key];
+    const val = state[g.key] || 0;
+    const rows = g.rules.map(r => {
+      const ok = val >= r.t;
+      return `
+        <div class="struct-row ${ok ? 'unlocked':'locked'}">
+          <span class="struct-check" style="color:${ok ? mm.color:'var(--dim)'}">${ok?'✓':'○'}</span>
+          <span class="struct-name">${r.name}</span>
+          <span class="struct-threshold">≥${r.t}</span>
+        </div>`;
+    }).join('');
+    return `
+      <div class="mg-card">
+        <div class="mg-header" style="color:${mm.color}">
+          <span>${mm.label}</span>
+          <span>${val}${g.key==='pollution'?'':'/100'}</span>
+        </div>
+        <div class="mg-bar-wrap">
+          <div class="mg-bar-fill" style="width:${Math.min(val,100)}%;background:${mm.color}"></div>
+        </div>
+        ${rows}
+      </div>`;
+  }).join('');
+}
+
+function renderHeader(state) {
+  const founded = state.founded_date;
+  let dayStr = state.era || '—';
+  if (founded) {
+    const days = Math.floor((Date.now() - new Date(founded).getTime()) / 86400000);
+    dayStr = `Day ${days + 1} of ${state.era}`;
+  }
+  document.getElementById('era-day').textContent = `${dayStr}  ·  ${state.laws_count || 0} laws`;
+  document.getElementById('world-summary').textContent = state.world_summary || '';
+}
+
+// ── Main loop ─────────────────────────────────────────────────────────────────
+
+let timer = null, tick = 60;
+
+async function load() {
+  clearInterval(timer);
+  document.getElementById('countdown').textContent = '';
+  try {
+    const s = await fetchState();
+    lastState = s;
+    renderHeader(s);
+    renderCity(s);
+    renderPolicy(s);
+    renderWorldStats(s);
+    renderStructures(s);
+    document.getElementById('last-updated').textContent =
+      `Updated ${new Date().toLocaleTimeString()}`;
+    loadProposals();
+    loadHistory();
+  } catch(e) {
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('loading').textContent = `⚠ ${e.message}`;
+  }
+  tick = 60;
+  timer = setInterval(() => {
+    tick--;
+    document.getElementById('countdown').textContent = `(refresh in ${tick}s)`;
+    if (tick <= 0) load();
+  }, 1000);
+}
+
+let _resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => { if (lastState) renderCity(lastState); }, 120);
+});
+
+// ── Repo config ───────────────────────────────────────────────────────────────
+const REPO_API = 'https://api.github.com/repos/ordinary9843/gitizens';
+
+async function loadProposals() {
+  try {
+    const r = await fetch(`${REPO_API}/issues?labels=proposal&state=open&per_page=8`, {cache:'no-cache'});
+    if (!r.ok) { document.getElementById('proposals-list').innerHTML = '<p class="no-data">Repo is private or API unavailable.</p>'; return; }
+    const issues = await r.json();
+    if (!issues.length) { document.getElementById('proposals-list').innerHTML = '<p class="no-data">No open proposals right now.</p>'; return; }
+    document.getElementById('proposals-list').innerHTML = issues.map(i => {
+      const age = Math.floor((Date.now() - new Date(i.created_at)) / 3600000);
+      const ageStr = age < 24 ? `${age}h ago` : `${Math.floor(age/24)}d ago`;
+      return `<div class="proposal-item">
+        <span class="proposal-votes">👍 ${i.reactions?.['+1'] ?? '?'}</span>
+        <span class="proposal-title">${i.title.replace(/^\[PROPOSAL\]\s*/,'')}</span>
+        <span style="color:var(--dim);font-size:10px">${ageStr}</span>
+        <a class="proposal-link" href="${i.html_url}" target="_blank">Vote →</a>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('proposals-list').innerHTML = '<p class="no-data">Unable to load proposals.</p>';
+  }
+}
+
+async function loadRecentLaws(history) {
+  const laws = history.filter(h => h.laws_count > 0).slice(-5).reverse();
+  if (!laws.length) { document.getElementById('recent-laws-list').innerHTML = '<p class="no-data">No laws enacted yet.</p>'; return; }
+  document.getElementById('recent-laws-list').innerHTML = laws.map(h => `
+    <div class="proposal-item">
+      <span style="color:var(--yellow);font-size:11px">Law ${String(h.laws_count).padStart(3,'0')}</span>
+      <span style="color:var(--dim);font-size:11px">${h.era}</span>
+      <span style="color:var(--dim);font-size:10px;margin-left:auto">${h.date.slice(0,10)}</span>
+    </div>`).join('');
+}
+
+function renderHistoryChart(history) {
+  const svg = document.getElementById('history-svg');
+  if (!history || history.length < 2) { svg.innerHTML = '<text x="450" y="90" fill="#484f58" font-family="monospace" font-size="11" text-anchor="middle">Not enough data yet</text>'; return; }
+  const W = 900, H = 160, PAD = 20;
+  const n = history.length;
+  const lines = [
+    { key:'education',    color:'#388bfd' },
+    { key:'industry',     color:'#bc8cff' },
+    { key:'welfare',      color:'#3fb950' },
+    { key:'green_policy', color:'#2dd4bf' },
+    { key:'pollution',    color:'#f85149' },
+  ];
+  const xOf = i => PAD + (i / (n-1)) * (W - 2*PAD);
+  const yOf = v => PAD + (1 - v/100) * (H - 2*PAD);
+  let parts = [`<rect width="${W}" height="${H}" fill="#0d1117"/>`];
+  [25,50,75].forEach(v => {
+    const y = yOf(v);
+    parts.push(`<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="#21262d" stroke-width="1"/>`);
+    parts.push(`<text x="${PAD-4}" y="${y+4}" fill="#484f58" font-size="8" font-family="monospace" text-anchor="end">${v}</text>`);
+  });
+  lines.forEach(({key, color}) => {
+    const pts = history.map((h,i) => `${xOf(i).toFixed(1)},${yOf(h[key]||0).toFixed(1)}`).join(' ');
+    parts.push(`<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.85"/>`);
+  });
+  parts.push(`<text x="${PAD}" y="${H-2}" fill="#484f58" font-size="8" font-family="monospace">Tick 1</text>`);
+  parts.push(`<text x="${W-PAD}" y="${H-2}" fill="#484f58" font-size="8" font-family="monospace" text-anchor="end">Tick ${n}</text>`);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = parts.join('');
+}
+
+async function loadHistory() {
+  // Use raw GitHub content URL so this works both locally and on GitHub Pages
+  const HISTORY_URL = 'https://raw.githubusercontent.com/ordinary9843/gitizens/master/world/history.json';
+  try {
+    const r = await fetch(HISTORY_URL, {cache:'no-cache'});
+    if (r.ok) {
+      const h = await r.json();
+      renderHistoryChart(h);
+      loadRecentLaws(h);
+    }
+  } catch(_) {}
+}
+
+load();
+</script>
+</body>
+</html>

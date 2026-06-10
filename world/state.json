@@ -1,0 +1,21 @@
+{
+  "era": "Founding Era",
+  "laws_count": 0,
+  "last_enacted": null,
+  "founded_date": "2026-06-10",
+  "world_summary": "The world begins. Citizens have gathered to form the first government of Gitizens. Cast your vote, propose a law, and shape this civilization forever.",
+  "treasury": 1000,
+  "currency": "Git Coins",
+  "stars_last_counted": 0,
+  "education": 30,
+  "industry": 20,
+  "welfare": 25,
+  "green_policy": 30,
+  "defense": 20,
+  "population": 1000,
+  "pollution": 5,
+  "stability": 70,
+  "tags_applied": [
+    "era/founding-era"
+  ]
+}

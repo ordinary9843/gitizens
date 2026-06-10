@@ -1,0 +1,7 @@
+name: Use the Plugin
+description: "Proposals must be submitted via the claude-gitizens plugin. See contact links below."
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please use the [claude-gitizens](https://github.com/ordinary9843/claude-gitizens) plugin and run `/gitizens:propose` to submit a proposal.

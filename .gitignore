@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.superpowers/
+*.log
+.DS_Store
+Thumbs.db
+scripts/_event_body.txt

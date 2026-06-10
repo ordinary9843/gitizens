@@ -1,0 +1,12 @@
+# History
+
+| Law | File | Proposal | Vote | Date |
+|-----|------|----------|------|------|
+| 1 | [law-001](../world/laws/law-001.md) | [#20](https://github.com/ordinary9843/gitizens/issues/20) Fund the National Education Initiative | 1+1 0-1 | 2026-06-10 |
+| 2 | [law-002](../world/laws/law-002.md) | [#21](https://github.com/ordinary9843/gitizens/issues/21) Jumpstart Industrial Development | 1+1 0-1 | 2026-06-10 |
+| 3 | [law-003](../world/laws/law-003.md) | [#22](https://github.com/ordinary9843/gitizens/issues/22) Launch the Social Welfare Program | 1+1 0-1 | 2026-06-10 |
+| 4 | [law-004](../world/laws/law-004.md) | [#23](https://github.com/ordinary9843/gitizens/issues/23) Protect Our Natural Environment | 1+1 0-1 | 2026-06-10 |
+| 5 | [law-005](../world/laws/law-005.md) | [#24](https://github.com/ordinary9843/gitizens/issues/24) Establish the National Defense Corps | 1+1 0-1 | 2026-06-10 |
+| 6 | [law-006](../world/laws/law-006.md) | [#25](https://github.com/ordinary9843/gitizens/issues/25) Expand Educational Excellence | 1+1 0-1 | 2026-06-10 |
+| 7 | [law-007](../world/laws/law-007.md) | [#26](https://github.com/ordinary9843/gitizens/issues/26) Deepen Welfare Commitments | 1+1 0-1 | 2026-06-10 |
+| 8 | [law-008](../world/laws/law-008.md) | [#27](https://github.com/ordinary9843/gitizens/issues/27) Invest in Nature Conservation | 1+1 0-1 | 2026-06-10 |

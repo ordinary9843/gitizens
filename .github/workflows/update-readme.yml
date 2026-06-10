@@ -1,0 +1,34 @@
+name: "[SYSTEM] Update World Badges"
+
+on:
+  workflow_run:
+    workflows: ["[WORLD] Tally Votes"]
+    types: [completed]
+
+jobs:
+  update-badges:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull latest (tally may have just pushed)
+        run: git pull origin master
+
+      - name: Configure git
+        run: |
+          git config user.name "gitizens-bot"
+          git config user.email "gitizens-bot@users.noreply.github.com"
+
+      - name: Update badges
+        run: python scripts/update_readme.py
+
+      - name: Commit if changed
+        run: |
+          git add README.md
+          git diff --cached --quiet || git commit -m "[SYSTEM] update world state badges [skip ci]"
+          git push origin master || true
