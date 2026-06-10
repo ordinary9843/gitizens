@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-10 — [Law 006](laws/law-006.md)*
+*Last updated: 2026-06-10 — [Law 007](laws/law-007.md)*
 
 ---
 
@@ -9,16 +9,16 @@
 | Field | Value |
 |-------|-------|
 | Era | Founding Era |
-| Laws enacted | 6 |
+| Laws enacted | 7 |
 | Last enacted | 2026-06-10 |
-| Treasury | 516 Git Coins |
+| Treasury | 416 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 55/100 |
-| Industry | 20/100 |
+| Industry | 35/100 |
 | Welfare | 55/100 |
 | Green Policy | 50/100 |
 | Defense | 20/100 |
@@ -49,7 +49,9 @@
 
 ### Sectors
 
-*(none yet)*
+| ID | Name | Built by | Trigger |
+|----|------|----------|---------|
+| `sec-001` | Manufacturing District | [Law 007](laws/law-007.md) | industry >= 25 |
 
 ---
 

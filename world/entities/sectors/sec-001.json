@@ -1,0 +1,7 @@
+{
+  "id": "sec-001",
+  "name": "Manufacturing District",
+  "built_law": 7,
+  "built_at": "2026-06-10T16:12:14.504688+00:00",
+  "auto_trigger": "industry >= 25"
+}

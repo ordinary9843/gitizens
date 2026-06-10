@@ -16,3 +16,4 @@
 | 4 | [law-004](../world/laws/law-004.md) | [#3](https://github.com/ordinary9843/gitizens/issues/3) Launch the Social Welfare Program | 1+1 0-1 | 2026-06-10 |
 | 5 | [law-005](../world/laws/law-005.md) | [#4](https://github.com/ordinary9843/gitizens/issues/4) Build the Grand Archive — Permanent Record of All Laws | 1+1 0-1 | 2026-06-10 |
 | 6 | [law-006](../world/laws/law-006.md) | [#5](https://github.com/ordinary9843/gitizens/issues/5) Invest in Green Technology — Carbon-Free by 2040 | 1+1 0-1 | 2026-06-10 |
+| 7 | [law-007](../world/laws/law-007.md) | [#6](https://github.com/ordinary9843/gitizens/issues/6) Jumpstart Industrial Development — Factory District Initiative | 1+1 0-1 | 2026-06-10 |
