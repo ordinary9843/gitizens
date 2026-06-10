@@ -1,8 +1,9 @@
 {
-  "next_seq": 3,
-  "count": 2,
+  "next_seq": 4,
+  "count": 3,
   "entities": [
     "bld-001",
-    "bld-002"
+    "bld-002",
+    "bld-003"
   ]
 }
