@@ -14,5 +14,21 @@
     "stability": 69,
     "treasury": 804,
     "active_event": null
+  },
+  {
+    "tick": 2,
+    "date": "2026-06-10T15:44:11Z",
+    "laws_count": 3,
+    "era": "Founding Era",
+    "education": 45,
+    "industry": 20,
+    "welfare": 40,
+    "green_policy": 30,
+    "defense": 20,
+    "pollution": 5,
+    "population": 1050,
+    "stability": 68,
+    "treasury": 808,
+    "active_event": null
   }
 ]
