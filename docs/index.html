@@ -817,6 +817,7 @@ async function load() {
     document.getElementById('last-updated').textContent =
       `Updated ${new Date().toLocaleTimeString()}`;
     loadProposals();
+    loadRecentLaws();
     loadHistory();
   } catch(e) {
     document.getElementById('loading').style.display = 'flex';
@@ -860,15 +861,24 @@ async function loadProposals() {
   }
 }
 
-async function loadRecentLaws(history) {
-  const laws = history.filter(h => h.laws_count > 0).slice(-5).reverse();
-  if (!laws.length) { document.getElementById('recent-laws-list').innerHTML = '<p class="no-data">No laws enacted yet.</p>'; return; }
-  document.getElementById('recent-laws-list').innerHTML = laws.map(h => `
-    <div class="proposal-item">
-      <span style="color:var(--yellow);font-size:11px">Law ${String(h.laws_count).padStart(3,'0')}</span>
-      <span style="color:var(--dim);font-size:11px">${h.era}</span>
-      <span style="color:var(--dim);font-size:10px;margin-left:auto">${h.date.slice(0,10)}</span>
-    </div>`).join('');
+async function loadRecentLaws() {
+  try {
+    const r = await fetch(`${RAW}/world/laws_index.json`, {cache:'no-cache'});
+    if (!r.ok) throw new Error();
+    const laws = await r.json();
+    const recent = laws.slice(-5).reverse();
+    if (!recent.length) { document.getElementById('recent-laws-list').innerHTML = '<p class="no-data">No laws enacted yet.</p>'; return; }
+    document.getElementById('recent-laws-list').innerHTML = recent.map(l => `
+      <div class="proposal-item">
+        <span style="color:var(--yellow);font-size:11px">Law ${String(l.number).padStart(3,'0')}</span>
+        <span style="color:var(--text,#c9d1d9);font-size:11px;flex:1;margin:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.title}</span>
+        <span style="color:var(--dim);font-size:10px">${l.era}</span>
+        <span style="color:var(--dim);font-size:10px;margin-left:8px">${l.enacted_date}</span>
+        <a class="proposal-link" href="${l.issue_url}" target="_blank">#${l.issue_number} →</a>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('recent-laws-list').innerHTML = '<p class="no-data">No laws enacted yet.</p>';
+  }
 }
 
 function renderHistoryChart(history) {
@@ -902,14 +912,12 @@ function renderHistoryChart(history) {
 }
 
 async function loadHistory() {
-  // Use raw GitHub content URL so this works both locally and on GitHub Pages
   const HISTORY_URL = 'https://raw.githubusercontent.com/ordinary9843/gitizens/master/world/history.json';
   try {
     const r = await fetch(HISTORY_URL, {cache:'no-cache'});
     if (r.ok) {
       const h = await r.json();
       renderHistoryChart(h);
-      loadRecentLaws(h);
     }
   } catch(_) {}
 }
