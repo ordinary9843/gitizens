@@ -1319,3 +1319,374 @@ class TestCheckEventExpiry:
         # Should use 4h default → 5h ago > 4h → expired
         result = tv.check_event_expiry(0)
         assert result is True
+
+
+# ===========================================================================
+# slugify — special character handling
+# ===========================================================================
+
+class TestSlugify:
+    def test_lowercase_conversion(self):
+        assert tv.slugify("Industrial Era") == "industrial-era"
+
+    def test_colon_replaced(self):
+        assert tv.slugify("Crisis: Pollution") == "crisis-pollution"
+
+    def test_multiple_specials_collapsed(self):
+        assert tv.slugify("Hello   World!!") == "hello-world"
+
+    def test_leading_trailing_stripped(self):
+        assert tv.slugify("--hello--") == "hello"
+
+    def test_already_valid(self):
+        assert tv.slugify("founding-era") == "founding-era"
+
+    def test_numbers_preserved(self):
+        assert tv.slugify("Era 2050") == "era-2050"
+
+    def test_unicode_letters_stripped(self):
+        result = tv.slugify("Café Era")
+        assert "caf" in result
+        assert " " not in result
+
+
+# ===========================================================================
+# check_threshold_tags — milestone crossing detection
+# ===========================================================================
+
+class TestCheckThresholdTags:
+    def _state(self, **overrides):
+        return {**BASE_STATE, "tags_applied": [], **overrides}
+
+    def test_above_crossing_triggers(self):
+        before = self._state(welfare=59)
+        after  = self._state(welfare=61)
+        tags = tv.check_threshold_tags(before, after)
+        assert any(t[0] == "milestone/welfare-state" for t in tags)
+
+    def test_above_crossing_updates_tags_applied(self):
+        before = self._state(welfare=59)
+        after  = self._state(welfare=61)
+        tv.check_threshold_tags(before, after)
+        assert "milestone/welfare-state" in after["tags_applied"]
+
+    def test_already_applied_not_duplicated(self):
+        before = self._state(welfare=59)
+        after  = self._state(welfare=61, tags_applied=["milestone/welfare-state"])
+        tags = tv.check_threshold_tags(before, after)
+        assert not any(t[0] == "milestone/welfare-state" for t in tags)
+
+    def test_below_crossing_triggers(self):
+        before = self._state(pollution=25)
+        after  = self._state(pollution=15)
+        tags = tv.check_threshold_tags(before, after)
+        assert any(t[0] == "recovery/air-cleaned" for t in tags)
+
+    def test_no_crossing_no_tag(self):
+        before = self._state(welfare=50)
+        after  = self._state(welfare=55)
+        tags = tv.check_threshold_tags(before, after)
+        assert not any(t[0] == "milestone/welfare-state" for t in tags)
+
+    def test_exact_threshold_not_crossed_from_below(self):
+        # bv <= threshold < av requires av > threshold; av == threshold doesn't fire
+        before = self._state(welfare=59)
+        after  = self._state(welfare=60)
+        tags = tv.check_threshold_tags(before, after)
+        assert not any(t[0] == "milestone/welfare-state" for t in tags)
+
+    def test_exact_threshold_crossed_above(self):
+        before = self._state(welfare=60)
+        after  = self._state(welfare=61)
+        tags = tv.check_threshold_tags(before, after)
+        assert any(t[0] == "milestone/welfare-state" for t in tags)
+
+    def test_multiple_tags_fired_in_one_call(self):
+        before = self._state(welfare=59, education=49)
+        after  = self._state(welfare=61, education=51)
+        tags = tv.check_threshold_tags(before, after)
+        tag_names = [t[0] for t in tags]
+        assert "milestone/welfare-state" in tag_names
+        assert "milestone/educated-society" in tag_names
+
+    def test_missing_field_skipped(self):
+        before = {}
+        after  = {"tags_applied": []}
+        tags = tv.check_threshold_tags(before, after)
+        assert tags == []
+
+
+# ===========================================================================
+# entity_exists_by_name, auto_create_entity, auto_remove_entity
+# ===========================================================================
+
+def _make_category(tmp_path, category: str, entities: list | None = None):
+    cat_path = tmp_path / "world" / "entities" / category
+    cat_path.mkdir(parents=True)
+    entities = entities or []
+    index = {"next_seq": len(entities) + 1, "count": len(entities),
+             "entities": [e["id"] for e in entities]}
+    (cat_path / "_index.json").write_text(json.dumps(index))
+    for e in entities:
+        (cat_path / f"{e['id']}.json").write_text(json.dumps(e))
+    return cat_path
+
+
+class TestEntityExistsByName:
+    def test_finds_existing_entity(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "Public School", "built_law": 1,
+             "built_at": "2026-01-01T00:00:00Z", "auto_trigger": "education>=25"},
+        ])
+        assert tv.entity_exists_by_name("buildings", "Public School") == "bld-001"
+
+    def test_case_insensitive_match(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "Public School", "built_law": 1,
+             "built_at": "2026-01-01T00:00:00Z", "auto_trigger": "education>=25"},
+        ])
+        assert tv.entity_exists_by_name("buildings", "public school") == "bld-001"
+        assert tv.entity_exists_by_name("buildings", "PUBLIC SCHOOL") == "bld-001"
+
+    def test_returns_none_when_not_found(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings")
+        assert tv.entity_exists_by_name("buildings", "Nonexistent") is None
+
+    def test_missing_entity_file_skipped(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        cat_path = tmp_path / "world" / "entities" / "buildings"
+        cat_path.mkdir(parents=True)
+        index = {"next_seq": 2, "count": 1, "entities": ["bld-001"]}
+        (cat_path / "_index.json").write_text(json.dumps(index))
+        # bld-001.json intentionally absent
+        assert tv.entity_exists_by_name("buildings", "Anything") is None
+
+
+class TestAutoCreateEntity:
+    def test_creates_entity_file(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings")
+        eid = tv.auto_create_entity("buildings", "Test School", 5, "education>=25")
+        assert (tmp_path / "world" / "entities" / "buildings" / f"{eid}.json").exists()
+
+    def test_entity_has_correct_fields(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings")
+        eid = tv.auto_create_entity("buildings", "Test School", 5, "education>=25")
+        data = json.loads(
+            (tmp_path / "world/entities/buildings" / f"{eid}.json").read_text())
+        assert data["name"] == "Test School"
+        assert data["built_law"] == 5
+        assert data["auto_trigger"] == "education>=25"
+
+    def test_index_updated(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings")
+        eid = tv.auto_create_entity("buildings", "Test School", 5, "education>=25")
+        idx = json.loads(
+            (tmp_path / "world/entities/buildings/_index.json").read_text())
+        assert idx["count"] == 1
+        assert eid in idx["entities"]
+
+    def test_sequential_ids(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "districts")
+        id1 = tv.auto_create_entity("districts", "Park A", 1, "green_policy>=35")
+        id2 = tv.auto_create_entity("districts", "Park B", 2, "green_policy>=35")
+        assert id1 != id2
+        idx = json.loads(
+            (tmp_path / "world/entities/districts/_index.json").read_text())
+        assert idx["count"] == 2
+
+
+class TestAutoRemoveEntity:
+    def test_entity_file_deleted(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "Old School", "built_law": 1,
+             "built_at": "2026-01-01T00:00:00Z", "auto_trigger": "education>=25"},
+        ])
+        tv.auto_remove_entity("buildings", "bld-001", 10, "education dropped")
+        assert not (tmp_path / "world/entities/buildings/bld-001.json").exists()
+
+    def test_archived_to_world_archive(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "Old School", "built_law": 1,
+             "built_at": "2026-01-01T00:00:00Z", "auto_trigger": "education>=25"},
+        ])
+        tv.auto_remove_entity("buildings", "bld-001", 10, "education dropped")
+        assert (tmp_path / "world/archive/bld-001.json").exists()
+
+    def test_index_count_decremented(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "Old School", "built_law": 1,
+             "built_at": "2026-01-01T00:00:00Z", "auto_trigger": "education>=25"},
+        ])
+        tv.auto_remove_entity("buildings", "bld-001", 10, "education dropped")
+        idx = json.loads(
+            (tmp_path / "world/entities/buildings/_index.json").read_text())
+        assert idx["count"] == 0
+        assert "bld-001" not in idx["entities"]
+
+    def test_nonexistent_entity_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings")
+        tv.auto_remove_entity("buildings", "bld-999", 5, "reason")
+
+    def test_demolished_fields_in_archive(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "Old School", "built_law": 1,
+             "built_at": "2026-01-01T00:00:00Z", "auto_trigger": "education>=25"},
+        ])
+        tv.auto_remove_entity("buildings", "bld-001", 10, "education dropped")
+        archived = json.loads((tmp_path / "world/archive/bld-001.json").read_text())
+        assert archived["demolished_law"] == 10
+        assert "demolished_at" in archived
+        assert archived["auto_reason"] == "education dropped"
+
+
+# ===========================================================================
+# run_world_engine — entity creation/removal from policy metrics
+# ===========================================================================
+
+class TestRunWorldEngine:
+    def _setup_world(self, tmp_path, state_override=None):
+        (tmp_path / "world").mkdir()
+        state = {**BASE_STATE, **(state_override or {})}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            _make_category(tmp_path, cat)
+
+    def test_entity_created_when_metric_above_threshold(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world(tmp_path, {"education": 55})
+        changes = tv.run_world_engine(5)
+        assert any("National University" in c for c in changes)
+        assert tv.entity_exists_by_name("institutions", "National University") is not None
+
+    def test_no_duplicate_entity_created(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world(tmp_path, {"education": 55})
+        tv.run_world_engine(5)
+        changes2 = tv.run_world_engine(6)
+        assert not any("National University" in c for c in changes2)
+        idx = json.loads(
+            (tmp_path / "world/entities/institutions/_index.json").read_text())
+        assert idx["count"] == 1
+
+    def test_entity_removed_when_metric_drops(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world(tmp_path, {"education": 55})
+        tv.run_world_engine(5)
+        (tmp_path / "world/state.json").write_text(
+            json.dumps({**BASE_STATE, "education": 40}))
+        changes = tv.run_world_engine(6)
+        assert any("National University" in c for c in changes)
+        assert tv.entity_exists_by_name("institutions", "National University") is None
+
+    def test_no_change_returns_empty_list(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        # All metrics below all appear-thresholds → nothing created
+        self._setup_world(tmp_path, {
+            "education": 10, "industry": 10, "welfare": 10,
+            "green_policy": 10, "defense": 10, "pollution": 0,
+        })
+        changes = tv.run_world_engine(1)
+        assert changes == []
+
+    def test_pollution_entity_created(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world(tmp_path, {"pollution": 65})
+        changes = tv.run_world_engine(7)
+        assert any("Smog Zone" in c for c in changes)
+
+
+# ===========================================================================
+# validate_proposal.py — check_cooldown_for_proposal (standalone logic)
+# ===========================================================================
+
+import importlib
+import os as _os
+
+
+def _import_validate(tmp_path):
+    for k, v in [("ISSUE_NUMBER", "1"), ("ISSUE_TITLE", "[PROPOSAL] Test"),
+                 ("ISSUE_BODY", ""), ("GITHUB_TOKEN", "test-token"),
+                 ("GITHUB_REPOSITORY", "test/repo")]:
+        _os.environ.setdefault(k, v)
+        if not _os.environ.get(k):
+            _os.environ[k] = v
+    import sys
+    sys.modules.pop("scripts.validate_proposal", None)
+    import scripts.validate_proposal as vp
+    return vp
+
+
+class TestValidateCooldown:
+    def _vp(self, tmp_path):
+        return _import_validate(tmp_path)
+
+    def test_no_cooldown_file_returns_ok(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 10}})
+        assert ok
+
+    def test_cooldown_active_blocks(self, tmp_path, monkeypatch):
+        from datetime import datetime, timezone
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": today}))
+        ok, reason = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 10}})
+        assert not ok
+        assert "education" in reason
+
+    def test_cooldown_expired_allows(self, tmp_path, monkeypatch):
+        from datetime import datetime, timezone, timedelta
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        old = (datetime.now(timezone.utc) - timedelta(days=15)).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": old}))
+        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 10}})
+        assert ok
+
+    def test_non_policy_always_ok(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal({"type": "declaration"})
+        assert ok
+
+    def test_none_returns_ok(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(None)
+        assert ok
+
+    def test_corrupted_json_returns_ok(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/proposal_cooldowns.json").write_text("INVALID_JSON")
+        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 10}})
+        assert ok
+
+    def test_malformed_date_skipped(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": "not-a-date"}))
+        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 10}})
+        assert ok
