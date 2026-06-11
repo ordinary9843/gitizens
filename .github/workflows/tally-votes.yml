@@ -33,7 +33,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install openai pyyaml
+        run: pip install openai pyyaml pytest
 
       - name: Run tests
         env:
