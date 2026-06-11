@@ -174,5 +174,21 @@
     "stability": 59,
     "treasury": 339,
     "active_event": "evt-foreign-investment"
+  },
+  {
+    "tick": 12,
+    "date": "2026-06-11T12:38:53Z",
+    "laws_count": 11,
+    "era": "Founding Era",
+    "education": 63,
+    "industry": 40,
+    "welfare": 68,
+    "green_policy": 61,
+    "defense": 35,
+    "pollution": 0,
+    "population": 1550,
+    "stability": 57,
+    "treasury": 145,
+    "active_event": "evt-foreign-investment"
   }
 ]

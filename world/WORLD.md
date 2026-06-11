@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-11 — [Law 011](laws/law-011.md)*
+*Last updated: 2026-06-11*
 
 ---
 
@@ -20,7 +20,7 @@
 | Education | 63/100 |
 | Industry | 40/100 |
 | Welfare | 68/100 |
-| Green Policy | 60/100 |
+| Green Policy | 61/100 |
 | Defense | 35/100 |
 | Pollution *(derived)* | 0/100 |
 

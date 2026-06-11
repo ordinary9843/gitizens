@@ -31,5 +31,12 @@
     "narrative": "In a significant boost to the Gitizens' burgeoning economy, the latest tick has brought an influx of Foreign Direct Investment, enhancing the treasury to 339 GC. As the population swells to 1,500, leaders are urged to address rising stability concerns, currently at 59 out of 100, while pollution levels remain at a concerning 1 out of 100. The Founding Era continues to unfold, presenting both opportunities and challenges for this fledgling civilization.",
     "changes": "autonomous tick applied \u00b7 event: Foreign Direct Investment",
     "metrics": "population 1,500 \u00b7 treasury 339 GC \u00b7 stability 59/100 \u00b7 pollution 1/100"
+  },
+  {
+    "tick": 12,
+    "date": "2026-06-11",
+    "narrative": "In a significant development for the Gitizens civilization, Tick #12 concluded on June 11, 2026, marking a pivotal moment in the Founding Era with the population soaring to 1,550 citizens. The treasury has been bolstered to 145 Gold Coins, while stability remains steady at 57 out of 100, underscoring the community's resilience amid recent legislative advancements. Meanwhile, the event of Foreign Direct Investment promises to further enhance our economic landscape, inviting both optimism and cautious scrutiny.",
+    "changes": "autonomous tick applied \u00b7 2 laws enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Foreign Direct Investment",
+    "metrics": "population 1,550 \u00b7 treasury 145 GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
   }
 ]
