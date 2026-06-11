@@ -17,6 +17,10 @@ GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 REPO = os.environ["GITHUB_REPOSITORY"]
 VOTING_PERIOD_DAYS = 1
 AI_VOTING_HOURS = 4
+SIGNATURE_THRESHOLD = 10
+COOLDOWN_DAYS = 14
+ANNALS_INTERVAL = 10
+REPRESENTATIVE_DAYS = 7
 SKIP_TIMING = os.environ.get("SKIP_TIMING_CHECK", "").lower() in ("1", "true", "yes")
 
 client = OpenAI(
@@ -299,6 +303,7 @@ def check_event_expiry(laws_enacted_this_tick: int) -> bool:
     issue_number = active.get("issue_number", 0)
     if issue_number:
         close_event_issue(issue_number, responded, active)
+    fire_chained_event(active, responded)
     save_active_event({})
     return True
 
@@ -1292,6 +1297,8 @@ def process_issue(issue: dict):
         print(f"  #{number}: PASSED ({for_votes}+1 {against_votes}-1) -> law-{law_number:03d}")
         narrative = generate_narrative(clean_title, for_votes, against_votes, state_before)
 
+        active_event_now = load_active_event()
+        effect_data = apply_crisis_multiplier(effect_data, active_event_now)
         apply_effect(effect_data, law_number)
         world_changes = run_world_engine(law_number)
 
@@ -1320,17 +1327,15 @@ def process_issue(issue: dict):
             cost_line = f"**Treasury:** -{POLICY_COST} {currency} (balance: {state.get('treasury', 0)} {currency})  \n"
 
         proposer = issue.get("author", {}).get("login", "unknown")
-        for_line     = (", ".join(f"@{u}" for u in for_voters)     or "—")
-        against_line = (", ".join(f"@{u}" for u in against_voters) or "—")
+        signatories_block = format_signatories(for_voters, against_voters)
         Path(f"world/laws/law-{law_number:03d}.md").write_text(
             f"# Law {law_number:03d}: {clean_title}\n\n"
             f"**Enacted:** {today}  \n"
             f"**Proposal:** [#{number}]({issue_url})  \n"
             f"**Proposed by:** @{proposer}  \n"
             f"**Vote:** {for_votes} for, {against_votes} against  \n"
-            f"**Voted for:** {for_line}  \n"
-            f"**Voted against:** {against_line}  \n"
             f"{cost_line}"
+            f"{signatories_block}\n"
             "\n---\n\n"
             f"{body}\n\n"
             "---\n\n"
@@ -1340,9 +1345,12 @@ def process_issue(issue: dict):
 
         append_history(law_number, clean_title, number, for_votes, against_votes, True, today)
         update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
+        track_citizen_activity(for_voters, against_voters)
+        track_citizen_proposal(proposer)
         run(["git", "add", "-A"])
         run(["git", "commit", "-m",
              f"[LAW] law-{law_number:03d}: {clean_title} (#{number})"])
+        update_proposal_cooldown(effect_data, today)
         apply_tags(effect_data, state_before, state, law_number, clean_title, threshold_tags)
 
         world_note = ("\n\n**World changes:** " + ", ".join(world_changes)) if world_changes else ""
@@ -1375,6 +1383,233 @@ def process_issue(issue: dict):
         run(["gh", "issue", "edit", str(number), "--repo", REPO,
              "--add-label", "rejected", "--remove-label", "proposal"])
         run(["gh", "issue", "close", str(number), "--repo", REPO])
+
+
+# ── Citizen signatures ────────────────────────────────────────────────────────
+
+def format_signatories(for_voters: list[str], against_voters: list[str]) -> str:
+    total = len(for_voters) + len(against_voters)
+    for_str     = (", ".join(f"@{u}" for u in for_voters)     or "—")
+    against_str = (", ".join(f"@{u}" for u in against_voters) or "—")
+    if total <= SIGNATURE_THRESHOLD:
+        return (
+            f"**Voted for:** {for_str}  \n"
+            f"**Voted against:** {against_str}"
+        )
+    return (
+        f"<details>\n"
+        f"<summary>👥 {total} signatories</summary>\n\n"
+        f"**For:** {for_str}  \n"
+        f"**Against:** {against_str}\n\n"
+        f"</details>"
+    )
+
+
+def track_citizen_activity(for_voters: list[str], against_voters: list[str]):
+    path = Path("world/citizens.json")
+    data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    now_iso = datetime.now(timezone.utc).isoformat()
+    for user in for_voters + against_voters:
+        entry = data.setdefault(user, {"total_votes": 0, "total_proposals": 0, "last_active": now_iso})
+        entry["total_votes"] += 1
+        entry["last_active"] = now_iso
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def track_citizen_proposal(proposer: str):
+    path = Path("world/citizens.json")
+    data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    now_iso = datetime.now(timezone.utc).isoformat()
+    entry = data.setdefault(proposer, {"total_votes": 0, "total_proposals": 0, "last_active": now_iso})
+    entry["total_proposals"] += 1
+    entry["last_active"] = now_iso
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+# ── Proposal cooldown ─────────────────────────────────────────────────────────
+
+def check_proposal_cooldown(effect_data: dict | None) -> tuple[bool, str]:
+    if not effect_data or effect_data.get("type") != "policy":
+        return True, ""
+    path = Path("world/proposal_cooldowns.json")
+    if not path.exists():
+        return True, ""
+    cooldowns = json.loads(path.read_text(encoding="utf-8"))
+    today = datetime.now(timezone.utc).date()
+    for metric in effect_data.get("changes", {}):
+        if metric not in cooldowns:
+            continue
+        last_date = datetime.fromisoformat(cooldowns[metric]).date()
+        if (today - last_date).days < COOLDOWN_DAYS:
+            until = (last_date + timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
+            return False, f"metric '{metric}' on cooldown until {until}"
+    return True, ""
+
+
+def update_proposal_cooldown(effect_data: dict | None, date: str):
+    if not effect_data or effect_data.get("type") != "policy":
+        return
+    path = Path("world/proposal_cooldowns.json")
+    cooldowns = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    for metric in effect_data.get("changes", {}):
+        cooldowns[metric] = date
+    path.write_text(json.dumps(cooldowns, indent=2) + "\n", encoding="utf-8")
+
+
+# ── Weekly representatives ────────────────────────────────────────────────────
+
+def select_weekly_representatives():
+    reps_path = Path("world/representatives.json")
+    reps = json.loads(reps_path.read_text(encoding="utf-8")) if reps_path.exists() else {"selected_at": None}
+    if reps.get("selected_at"):
+        last = datetime.fromisoformat(reps["selected_at"]).date()
+        if (datetime.now(timezone.utc).date() - last).days < REPRESENTATIVE_DAYS:
+            return
+    citizens_path = Path("world/citizens.json")
+    if not citizens_path.exists():
+        return
+    citizens = json.loads(citizens_path.read_text(encoding="utf-8"))
+    if not citizens:
+        return
+    top3 = sorted(citizens.items(), key=lambda x: x[1].get("total_votes", 0), reverse=True)[:3]
+    representatives = [u for u, _ in top3]
+    today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    next_str = (datetime.now(timezone.utc) + timedelta(days=REPRESENTATIVE_DAYS)).strftime("%Y-%m-%d")
+    reps_path.write_text(
+        json.dumps({"selected_at": today_str, "next_selection": next_str,
+                    "representatives": representatives}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    if representatives:
+        names = ", ".join(f"@{r}" for r in representatives)
+        dispatch_num = get_or_create_dispatch_issue()
+        run(["gh", "issue", "comment", str(dispatch_num), "--repo", REPO,
+             "--body", f"🏛️ **Weekly Representatives elected:** {names}\n\nThese citizens showed the highest engagement this cycle."])
+    print(f"  Representatives: {representatives}")
+
+
+# ── World annals ──────────────────────────────────────────────────────────────
+
+def generate_annals(history: list):
+    tick_num = len(history)
+    if tick_num == 0 or tick_num % ANNALS_INTERVAL != 0:
+        return
+    chapter_num = tick_num // ANNALS_INTERVAL
+    chapter_path = Path(f"world/annals/chapter-{chapter_num:03d}.md")
+    if chapter_path.exists():
+        return
+    recent = history[-ANNALS_INTERVAL:]
+    state = read_state()
+    summary_data = {
+        "chapter": chapter_num,
+        "ticks": f"{tick_num - ANNALS_INTERVAL + 1}–{tick_num}",
+        "era": state.get("era"),
+        "laws_in_period": recent[-1].get("laws_count", 0) - recent[0].get("laws_count", 0),
+        "pop_change": recent[-1].get("population", 0) - recent[0].get("population", 0),
+        "treasury_change": recent[-1].get("treasury", 0) - recent[0].get("treasury", 0),
+    }
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": (
+            "You are the official historian of Gitizens.\n"
+            f"Write World Annals Chapter {chapter_num}, covering ticks {summary_data['ticks']}.\n"
+            f"Data: {json.dumps(summary_data)}\n"
+            f"Current world: {json.dumps(state)}\n\n"
+            "Format:\n"
+            f"# World Annals — Chapter {chapter_num}\n\n"
+            "## Summary\n<3-4 sentences of narrative history>\n\n"
+            "## Key Events\n<bullet points of notable changes>\n\n"
+            "## Citizen Voices\n<2 short quotes from fictional citizens, different perspectives>"
+        )}],
+        max_tokens=400,
+        temperature=0.7,
+    )
+    content = response.choices[0].message.content.strip()
+    chapter_path.parent.mkdir(parents=True, exist_ok=True)
+    chapter_path.write_text(content + "\n", encoding="utf-8")
+    tag = f"annals/ch-{chapter_num:03d}"
+    run(["gh", "release", "create", tag, "--repo", REPO,
+         "--title", f"📜 World Annals — Chapter {chapter_num}",
+         "--notes-file", str(chapter_path),
+         "--target", "master"])
+    print(f"  Annals chapter {chapter_num} published as Release {tag}")
+
+
+# ── Event chains ──────────────────────────────────────────────────────────────
+
+def fire_chained_event(resolved_event: dict, responded: bool):
+    chain_key = "triggers_next_on_response" if responded else "triggers_next_on_default"
+    next_evt_id = resolved_event.get(chain_key)
+    if not next_evt_id:
+        return
+    pool = load_event_pool()
+    next_evt = next((e for e in pool if e.get("id") == next_evt_id), None)
+    if not next_evt or load_active_event():
+        return
+    print(f"  Event chain: {resolved_event.get('title')} → {next_evt['title']}")
+    apply_event_effects(next_evt, "immediate_effects")
+    issue_num = open_event_issue(next_evt)
+    next_evt = dict(next_evt)
+    next_evt["fired_at"] = datetime.now(timezone.utc).isoformat()
+    next_evt["issue_number"] = issue_num
+    next_evt["chained_from"] = resolved_event.get("id")
+    save_active_event(next_evt)
+
+
+# ── Crisis multiplier ─────────────────────────────────────────────────────────
+
+def apply_crisis_multiplier(effect_data: dict | None, active_event: dict) -> dict | None:
+    if not effect_data or not active_event.get("is_crisis"):
+        return effect_data
+    if effect_data.get("type") != "policy":
+        return effect_data
+    multiplier = active_event.get("crisis_multiplier", 1.5)
+    modified = dict(effect_data)
+    modified["changes"] = {
+        k: int(round(v * multiplier)) for k, v in effect_data.get("changes", {}).items()
+    }
+    print(f"  Crisis multiplier {multiplier}x applied to policy changes")
+    return modified
+
+
+# ── AI citizen narrator ───────────────────────────────────────────────────────
+
+def generate_citizen_narrator():
+    state = read_state()
+    last_narrator = state.get("last_narrator_date")
+    if last_narrator:
+        last_dt = datetime.fromisoformat(last_narrator.replace("Z", "+00:00"))
+        if last_dt.tzinfo is None:
+            last_dt = last_dt.replace(tzinfo=timezone.utc)
+        if (datetime.now(timezone.utc) - last_dt).days < 7:
+            return
+    today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": (
+            "You are writing citizen perspectives for Gitizens.\n"
+            f"World state: {json.dumps(state)}\n\n"
+            "Write 3 short diary entries (2-3 sentences each) from 3 different fictional citizens:\n"
+            "1. A government official\n2. A factory worker\n3. A teacher\n\n"
+            "Each entry: '**[Name], [Occupation]:**\\n<diary entry>'\n"
+            "Make them react to the current world metrics and recent laws. Tone: vivid, personal."
+        )}],
+        max_tokens=300,
+        temperature=0.9,
+    )
+    narrative = response.choices[0].message.content.strip()
+    body = (
+        f"## 📖 Citizen Voices — {today_str}\n\n"
+        f"{narrative}\n\n"
+        f"*These are fictional citizen perspectives generated by the world engine.*"
+    )
+    run(["gh", "issue", "create", "--repo", REPO,
+         "--title", f"📖 Citizen Voices — {today_str}",
+         "--label", "citizen-voices",
+         "--body", body])
+    state["last_narrator_date"] = datetime.now(timezone.utc).isoformat()
+    write_state(state)
+    print("  Citizen narrator posted")
 
 
 def main():
@@ -1439,8 +1674,21 @@ def main():
         active_event_title, feedbacks_applied,
     )
 
-    # Snapshot world history
+    # Snapshot world history (do this before annals so tick count is accurate)
     append_history_snapshot(read_state())
+
+    # World annals (every 10 ticks)
+    try:
+        hist_data = json.loads(Path("world/history.json").read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        hist_data = []
+    generate_annals(hist_data)
+
+    # Weekly representatives
+    select_weekly_representatives()
+
+    # AI citizen narrator (weekly)
+    generate_citizen_narrator()
 
     # Commit any uncommitted world/ changes
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")

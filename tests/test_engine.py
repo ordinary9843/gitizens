@@ -377,3 +377,340 @@ class TestGetReactions:
             for_c, against_c, for_v, against_v = tv.get_reactions(99)
         assert for_c == 0 and against_c == 0
         assert for_v == [] and against_v == []
+
+
+# ===========================================================================
+# format_signatories
+# ===========================================================================
+
+class TestFormatSignatories:
+    def test_small_list_shows_inline(self):
+        result = tv.format_signatories(["a", "b", "c", "d", "e"], [])
+        assert "<details>" not in result
+        assert "@a" in result
+
+    def test_large_list_uses_collapsible(self):
+        voters = [f"user{i}" for i in range(15)]
+        result = tv.format_signatories(voters, [])
+        assert "<details>" in result
+        assert "15 signatories" in result
+
+    def test_empty_against_shows_dash(self):
+        result = tv.format_signatories(["alice"], [])
+        assert "—" in result
+
+    def test_threshold_boundary_10_inline(self):
+        voters = [f"u{i}" for i in range(10)]
+        result = tv.format_signatories(voters, [])
+        assert "<details>" not in result
+
+    def test_threshold_boundary_11_collapsible(self):
+        voters = [f"u{i}" for i in range(11)]
+        result = tv.format_signatories(voters, [])
+        assert "<details>" in result
+
+    def test_mixed_voters_counted_together(self):
+        for_v = [f"f{i}" for i in range(6)]
+        against_v = [f"a{i}" for i in range(6)]
+        result = tv.format_signatories(for_v, against_v)
+        assert "<details>" in result
+        assert "12 signatories" in result
+
+
+# ===========================================================================
+# track_citizen_activity / track_citizen_proposal
+# ===========================================================================
+
+class TestCitizenTracking:
+    def test_new_citizen_created(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        tv.track_citizen_activity(["alice"], [])
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "alice" in data
+        assert data["alice"]["total_votes"] == 1
+
+    def test_existing_citizen_incremented(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        tv.track_citizen_activity(["alice"], [])
+        tv.track_citizen_activity(["alice"], [])
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert data["alice"]["total_votes"] == 2
+
+    def test_multiple_voters_all_recorded(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        tv.track_citizen_activity(["alice", "bob"], ["charlie"])
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert len(data) == 3
+
+    def test_track_proposal_increments_proposals(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        tv.track_citizen_proposal("alice")
+        tv.track_citizen_proposal("alice")
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert data["alice"]["total_proposals"] == 2
+        assert data["alice"]["total_votes"] == 0
+
+
+# ===========================================================================
+# check_proposal_cooldown / update_proposal_cooldown
+# ===========================================================================
+
+class TestProposalCooldown:
+    def test_no_cooldown_file_returns_ok(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        effect = {"type": "policy", "changes": {"education": 10}}
+        ok, _ = tv.check_proposal_cooldown(effect)
+        assert ok
+
+    def test_cooldown_active_blocks(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": today}))
+        effect = {"type": "policy", "changes": {"education": 10}}
+        ok, reason = tv.check_proposal_cooldown(effect)
+        assert not ok
+        assert "education" in reason
+
+    def test_cooldown_expired_allows(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        old_date = (datetime.now(timezone.utc) - timedelta(days=15)).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": old_date}))
+        effect = {"type": "policy", "changes": {"education": 10}}
+        ok, _ = tv.check_proposal_cooldown(effect)
+        assert ok
+
+    def test_non_policy_always_ok(self):
+        ok, _ = tv.check_proposal_cooldown({"type": "declaration"})
+        assert ok
+
+    def test_none_effect_data_always_ok(self):
+        ok, _ = tv.check_proposal_cooldown(None)
+        assert ok
+
+    def test_update_writes_date(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        effect = {"type": "policy", "changes": {"welfare": 5, "education": 3}}
+        tv.update_proposal_cooldown(effect, "2026-06-11")
+        data = json.loads((tmp_path / "world/proposal_cooldowns.json").read_text())
+        assert data["welfare"] == "2026-06-11"
+        assert data["education"] == "2026-06-11"
+
+    def test_update_non_policy_skips(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        tv.update_proposal_cooldown({"type": "declaration"}, "2026-06-11")
+        assert not (tmp_path / "world/proposal_cooldowns.json").exists()
+
+
+# ===========================================================================
+# apply_crisis_multiplier
+# ===========================================================================
+
+class TestCrisisMultiplier:
+    def test_no_crisis_returns_unchanged(self):
+        effect = {"type": "policy", "changes": {"education": 10}}
+        result = tv.apply_crisis_multiplier(effect, {"is_crisis": False})
+        assert result["changes"]["education"] == 10
+
+    def test_crisis_multiplies_changes(self):
+        effect = {"type": "policy", "changes": {"welfare": 8, "education": 5}}
+        active = {"is_crisis": True, "crisis_multiplier": 1.5}
+        result = tv.apply_crisis_multiplier(effect, active)
+        assert result["changes"]["welfare"] == 12   # 8 × 1.5
+        assert result["changes"]["education"] == 8  # round(5 × 1.5) = 8
+
+    def test_non_policy_type_unchanged(self):
+        effect = {"type": "declaration"}
+        active = {"is_crisis": True, "crisis_multiplier": 2.0}
+        result = tv.apply_crisis_multiplier(effect, active)
+        assert result == effect
+
+    def test_empty_active_event_no_crash(self):
+        effect = {"type": "policy", "changes": {"industry": 6}}
+        result = tv.apply_crisis_multiplier(effect, {})
+        assert result["changes"]["industry"] == 6
+
+    def test_none_effect_data_returns_none(self):
+        result = tv.apply_crisis_multiplier(None, {"is_crisis": True})
+        assert result is None
+
+    def test_original_dict_not_mutated(self):
+        effect = {"type": "policy", "changes": {"defense": 10}}
+        active = {"is_crisis": True, "crisis_multiplier": 2.0}
+        result = tv.apply_crisis_multiplier(effect, active)
+        assert effect["changes"]["defense"] == 10  # original unchanged
+        assert result["changes"]["defense"] == 20
+
+
+# ===========================================================================
+# fire_chained_event
+# ===========================================================================
+
+class TestEventChain:
+    BASE_CHAIN_EVENT = {
+        "id": "evt-recovery",
+        "title": "Recovery",
+        "immediate_effects": {},
+        "trigger_conditions": {},
+        "rarity": "common",
+        "duration_hours": 4,
+        "default_consequence": {},
+        "response_consequence": {},
+    }
+
+    def test_no_chain_field_does_nothing(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/active_event.json").write_text("{}")
+        (tmp_path / "world/event_pool.json").write_text("[]")
+        tv.fire_chained_event({"id": "evt-drought", "title": "Drought"}, responded=True)
+        assert json.loads((tmp_path / "world/active_event.json").read_text()) == {}
+
+    def test_chain_on_response_fires_next(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/active_event.json").write_text("{}")
+        (tmp_path / "world/event_pool.json").write_text(json.dumps([self.BASE_CHAIN_EVENT]))
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        event = {"id": "evt-drought", "title": "Drought",
+                 "triggers_next_on_response": "evt-recovery"}
+        with patch.object(tv, "open_event_issue", return_value=99), \
+             patch.object(tv, "apply_event_effects"):
+            tv.fire_chained_event(event, responded=True)
+        active = json.loads((tmp_path / "world/active_event.json").read_text())
+        assert active.get("id") == "evt-recovery"
+        assert active.get("chained_from") == "evt-drought"
+        assert active.get("issue_number") == 99
+
+    def test_chain_on_default_fires_different(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/active_event.json").write_text("{}")
+        famine = {**self.BASE_CHAIN_EVENT, "id": "evt-famine", "title": "Famine"}
+        (tmp_path / "world/event_pool.json").write_text(json.dumps([famine]))
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        event = {"id": "evt-drought", "title": "Drought",
+                 "triggers_next_on_default": "evt-famine"}
+        with patch.object(tv, "open_event_issue", return_value=42), \
+             patch.object(tv, "apply_event_effects"):
+            tv.fire_chained_event(event, responded=False)
+        active = json.loads((tmp_path / "world/active_event.json").read_text())
+        assert active.get("id") == "evt-famine"
+
+    def test_no_chain_when_event_already_active(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        existing = {**self.BASE_CHAIN_EVENT, "id": "evt-existing", "fired_at": "2026-01-01T00:00:00+00:00"}
+        (tmp_path / "world/active_event.json").write_text(json.dumps(existing))
+        (tmp_path / "world/event_pool.json").write_text(json.dumps([self.BASE_CHAIN_EVENT]))
+        event = {"id": "evt-drought", "title": "Drought",
+                 "triggers_next_on_response": "evt-recovery"}
+        with patch.object(tv, "open_event_issue") as mock_open:
+            tv.fire_chained_event(event, responded=True)
+            mock_open.assert_not_called()
+
+
+# ===========================================================================
+# select_weekly_representatives
+# ===========================================================================
+
+class TestSelectRepresentatives:
+    def test_top3_selected_by_votes(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "alice": {"total_votes": 50, "total_proposals": 2, "last_active": "2026-06-11T00:00:00Z"},
+            "bob":   {"total_votes": 30, "total_proposals": 1, "last_active": "2026-06-11T00:00:00Z"},
+            "carol": {"total_votes": 20, "total_proposals": 0, "last_active": "2026-06-11T00:00:00Z"},
+            "dave":  {"total_votes": 5,  "total_proposals": 0, "last_active": "2026-06-10T00:00:00Z"},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        (tmp_path / "world/representatives.json").write_text(json.dumps({"selected_at": None}))
+        with patch.object(tv, "get_or_create_dispatch_issue", return_value=13), \
+             patch.object(tv, "run", return_value=""):
+            tv.select_weekly_representatives()
+        reps = json.loads((tmp_path / "world/representatives.json").read_text())
+        assert reps["representatives"] == ["alice", "bob", "carol"]
+
+    def test_no_reselection_before_7_days(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"selected_at": yesterday, "representatives": ["alice"]}))
+        tv.select_weekly_representatives()
+        reps = json.loads((tmp_path / "world/representatives.json").read_text())
+        assert reps["representatives"] == ["alice"]
+
+    def test_fewer_than_3_citizens(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {"alice": {"total_votes": 5, "total_proposals": 0, "last_active": ""}}
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        (tmp_path / "world/representatives.json").write_text(json.dumps({"selected_at": None}))
+        with patch.object(tv, "get_or_create_dispatch_issue", return_value=13), \
+             patch.object(tv, "run", return_value=""):
+            tv.select_weekly_representatives()
+        reps = json.loads((tmp_path / "world/representatives.json").read_text())
+        assert len(reps["representatives"]) == 1
+
+
+# ===========================================================================
+# generate_annals
+# ===========================================================================
+
+class TestAnnalsGeneration:
+    def test_no_generation_before_interval(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world/annals").mkdir(parents=True)
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        history = [{"tick": i} for i in range(9)]
+        tv.generate_annals(history)
+        assert not list((tmp_path / "world/annals").glob("*.md"))
+
+    def test_no_generation_on_empty_history(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world/annals").mkdir(parents=True)
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        tv.generate_annals([])
+        assert not list((tmp_path / "world/annals").glob("*.md"))
+
+    def test_generation_at_interval(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world/annals").mkdir(parents=True)
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        history = [{"tick": i, "laws_count": 0, "population": 1000,
+                    "treasury": 0, "era": "Founding Era"} for i in range(10)]
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "# World Annals — Chapter 1\n\nTest content."
+        )
+        with patch.object(tv, "client", mock_client), \
+             patch.object(tv, "run", return_value=""):
+            tv.generate_annals(history)
+        assert (tmp_path / "world/annals/chapter-001.md").exists()
+
+    def test_no_duplicate_generation(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world/annals").mkdir(parents=True)
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        chapter = tmp_path / "world/annals/chapter-001.md"
+        chapter.write_text("existing content\n")
+        history = [{"tick": i, "laws_count": 0, "population": 1000,
+                    "treasury": 0} for i in range(10)]
+        mock_client = MagicMock()
+        with patch.object(tv, "client", mock_client), \
+             patch.object(tv, "run", return_value=""):
+            tv.generate_annals(history)
+        mock_client.chat.completions.create.assert_not_called()
+        assert chapter.read_text() == "existing content\n"

@@ -9,6 +9,7 @@ import json
 import re
 import subprocess
 import yaml
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from openai import OpenAI
 
@@ -29,6 +30,8 @@ REQUIRED_FIELDS = {
     "declaration": [],
 }
 
+COOLDOWN_DAYS = 14
+
 
 def gh(*args):
     subprocess.run(["gh", *args], check=False)
@@ -46,6 +49,27 @@ def fail(reason: str):
     gh("issue", "close", ISSUE_NUMBER, "--repo", REPO)
     gh("issue", "edit", ISSUE_NUMBER, "--repo", REPO, "--add-label", "invalid")
     sys.exit(0)
+
+
+def check_cooldown_for_proposal(effect_data: dict) -> tuple[bool, str]:
+    if not effect_data or effect_data.get("type") != "policy":
+        return True, ""
+    path = Path("world/proposal_cooldowns.json")
+    if not path.exists():
+        return True, ""
+    try:
+        cooldowns = json.loads(path.read_text(encoding="utf-8"))
+        today = datetime.now(timezone.utc).date()
+        for metric in effect_data.get("changes", {}):
+            if metric not in cooldowns:
+                continue
+            last_date = datetime.fromisoformat(cooldowns[metric]).date()
+            if (today - last_date).days < COOLDOWN_DAYS:
+                until = (last_date + timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
+                return False, f"metric '{metric}' on cooldown until {until}"
+    except Exception:
+        pass
+    return True, ""
 
 
 def load_world_context() -> dict:
@@ -184,6 +208,11 @@ def validate():
                f"**Cost notice:** Enacting this policy costs **{POLICY_COST} {currency}**.\n\n{status}")
         except Exception:
             pass
+
+    if effect_data and effect_data.get("type") == "policy":
+        ok, reason = check_cooldown_for_proposal(effect_data)
+        if not ok:
+            fail(f"Proposal cooldown active: {reason}")
 
     print("VALID — applying proposal label")
     gh("issue", "edit", ISSUE_NUMBER, "--repo", REPO, "--add-label", "proposal")
