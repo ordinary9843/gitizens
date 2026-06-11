@@ -110,5 +110,21 @@
     "stability": 63,
     "treasury": 241,
     "active_event": "evt-everyone-paints"
+  },
+  {
+    "tick": 8,
+    "date": "2026-06-11T04:26:05Z",
+    "laws_count": 9,
+    "era": "Founding Era",
+    "education": 58,
+    "industry": 25,
+    "welfare": 60,
+    "green_policy": 60,
+    "defense": 35,
+    "pollution": 4,
+    "population": 1350,
+    "stability": 62,
+    "treasury": 245,
+    "active_event": "evt-everyone-paints"
   }
 ]
