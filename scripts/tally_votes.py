@@ -49,10 +49,16 @@ POLICY_COST = 100  # Git Coins per policy proposal
 
 BASE_STATE_FIELDS = {
     "era", "laws_count", "last_enacted", "world_summary", "founded_date",
-    "treasury", "currency", "stars_last_counted",
+    "treasury", "currency", "stars_last_counted", "known_stargazers",
     "education", "industry", "welfare", "green_policy", "defense",
     "population", "pollution", "stability",
     "tags_applied", "next_tick_at", "last_narrator_date",
+}
+
+# System-managed entity fields that proposals cannot overwrite
+_EVOLVE_BLOCKED = {
+    "id", "built_law", "built_at", "auto_trigger",
+    "demolished_law", "demolished_at", "demolished_reason", "last_evolved_law",
 }
 
 # (metric, appear_threshold, category, entity_name, remove_threshold)
@@ -164,7 +170,7 @@ def append_history_snapshot(state: dict):
         history = []
     active_id = load_active_event().get("id")
     snapshot = {
-        "tick":         len(history) + 1,
+        "tick":         (history[-1]["tick"] + 1) if history else 1,
         "date":         datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "laws_count":   state.get("laws_count", 0),
         "era":          state.get("era", "Founding Era"),
@@ -423,10 +429,10 @@ def world_autonomous_tick() -> bool:
     if wel > 80:
         new_stb = min(100, new_stb + 1)
 
-    # Idle income: industrial output + population tax
+    # Idle income: industrial output + population tax (capped at 100,000)
     industry_income = ind // 10       # 0–8 GC/tick
     pop_income      = new_pop // 500  # 1 GC per 500 citizens
-    new_treasury = treasury + industry_income + pop_income
+    new_treasury = min(100_000, treasury + industry_income + pop_income)
 
     # Era re-evaluation
     state.update({
@@ -495,13 +501,14 @@ def apply_effect(effect_data: dict | None, law_number: int):
         write_state(state)
 
     elif etype == "evolve":
-        entity_id = effect_data["id"]
+        entity_id = effect_data.get("id", "")
         changes = effect_data.get("changes", {})
+        safe_changes = {k: v for k, v in changes.items() if k not in _EVOLVE_BLOCKED}
         for cat in ("buildings", "districts", "institutions", "sectors"):
             path = Path(f"world/entities/{cat}/{entity_id}.json")
             if path.exists():
                 entity = read_json(path)
-                entity.update(changes)
+                entity.update(safe_changes)
                 entity["last_evolved_law"] = law_number
                 write_json(path, entity)
                 break
@@ -992,7 +999,7 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
         history = json.loads(Path("world/history.json").read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         pass
-    tick_num = len(history) + 1  # this tick hasn't been snapshotted yet
+    tick_num = (history[-1]["tick"] + 1) if history else 1  # this tick hasn't been snapshotted yet
 
     metrics_str = (
         f"population {state.get('population',0):,} · "
@@ -1060,30 +1067,40 @@ def collect_star_income():
     state = read_state()
     if state.get("treasury") is None:
         return
-    star_str = run(["gh", "api", f"repos/{REPO}", "--jq", ".stargazers_count"])
-    try:
-        current_stars = int(star_str)
-    except (ValueError, TypeError):
-        return
-    last_stars = state.get("stars_last_counted")
-    state["stars_last_counted"] = current_stars
-    if last_stars is None:
+
+    raw = run(["gh", "api", f"repos/{REPO}/stargazers", "--paginate",
+               "--jq", ".[].login"])
+    current_logins = {line.strip() for line in raw.splitlines() if line.strip()}
+
+    # First run: initialize tracking without income (migration-safe)
+    if state.get("known_stargazers") is None:
+        state["known_stargazers"] = sorted(current_logins)
+        state["stars_last_counted"] = len(current_logins)
         write_state(state)
-        print(f"  Star counter initialized at {current_stars}")
+        print(f"  Star tracking initialized: {len(current_logins)} existing stars, no income (first run)")
         return
-    new_stars = max(0, current_stars - last_stars)
-    if new_stars == 0:
+
+    ever_starred = set(state["known_stargazers"])
+    new_logins = current_logins - ever_starred
+
+    # Union never shrinks — re-starring after unstar earns no income
+    state["known_stargazers"] = sorted(ever_starred | current_logins)
+    state["stars_last_counted"] = len(current_logins)
+
+    if not new_logins:
+        write_state(state)
         return
-    income = new_stars * 10
+
+    income = len(new_logins) * 10
     currency = state.get("currency", "Git Coins")
-    state["treasury"] = state.get("treasury", 0) + income
+    state["treasury"] = min(100_000, state.get("treasury", 0) + income)
     write_state(state)
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     generate_dashboard_svg(read_stats(), today)
     run(["git", "add", "world/state.json", "world/stats.svg"])
     run(["git", "commit", "-m",
-         f"[WORLD] treasury: +{income} {currency} from {new_stars} star(s)"])
-    print(f"  Star income: +{new_stars} stars → +{income} {currency}")
+         f"[WORLD] treasury: +{income} {currency} from {len(new_logins)} new star(s)"])
+    print(f"  Star income: +{len(new_logins)} new stars → +{income} {currency}")
 
 
 # ── AI citizen processing ─────────────────────────────────────────────────────
@@ -1268,10 +1285,19 @@ def get_open_proposals() -> list:
 
 
 def get_reactions(issue_number: int) -> tuple[int, int, list[str], list[str]]:
-    data = gh_json(["api", f"repos/{REPO}/issues/{issue_number}/reactions", "--paginate"])
+    # Use --jq to extract one object per line so --paginate concatenation is safe
+    raw = run(["gh", "api", f"repos/{REPO}/issues/{issue_number}/reactions",
+               "--paginate", "--jq", ".[] | {login: .user.login, content: .content}"])
     user_votes: dict[str, str] = {}
-    for r in data:
-        user_votes[r["user"]["login"]] = r["content"]
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+            user_votes[r["login"]] = r["content"]
+        except (json.JSONDecodeError, KeyError):
+            continue
     for_voters     = sorted(u for u, v in user_votes.items() if v == "+1")
     against_voters = sorted(u for u, v in user_votes.items() if v == "-1")
     return len(for_voters), len(against_voters), for_voters, against_voters
@@ -1525,7 +1551,10 @@ def update_proposal_cooldown(effect_data: dict | None, date: str):
     if not effect_data or effect_data.get("type") != "policy":
         return
     path = Path("world/proposal_cooldowns.json")
-    cooldowns = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    try:
+        cooldowns = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    except (json.JSONDecodeError, OSError):
+        cooldowns = {}
     for metric in effect_data.get("changes", {}):
         cooldowns[metric] = date
     path.write_text(json.dumps(cooldowns, indent=2) + "\n", encoding="utf-8")
@@ -1537,9 +1566,12 @@ def select_weekly_representatives():
     reps_path = Path("world/representatives.json")
     reps = json.loads(reps_path.read_text(encoding="utf-8")) if reps_path.exists() else {"selected_at": None}
     if reps.get("selected_at"):
-        last = datetime.fromisoformat(reps["selected_at"]).date()
-        if (datetime.now(timezone.utc).date() - last).days < REPRESENTATIVE_DAYS:
-            return
+        try:
+            last = datetime.fromisoformat(reps["selected_at"]).date()
+            if (datetime.now(timezone.utc).date() - last).days < REPRESENTATIVE_DAYS:
+                return
+        except (ValueError, TypeError):
+            pass  # malformed date — allow re-selection
     citizens_path = Path("world/citizens.json")
     if not citizens_path.exists():
         return

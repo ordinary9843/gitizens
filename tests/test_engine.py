@@ -357,26 +357,52 @@ class TestAppendHistorySnapshot:
 # ===========================================================================
 
 class TestGetReactions:
+    def _make_jsonl(self, items):
+        """Return JSONL string matching --jq '.[] | {login, content}' output."""
+        return "\n".join(
+            json.dumps({"login": i["user"]["login"], "content": i["content"]})
+            for i in items
+        )
+
     def test_returns_voter_lists(self):
-        mock_data = [
+        raw_items = [
             {"user": {"login": "alice"}, "content": "+1"},
             {"user": {"login": "bob"},   "content": "-1"},
             {"user": {"login": "carol"}, "content": "+1"},
             {"user": {"login": "alice"}, "content": "-1"},  # alice changed her vote
         ]
-        with patch.object(tv, "gh_json", return_value=mock_data):
+        with patch.object(tv, "run", return_value=self._make_jsonl(raw_items)):
             for_c, against_c, for_v, against_v = tv.get_reactions(42)
-        # alice's last vote is -1
+        # alice's last vote is -1 (dict overwrites)
         assert for_c == 1
         assert against_c == 2
         assert for_v == ["carol"]
         assert sorted(against_v) == ["alice", "bob"]
 
     def test_empty_reactions(self):
-        with patch.object(tv, "gh_json", return_value=[]):
+        with patch.object(tv, "run", return_value=""):
             for_c, against_c, for_v, against_v = tv.get_reactions(99)
         assert for_c == 0 and against_c == 0
         assert for_v == [] and against_v == []
+
+    def test_pagination_multi_page_parsed(self):
+        # Simulate paginated output: multiple JSONL blocks (as gh --jq outputs)
+        page1 = '{"login": "alice", "content": "+1"}\n{"login": "bob", "content": "+1"}'
+        page2 = '{"login": "carol", "content": "-1"}'
+        raw = page1 + "\n" + page2
+        with patch.object(tv, "run", return_value=raw):
+            for_c, against_c, for_v, against_v = tv.get_reactions(1)
+        assert for_c == 2
+        assert against_c == 1
+        assert for_v == ["alice", "bob"]
+        assert against_v == ["carol"]
+
+    def test_malformed_line_skipped(self):
+        raw = '{"login": "alice", "content": "+1"}\nNOT_JSON\n{"login": "bob", "content": "+1"}'
+        with patch.object(tv, "run", return_value=raw):
+            for_c, against_c, for_v, against_v = tv.get_reactions(1)
+        assert for_c == 2
+        assert for_v == ["alice", "bob"]
 
 
 # ===========================================================================
@@ -862,3 +888,167 @@ class TestProcessFeedbackWorldEngine:
         assert result is False
         citizens = json.loads((tmp_path / "world/citizens.json").read_text())
         assert "carol" in citizens  # tracked even on dismissed feedback
+
+
+# ===========================================================================
+# collect_star_income — per-login tracking (anti-star-washing)
+# ===========================================================================
+
+class TestCollectStarIncome:
+    def _setup(self, tmp_path, state_extra=None):
+        (tmp_path / "world").mkdir()
+        state = {**BASE_STATE, "treasury": 200, **(state_extra or {})}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        (tmp_path / "world/stats.json").write_text(json.dumps({}))
+
+    def _run(self, tmp_path, monkeypatch, stargazers_output):
+        monkeypatch.chdir(tmp_path)
+        calls = []
+        def fake_run(cmd):
+            if "stargazers" in " ".join(cmd):
+                return stargazers_output
+            calls.append(cmd)
+            return ""
+        with patch.object(tv, "run", side_effect=fake_run), \
+             patch.object(tv, "generate_dashboard_svg"):
+            tv.collect_star_income()
+        return calls
+
+    def test_first_run_initializes_no_income(self, tmp_path, monkeypatch):
+        self._setup(tmp_path)
+        self._run(tmp_path, monkeypatch, "alice\nbob\n")
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == 200  # no income on first run
+        assert set(state["known_stargazers"]) == {"alice", "bob"}
+
+    def test_new_star_earns_income(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, {"known_stargazers": ["alice"]})
+        self._run(tmp_path, monkeypatch, "alice\nbob\n")
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == 210  # bob is new: +10 GC
+        assert set(state["known_stargazers"]) == {"alice", "bob"}
+
+    def test_restar_earns_no_income(self, tmp_path, monkeypatch):
+        # alice starred, unstarred (removed from current), then re-starred
+        # ever_starred still contains alice → no income
+        self._setup(tmp_path, {"known_stargazers": ["alice", "bob"]})
+        self._run(tmp_path, monkeypatch, "alice\n")  # bob unstarred, alice re-starred
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == 200  # no new income (alice was already known)
+
+    def test_no_stars_no_income(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, {"known_stargazers": ["alice"]})
+        self._run(tmp_path, monkeypatch, "alice\n")  # same stargazers
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == 200
+
+    def test_treasury_capped_at_100000(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, {"treasury": 99_995, "known_stargazers": []})
+        self._run(tmp_path, monkeypatch, "\n".join(f"u{i}" for i in range(10)))
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == 100_000  # capped
+
+    def test_empty_stargazers_no_crash(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, {"known_stargazers": ["alice"]})
+        self._run(tmp_path, monkeypatch, "")  # no output (0 stars)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == 200  # no income, no crash
+
+
+# ===========================================================================
+# append_history_snapshot — tick counter correctness after truncation
+# ===========================================================================
+
+class TestAppendHistorySnapshotTick:
+    def test_first_tick_is_1(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        (tmp_path / "world/active_event.json").write_text("{}")
+        tv.append_history_snapshot(BASE_STATE)
+        hist = json.loads((tmp_path / "world/history.json").read_text())
+        assert hist[0]["tick"] == 1
+
+    def test_tick_increments_sequentially(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        (tmp_path / "world/active_event.json").write_text("{}")
+        for _ in range(5):
+            tv.append_history_snapshot(BASE_STATE)
+        hist = json.loads((tmp_path / "world/history.json").read_text())
+        assert [h["tick"] for h in hist] == [1, 2, 3, 4, 5]
+
+    def test_tick_continues_after_100_entry_truncation(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        (tmp_path / "world/active_event.json").write_text("{}")
+        # Seed history with 100 entries (ticks 1–100)
+        history = [{"tick": i + 1, "era": "Founding Era", "laws_count": 0,
+                    "population": 1000, "treasury": 0, "education": 0,
+                    "industry": 0, "welfare": 0, "green_policy": 0, "defense": 0,
+                    "pollution": 0, "stability": 79, "active_event": None,
+                    "date": "2026-01-01T00:00:00Z"} for i in range(100)]
+        (tmp_path / "world/history.json").write_text(json.dumps(history))
+        tv.append_history_snapshot(BASE_STATE)
+        hist = json.loads((tmp_path / "world/history.json").read_text())
+        assert len(hist) == 100       # still capped at 100
+        assert hist[-1]["tick"] == 101  # correctly incremented, not reset
+
+
+# ===========================================================================
+# apply_effect evolve — _EVOLVE_BLOCKED defense-in-depth
+# ===========================================================================
+
+class TestApplyEffectEvolveBlocked:
+    def _make_entity(self, tmp_path, category="buildings", name="bld-001"):
+        (tmp_path / "world" / "entities" / category).mkdir(parents=True)
+        entity = {
+            "id": name, "name": "Test Building",
+            "built_law": 3, "built_at": "2026-01-01T00:00:00Z",
+            "auto_trigger": "education>=25",
+        }
+        (tmp_path / f"world/entities/{category}/{name}.json").write_text(json.dumps(entity))
+
+    def test_blocked_field_not_overwritten(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        self._make_entity(tmp_path)
+        effect = {"type": "evolve", "id": "bld-001",
+                  "changes": {"built_law": 999, "capacity": 500}}
+        tv.apply_effect(effect, 10)
+        entity = json.loads((tmp_path / "world/entities/buildings/bld-001.json").read_text())
+        assert entity["built_law"] == 3    # blocked — unchanged
+        assert entity["capacity"] == 500   # allowed — applied
+
+    def test_allowed_field_updated(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        self._make_entity(tmp_path)
+        effect = {"type": "evolve", "id": "bld-001",
+                  "changes": {"level": 2, "description": "Upgraded"}}
+        tv.apply_effect(effect, 10)
+        entity = json.loads((tmp_path / "world/entities/buildings/bld-001.json").read_text())
+        assert entity["level"] == 2
+        assert entity["description"] == "Upgraded"
+        assert entity["last_evolved_law"] == 10  # always set
+
+
+# ===========================================================================
+# world_autonomous_tick — treasury cap
+# ===========================================================================
+
+class TestAutonomousTickTreasuryCap:
+    def test_treasury_never_exceeds_100000(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        state = {**BASE_STATE, "treasury": 99_990, "industry": 80, "population": 1000}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        with patch.object(tv, "write_state") as ws, \
+             patch.object(tv, "run", return_value=""):
+            tv.world_autonomous_tick()
+            written = ws.call_args[0][0]
+        assert written["treasury"] <= 100_000

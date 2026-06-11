@@ -13,6 +13,8 @@ on:
 jobs:
   tally:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     permissions:
       issues: write
       contents: write
@@ -31,9 +33,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
-        run: pip install openai pyyaml pytest
+        run: pip install -r requirements.txt
 
       - name: Run tests
         env:
