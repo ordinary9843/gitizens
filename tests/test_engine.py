@@ -46,6 +46,14 @@ def _import_module():
 
 tv = _import_module()
 
+# Engine submodule references for correct patch targeting after sys.path is set
+import engine.gh        as _engine_gh
+import engine.world     as _engine_world
+import engine.events    as _engine_events
+import engine.chronicle as _engine_chronicle
+import engine.content   as _engine_content
+import engine.proposals as _engine_proposals
+
 
 # ===========================================================================
 # determine_era
@@ -114,8 +122,8 @@ class TestIdleEconomy:
         with tempfile.TemporaryDirectory() as tmp:
             state_path = Path(tmp) / "state.json"
             state_path.write_text(json.dumps(state), encoding="utf-8")
-            with patch.object(tv, "read_state", return_value=dict(state)), \
-                 patch.object(tv, "write_state") as mock_write:
+            with patch.object(_engine_world, "read_state", return_value=dict(state)), \
+                 patch.object(_engine_world, "write_state") as mock_write:
                 tv.world_autonomous_tick()
                 if mock_write.called:
                     return mock_write.call_args[0][0]
@@ -180,10 +188,10 @@ class TestEventEligibility:
 
     def test_eligible_without_conditions(self):
         state = {**BASE_STATE, "education": 30}
-        with patch.object(tv, "load_event_pool", return_value=self.SAMPLE_POOL):
+        with patch.object(_engine_events, "load_event_pool", return_value=self.SAMPLE_POOL):
             # 15% chance — force it by mocking random
-            with patch("scripts.tally_votes.random.random", return_value=0.05):
-                with patch("scripts.tally_votes.random.choices",
+            with patch("engine.events.random.random", return_value=0.05):
+                with patch("engine.events.random.choices",
                            side_effect=lambda pop, weights, k: [pop[0]]) as mock_choices:
                     result = tv.fire_random_event(state)
                     chosen_pool = mock_choices.call_args[0][0]
@@ -192,9 +200,9 @@ class TestEventEligibility:
 
     def test_high_education_unlocks_events(self):
         state = {**BASE_STATE, "education": 75}
-        with patch.object(tv, "load_event_pool", return_value=self.SAMPLE_POOL):
-            with patch("scripts.tally_votes.random.random", return_value=0.05):
-                with patch("scripts.tally_votes.random.choices",
+        with patch.object(_engine_events, "load_event_pool", return_value=self.SAMPLE_POOL):
+            with patch("engine.events.random.random", return_value=0.05):
+                with patch("engine.events.random.choices",
                            side_effect=lambda pop, weights, k: [pop[0]]) as mock_choices:
                     tv.fire_random_event(state)
                     chosen_pool = mock_choices.call_args[0][0]
@@ -202,9 +210,9 @@ class TestEventEligibility:
 
     def test_edu_bonus_increases_rare_weight(self):
         state = {**BASE_STATE, "education": 75}  # >70 → edu_bonus = 5
-        with patch.object(tv, "load_event_pool", return_value=self.SAMPLE_POOL):
-            with patch("scripts.tally_votes.random.random", return_value=0.05):
-                with patch("scripts.tally_votes.random.choices",
+        with patch.object(_engine_events, "load_event_pool", return_value=self.SAMPLE_POOL):
+            with patch("engine.events.random.random", return_value=0.05):
+                with patch("engine.events.random.choices",
                            side_effect=lambda pop, weights, k: [pop[0]]) as mock_choices:
                     tv.fire_random_event(state)
                     weights = mock_choices.call_args[1]["weights"]
@@ -215,15 +223,15 @@ class TestEventEligibility:
 
     def test_no_trigger_at_15_percent_boundary(self):
         state = {**BASE_STATE}
-        with patch.object(tv, "load_event_pool", return_value=self.SAMPLE_POOL):
-            with patch("scripts.tally_votes.random.random", return_value=0.16):
+        with patch.object(_engine_events, "load_event_pool", return_value=self.SAMPLE_POOL):
+            with patch("engine.events.random.random", return_value=0.16):
                 result = tv.fire_random_event(state)
                 assert result is None
 
     def test_empty_pool_returns_none(self):
         state = {**BASE_STATE}
-        with patch.object(tv, "load_event_pool", return_value=[]):
-            with patch("scripts.tally_votes.random.random", return_value=0.05):
+        with patch.object(_engine_events, "load_event_pool", return_value=[]):
+            with patch("engine.events.random.random", return_value=0.05):
                 result = tv.fire_random_event(state)
                 assert result is None
 
@@ -237,8 +245,8 @@ class TestApplyEventEffects:
         event = {"immediate_effects": effects, "default_consequence": effects,
                  "response_consequence": effects}
         captured = {}
-        with patch.object(tv, "read_state", return_value=dict(state)), \
-             patch.object(tv, "write_state", side_effect=lambda s: captured.update(s)):
+        with patch.object(_engine_world, "read_state", return_value=dict(state)), \
+             patch.object(_engine_world, "write_state", side_effect=lambda s: captured.update(s)):
             tv.apply_event_effects(event, key)
         return captured
 
@@ -371,7 +379,7 @@ class TestGetReactions:
             {"user": {"login": "carol"}, "content": "+1"},
             {"user": {"login": "alice"}, "content": "-1"},  # alice changed her vote
         ]
-        with patch.object(tv, "run", return_value=self._make_jsonl(raw_items)):
+        with patch.object(_engine_gh, "run", return_value=self._make_jsonl(raw_items)):
             for_c, against_c, for_v, against_v = tv.get_reactions(42)
         # alice's last vote is -1 (dict overwrites)
         assert for_c == 1
@@ -380,7 +388,7 @@ class TestGetReactions:
         assert sorted(against_v) == ["alice", "bob"]
 
     def test_empty_reactions(self):
-        with patch.object(tv, "run", return_value=""):
+        with patch.object(_engine_gh, "run", return_value=""):
             for_c, against_c, for_v, against_v = tv.get_reactions(99)
         assert for_c == 0 and against_c == 0
         assert for_v == [] and against_v == []
@@ -390,7 +398,7 @@ class TestGetReactions:
         page1 = '{"login": "alice", "content": "+1"}\n{"login": "bob", "content": "+1"}'
         page2 = '{"login": "carol", "content": "-1"}'
         raw = page1 + "\n" + page2
-        with patch.object(tv, "run", return_value=raw):
+        with patch.object(_engine_gh, "run", return_value=raw):
             for_c, against_c, for_v, against_v = tv.get_reactions(1)
         assert for_c == 2
         assert against_c == 1
@@ -399,7 +407,7 @@ class TestGetReactions:
 
     def test_malformed_line_skipped(self):
         raw = '{"login": "alice", "content": "+1"}\nNOT_JSON\n{"login": "bob", "content": "+1"}'
-        with patch.object(tv, "run", return_value=raw):
+        with patch.object(_engine_gh, "run", return_value=raw):
             for_c, against_c, for_v, against_v = tv.get_reactions(1)
         assert for_c == 2
         assert for_v == ["alice", "bob"]
@@ -610,8 +618,8 @@ class TestEventChain:
         (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
         event = {"id": "evt-drought", "title": "Drought",
                  "triggers_next_on_response": "evt-recovery"}
-        with patch.object(tv, "open_event_issue", return_value=99), \
-             patch.object(tv, "apply_event_effects"):
+        with patch.object(_engine_events, "open_event_issue", return_value=99), \
+             patch.object(_engine_events, "apply_event_effects"):
             tv.fire_chained_event(event, responded=True)
         active = json.loads((tmp_path / "world/active_event.json").read_text())
         assert active.get("id") == "evt-recovery"
@@ -627,8 +635,8 @@ class TestEventChain:
         (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
         event = {"id": "evt-drought", "title": "Drought",
                  "triggers_next_on_default": "evt-famine"}
-        with patch.object(tv, "open_event_issue", return_value=42), \
-             patch.object(tv, "apply_event_effects"):
+        with patch.object(_engine_events, "open_event_issue", return_value=42), \
+             patch.object(_engine_events, "apply_event_effects"):
             tv.fire_chained_event(event, responded=False)
         active = json.loads((tmp_path / "world/active_event.json").read_text())
         assert active.get("id") == "evt-famine"
@@ -721,8 +729,8 @@ class TestAnnalsGeneration:
         mock_client.chat.completions.create.return_value.choices[0].message.content = (
             "# World Annals — Chapter 1\n\nTest content."
         )
-        with patch.object(tv, "client", mock_client), \
-             patch.object(tv, "run", return_value=""):
+        with patch.object(_engine_content, "client", mock_client), \
+             patch.object(_engine_content, "run", return_value=""):
             tv.generate_annals(history)
         assert (tmp_path / "world/annals/chapter-001.md").exists()
 
@@ -735,8 +743,8 @@ class TestAnnalsGeneration:
         history = [{"tick": i + 1, "laws_count": 0, "population": 1000,
                     "treasury": 0} for i in range(10)]  # ticks 1-10 → chapter-001 already exists
         mock_client = MagicMock()
-        with patch.object(tv, "client", mock_client), \
-             patch.object(tv, "run", return_value=""):
+        with patch.object(_engine_content, "client", mock_client), \
+             patch.object(_engine_content, "run", return_value=""):
             tv.generate_annals(history)
         mock_client.chat.completions.create.assert_not_called()
         assert chapter.read_text() == "existing content\n"
@@ -848,12 +856,12 @@ class TestProcessFeedbackWorldEngine:
             "body": "## Description\n\nTest\n\n## Effect\n\n```yaml\ntype: policy\nchanges:\n  education: +5\n```\n",
         }
         engine_calls = []
-        with patch.object(tv, "get_reactions", return_value=(1, 0, ["alice"], [])), \
-             patch.object(tv, "run", return_value=""), \
-             patch.object(tv, "run_world_engine", side_effect=lambda n: engine_calls.append(n) or []):
-            tv.SKIP_TIMING = True
+        with patch.object(_engine_proposals, "get_reactions", return_value=(1, 0, ["alice"], [])), \
+             patch.object(_engine_proposals, "run", return_value=""), \
+             patch.object(_engine_proposals, "run_world_engine", side_effect=lambda n: engine_calls.append(n) or []):
+            _engine_proposals.SKIP_TIMING = True
             tv.process_feedback(issue)
-            tv.SKIP_TIMING = False
+            _engine_proposals.SKIP_TIMING = False
         assert None in engine_calls  # world engine called with None for feedback
 
     def test_feedback_tracks_citizen_activity(self, tmp_path, monkeypatch):
@@ -863,12 +871,12 @@ class TestProcessFeedbackWorldEngine:
             "number": 43, "title": "[FEEDBACK] Test", "createdAt": "2020-01-01T00:00:00Z",
             "body": "## Description\n\nTest\n\n## Effect\n\n```yaml\ntype: policy\nchanges:\n  welfare: +1\n```\n",
         }
-        with patch.object(tv, "get_reactions", return_value=(1, 0, ["bob"], [])), \
-             patch.object(tv, "run", return_value=""), \
-             patch.object(tv, "run_world_engine", return_value=[]):
-            tv.SKIP_TIMING = True
+        with patch.object(_engine_proposals, "get_reactions", return_value=(1, 0, ["bob"], [])), \
+             patch.object(_engine_proposals, "run", return_value=""), \
+             patch.object(_engine_proposals, "run_world_engine", return_value=[]):
+            _engine_proposals.SKIP_TIMING = True
             tv.process_feedback(issue)
-            tv.SKIP_TIMING = False
+            _engine_proposals.SKIP_TIMING = False
         citizens = json.loads((tmp_path / "world/citizens.json").read_text())
         assert "bob" in citizens
         assert citizens["bob"]["total_votes"] == 1
@@ -880,11 +888,11 @@ class TestProcessFeedbackWorldEngine:
             "number": 44, "title": "[FEEDBACK] Test", "createdAt": "2020-01-01T00:00:00Z",
             "body": "anything",
         }
-        with patch.object(tv, "get_reactions", return_value=(0, 1, [], ["carol"])), \
-             patch.object(tv, "run", return_value=""):
-            tv.SKIP_TIMING = True
+        with patch.object(_engine_proposals, "get_reactions", return_value=(0, 1, [], ["carol"])), \
+             patch.object(_engine_proposals, "run", return_value=""):
+            _engine_proposals.SKIP_TIMING = True
             result = tv.process_feedback(issue)
-            tv.SKIP_TIMING = False
+            _engine_proposals.SKIP_TIMING = False
         assert result is False
         citizens = json.loads((tmp_path / "world/citizens.json").read_text())
         assert "carol" in citizens  # tracked even on dismissed feedback
@@ -909,8 +917,8 @@ class TestCollectStarIncome:
                 return stargazers_output
             calls.append(cmd)
             return ""
-        with patch.object(tv, "run", side_effect=fake_run), \
-             patch.object(tv, "generate_dashboard_svg"):
+        with patch.object(_engine_chronicle, "run", side_effect=fake_run), \
+             patch.object(_engine_chronicle, "generate_dashboard_svg"):
             tv.collect_star_income()
         return calls
 
@@ -1047,8 +1055,8 @@ class TestAutonomousTickTreasuryCap:
         (tmp_path / "world").mkdir()
         state = {**BASE_STATE, "treasury": 99_990, "industry": 80, "population": 1000}
         (tmp_path / "world/state.json").write_text(json.dumps(state))
-        with patch.object(tv, "write_state") as ws, \
-             patch.object(tv, "run", return_value=""):
+        with patch.object(_engine_world, "write_state") as ws, \
+             patch.object(_engine_world, "run", return_value=""):
             tv.world_autonomous_tick()
             written = ws.call_args[0][0]
         assert written["treasury"] <= 100_000
@@ -1217,7 +1225,7 @@ class TestUpsertBotComment:
             if "--method" in cmd and "PATCH" in cmd:
                 return '{"id": 12345}'  # non-empty = success
             return ""
-        monkeypatch.setattr(tv, "run", fake_run)
+        monkeypatch.setattr(_engine_content, "run", fake_run)
         tv.upsert_bot_comment(99, "hello world")
         patch_calls = [c for c in patched if "PATCH" in c]
         assert len(patch_calls) == 1
@@ -1233,7 +1241,7 @@ class TestUpsertBotComment:
                 posted.append(cmd)
                 return "https://github.com/test/repo/issues/5#issuecomment-9876543"
             return ""
-        monkeypatch.setattr(tv, "run", fake_run)
+        monkeypatch.setattr(_engine_content, "run", fake_run)
         tv.upsert_bot_comment(5, "new comment body")
         assert len(posted) == 1
         ids = json.loads((tmp_path / "world/pinned_comment_ids.json").read_text())
@@ -1251,7 +1259,7 @@ class TestUpsertBotComment:
                 posted.append(cmd)
                 return "https://github.com/test/repo/issues/7#issuecomment-222"
             return ""
-        monkeypatch.setattr(tv, "run", fake_run)
+        monkeypatch.setattr(_engine_content, "run", fake_run)
         tv.upsert_bot_comment(7, "updated body")
         assert len(posted) == 1
         ids = json.loads((tmp_path / "world/pinned_comment_ids.json").read_text())
@@ -1823,53 +1831,53 @@ class TestCheckEventExpiryVoting:
 
     def test_responded_when_for_votes_win(self):
         evt = self._make_expired_event(issue_number=42)
-        with patch.object(tv, "load_active_event", return_value=evt), \
-             patch.object(tv, "get_reactions", return_value=(3, 1, ["a","b","c"], ["d"])), \
-             patch.object(tv, "apply_event_effects") as mock_apply, \
-             patch.object(tv, "close_event_issue"), \
-             patch.object(tv, "save_active_event"), \
-             patch.object(tv, "fire_chained_event"):
+        with patch.object(_engine_events, "load_active_event", return_value=evt), \
+             patch.object(_engine_events, "get_reactions", return_value=(3, 1, ["a","b","c"], ["d"])), \
+             patch.object(_engine_events, "apply_event_effects") as mock_apply, \
+             patch.object(_engine_events, "close_event_issue"), \
+             patch.object(_engine_events, "save_active_event"), \
+             patch.object(_engine_events, "fire_chained_event"):
             tv.check_event_expiry(0)
             mock_apply.assert_called_once_with(evt, "response_consequence")
 
     def test_default_when_against_votes_win(self):
         evt = self._make_expired_event(issue_number=42)
-        with patch.object(tv, "load_active_event", return_value=evt), \
-             patch.object(tv, "get_reactions", return_value=(1, 3, ["a"], ["b","c","d"])), \
-             patch.object(tv, "apply_event_effects") as mock_apply, \
-             patch.object(tv, "close_event_issue"), \
-             patch.object(tv, "save_active_event"), \
-             patch.object(tv, "fire_chained_event"):
+        with patch.object(_engine_events, "load_active_event", return_value=evt), \
+             patch.object(_engine_events, "get_reactions", return_value=(1, 3, ["a"], ["b","c","d"])), \
+             patch.object(_engine_events, "apply_event_effects") as mock_apply, \
+             patch.object(_engine_events, "close_event_issue"), \
+             patch.object(_engine_events, "save_active_event"), \
+             patch.object(_engine_events, "fire_chained_event"):
             tv.check_event_expiry(0)
             mock_apply.assert_called_once_with(evt, "default_consequence")
 
     def test_default_when_no_votes(self):
         evt = self._make_expired_event(issue_number=42)
-        with patch.object(tv, "load_active_event", return_value=evt), \
-             patch.object(tv, "get_reactions", return_value=(0, 0, [], [])), \
-             patch.object(tv, "apply_event_effects") as mock_apply, \
-             patch.object(tv, "close_event_issue"), \
-             patch.object(tv, "save_active_event"), \
-             patch.object(tv, "fire_chained_event"):
+        with patch.object(_engine_events, "load_active_event", return_value=evt), \
+             patch.object(_engine_events, "get_reactions", return_value=(0, 0, [], [])), \
+             patch.object(_engine_events, "apply_event_effects") as mock_apply, \
+             patch.object(_engine_events, "close_event_issue"), \
+             patch.object(_engine_events, "save_active_event"), \
+             patch.object(_engine_events, "fire_chained_event"):
             tv.check_event_expiry(0)
             mock_apply.assert_called_once_with(evt, "default_consequence")
 
     def test_fallback_to_laws_when_no_issue_number(self):
         evt = self._make_expired_event(issue_number=0)
-        with patch.object(tv, "load_active_event", return_value=evt), \
-             patch.object(tv, "apply_event_effects") as mock_apply, \
-             patch.object(tv, "close_event_issue"), \
-             patch.object(tv, "save_active_event"), \
-             patch.object(tv, "fire_chained_event"):
+        with patch.object(_engine_events, "load_active_event", return_value=evt), \
+             patch.object(_engine_events, "apply_event_effects") as mock_apply, \
+             patch.object(_engine_events, "close_event_issue"), \
+             patch.object(_engine_events, "save_active_event"), \
+             patch.object(_engine_events, "fire_chained_event"):
             tv.check_event_expiry(2)
             mock_apply.assert_called_once_with(evt, "response_consequence")
 
     def test_fallback_default_when_no_issue_no_laws(self):
         evt = self._make_expired_event(issue_number=0)
-        with patch.object(tv, "load_active_event", return_value=evt), \
-             patch.object(tv, "apply_event_effects") as mock_apply, \
-             patch.object(tv, "close_event_issue"), \
-             patch.object(tv, "save_active_event"), \
-             patch.object(tv, "fire_chained_event"):
+        with patch.object(_engine_events, "load_active_event", return_value=evt), \
+             patch.object(_engine_events, "apply_event_effects") as mock_apply, \
+             patch.object(_engine_events, "close_event_issue"), \
+             patch.object(_engine_events, "save_active_event"), \
+             patch.object(_engine_events, "fire_chained_event"):
             tv.check_event_expiry(0)
             mock_apply.assert_called_once_with(evt, "default_consequence")

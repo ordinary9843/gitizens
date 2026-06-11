@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GITIZENS — Civilization Simulator</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <style>
     :root {
@@ -31,7 +32,7 @@
     /* ── Header ── */
     #header {
       padding: 12px 24px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     }
     #header h1 { font-size: 20px; font-weight: bold; letter-spacing: 4px; }
     #era-day   { font-size: 13px; color: var(--muted); }
@@ -240,6 +241,7 @@
 <body>
 
 <div id="header">
+  <img src="logo.png" alt="Gitizens" height="26" style="flex-shrink:0;margin-right:-2px;vertical-align:middle">
   <h1>GITIZENS</h1>
   <span id="era-day">Loading…</span>
   <span id="reps-display"></span>
