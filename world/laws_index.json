@@ -33,7 +33,7 @@
   },
   {
     "number": 5,
-    "title": "Build the Grand Archive — Permanent Record of All Laws",
+    "title": "Build the Grand Archive \u2014 Permanent Record of All Laws",
     "issue_number": 4,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/4",
     "enacted_date": "2026-06-10",
@@ -41,7 +41,7 @@
   },
   {
     "number": 6,
-    "title": "Invest in Green Technology — Carbon-Free by 2040",
+    "title": "Invest in Green Technology \u2014 Carbon-Free by 2040",
     "issue_number": 5,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/5",
     "enacted_date": "2026-06-10",
@@ -49,7 +49,7 @@
   },
   {
     "number": 7,
-    "title": "Jumpstart Industrial Development — Factory District Initiative",
+    "title": "Jumpstart Industrial Development \u2014 Factory District Initiative",
     "issue_number": 6,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/6",
     "enacted_date": "2026-06-10",
@@ -61,6 +61,14 @@
     "issue_number": 7,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/7",
     "enacted_date": "2026-06-10",
+    "era": "Founding Era"
+  },
+  {
+    "number": 9,
+    "title": "Enforce the Green Standard \u2014 Industrial Emission Limits",
+    "issue_number": 9,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/9",
+    "enacted_date": "2026-06-11",
     "era": "Founding Era"
   }
 ]
