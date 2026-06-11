@@ -1,1 +1,23 @@
-{}
+{
+  "id": "evt-everyone-paints",
+  "category": "weird",
+  "rarity": "common",
+  "title": "\u5168\u6c11\u7a81\u7136\u958b\u59cb\u756b\u756b",
+  "description": "\u6c92\u6709\u660e\u78ba\u539f\u56e0\uff0c\u9019\u500b\u6708\u6bcf\u500b\u4eba\u90fd\u5728\u756b\u756b\u3002\u8857\u4e0a\u3001\u516c\u53f8\u3001\u91ab\u9662\uff0c\u5230\u8655\u90fd\u662f\u5857\u9d09\u8207\u756b\u5e03\u3002",
+  "flavor": "\u7f8e\u8853\u7528\u54c1\u5e97\u8001\u95c6\u8aaa\u4ed6\u9019\u8f29\u5b50\u6c92\u898b\u904e\u9019\u7a2e\u666f\u8c61\uff0c\u984f\u6599\u5b8c\u5168\u8ce3\u5149\u4e86\u3002",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "welfare": 5,
+    "education": 3
+  },
+  "default_consequence": {},
+  "response_consequence": {
+    "welfare": 8,
+    "education": 5
+  },
+  "response_hint": "\u901a\u904e\u85dd\u8853\u6559\u80b2\u632f\u8208\u6cd5\u53ef\u8d81\u52e2\u57f9\u990a\u4e0b\u4e00\u4ee3\u7684\u5275\u9020\u529b\u8207\u7f8e\u611f\u3002",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-06-11T01:36:12.865336+00:00",
+  "issue_number": 0
+}
