@@ -10,6 +10,10 @@ on:
         required: false
         default: "false"
 
+concurrency:
+  group: world-tick
+  cancel-in-progress: false
+
 jobs:
   tally:
     runs-on: ubuntu-latest

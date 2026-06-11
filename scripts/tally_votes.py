@@ -1076,36 +1076,44 @@ def update_laws_index(law_number: int, title: str, issue_number: int,
 
 # ── World dispatch ─────────────────────────────────────────────────────────────
 
-def _get_bot_login() -> str:
+_PINNED_IDS_PATH = Path("world/pinned_comment_ids.json")
+
+
+def _load_pinned_ids() -> dict:
     try:
-        return run(["gh", "api", "user", "--jq", ".login"]).strip()
-    except Exception:
-        return ""
+        return json.loads(_PINNED_IDS_PATH.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
 
 
 def upsert_bot_comment(issue_num: int, body: str):
-    """Edit the first bot-owned comment on issue_num, or post a new one if none exists."""
-    bot_login = _get_bot_login()
-    if bot_login:
-        comments = gh_json([
-            "api", f"repos/{REPO}/issues/{issue_num}/comments",
-            "--paginate",
-        ])
-        for c in comments:
-            if c.get("user", {}).get("login") == bot_login:
-                tmp = Path("scripts/_patch_body.txt")
-                tmp.write_text(body, encoding="utf-8")
-                run(["gh", "api", "--method", "PATCH",
-                     f"repos/{REPO}/issues/comments/{c['id']}",
-                     "--field", f"body=@{tmp}"])
-                tmp.unlink(missing_ok=True)
-                print(f"  Updated pinned comment on issue #{issue_num}")
-                return
-    tmp = Path("scripts/_comment_body.txt")
-    tmp.write_text(body, encoding="utf-8")
-    run(["gh", "issue", "comment", str(issue_num), "--repo", REPO, "--body-file", str(tmp)])
-    tmp.unlink(missing_ok=True)
-    print(f"  Posted new comment to issue #{issue_num}")
+    """Edit the tracked pinned comment for this issue, or post and track a new one."""
+    ids = _load_pinned_ids()
+    comment_id = ids.get(str(issue_num))
+    tmp = Path("scripts/_upsert_payload.json")
+    tmp.write_text(json.dumps({"body": body}), encoding="utf-8")
+    if comment_id:
+        result = run(["gh", "api", "--method", "PATCH",
+                      f"repos/{REPO}/issues/comments/{comment_id}",
+                      "--input", str(tmp)])
+        tmp.unlink(missing_ok=True)
+        if result:
+            print(f"  Updated pinned comment #{comment_id} on issue #{issue_num}")
+            return
+        print(f"  [WARN] PATCH failed for comment #{comment_id}, posting new")
+    tmp2 = Path("scripts/_upsert_body.txt")
+    tmp2.write_text(body, encoding="utf-8")
+    result = run(["gh", "issue", "comment", str(issue_num), "--repo", REPO,
+                  "--body-file", str(tmp2)])
+    tmp2.unlink(missing_ok=True)
+    m = re.search(r"issuecomment-(\d+)", result)
+    if m:
+        new_id = int(m.group(1))
+        ids[str(issue_num)] = new_id
+        _PINNED_IDS_PATH.write_text(json.dumps(ids, indent=2) + "\n", encoding="utf-8")
+        print(f"  Posted and pinned comment #{new_id} on issue #{issue_num}")
+    else:
+        print(f"  Posted new comment to issue #{issue_num}")
 
 
 def get_or_create_dispatch_issue() -> int:
