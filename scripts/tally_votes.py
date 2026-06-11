@@ -303,8 +303,8 @@ def check_event_expiry(laws_enacted_this_tick: int) -> bool:
     issue_number = active.get("issue_number", 0)
     if issue_number:
         close_event_issue(issue_number, responded, active)
-    fire_chained_event(active, responded)
     save_active_event({})
+    fire_chained_event(active, responded)
     return True
 
 
