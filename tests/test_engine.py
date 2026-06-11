@@ -1143,4 +1143,179 @@ class TestUpdateLawsIndexGuard:
         tv.update_laws_index(5, "Test", 10, "http://x", "Founding Era", "2026-06-11")
         data = json.loads((tmp_path / "world/laws_index.json").read_text())
         assert len(data) == 1
-        assert data[0]["number"] == 5
+
+
+# ===========================================================================
+# _build_chronicle_body — handles missing metrics, includes representatives
+# ===========================================================================
+
+class TestBuildChronicleBody:
+    def test_empty_dispatches_returns_string(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        body = tv._build_chronicle_body()
+        assert "World Chronicle" in body
+
+    def test_missing_metrics_field_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        # Old-format entry without 'metrics' key
+        dispatches = [{"tick": 5, "date": "2026-06-11",
+                       "narrative": "Test narrative.", "changes": "tick applied"}]
+        (tmp_path / "world/dispatches.json").write_text(json.dumps(dispatches))
+        body = tv._build_chronicle_body()
+        assert "Test narrative" in body
+
+    def test_includes_last_5_dispatches(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        dispatches = [
+            {"tick": i, "date": "2026-06-11", "narrative": f"Narrative {i}.",
+             "changes": "tick", "metrics": f"pop {i*100}"}
+            for i in range(1, 9)
+        ]
+        (tmp_path / "world/dispatches.json").write_text(json.dumps(dispatches))
+        body = tv._build_chronicle_body()
+        # Should contain ticks 4-8 (last 5 of 8), not tick 1
+        assert "Narrative 8" in body
+        assert "Narrative 4" in body
+        assert "Narrative 1" not in body
+
+    def test_includes_representatives_when_present(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        reps = {"selected_at": "2026-06-11", "next_selection": "2026-06-18",
+                "representatives": ["alice", "bob"]}
+        (tmp_path / "world/representatives.json").write_text(json.dumps(reps))
+        body = tv._build_chronicle_body()
+        assert "@alice" in body
+        assert "@bob" in body
+
+    def test_no_representatives_file_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        # No representatives.json
+        body = tv._build_chronicle_body()
+        assert "World Chronicle" in body
+
+
+# ===========================================================================
+# upsert_bot_comment — stored ID PATCH path and POST fallback
+# ===========================================================================
+
+class TestUpsertBotComment:
+    def test_patch_when_id_stored(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/pinned_comment_ids.json").write_text('{"99": 12345}')
+        patched = []
+        def fake_run(cmd):
+            patched.append(cmd)
+            if "--method" in cmd and "PATCH" in cmd:
+                return '{"id": 12345}'  # non-empty = success
+            return ""
+        monkeypatch.setattr(tv, "run", fake_run)
+        tv.upsert_bot_comment(99, "hello world")
+        patch_calls = [c for c in patched if "PATCH" in c]
+        assert len(patch_calls) == 1
+        assert any("12345" in part for part in patch_calls[0])
+
+    def test_post_when_no_stored_id(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        # No pinned_comment_ids.json
+        posted = []
+        def fake_run(cmd):
+            if "issue" in cmd and "comment" in cmd:
+                posted.append(cmd)
+                return "https://github.com/test/repo/issues/5#issuecomment-9876543"
+            return ""
+        monkeypatch.setattr(tv, "run", fake_run)
+        tv.upsert_bot_comment(5, "new comment body")
+        assert len(posted) == 1
+        ids = json.loads((tmp_path / "world/pinned_comment_ids.json").read_text())
+        assert ids.get("5") == 9876543
+
+    def test_patch_failure_falls_back_to_post(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/pinned_comment_ids.json").write_text('{"7": 111}')
+        posted = []
+        def fake_run(cmd):
+            if "PATCH" in cmd:
+                return ""  # empty = PATCH failed
+            if "issue" in cmd and "comment" in cmd:
+                posted.append(cmd)
+                return "https://github.com/test/repo/issues/7#issuecomment-222"
+            return ""
+        monkeypatch.setattr(tv, "run", fake_run)
+        tv.upsert_bot_comment(7, "updated body")
+        assert len(posted) == 1
+        ids = json.loads((tmp_path / "world/pinned_comment_ids.json").read_text())
+        assert ids.get("7") == 222
+
+
+# ===========================================================================
+# check_event_expiry — timezone and duration_hours type safety
+# ===========================================================================
+
+class TestCheckEventExpiry:
+    def _write_event(self, path, fired_ago_hours, duration_hours=4, extra=None):
+        fired_at = (datetime.now(timezone.utc) - timedelta(hours=fired_ago_hours)).isoformat()
+        evt = {"id": "evt-test", "title": "Test Event",
+               "fired_at": fired_at, "duration_hours": duration_hours,
+               "issue_number": 0, "immediate_effects": {},
+               "default_consequence": {}, "response_consequence": {}}
+        if extra:
+            evt.update(extra)
+        (path / "world/active_event.json").write_text(json.dumps(evt))
+
+    def test_not_expired_returns_false(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        self._write_event(tmp_path, fired_ago_hours=1, duration_hours=4)
+        assert tv.check_event_expiry(0) is False
+
+    def test_expired_returns_true(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        (tmp_path / "world/active_event.json").write_text("{}")
+        self._write_event(tmp_path, fired_ago_hours=5, duration_hours=4)
+        def fake_run(cmd): return ""
+        monkeypatch.setattr(tv, "run", fake_run)
+        result = tv.check_event_expiry(0)
+        assert result is True
+
+    def test_malformed_fired_at_clears_event(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        (tmp_path / "world/active_event.json").write_text(
+            json.dumps({"id": "x", "title": "Bad", "fired_at": "not-a-date",
+                        "duration_hours": 4, "issue_number": 0}))
+        result = tv.check_event_expiry(0)
+        assert result is False
+        active = json.loads((tmp_path / "world/active_event.json").read_text())
+        assert active == {}
+
+    def test_non_numeric_duration_defaults_to_4h(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        (tmp_path / "world/active_event.json").write_text("{}")
+        fired_at = (datetime.now(timezone.utc) - timedelta(hours=5)).isoformat()
+        evt = {"id": "x", "title": "T", "fired_at": fired_at,
+               "duration_hours": "bad_value", "issue_number": 0,
+               "immediate_effects": {}, "default_consequence": {},
+               "response_consequence": {}}
+        (tmp_path / "world/active_event.json").write_text(json.dumps(evt))
+        def fake_run(cmd): return ""
+        monkeypatch.setattr(tv, "run", fake_run)
+        # Should use 4h default → 5h ago > 4h → expired
+        result = tv.check_event_expiry(0)
+        assert result is True

@@ -9,6 +9,7 @@ import math
 import re
 import random
 import subprocess
+import tempfile
 import yaml
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -236,6 +237,8 @@ def fire_random_event(state: dict) -> dict | None:
 
 
 def open_event_issue(event: dict) -> int:
+    run(["gh", "label", "create", "event", "--repo", REPO,
+         "--color", "0075ca", "--description", "Active world event", "--force"])
     imm = event.get("immediate_effects", {})
     imm_str = "  ".join(
         f"{k} {'+' if isinstance(v, (int,float)) and v>0 else ''}{v}"
@@ -300,9 +303,18 @@ def check_event_expiry(laws_enacted_this_tick: int) -> bool:
     active = load_active_event()
     if not active or not active.get("fired_at"):
         return False
-    fired_dt = datetime.fromisoformat(active["fired_at"])
+    try:
+        fired_dt = datetime.fromisoformat(active["fired_at"].replace("Z", "+00:00"))
+        if fired_dt.tzinfo is None:
+            fired_dt = fired_dt.replace(tzinfo=timezone.utc)
+    except (ValueError, AttributeError):
+        save_active_event({})
+        return False
     now = datetime.now(timezone.utc)
-    duration = active.get("duration_hours", 4)
+    try:
+        duration = float(active.get("duration_hours", 4))
+    except (TypeError, ValueError):
+        duration = 4.0
     if now < fired_dt + timedelta(hours=duration):
         return False
     responded = laws_enacted_this_tick > 0
@@ -1090,22 +1102,26 @@ def upsert_bot_comment(issue_num: int, body: str):
     """Edit the tracked pinned comment for this issue, or post and track a new one."""
     ids = _load_pinned_ids()
     comment_id = ids.get(str(issue_num))
-    tmp = Path("scripts/_upsert_payload.json")
-    tmp.write_text(json.dumps({"body": body}), encoding="utf-8")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as tf:
+        tf.write(json.dumps({"body": body}))
+        payload_path = tf.name
     if comment_id:
         result = run(["gh", "api", "--method", "PATCH",
                       f"repos/{REPO}/issues/comments/{comment_id}",
-                      "--input", str(tmp)])
-        tmp.unlink(missing_ok=True)
+                      "--input", payload_path])
+        Path(payload_path).unlink(missing_ok=True)
         if result:
             print(f"  Updated pinned comment #{comment_id} on issue #{issue_num}")
             return
         print(f"  [WARN] PATCH failed for comment #{comment_id}, posting new")
-    tmp2 = Path("scripts/_upsert_body.txt")
-    tmp2.write_text(body, encoding="utf-8")
+    else:
+        Path(payload_path).unlink(missing_ok=True)
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, encoding="utf-8") as tf:
+        tf.write(body)
+        body_path = tf.name
     result = run(["gh", "issue", "comment", str(issue_num), "--repo", REPO,
-                  "--body-file", str(tmp2)])
-    tmp2.unlink(missing_ok=True)
+                  "--body-file", body_path])
+    Path(body_path).unlink(missing_ok=True)
     m = re.search(r"issuecomment-(\d+)", result)
     if m:
         new_id = int(m.group(1))
@@ -1301,7 +1317,7 @@ def collect_star_income():
 def get_ai_proposals() -> list:
     issues = gh_json([
         "issue", "list", "--repo", REPO, "--label", "ai-proposal",
-        "--state", "open", "--json", "number,title,body,createdAt,reactions", "--limit", "50",
+        "--state", "open", "--json", "number,title,body,createdAt", "--limit", "50",
     ])
     return sorted(issues, key=lambda x: x["number"])
 
@@ -1406,7 +1422,7 @@ def process_ai_proposal(issue: dict):
 def get_feedbacks() -> list:
     issues = gh_json([
         "issue", "list", "--repo", REPO, "--label", "feedback",
-        "--state", "open", "--json", "number,title,body,createdAt,reactions", "--limit", "50",
+        "--state", "open", "--json", "number,title,body,createdAt", "--limit", "50",
     ])
     return sorted(issues, key=lambda x: x["number"])
 
@@ -1827,12 +1843,7 @@ def generate_annals(history: list):
     content = response.choices[0].message.content.strip()
     chapter_path.parent.mkdir(parents=True, exist_ok=True)
     chapter_path.write_text(content + "\n", encoding="utf-8")
-    tag = f"annals/ch-{chapter_num:03d}"
-    run(["gh", "release", "create", tag, "--repo", REPO,
-         "--title", f"[Annals] Chapter {chapter_num:03d}",
-         "--notes-file", str(chapter_path),
-         "--target", "master"])
-    print(f"  Annals chapter {chapter_num} published as Release {tag}")
+    print(f"  Annals chapter {chapter_num} written to {chapter_path}")
 
 
 # ── Event chains ──────────────────────────────────────────────────────────────
@@ -1941,7 +1952,24 @@ def generate_citizen_narrator():
     print("  Citizen narrator updated")
 
 
+def _ensure_labels():
+    labels = [
+        ("ai-proposal",    "0075ca", "AI-generated proposal"),
+        ("applied",        "0e8a16", "Feedback or effect applied"),
+        ("citizen-voices", "d93f0b", "Weekly citizen diary"),
+        ("dispatch",       "e4e669", "World Chronicle dispatch"),
+        ("event",          "6f42c1", "Active world event"),
+        ("feedback",       "fbca04", "Citizen feedback"),
+        ("passed",         "0e8a16", "Proposal passed and enacted"),
+        ("rejected",       "d73a4a", "Proposal rejected"),
+    ]
+    for name, color, desc in labels:
+        run(["gh", "label", "create", name, "--repo", REPO,
+             "--color", color, "--description", desc, "--force"])
+
+
 def main():
+    _ensure_labels()
     collect_star_income()
     tick_changed = world_autonomous_tick()
 
@@ -2053,6 +2081,7 @@ def main():
 
     unpushed = run(["git", "log", "origin/master..HEAD", "--oneline"])
     if unpushed:
+        run(["git", "pull", "--rebase", "origin", "master"])
         run(["git", "push", "origin", "master", "--follow-tags"])
         print("Pushed.")
 
