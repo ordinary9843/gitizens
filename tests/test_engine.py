@@ -714,3 +714,151 @@ class TestAnnalsGeneration:
             tv.generate_annals(history)
         mock_client.chat.completions.create.assert_not_called()
         assert chapter.read_text() == "existing content\n"
+
+
+# ===========================================================================
+# apply_effect — state_patch allowlist (C1 defense-in-depth)
+# ===========================================================================
+
+class TestApplyEffectStatePatch:
+    def test_allowed_key_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        effect = {"type": "state_patch", "patch": {"treasury": 500}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == 500
+
+    def test_blocked_key_silently_skipped(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        original = {**BASE_STATE, "laws_count": 5}
+        (tmp_path / "world/state.json").write_text(json.dumps(original))
+        effect = {"type": "state_patch", "patch": {"laws_count": 0, "treasury": 300}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["laws_count"] == 5   # blocked key unchanged
+        assert state["treasury"] == 300   # allowed key applied
+        assert "BLOCKED" in capsys.readouterr().out
+
+    def test_numeric_value_clamped_to_0_100(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        effect = {"type": "state_patch", "patch": {"education": 999}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["education"] == 100  # clamped
+
+    def test_null_value_skipped(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        original = {**BASE_STATE}
+        (tmp_path / "world/state.json").write_text(json.dumps(original))
+        effect = {"type": "state_patch", "patch": {"education": None}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["education"] == BASE_STATE["education"]  # unchanged
+        assert "BLOCKED" in capsys.readouterr().out
+
+    def test_treasury_capped_at_100000(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        effect = {"type": "state_patch", "patch": {"treasury": 9_999_999}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == 100_000
+
+
+# ===========================================================================
+# check_proposal_cooldown — robustness (M1)
+# ===========================================================================
+
+class TestProposalCooldownRobustness:
+    def test_corrupted_json_file_returns_ok(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/proposal_cooldowns.json").write_text("{ NOT VALID JSON }")
+        effect = {"type": "policy", "changes": {"education": 10}}
+        ok, _ = tv.check_proposal_cooldown(effect)
+        assert ok  # corrupted file → fail open (don't block proposals)
+
+    def test_malformed_date_in_cooldowns_returns_ok(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": "not-a-date"}))
+        effect = {"type": "policy", "changes": {"education": 10}}
+        ok, _ = tv.check_proposal_cooldown(effect)
+        assert ok  # malformed date for metric → skip that metric
+
+
+# ===========================================================================
+# process_feedback — world engine triggered, citizen tracking (H1, H3)
+# ===========================================================================
+
+class TestProcessFeedbackWorldEngine:
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        (tmp_path / "world/citizens.json").write_text("{}")
+        (tmp_path / "world/active_event.json").write_text("{}")
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world/entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+
+    def test_feedback_triggers_world_engine(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        # education at 60; feedback pushes it above 55 threshold → National University
+        state = {**BASE_STATE, "education": 53}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        issue = {
+            "number": 42, "title": "[FEEDBACK] Test", "createdAt": "2020-01-01T00:00:00Z",
+            "body": "## Description\n\nTest\n\n## Effect\n\n```yaml\ntype: policy\nchanges:\n  education: +5\n```\n",
+        }
+        engine_calls = []
+        with patch.object(tv, "get_reactions", return_value=(1, 0, ["alice"], [])), \
+             patch.object(tv, "run", return_value=""), \
+             patch.object(tv, "run_world_engine", side_effect=lambda n: engine_calls.append(n) or []):
+            tv.SKIP_TIMING = True
+            tv.process_feedback(issue)
+            tv.SKIP_TIMING = False
+        assert None in engine_calls  # world engine called with None for feedback
+
+    def test_feedback_tracks_citizen_activity(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        issue = {
+            "number": 43, "title": "[FEEDBACK] Test", "createdAt": "2020-01-01T00:00:00Z",
+            "body": "## Description\n\nTest\n\n## Effect\n\n```yaml\ntype: policy\nchanges:\n  welfare: +1\n```\n",
+        }
+        with patch.object(tv, "get_reactions", return_value=(1, 0, ["bob"], [])), \
+             patch.object(tv, "run", return_value=""), \
+             patch.object(tv, "run_world_engine", return_value=[]):
+            tv.SKIP_TIMING = True
+            tv.process_feedback(issue)
+            tv.SKIP_TIMING = False
+        citizens = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "bob" in citizens
+        assert citizens["bob"]["total_votes"] == 1
+
+    def test_dismissed_feedback_still_tracks_voters(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        issue = {
+            "number": 44, "title": "[FEEDBACK] Test", "createdAt": "2020-01-01T00:00:00Z",
+            "body": "anything",
+        }
+        with patch.object(tv, "get_reactions", return_value=(0, 1, [], ["carol"])), \
+             patch.object(tv, "run", return_value=""):
+            tv.SKIP_TIMING = True
+            result = tv.process_feedback(issue)
+            tv.SKIP_TIMING = False
+        assert result is False
+        citizens = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "carol" in citizens  # tracked even on dismissed feedback

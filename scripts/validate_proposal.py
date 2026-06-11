@@ -32,6 +32,20 @@ REQUIRED_FIELDS = {
 
 COOLDOWN_DAYS = 14
 
+# state_patch allowlist — any key outside this set is rejected
+_PATCH_ALLOWED = {
+    "treasury", "currency", "founded_date",
+    "education", "industry", "welfare", "green_policy", "defense",
+    "pollution", "stability", "population",
+}
+_PATCH_0_100 = {"education", "industry", "welfare", "green_policy", "defense", "pollution", "stability"}
+
+# evolve.changes must not touch these system-managed fields
+_EVOLVE_BLOCKED = {
+    "id", "built_law", "built_at", "auto_trigger",
+    "demolished_law", "demolished_at", "demolished_reason", "last_evolved_law",
+}
+
 
 def gh(*args):
     subprocess.run(["gh", *args], check=False)
@@ -59,16 +73,19 @@ def check_cooldown_for_proposal(effect_data: dict) -> tuple[bool, str]:
         return True, ""
     try:
         cooldowns = json.loads(path.read_text(encoding="utf-8"))
-        today = datetime.now(timezone.utc).date()
-        for metric in effect_data.get("changes", {}):
-            if metric not in cooldowns:
-                continue
+    except (json.JSONDecodeError, OSError):
+        return True, ""
+    today = datetime.now(timezone.utc).date()
+    for metric in effect_data.get("changes", {}):
+        if metric not in cooldowns:
+            continue
+        try:
             last_date = datetime.fromisoformat(cooldowns[metric]).date()
-            if (today - last_date).days < COOLDOWN_DAYS:
-                until = (last_date + timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
-                return False, f"metric '{metric}' on cooldown until {until}"
-    except Exception:
-        pass
+        except (ValueError, TypeError):
+            continue
+        if (today - last_date).days < COOLDOWN_DAYS:
+            until = (last_date + timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
+            return False, f"metric '{metric}' on cooldown until {until}"
     return True, ""
 
 
@@ -151,6 +168,55 @@ def validate():
             if not found:
                 fail(f"Entity `{entity_id}` does not exist. "
                      "Check [world/WORLD.md](world/WORLD.md) for valid entity IDs.")
+            evo_changes = effect_data.get("changes", {})
+            if not isinstance(evo_changes, dict) or not evo_changes:
+                fail("evolve `changes` must be a non-empty mapping.")
+            for key in evo_changes:
+                if key in _EVOLVE_BLOCKED:
+                    fail(f"evolve `changes` cannot modify system field `{key}`.")
+                if not isinstance(evo_changes[key], (str, int, float, bool)):
+                    fail(f"evolve `changes.{key}` must be a scalar value (string or number).")
+
+        if effect_type == "state_patch":
+            patch = effect_data.get("patch", {})
+            if not isinstance(patch, dict) or not patch:
+                fail("state_patch `patch` must be a non-empty mapping.")
+            for key in patch:
+                if key not in _PATCH_ALLOWED:
+                    fail(f"state_patch key `{key}` is not allowed. "
+                         f"Allowed: {', '.join(sorted(_PATCH_ALLOWED))}")
+            for key, val in patch.items():
+                if key in _PATCH_0_100:
+                    try:
+                        v = int(val)
+                    except (TypeError, ValueError):
+                        fail(f"state_patch `{key}` must be an integer, got {type(val).__name__}.")
+                    if not (0 <= v <= 100):
+                        fail(f"state_patch `{key}` must be between 0 and 100.")
+                elif key == "population":
+                    try:
+                        v = int(val)
+                    except (TypeError, ValueError):
+                        fail("state_patch `population` must be an integer.")
+                    if not (0 <= v <= 10_000_000):
+                        fail("state_patch `population` must be between 0 and 10,000,000.")
+                elif key == "treasury":
+                    try:
+                        v = int(val)
+                    except (TypeError, ValueError):
+                        fail("state_patch `treasury` must be an integer.")
+                    if not (0 <= v <= 100_000):
+                        fail("state_patch `treasury` must be between 0 and 100,000.")
+                elif key == "currency":
+                    if not isinstance(val, str) or not val.strip() or len(val) > 30:
+                        fail("state_patch `currency` must be a non-empty string (max 30 chars).")
+                elif key == "founded_date":
+                    if not isinstance(val, str):
+                        fail("state_patch `founded_date` must be a string (ISO date).")
+                    try:
+                        datetime.fromisoformat(val)
+                    except ValueError:
+                        fail(f"state_patch `founded_date` must be a valid ISO date, got '{val}'.")
 
     # LLM contextual validation
     ctx = load_world_context()

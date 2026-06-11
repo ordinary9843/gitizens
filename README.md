@@ -69,5 +69,3 @@ Claude will show you the current world state, guide you through writing the prop
 | **Buildings** | Auto-created/removed by the world engine based on metric thresholds |
 
 ---
-
-*World ticks every 4 hours · MIT License*

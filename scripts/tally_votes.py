@@ -52,7 +52,7 @@ BASE_STATE_FIELDS = {
     "treasury", "currency", "stars_last_counted",
     "education", "industry", "welfare", "green_policy", "defense",
     "population", "pollution", "stability",
-    "tags_applied",
+    "tags_applied", "next_tick_at", "last_narrator_date",
 }
 
 # (metric, appear_threshold, category, entity_name, remove_threshold)
@@ -94,6 +94,8 @@ RARITY_WEIGHTS = {"common": 60, "uncommon": 25, "rare": 10, "legendary": 5}
 
 def run(cmd: list[str]) -> str:
     result = subprocess.run(cmd, capture_output=True, encoding="utf-8", errors="replace")
+    if result.returncode != 0 and result.stderr.strip():
+        print(f"  [WARN] {cmd[0]} {cmd[1] if len(cmd) > 1 else ''}: {result.stderr.strip()[:300]}")
     return result.stdout.strip()
 
 
@@ -450,7 +452,7 @@ def world_autonomous_tick() -> bool:
 
 # ── World engine ─────────────────────────────────────────────────────────────
 
-def run_world_engine(law_number: int) -> list[str]:
+def run_world_engine(law_number: int | None) -> list[str]:
     """Auto-create/remove entities based on current policy metrics."""
     state = read_state()
     changes = []
@@ -506,8 +508,35 @@ def apply_effect(effect_data: dict | None, law_number: int):
 
     elif etype == "state_patch":
         patch = effect_data.get("patch", {})
+        _ALLOWED = {
+            "treasury", "currency", "founded_date",
+            "education", "industry", "welfare", "green_policy", "defense",
+            "pollution", "stability", "population",
+        }
+        _NUMERIC_0_100 = {"education", "industry", "welfare", "green_policy",
+                          "defense", "pollution", "stability"}
         state = read_state()
-        state.update(patch)
+        for key, val in patch.items():
+            if key not in _ALLOWED:
+                print(f"  [BLOCKED] state_patch key '{key}' not in allowlist — skipped")
+                continue
+            if key in _NUMERIC_0_100:
+                try:
+                    state[key] = max(0, min(100, int(val)))
+                except (TypeError, ValueError):
+                    print(f"  [BLOCKED] state_patch key '{key}' invalid value '{val}' — skipped")
+            elif key == "population":
+                try:
+                    state[key] = max(0, min(10_000_000, int(val)))
+                except (TypeError, ValueError):
+                    print(f"  [BLOCKED] state_patch key '{key}' invalid value '{val}' — skipped")
+            elif key == "treasury":
+                try:
+                    state[key] = max(0, min(100_000, int(val)))
+                except (TypeError, ValueError):
+                    print(f"  [BLOCKED] state_patch key '{key}' invalid value '{val}' — skipped")
+            else:
+                state[key] = val  # currency, founded_date — validated at proposal time
         write_state(state)
 
 
@@ -963,7 +992,7 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
         history = json.loads(Path("world/history.json").read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         pass
-    tick_num = len(history)
+    tick_num = len(history) + 1  # this tick hasn't been snapshotted yet
 
     metrics_str = (
         f"population {state.get('population',0):,} · "
@@ -1049,7 +1078,9 @@ def collect_star_income():
     currency = state.get("currency", "Git Coins")
     state["treasury"] = state.get("treasury", 0) + income
     write_state(state)
-    run(["git", "add", "world/state.json"])
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    generate_dashboard_svg(read_stats(), today)
+    run(["git", "add", "world/state.json", "world/stats.svg"])
     run(["git", "commit", "-m",
          f"[WORLD] treasury: +{income} {currency} from {new_stars} star(s)"])
     print(f"  Star income: +{new_stars} stars → +{income} {currency}")
@@ -1131,6 +1162,7 @@ def process_ai_proposal(issue: dict):
     generate_dashboard_svg(stats, today)
     generate_map_svg(today)
     generate_world_md(state, law_number, today)
+    update_readme(state, stats, law_number, today)
     update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
     update_proposal_cooldown(effect_data, today)
 
@@ -1181,8 +1213,9 @@ def process_feedback(issue: dict) -> bool:
         print(f"  Feedback #{number}: window not over, skipping")
         return False
 
-    _, against_votes, _, _ = get_reactions(number)
+    _, against_votes, for_voters, against_voters = get_reactions(number)
     clean_title = re.sub(r"^\[FEEDBACK\]\s*", "", title).strip()
+    track_citizen_activity(for_voters, against_voters)
 
     if against_votes > 0:
         print(f"  Feedback #{number}: DISMISSED ({against_votes} 👎)")
@@ -1205,6 +1238,7 @@ def process_feedback(issue: dict) -> bool:
             elif metric in ("stability", "pollution"):
                 state[metric] = max(0, min(100, state.get(metric, 0) + int(delta)))
         write_state(state)
+        run_world_engine(None)
 
         changes_str = ", ".join(
             f"{k} {'+' if int(v) > 0 else ''}{v}" for k, v in changes.items()
@@ -1359,13 +1393,14 @@ def process_issue(issue: dict):
             currency  = state_before.get("currency", "Git Coins")
             cost_line = f"**Treasury:** -{POLICY_COST} {currency} (balance: {state.get('treasury', 0)} {currency})  \n"
 
-        proposer = issue.get("author", {}).get("login", "unknown")
+        proposer = issue.get("author", {}).get("login") or ""
+        proposer_display = f"@{proposer}" if proposer else "*(unknown)*"
         signatories_block = format_signatories(for_voters, against_voters)
         Path(f"world/laws/law-{law_number:03d}.md").write_text(
             f"# Law {law_number:03d}: {clean_title}\n\n"
             f"**Enacted:** {today}  \n"
             f"**Proposal:** [#{number}]({issue_url})  \n"
-            f"**Proposed by:** @{proposer}  \n"
+            f"**Proposed by:** {proposer_display}  \n"
             f"**Vote:** {for_votes} for, {against_votes} against  \n"
             f"{cost_line}"
             f"{signatories_block}\n"
@@ -1379,7 +1414,8 @@ def process_issue(issue: dict):
         append_history(law_number, clean_title, number, for_votes, against_votes, True, today)
         update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
         track_citizen_activity(for_voters, against_voters)
-        track_citizen_proposal(proposer)
+        if proposer:
+            track_citizen_proposal(proposer)
         run(["git", "add", "-A"])
         run(["git", "commit", "-m",
              f"[LAW] law-{law_number:03d}: {clean_title} (#{number})"])
@@ -1467,12 +1503,18 @@ def check_proposal_cooldown(effect_data: dict | None) -> tuple[bool, str]:
     path = Path("world/proposal_cooldowns.json")
     if not path.exists():
         return True, ""
-    cooldowns = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        cooldowns = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return True, ""
     today = datetime.now(timezone.utc).date()
     for metric in effect_data.get("changes", {}):
         if metric not in cooldowns:
             continue
-        last_date = datetime.fromisoformat(cooldowns[metric]).date()
+        try:
+            last_date = datetime.fromisoformat(cooldowns[metric]).date()
+        except (ValueError, TypeError):
+            continue
         if (today - last_date).days < COOLDOWN_DAYS:
             until = (last_date + timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
             return False, f"metric '{metric}' on cooldown until {until}"
@@ -1638,6 +1680,8 @@ def generate_citizen_narrator():
         f"{narrative}\n\n"
         f"*These are fictional citizen perspectives generated by the world engine.*"
     )
+    run(["gh", "label", "create", "citizen-voices", "--repo", REPO,
+         "--color", "d93f0b", "--description", "Weekly citizen diary", "--force"])
     run(["gh", "issue", "create", "--repo", REPO,
          "--title", f"📖 Citizen Voices — {today_str}",
          "--label", "citizen-voices",
