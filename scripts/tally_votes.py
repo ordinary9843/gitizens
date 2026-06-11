@@ -592,7 +592,7 @@ def generate_dashboard_svg(stats: dict, date: str):
     pop = state.get("population", 0)
     stb = state.get("stability", 0)
 
-    def bar_w(val, max_w=140):
+    def bar_w(val, max_w=270):
         return max(int(val / 100 * max_w), 2 if val > 0 else 0)
 
     def mc(val):  # metric color
@@ -685,11 +685,14 @@ def generate_map_svg(date: str):
     CELLS_TOP = 58
 
     CELL_PAD = 12
-    CHIP_W, CHIP_H, CHIP_GAP = 58, 22, 6
+    CHIP_W, CHIP_H, CHIP_GAP = 58, 30, 6
 
     chips_per_row = (CELL_W - 2 * CELL_PAD + CHIP_GAP) // (CHIP_W + CHIP_GAP)
     chip_rows     = (CELL_H - 38) // (CHIP_H + CHIP_GAP)
     MAX_CHIPS     = chips_per_row * chip_rows
+
+    def _trunc(s: str, n: int = 9) -> str:
+        return s[:n] + "…" if len(s) > n else s
 
     state = read_state()
     pol = pollution_level(state)
@@ -700,12 +703,20 @@ def generate_map_svg(date: str):
     for cat, label in CATEGORIES:
         try:
             idx = read_json(Path(f"world/entities/{cat}/_index.json"))
-            entities = [e for e in idx.get("entities", [])
-                        if Path(f"world/entities/{cat}/{e}.json").exists()]
+            entity_records = []
+            for eid in idx.get("entities", []):
+                p = Path(f"world/entities/{cat}/{eid}.json")
+                if not p.exists():
+                    continue
+                try:
+                    e = read_json(p)
+                    entity_records.append({"id": eid, "name": e.get("name", eid)})
+                except (json.JSONDecodeError, OSError):
+                    entity_records.append({"id": eid, "name": eid})
         except (FileNotFoundError, json.JSONDecodeError, OSError):
-            entities = []
-        categories_data.append((cat, label, entities))
-        total_entities += len(entities)
+            entity_records = []
+        categories_data.append((cat, label, entity_records))
+        total_entities += len(entity_records)
 
     lines = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}">',
@@ -733,14 +744,15 @@ def generate_map_svg(date: str):
         if count == 0:
             lines.append(f'  <text x="{cx + CELL_PAD}" y="{cy + 58}" fill="#30363d" font-family="monospace" font-size="10">— none yet —</text>')
         else:
-            show     = entities[:MAX_CHIPS - 1] if count > MAX_CHIPS else entities
+            show     = entity_records[:MAX_CHIPS - 1] if count > MAX_CHIPS else entity_records
             overflow = count - len(show)
-            for j, eid in enumerate(show):
+            for j, rec in enumerate(show):
                 fx = cx + CELL_PAD + (j % chips_per_row) * (CHIP_W + CHIP_GAP)
                 fy = cy + 32       + (j // chips_per_row) * (CHIP_H + CHIP_GAP)
                 lines += [
                     f'  <rect x="{fx}" y="{fy}" width="{CHIP_W}" height="{CHIP_H}" rx="3" fill="#161b22" stroke="{color}" stroke-width="1"/>',
-                    f'  <text x="{fx + CHIP_W // 2}" y="{fy + 15}" fill="#c9d1d9" font-family="monospace" font-size="9" text-anchor="middle">{eid}</text>',
+                    f'  <text x="{fx + CHIP_W // 2}" y="{fy + 12}" fill="#c9d1d9" font-family="monospace" font-size="8" text-anchor="middle">{_trunc(rec["name"])}</text>',
+                    f'  <text x="{fx + CHIP_W // 2}" y="{fy + 24}" fill="#484f58" font-family="monospace" font-size="7" text-anchor="middle">{rec["id"]}</text>',
                 ]
             if overflow > 0:
                 j  = len(show)
@@ -748,7 +760,7 @@ def generate_map_svg(date: str):
                 fy = cy + 32       + (j // chips_per_row) * (CHIP_H + CHIP_GAP)
                 lines += [
                     f'  <rect x="{fx}" y="{fy}" width="{CHIP_W}" height="{CHIP_H}" rx="3" fill="#161b22" stroke="#484f58" stroke-width="1"/>',
-                    f'  <text x="{fx + CHIP_W // 2}" y="{fy + 15}" fill="#484f58" font-family="monospace" font-size="9" text-anchor="middle">+{overflow} more</text>',
+                    f'  <text x="{fx + CHIP_W // 2}" y="{fy + 18}" fill="#484f58" font-family="monospace" font-size="9" text-anchor="middle">+{overflow} more</text>',
                 ]
 
     lines.append('</svg>')
