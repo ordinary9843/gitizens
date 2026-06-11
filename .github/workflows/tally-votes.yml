@@ -35,6 +35,12 @@ jobs:
       - name: Install dependencies
         run: pip install openai pyyaml
 
+      - name: Run tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python -m pytest tests/ -q
+
       - name: Tally votes and apply effects
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
