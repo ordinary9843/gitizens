@@ -1146,7 +1146,7 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
     narrative = response.choices[0].message.content.strip()
 
     comment = (
-        f"## 📰 Dispatch — {today} · Tick {tick_num}\n\n"
+        f"## Dispatch — {today} · Tick {tick_num}\n\n"
         f"{narrative}\n\n"
         f"**Metrics:** {metrics_str}  \n"
         f"**This tick:** {changes_summary}"
