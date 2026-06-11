@@ -16,6 +16,7 @@ from openai import OpenAI
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 REPO = os.environ["GITHUB_REPOSITORY"]
 VOTING_PERIOD_DAYS = 1
+AI_VOTING_HOURS = 4
 SKIP_TIMING = os.environ.get("SKIP_TIMING_CHECK", "").lower() in ("1", "true", "yes")
 
 client = OpenAI(
@@ -897,6 +898,124 @@ def append_history(law_number: int | None, title: str, issue_number: int,
     path.write_text(content + row + "\n", encoding="utf-8")
 
 
+# ── Laws index ────────────────────────────────────────────────────────────────
+
+def update_laws_index(law_number: int, title: str, issue_number: int,
+                      issue_url: str, era: str, date: str):
+    path = Path("world/laws_index.json")
+    data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    data.append({
+        "number": law_number,
+        "title": title,
+        "issue_number": issue_number,
+        "issue_url": issue_url,
+        "enacted_date": date,
+        "era": era,
+    })
+    if len(data) > 20:
+        data = data[-20:]
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+# ── World dispatch ─────────────────────────────────────────────────────────────
+
+def get_or_create_dispatch_issue() -> int:
+    issues = gh_json([
+        "issue", "list", "--repo", REPO, "--label", "dispatch",
+        "--state", "open", "--json", "number", "--limit", "1",
+    ])
+    if issues:
+        return issues[0]["number"]
+    body = (
+        "This issue is the permanent news feed for **Gitizens**.\n\n"
+        "Every 4 hours, the world narrator posts a dispatch summarizing "
+        "what happened in the latest tick — laws passed, events fired, "
+        "population changes, and more.\n\n"
+        "*React with 👍 to follow the chronicle.*"
+    )
+    tmp = Path("scripts/_dispatch_body.txt")
+    tmp.write_text(body, encoding="utf-8")
+    result = run(["gh", "issue", "create", "--repo", REPO,
+                  "--title", "📰 World Chronicle — The Gitizens Dispatch",
+                  "--label", "dispatch",
+                  "--body-file", str(tmp)])
+    tmp.unlink(missing_ok=True)
+    try:
+        return int(result.strip().split("/")[-1])
+    except (ValueError, IndexError):
+        return 0
+
+
+def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
+                        event_title: str, feedback_count: int):
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    history = []
+    try:
+        history = json.loads(Path("world/history.json").read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+    tick_num = len(history)
+
+    metrics_str = (
+        f"population {state.get('population',0):,} · "
+        f"treasury {state.get('treasury',0)} GC · "
+        f"stability {state.get('stability',0)}/100 · "
+        f"pollution {state.get('pollution',0)}/100"
+    )
+    changes_parts = []
+    if tick_changed:
+        changes_parts.append("autonomous tick applied")
+    if laws_passed:
+        changes_parts.append(f"{laws_passed} law{'s' if laws_passed > 1 else ''} enacted")
+    if feedback_count:
+        changes_parts.append(f"{feedback_count} citizen feedback{'s' if feedback_count > 1 else ''} applied")
+    if event_title:
+        changes_parts.append(f"event: {event_title}")
+    changes_summary = " · ".join(changes_parts) if changes_parts else "quiet tick"
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": (
+            "You are the narrator of Gitizens, a GitHub-based civilization.\n"
+            f"Tick #{tick_num} just completed on {today}.\n"
+            f"World state: era={state.get('era')}, {metrics_str}\n"
+            f"This tick: {changes_summary}\n\n"
+            "Write a 2-3 sentence news dispatch in the style of a newspaper. "
+            "Mention specific numbers. Tone: serious but vivid. No emoji, no markdown headers."
+        )}],
+        max_tokens=120,
+        temperature=0.7,
+    )
+    narrative = response.choices[0].message.content.strip()
+
+    comment = (
+        f"## 📰 Dispatch — {today} · Tick {tick_num}\n\n"
+        f"{narrative}\n\n"
+        f"**Metrics:** {metrics_str}  \n"
+        f"**This tick:** {changes_summary}"
+    )
+
+    issue_num = get_or_create_dispatch_issue()
+    if issue_num:
+        run(["gh", "issue", "comment", str(issue_num), "--repo", REPO, "--body", comment])
+        print(f"  Dispatch posted to issue #{issue_num}")
+
+    dispatches_path = Path("world/dispatches.json")
+    try:
+        dispatches = json.loads(dispatches_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        dispatches = []
+    dispatches.append({
+        "tick": tick_num,
+        "date": today,
+        "narrative": narrative,
+        "changes": changes_summary,
+    })
+    if len(dispatches) > 10:
+        dispatches = dispatches[-10:]
+    dispatches_path.write_text(json.dumps(dispatches, indent=2) + "\n", encoding="utf-8")
+
+
 # ── Star income ───────────────────────────────────────────────────────────────
 
 def collect_star_income():
@@ -925,6 +1044,160 @@ def collect_star_income():
     run(["git", "commit", "-m",
          f"[WORLD] treasury: +{income} {currency} from {new_stars} star(s)"])
     print(f"  Star income: +{new_stars} stars → +{income} {currency}")
+
+
+# ── AI citizen processing ─────────────────────────────────────────────────────
+
+def get_ai_proposals() -> list:
+    issues = gh_json([
+        "issue", "list", "--repo", REPO, "--label", "ai-proposal",
+        "--state", "open", "--json", "number,title,body,createdAt,reactions", "--limit", "50",
+    ])
+    return sorted(issues, key=lambda x: x["number"])
+
+
+def process_ai_proposal(issue: dict):
+    number = issue["number"]
+    title = issue["title"]
+    body = issue.get("body") or ""
+    created_at = datetime.fromisoformat(issue["createdAt"].replace("Z", "+00:00"))
+    now = datetime.now(timezone.utc)
+
+    if not SKIP_TIMING and (now - created_at) < timedelta(hours=AI_VOTING_HOURS):
+        print(f"  AI-proposal #{number}: window not over, skipping")
+        return
+
+    _, against_votes, _, against_voters = get_reactions(number)
+    today = now.strftime("%Y-%m-%d")
+    clean_title = re.sub(r"^\[AI-PROPOSAL\]\s*", "", title).strip()
+    issue_url = f"https://github.com/{REPO}/issues/{number}"
+
+    if against_votes > 0:
+        print(f"  AI-proposal #{number}: VETOED ({against_votes} 👎)")
+        stats = read_stats()
+        stats["proposals_total"] = stats.get("proposals_total", 0) + 1
+        stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
+        write_stats(stats)
+        run(["gh", "issue", "comment", str(number), "--repo", REPO,
+             "--body", f"**AI proposal vetoed** by citizen vote ({against_votes} 👎). No effect applied."])
+        run(["gh", "issue", "edit", str(number), "--repo", REPO,
+             "--add-label", "rejected", "--remove-label", "ai-proposal"])
+        run(["gh", "issue", "close", str(number), "--repo", REPO])
+        return
+
+    law_number = next_law_number()
+    state_before = read_state()
+    effect_data = parse_effect(body)
+
+    print(f"  AI-proposal #{number}: PASSED (no veto) -> law-{law_number:03d}")
+    narrative = generate_narrative(clean_title, 0, 0, state_before)
+
+    apply_effect(effect_data, law_number)
+    world_changes = run_world_engine(law_number)
+
+    state = read_state()
+    state["era"] = determine_era(state)
+    state["laws_count"] = law_number
+    state["last_enacted"] = today
+    state["world_summary"] = update_world_summary(state)
+    threshold_tags = check_threshold_tags(state_before, state)
+    write_state(state)
+
+    stats = read_stats()
+    stats["proposals_total"] = stats.get("proposals_total", 0) + 1
+    stats["proposals_passed"] = stats.get("proposals_passed", 0) + 1
+    write_stats(stats)
+
+    generate_dashboard_svg(stats, today)
+    generate_map_svg(today)
+    generate_world_md(state, law_number, today)
+    update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
+
+    Path(f"world/laws/law-{law_number:03d}.md").write_text(
+        f"# Law {law_number:03d}: {clean_title}\n\n"
+        f"**Enacted:** {today}  \n"
+        f"**Proposal:** [#{number}]({issue_url})  \n"
+        f"**Proposed by:** AI citizen  \n"
+        f"**Vote:** auto-passed (no veto)  \n"
+        "\n---\n\n"
+        f"{body}\n\n"
+        "---\n\n"
+        f"*{narrative}*\n",
+        encoding="utf-8",
+    )
+    append_history(law_number, clean_title, number, 0, 0, True, today)
+    run(["git", "add", "-A"])
+    run(["git", "commit", "-m", f"[LAW] law-{law_number:03d}: {clean_title} (AI, #{number})"])
+    apply_tags(effect_data, state_before, state, law_number, clean_title, threshold_tags)
+
+    world_note = ("\n\n**World changes:** " + ", ".join(world_changes)) if world_changes else ""
+    run(["gh", "issue", "comment", str(number), "--repo", REPO,
+         "--body",
+         f"**Law {law_number:03d} enacted** (AI proposal — no veto received).\n\n"
+         f"{narrative}{world_note}"])
+    run(["gh", "issue", "edit", str(number), "--repo", REPO,
+         "--add-label", "passed", "--remove-label", "ai-proposal"])
+    run(["gh", "issue", "close", str(number), "--repo", REPO])
+
+
+def get_feedbacks() -> list:
+    issues = gh_json([
+        "issue", "list", "--repo", REPO, "--label", "feedback",
+        "--state", "open", "--json", "number,title,body,createdAt,reactions", "--limit", "50",
+    ])
+    return sorted(issues, key=lambda x: x["number"])
+
+
+def process_feedback(issue: dict) -> bool:
+    """Returns True if feedback was applied."""
+    number = issue["number"]
+    title = issue["title"]
+    body = issue.get("body") or ""
+    created_at = datetime.fromisoformat(issue["createdAt"].replace("Z", "+00:00"))
+    now = datetime.now(timezone.utc)
+
+    if not SKIP_TIMING and (now - created_at) < timedelta(hours=AI_VOTING_HOURS):
+        print(f"  Feedback #{number}: window not over, skipping")
+        return False
+
+    _, against_votes, _, _ = get_reactions(number)
+    clean_title = re.sub(r"^\[FEEDBACK\]\s*", "", title).strip()
+
+    if against_votes > 0:
+        print(f"  Feedback #{number}: DISMISSED ({against_votes} 👎)")
+        run(["gh", "issue", "comment", str(number), "--repo", REPO,
+             "--body", f"**Feedback dismissed** by citizens ({against_votes} 👎). No effect applied."])
+        run(["gh", "issue", "edit", str(number), "--repo", REPO,
+             "--add-label", "rejected", "--remove-label", "feedback"])
+        run(["gh", "issue", "close", str(number), "--repo", REPO])
+        return False
+
+    effect_data = parse_effect(body)
+    if effect_data and effect_data.get("type") == "policy":
+        changes = effect_data.get("changes", {})
+        state = read_state()
+        for metric, delta in changes.items():
+            if metric in POLICY_METRICS:
+                state[metric] = max(0, min(100, state.get(metric, 0) + int(delta)))
+            elif metric in ("stability", "pollution"):
+                state[metric] = max(0, min(100, state.get(metric, 0) + int(delta)))
+        write_state(state)
+
+        changes_str = ", ".join(
+            f"{k} {'+' if int(v) > 0 else ''}{v}" for k, v in changes.items()
+        )
+        print(f"  Feedback #{number}: APPLIED ({changes_str})")
+        run(["gh", "issue", "comment", str(number), "--repo", REPO,
+             "--body", f"**Citizen feedback acknowledged.** Effects applied: {changes_str}"])
+    else:
+        print(f"  Feedback #{number}: APPLIED (no mechanical effect)")
+        run(["gh", "issue", "comment", str(number), "--repo", REPO,
+             "--body", "**Citizen feedback noted.** The world has taken notice."])
+
+    run(["gh", "issue", "edit", str(number), "--repo", REPO,
+         "--add-label", "applied", "--remove-label", "feedback"])
+    run(["gh", "issue", "close", str(number), "--repo", REPO])
+    return True
 
 
 # ── Issue processing ──────────────────────────────────────────────────────────
@@ -1066,6 +1339,7 @@ def process_issue(issue: dict):
         )
 
         append_history(law_number, clean_title, number, for_votes, against_votes, True, today)
+        update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
         run(["git", "add", "-A"])
         run(["git", "commit", "-m",
              f"[LAW] law-{law_number:03d}: {clean_title} (#{number})"])
@@ -1116,16 +1390,31 @@ def main():
         if read_state().get("laws_count", 0) > laws_before:
             laws_this_tick += 1
 
+    # Process AI proposals (default pass, 👎 vetoes)
+    for ai_proposal in get_ai_proposals():
+        laws_before = read_state().get("laws_count", 0)
+        process_ai_proposal(ai_proposal)
+        if read_state().get("laws_count", 0) > laws_before:
+            laws_this_tick += 1
+
+    # Process citizen feedbacks (default apply, 👎 dismisses)
+    feedbacks_applied = 0
+    for feedback in get_feedbacks():
+        if process_feedback(feedback):
+            feedbacks_applied += 1
+
     # Check if the active event expired
     active_before = load_active_event()
     resolved_event_title = active_before.get("title", "") if active_before else ""
     event_resolved = check_event_expiry(laws_this_tick)
 
     # Maybe fire a new event if none is active
+    active_event_title = ""
     if not load_active_event():
         state = read_state()
         new_event = fire_random_event(state)
         if new_event:
+            active_event_title = new_event["title"]
             print(f"  Firing event: {new_event['title']} ({new_event['rarity']})")
             apply_event_effects(new_event, "immediate_effects")
             issue_num = open_event_issue(new_event)
@@ -1133,6 +1422,22 @@ def main():
             new_event["issue_number"] = issue_num
             save_active_event(new_event)
             print(f"  Event issue #{issue_num} opened")
+    else:
+        active_event_title = load_active_event().get("title", "")
+
+    # Generate new AI proposals and feedbacks for next cycle
+    from auto_propose import should_generate, generate_ai_proposal, generate_feedbacks as gen_feedbacks
+    should_prop, should_fb = should_generate(REPO)
+    if should_prop:
+        generate_ai_proposal(client, read_state(), REPO)
+    if should_fb:
+        gen_feedbacks(client, read_state(), REPO)
+
+    # Post world dispatch to Chronicle issue
+    post_world_dispatch(
+        read_state(), tick_changed, laws_this_tick,
+        active_event_title, feedbacks_applied,
+    )
 
     # Snapshot world history
     append_history_snapshot(read_state())
