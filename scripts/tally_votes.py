@@ -257,18 +257,20 @@ def open_event_issue(event: dict) -> int:
         f"**Category:** {event.get('category','?').title()}  ·  "
         f"**Rarity:** {event.get('rarity','?').title()}\n\n"
         f"**Immediate effects (already applied):** {imm_str}\n\n"
-        f"**Response window:** 4 hours from now\n\n"
-        f"**If NO law is passed:** {fmt_effects(event.get('default_consequence', {}))}\n\n"
-        f"**If ANY law is passed:** {fmt_effects(event.get('response_consequence', {}))}\n\n"
-        f"> 💡 **Hint:** {event.get('response_hint', 'Pass any law to respond.')}\n"
+        f"**Response window:** 4 hours\n\n"
+        f"**👍 React to mobilise** — response: {fmt_effects(event.get('response_consequence', {}))}\n\n"
+        f"**👎 React to stand down** — default: {fmt_effects(event.get('default_consequence', {}))}\n\n"
+        f"> 💡 **Hint:** {event.get('response_hint', 'React 👍 to trigger the response consequence.')}\n"
     )
-    tmp = Path("scripts/_event_body.txt")
-    tmp.write_text(body, encoding="utf-8")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False,
+                                    encoding="utf-8") as tf:
+        tf.write(body)
+        body_path = tf.name
     result = run(["gh", "issue", "create", "--repo", REPO,
                   "--title", f"[EVENT] {event['title']}",
                   "--label", "event",
-                  "--body-file", str(tmp)])
-    tmp.unlink(missing_ok=True)
+                  "--body-file", body_path])
+    Path(body_path).unlink(missing_ok=True)
     try:
         return int(result.strip().split("/")[-1])
     except (ValueError, IndexError):
@@ -286,11 +288,11 @@ def close_event_issue(issue_number: int, responded: bool, event: dict):
     if responded:
         key = "response_consequence"
         icon = "✅"
-        outcome = "A law was passed in time. Response consequence applied"
+        outcome = "Citizens voted 👍 to mobilise. Response consequence applied"
     else:
         key = "default_consequence"
         icon = "⏰"
-        outcome = "No law was passed. Default consequence applied"
+        outcome = "No citizen response (👎 or no votes). Default consequence applied"
     effects = fmt_effects(event.get(key, {}))
     run(["gh", "issue", "comment", str(issue_number), "--repo", REPO,
          "--body", f"{icon} **Event resolved.** {outcome}: {effects}"])
@@ -317,7 +319,12 @@ def check_event_expiry(laws_enacted_this_tick: int) -> bool:
         duration = 4.0
     if now < fired_dt + timedelta(hours=duration):
         return False
-    responded = laws_enacted_this_tick > 0
+    event_issue = active.get("issue_number", 0)
+    if event_issue:
+        for_votes, against_votes, _, _ = get_reactions(event_issue)
+        responded = for_votes > against_votes
+    else:
+        responded = laws_enacted_this_tick > 0
     consequence_key = "response_consequence" if responded else "default_consequence"
     print(f"  Event expired: {active['title']} — {'responded' if responded else 'no response'}")
     apply_event_effects(active, consequence_key)
@@ -1161,6 +1168,90 @@ def get_or_create_dispatch_issue() -> int:
         return 0
 
 
+def _load_entity_names() -> set[str]:
+    """Return the set of all currently-existing entity names (lowercase)."""
+    names: set[str] = set()
+    for cat in ("buildings", "districts", "institutions", "sectors"):
+        idx_path = Path(f"world/entities/{cat}/_index.json")
+        if not idx_path.exists():
+            continue
+        try:
+            idx = read_json(idx_path)
+            for eid in idx.get("entities", []):
+                p = Path(f"world/entities/{cat}/{eid}.json")
+                if p.exists():
+                    e = read_json(p)
+                    names.add(e.get("name", "").strip().lower())
+        except Exception:
+            pass
+    return names
+
+
+_METRIC_EMOJI = {
+    "education":    "📚",
+    "industry":     "🏭",
+    "welfare":      "🏠",
+    "green_policy": "🌿",
+    "defense":      "⚔️",
+    "pollution":    "☁️",
+}
+
+
+def _build_gap_dashboard(state: dict,
+                         entity_names: set[str] | None = None) -> str:
+    """Return a '🎯 What Needs Your Vote' Markdown block for the Chronicle."""
+    if entity_names is None:
+        entity_names = _load_entity_names()
+
+    pending: list[tuple[int, str, int, int, str]] = []
+    at_risk: list[tuple[str, int, int, str]] = []
+
+    for metric, appear, _cat, name, remove in WORLD_GENERATION_RULES:
+        if metric == "pollution":
+            continue  # pollution entities are consequences, not player goals
+        value = state.get(metric, 0)
+        exists = name.strip().lower() in entity_names
+        if not exists and value < appear:
+            gap = appear - value
+            pending.append((gap, metric, value, appear, name))
+        elif exists and value <= remove + 4:
+            at_risk.append((metric, value, remove, name))
+
+    lines: list[str] = ["## 🎯 What Needs Your Vote\n"]
+
+    pending.sort()
+    for gap, metric, value, appear, name in pending[:3]:
+        emoji = _METRIC_EMOJI.get(metric, "📌")
+        lines.append(f"- {emoji} **{name}** — {metric} {value}/{appear} (needs +{gap})")
+
+    for metric, value, remove, name in at_risk:
+        emoji = _METRIC_EMOJI.get(metric, "📌")
+        lines.append(f"- ⚠️ **{name}** at risk — {metric} {value} (removal if < {remove})")
+
+    applied = state.get("tags_applied", [])
+    for field, direction, threshold, tag_name in THRESHOLD_TAGS:
+        if tag_name in applied:
+            continue
+        value = state.get(field, 0)
+        if direction == "above":
+            gap = threshold - value
+            if 0 < gap <= 10:
+                emoji = _METRIC_EMOJI.get(field, "🏆")
+                lines.append(f"- {emoji} Milestone **{tag_name}** — {field} {value}/{threshold} "
+                              f"(needs +{gap})")
+        elif direction == "below":
+            gap = value - threshold
+            if 0 < gap <= 10:
+                emoji = _METRIC_EMOJI.get(field, "🏆")
+                lines.append(f"- {emoji} Milestone **{tag_name}** — {field} {value} → {threshold} "
+                              f"(needs -{gap})")
+
+    if len(lines) == 1:
+        lines.append("- ✅ All near-threshold goals reached — explore new frontiers!")
+
+    return "\n".join(lines)
+
+
 def _build_chronicle_body() -> str:
     """Build the World Chronicle pinned comment from the last 5 dispatches + representatives."""
     dispatches_path = Path("world/dispatches.json")
@@ -1197,6 +1288,14 @@ def _build_chronicle_body() -> str:
                 lines.append("\n---\n")
         except (json.JSONDecodeError, OSError):
             pass
+
+    try:
+        state = read_state()
+        entity_names = _load_entity_names()
+        lines.append(_build_gap_dashboard(state, entity_names))
+        lines.append("\n---\n")
+    except Exception:
+        pass
 
     updated = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     lines.append(

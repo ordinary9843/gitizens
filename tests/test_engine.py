@@ -1690,3 +1690,186 @@ class TestValidateCooldown:
         ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 10}})
         assert ok
+
+
+# ===========================================================================
+# _load_entity_names
+# ===========================================================================
+
+class TestLoadEntityNames:
+    def test_returns_names_from_all_categories(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "Public School", "built_law": 1,
+             "built_at": "", "auto_trigger": ""},
+        ])
+        _make_category(tmp_path, "districts", [
+            {"id": "dst-001", "name": "City Park", "built_law": 2,
+             "built_at": "", "auto_trigger": ""},
+        ])
+        _make_category(tmp_path, "institutions")
+        _make_category(tmp_path, "sectors")
+        names = tv._load_entity_names()
+        assert "public school" in names
+        assert "city park" in names
+
+    def test_missing_category_dir_skipped(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world" / "entities").mkdir(parents=True)
+        names = tv._load_entity_names()
+        assert names == set()
+
+    def test_names_are_lowercase(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "National University", "built_law": 1,
+             "built_at": "", "auto_trigger": ""},
+        ])
+        _make_category(tmp_path, "districts")
+        _make_category(tmp_path, "institutions")
+        _make_category(tmp_path, "sectors")
+        names = tv._load_entity_names()
+        assert "national university" in names
+        assert "National University" not in names
+
+
+# ===========================================================================
+# _build_gap_dashboard
+# ===========================================================================
+
+class TestBuildGapDashboard:
+    def _state(self, **overrides):
+        return {**BASE_STATE, "tags_applied": [], **overrides}
+
+    def test_shows_closest_unbuilt_entity(self):
+        state = self._state(green_policy=62)
+        result = tv._build_gap_dashboard(state, entity_names=set())
+        assert "Nature Reserve" in result
+        assert "+3" in result
+
+    def test_built_entity_not_shown_as_pending(self):
+        state = self._state(green_policy=62)
+        result = tv._build_gap_dashboard(state, entity_names={"nature reserve"})
+        assert "Nature Reserve" not in result
+
+    def test_at_risk_entity_shown(self):
+        state = self._state(green_policy=30)
+        result = tv._build_gap_dashboard(state, entity_names={"nature reserve"})
+        assert "Nature Reserve" in result
+        assert "at risk" in result
+
+    def test_entity_safely_built_not_at_risk(self):
+        state = self._state(green_policy=70)
+        result = tv._build_gap_dashboard(state, entity_names={"nature reserve"})
+        assert "at risk" not in result
+
+    def test_milestone_near_threshold_shown(self):
+        state = self._state(industry=44, tags_applied=[])
+        result = tv._build_gap_dashboard(state, entity_names=set())
+        assert "milestone/industrial-age" in result
+
+    def test_milestone_already_applied_not_shown(self):
+        state = self._state(industry=44, tags_applied=["milestone/industrial-age"])
+        result = tv._build_gap_dashboard(state, entity_names=set())
+        assert "milestone/industrial-age" not in result
+
+    def test_milestone_gap_above_10_not_shown(self):
+        state = self._state(industry=30, tags_applied=[])
+        result = tv._build_gap_dashboard(state, entity_names=set())
+        assert "milestone/industrial-age" not in result
+
+    def test_empty_section_shows_fallback(self):
+        all_tag_names = [t[3] for t in tv.THRESHOLD_TAGS]
+        # pollution=0 means Smog Zone doesn't exist — exclude it from entity_names
+        # so there's no at-risk entity and no pending entity to show
+        state = {
+            "education": 100, "industry": 100, "welfare": 100,
+            "green_policy": 100, "defense": 100, "pollution": 0,
+            "stability": 100, "tags_applied": all_tag_names,
+        }
+        all_entity_names = {r[3].strip().lower() for r in tv.WORLD_GENERATION_RULES
+                            if r[0] != "pollution"}
+        result = tv._build_gap_dashboard(state, entity_names=all_entity_names)
+        assert "All near-threshold goals reached" in result
+
+    def test_shows_at_most_3_pending(self):
+        state = {**BASE_STATE, "education": 0, "industry": 0, "welfare": 0,
+                 "green_policy": 0, "defense": 0, "pollution": 0,
+                 "tags_applied": []}
+        result = tv._build_gap_dashboard(state, entity_names=set())
+        pending_lines = [line for line in result.splitlines() if "needs +" in line]
+        assert len(pending_lines) <= 3
+
+    def test_returns_string_with_header(self):
+        result = tv._build_gap_dashboard(self._state(), entity_names=set())
+        assert "What Needs Your Vote" in result
+        assert isinstance(result, str)
+
+
+# ===========================================================================
+# check_event_expiry — reaction-based voting (Feature A)
+# ===========================================================================
+
+class TestCheckEventExpiryVoting:
+    def _make_expired_event(self, issue_number: int = 42) -> dict:
+        fired = (datetime.now(timezone.utc) - timedelta(hours=5)).isoformat()
+        return {
+            "id": "evt-test", "title": "Test Event",
+            "fired_at": fired, "duration_hours": 4,
+            "issue_number": issue_number,
+            "default_consequence": {"stability": -5},
+            "response_consequence": {"treasury": 20},
+        }
+
+    def test_responded_when_for_votes_win(self):
+        evt = self._make_expired_event(issue_number=42)
+        with patch.object(tv, "load_active_event", return_value=evt), \
+             patch.object(tv, "get_reactions", return_value=(3, 1, ["a","b","c"], ["d"])), \
+             patch.object(tv, "apply_event_effects") as mock_apply, \
+             patch.object(tv, "close_event_issue"), \
+             patch.object(tv, "save_active_event"), \
+             patch.object(tv, "fire_chained_event"):
+            tv.check_event_expiry(0)
+            mock_apply.assert_called_once_with(evt, "response_consequence")
+
+    def test_default_when_against_votes_win(self):
+        evt = self._make_expired_event(issue_number=42)
+        with patch.object(tv, "load_active_event", return_value=evt), \
+             patch.object(tv, "get_reactions", return_value=(1, 3, ["a"], ["b","c","d"])), \
+             patch.object(tv, "apply_event_effects") as mock_apply, \
+             patch.object(tv, "close_event_issue"), \
+             patch.object(tv, "save_active_event"), \
+             patch.object(tv, "fire_chained_event"):
+            tv.check_event_expiry(0)
+            mock_apply.assert_called_once_with(evt, "default_consequence")
+
+    def test_default_when_no_votes(self):
+        evt = self._make_expired_event(issue_number=42)
+        with patch.object(tv, "load_active_event", return_value=evt), \
+             patch.object(tv, "get_reactions", return_value=(0, 0, [], [])), \
+             patch.object(tv, "apply_event_effects") as mock_apply, \
+             patch.object(tv, "close_event_issue"), \
+             patch.object(tv, "save_active_event"), \
+             patch.object(tv, "fire_chained_event"):
+            tv.check_event_expiry(0)
+            mock_apply.assert_called_once_with(evt, "default_consequence")
+
+    def test_fallback_to_laws_when_no_issue_number(self):
+        evt = self._make_expired_event(issue_number=0)
+        with patch.object(tv, "load_active_event", return_value=evt), \
+             patch.object(tv, "apply_event_effects") as mock_apply, \
+             patch.object(tv, "close_event_issue"), \
+             patch.object(tv, "save_active_event"), \
+             patch.object(tv, "fire_chained_event"):
+            tv.check_event_expiry(2)
+            mock_apply.assert_called_once_with(evt, "response_consequence")
+
+    def test_fallback_default_when_no_issue_no_laws(self):
+        evt = self._make_expired_event(issue_number=0)
+        with patch.object(tv, "load_active_event", return_value=evt), \
+             patch.object(tv, "apply_event_effects") as mock_apply, \
+             patch.object(tv, "close_event_issue"), \
+             patch.object(tv, "save_active_event"), \
+             patch.object(tv, "fire_chained_event"):
+            tv.check_event_expiry(0)
+            mock_apply.assert_called_once_with(evt, "default_consequence")
