@@ -13,7 +13,7 @@
   <text x="210" y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">8</text>
 
   <text x="396" y="90"  fill="#484f58" font-family="monospace" font-size="10">TREASURY</text>
-  <text x="396" y="116" fill="#e3b341" font-family="monospace" font-size="26" font-weight="bold">59</text>
+  <text x="396" y="116" fill="#e3b341" font-family="monospace" font-size="26" font-weight="bold">67</text>
 
   <text x="582" y="90"  fill="#484f58" font-family="monospace" font-size="10">PASS RATE</text>
   <text x="582" y="116" fill="#3fb950" font-family="monospace" font-size="26" font-weight="bold">100%</text>
@@ -24,20 +24,20 @@
   <text x="700" y="150" fill="#3fb950" font-family="monospace" font-size="10" text-anchor="end">POLLUTION 0/100</text>
 
   <text x="24"  y="168" fill="#8b949e" font-family="monospace" font-size="10">EDU</text>
-  <rect x="56"  y="158" width="170" height="12" rx="2" fill="#3fb950"/>
-  <text x="230" y="168" fill="#3fb950" font-family="monospace" font-size="10">63</text>
+  <rect x="56"  y="158" width="178" height="12" rx="2" fill="#3fb950"/>
+  <text x="238" y="168" fill="#3fb950" font-family="monospace" font-size="10">66</text>
 
   <text x="24"  y="186" fill="#8b949e" font-family="monospace" font-size="10">IND</text>
-  <rect x="56"  y="176" width="108" height="12" rx="2" fill="#e3b341"/>
-  <text x="168" y="186" fill="#e3b341" font-family="monospace" font-size="10">40</text>
+  <rect x="56"  y="176" width="121" height="12" rx="2" fill="#e3b341"/>
+  <text x="181" y="186" fill="#e3b341" font-family="monospace" font-size="10">45</text>
 
   <text x="24"  y="204" fill="#8b949e" font-family="monospace" font-size="10">WEL</text>
   <rect x="56"  y="194" width="183" height="12" rx="2" fill="#3fb950"/>
   <text x="243" y="204" fill="#3fb950" font-family="monospace" font-size="10">68</text>
 
   <text x="400" y="168" fill="#8b949e" font-family="monospace" font-size="10">GRN</text>
-  <rect x="432" y="158" width="84" height="12" rx="2" fill="#3fb950"/>
-  <text x="520" y="168" fill="#3fb950" font-family="monospace" font-size="10">65</text>
+  <rect x="432" y="158" width="87" height="12" rx="2" fill="#3fb950"/>
+  <text x="523" y="168" fill="#3fb950" font-family="monospace" font-size="10">67</text>
 
   <text x="400" y="186" fill="#8b949e" font-family="monospace" font-size="10">DEF</text>
   <rect x="432" y="176" width="53" height="12" rx="2" fill="#e3b341"/>
@@ -52,11 +52,11 @@
   <line x1="660.0" y1="183.0" x2="689.4" y2="223.5" stroke="#30363d" stroke-width="0.5"/>
   <line x1="660.0" y1="183.0" x2="630.6" y2="223.5" stroke="#30363d" stroke-width="0.5"/>
   <line x1="660.0" y1="183.0" x2="612.4" y2="167.5" stroke="#30363d" stroke-width="0.5"/>
-  <polygon points="660.0,151.5 679.0,176.8 680.0,210.5 640.9,209.3 640.5,176.7" fill="rgba(56,139,253,0.14)" stroke="#388bfd" stroke-width="1.2"/>
-  <circle cx="660.0" cy="151.5" r="2.2" fill="#388bfd"/>
-  <circle cx="679.0" cy="176.8" r="2.2" fill="#bc8cff"/>
+  <polygon points="660.0,150.0 681.4,176.0 680.0,210.5 640.3,210.1 640.5,176.7" fill="rgba(56,139,253,0.14)" stroke="#388bfd" stroke-width="1.2"/>
+  <circle cx="660.0" cy="150.0" r="2.2" fill="#388bfd"/>
+  <circle cx="681.4" cy="176.0" r="2.2" fill="#bc8cff"/>
   <circle cx="680.0" cy="210.5" r="2.2" fill="#3fb950"/>
-  <circle cx="640.9" cy="209.3" r="2.2" fill="#2dd4bf"/>
+  <circle cx="640.3" cy="210.1" r="2.2" fill="#2dd4bf"/>
   <circle cx="640.5" cy="176.7" r="2.2" fill="#f0883e"/>
   <text x="660.0" y="124.0" dy="-0.2em" fill="#484f58" font-family="monospace" font-size="7" text-anchor="middle">EDU</text>
   <text x="716.1" y="164.8" dy="-0.2em" fill="#484f58" font-family="monospace" font-size="7" text-anchor="start">IND</text>
@@ -80,9 +80,9 @@
   <text x="280" y="314" fill="#484f58" font-family="monospace" font-size="10">POLLUTION</text>
   <text x="536" y="314" fill="#484f58" font-family="monospace" font-size="10">STABILITY</text>
 
-  <text x="24"  y="334" fill="#c9d1d9" font-family="monospace" font-size="18" font-weight="bold">1,850</text>
+  <text x="24"  y="334" fill="#c9d1d9" font-family="monospace" font-size="18" font-weight="bold">2,000</text>
   <text x="280" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">0/100</text>
-  <text x="536" y="334" fill="#e3b341" font-family="monospace" font-size="18" font-weight="bold">53/100</text>
+  <text x="536" y="334" fill="#e3b341" font-family="monospace" font-size="18" font-weight="bold">51/100</text>
 
   <text x="24" y="358" fill="#484f58" font-family="monospace" font-size="10">Total proposals: 12 | Updated: 2026-06-11</text>
 </svg>
