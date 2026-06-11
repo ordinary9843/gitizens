@@ -17,5 +17,12 @@
     "narrative": "In a decisive advancement for the Gitizens, the population has surged to 1,400, reflecting a promising growth during the Founding Era. However, with a treasury of only 269 GC and stability at a precarious 61 out of 100, concerns about governance and resource management loom large. As pollution levels remain at 3 out of 100, the delicate balance of progress and preservation hangs in the balance.",
     "changes": "autonomous tick applied",
     "metrics": "population 1,400 \u00b7 treasury 269 GC \u00b7 stability 61/100 \u00b7 pollution 3/100"
+  },
+  {
+    "tick": 10,
+    "date": "2026-06-11",
+    "narrative": "In a significant development for Gitizens, the recent Foreign Direct Investment has injected 150 gold coins into the treasury, bringing the total to 483 GC. With a population of 1,450 now thriving in the Founding Era, the civilization's stability holds steady at 60 out of 100, though concerns rise as pollution levels creep to 2 out of 100. As the community grapples with growth and environmental impact, leaders must navigate this delicate balance moving forward.",
+    "changes": "autonomous tick applied \u00b7 event: Foreign Direct Investment",
+    "metrics": "population 1,450 \u00b7 treasury 333 GC \u00b7 stability 60/100 \u00b7 pollution 2/100"
   }
 ]
