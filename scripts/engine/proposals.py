@@ -11,7 +11,7 @@ from .state import read_state, write_state, read_stats, write_stats
 from .world import determine_era, check_threshold_tags, run_world_engine, apply_effect, apply_tags
 from .state import load_active_event
 from .events import apply_crisis_multiplier
-from .svg import generate_dashboard_svg, generate_map_svg
+from .svg import generate_dashboard_svg
 from .content import generate_narrative, update_world_summary, generate_world_md, update_readme
 from .chronicle import append_history, update_laws_index
 from .citizens import (
@@ -149,7 +149,6 @@ def process_issue(issue: dict):
         write_stats(stats)
 
         generate_dashboard_svg(stats, today)
-        generate_map_svg(today)
         generate_world_md(state, law_number, today)
         update_readme(state, stats, law_number, today)
 
@@ -207,7 +206,6 @@ def process_issue(issue: dict):
         state = read_state()
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         generate_dashboard_svg(stats, today)
-        generate_map_svg(today)
         generate_world_md(state, None, today)
         update_readme(state, stats, None, today)
         append_history(None, clean_title, number, for_votes, against_votes, False, today)
@@ -284,7 +282,6 @@ def process_ai_proposal(issue: dict):
     write_stats(stats)
 
     generate_dashboard_svg(stats, today)
-    generate_map_svg(today)
     generate_world_md(state, law_number, today)
     update_readme(state, stats, law_number, today)
     update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)

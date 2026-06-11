@@ -2,7 +2,7 @@ import json
 import math
 from pathlib import Path
 
-from .constants import CATEGORIES, CATEGORY_COLORS
+from .constants import CATEGORIES
 from .state import read_json, read_state
 from .world import pollution_level, env_bg_color
 
@@ -197,94 +197,3 @@ def generate_dashboard_svg(stats: dict, date: str):
   <text x="24" y="358" fill="#484f58" font-family="monospace" font-size="10">Total proposals: {total} | Updated: {date}</text>
 </svg>"""
     Path("world/stats.svg").write_text(svg, encoding="utf-8")
-
-
-def generate_map_svg(date: str):
-    W, H = 760, 370
-    PAD, INNER_GAP = 24, 14
-
-    CELL_W = (W - 2 * PAD - INNER_GAP) // 2
-    CELL_H = 140
-    CELLS_TOP = 58
-
-    CELL_PAD = 12
-    CHIP_W, CHIP_H, CHIP_GAP = 58, 30, 6
-
-    chips_per_row = (CELL_W - 2 * CELL_PAD + CHIP_GAP) // (CHIP_W + CHIP_GAP)
-    chip_rows     = (CELL_H - 38) // (CHIP_H + CHIP_GAP)
-    MAX_CHIPS     = chips_per_row * chip_rows
-
-    def _trunc(s: str, n: int = 9) -> str:
-        return s[:n] + "…" if len(s) > n else s
-
-    state = read_state()
-    pol = pollution_level(state)
-    bg_color = env_bg_color(pol)
-
-    categories_data = []
-    total_entities = 0
-    for cat, label in CATEGORIES:
-        try:
-            idx = read_json(Path(f"world/entities/{cat}/_index.json"))
-            entity_records = []
-            for eid in idx.get("entities", []):
-                p = Path(f"world/entities/{cat}/{eid}.json")
-                if not p.exists():
-                    continue
-                try:
-                    e = read_json(p)
-                    entity_records.append({"id": eid, "name": e.get("name", eid)})
-                except (json.JSONDecodeError, OSError):
-                    entity_records.append({"id": eid, "name": eid})
-        except (FileNotFoundError, json.JSONDecodeError, OSError):
-            entity_records = []
-        categories_data.append((cat, label, entity_records))
-        total_entities += len(entity_records)
-
-    lines = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}">',
-        f'  <rect width="{W}" height="{H}" rx="8" fill="{bg_color}"/>',
-        f'  <text x="{PAD}" y="36" fill="#c9d1d9" font-family="monospace" font-size="14" font-weight="bold">GITIZENS — World Map</text>',
-        f'  <text x="{W - PAD}" y="36" fill="#484f58" font-family="monospace" font-size="11" text-anchor="end">{total_entities} structure{"s" if total_entities != 1 else ""} | Updated: {date}</text>',
-        f'  <line x1="{PAD}" y1="48" x2="{W - PAD}" y2="48" stroke="#30363d" stroke-width="1"/>',
-    ]
-
-    for i, (cat, label, entity_records) in enumerate(categories_data):
-        col = i % 2
-        row = i // 2
-        cx = PAD + col * (CELL_W + INNER_GAP)
-        cy = CELLS_TOP + row * (CELL_H + INNER_GAP)
-        color = CATEGORY_COLORS.get(cat, "#8b949e")
-        count = len(entity_records)
-
-        lines += [
-            f'  <rect x="{cx}" y="{cy}" width="{CELL_W}" height="{CELL_H}" rx="4" fill="#0d1117" stroke="#30363d" stroke-width="1"/>',
-            f'  <rect x="{cx}" y="{cy}" width="{CELL_W}" height="3" rx="2" fill="{color}"/>',
-            f'  <text x="{cx + CELL_PAD}" y="{cy + 22}" fill="{color}" font-family="monospace" font-size="11" font-weight="bold">{label.upper()}</text>',
-            f'  <text x="{cx + CELL_W - CELL_PAD}" y="{cy + 22}" fill="{color}" font-family="monospace" font-size="14" font-weight="bold" text-anchor="end">{count}</text>',
-        ]
-
-        if count == 0:
-            lines.append(f'  <text x="{cx + CELL_PAD}" y="{cy + 58}" fill="#30363d" font-family="monospace" font-size="10">— none yet —</text>')
-        else:
-            show     = entity_records[:MAX_CHIPS - 1] if count > MAX_CHIPS else entity_records
-            overflow = count - len(show)
-            for j, rec in enumerate(show):
-                fx = cx + CELL_PAD + (j % chips_per_row) * (CHIP_W + CHIP_GAP)
-                fy = cy + 32       + (j // chips_per_row) * (CHIP_H + CHIP_GAP)
-                lines += [
-                    f'  <rect x="{fx}" y="{fy}" width="{CHIP_W}" height="{CHIP_H}" rx="3" fill="#161b22" stroke="{color}" stroke-width="1"/>',
-                    f'  <text x="{fx + CHIP_W // 2}" y="{fy + 12}" fill="#c9d1d9" font-family="monospace" font-size="8" text-anchor="middle">{_trunc(rec["name"])}</text>',
-                    f'  <text x="{fx + CHIP_W // 2}" y="{fy + 24}" fill="#484f58" font-family="monospace" font-size="7" text-anchor="middle">{rec["id"]}</text>',
-                ]
-            if overflow > 0:
-                j  = len(show)
-                fx = cx + CELL_PAD + (j % chips_per_row) * (CHIP_W + CHIP_GAP)
-                fy = cy + 32       + (j // chips_per_row) * (CHIP_H + CHIP_GAP)
-                lines += [
-                    f'  <rect x="{fx}" y="{fy}" width="{CHIP_W}" height="{CHIP_H}" rx="3" fill="#161b22" stroke="#484f58" stroke-width="1"/>',
-                    f'  <text x="{fx + CHIP_W // 2}" y="{fy + 18}" fill="#484f58" font-family="monospace" font-size="9" text-anchor="middle">+{overflow} more</text>',
-                ]
-
-    lines.append('</svg>')
-    Path("world/map.svg").write_text("\n".join(lines), encoding="utf-8")

@@ -36,7 +36,7 @@ from engine import (
     fire_random_event, open_event_issue, close_event_issue,
     check_event_expiry, fire_chained_event, apply_crisis_multiplier,
     # svg
-    svg_radar, generate_dashboard_svg, generate_map_svg,
+    svg_radar, generate_dashboard_svg,
     # content
     client, generate_narrative, update_world_summary, generate_world_md,
     generate_annals, generate_citizen_narrator, upsert_bot_comment, update_readme,
@@ -140,7 +140,6 @@ def main():
     if dirty:
         stats = read_stats()
         generate_dashboard_svg(stats, today)
-        generate_map_svg(today)
         state = read_state()
         generate_world_md(state, None, today)
         update_readme(state, stats, None, today)
