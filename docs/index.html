@@ -744,12 +744,14 @@ function renderWorldStats(state) {
   const stbClr = stb >= 60 ? '#3fb950' : stb >= 40 ? '#e3b341' : '#f85149';
   const pop    = (state.population || 0).toLocaleString();
   const trs    = (state.treasury   || 0).toLocaleString();
+  const nextTick = state.next_tick_at ? `${state.next_tick_at} UTC` : '—';
   document.getElementById('world-stats').innerHTML = [
     { label:'Population', value: pop,               color:'#c9d1d9' },
     { label:'Stability',  value: `${stb}/100`,      color: stbClr   },
     { label:'Treasury',   value: `${trs} GC`,       color:'#e3b341' },
     { label:'Laws',       value: state.laws_count || 0, color:'#c9d1d9' },
     { label:'Era',        value: state.era || '—',  color:'#8b949e' },
+    { label:'Next tick',  value: nextTick,           color:'#2dd4bf' },
   ].map(({ label, value, color }) => `
     <div class="stat-row">
       <span class="stat-label">${label}</span>

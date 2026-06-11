@@ -192,6 +192,11 @@ def validate():
     if not result.get("valid", True):
         fail(f"{result.get('reason', 'Proposal did not pass review.')}")
 
+    if effect_data and effect_data.get("type") == "policy":
+        ok, reason = check_cooldown_for_proposal(effect_data)
+        if not ok:
+            fail(f"Proposal cooldown active: {reason}")
+
     # Treasury notice for policy proposals
     if effect_data and effect_data.get("type") == "policy":
         try:
@@ -208,11 +213,6 @@ def validate():
                f"**Cost notice:** Enacting this policy costs **{POLICY_COST} {currency}**.\n\n{status}")
         except Exception:
             pass
-
-    if effect_data and effect_data.get("type") == "policy":
-        ok, reason = check_cooldown_for_proposal(effect_data)
-        if not ok:
-            fail(f"Proposal cooldown active: {reason}")
 
     print("VALID — applying proposal label")
     gh("issue", "edit", ISSUE_NUMBER, "--repo", REPO, "--add-label", "proposal")

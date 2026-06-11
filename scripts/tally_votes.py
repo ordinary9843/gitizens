@@ -881,7 +881,11 @@ def update_readme(state: dict, stats: dict, law_number: int | None = None, date:
     content = readme_path.read_text(encoding="utf-8")
     era = state.get("era", "")
     laws_count = state.get("laws_count", 0)
-    block = f"**Era:** {era} | **Laws enacted:** {laws_count} | [World state](world/WORLD.md)"
+    next_tick = state.get("next_tick_at", "—")
+    block = (
+        f"**Era:** {era} | **Laws enacted:** {laws_count} | [World state](world/WORLD.md)  \n"
+        f"**Next tick:** {next_tick} UTC"
+    )
     new_content = re.sub(
         r"<!-- STATE_START -->.*?<!-- STATE_END -->",
         f"<!-- STATE_START -->\n{block}\n<!-- STATE_END -->",
@@ -1094,9 +1098,20 @@ def process_ai_proposal(issue: dict):
     state_before = read_state()
     effect_data = parse_effect(body)
 
+    if effect_data and effect_data.get("type") == "policy":
+        ok, reason = check_proposal_cooldown(effect_data)
+        if not ok:
+            print(f"  AI-proposal #{number}: COOLDOWN BLOCKED — {reason}")
+            run(["gh", "issue", "comment", str(number), "--repo", REPO,
+                 "--body", f"**AI proposal blocked: metric on cooldown.**\n\n{reason}"])
+            run(["gh", "issue", "edit", str(number), "--repo", REPO, "--remove-label", "ai-proposal"])
+            run(["gh", "issue", "close", str(number), "--repo", REPO])
+            return
+
     print(f"  AI-proposal #{number}: PASSED (no veto) -> law-{law_number:03d}")
     narrative = generate_narrative(clean_title, 0, 0, state_before)
-
+    active_event_now = load_active_event()
+    effect_data = apply_crisis_multiplier(effect_data, active_event_now)
     apply_effect(effect_data, law_number)
     world_changes = run_world_engine(law_number)
 
@@ -1117,6 +1132,7 @@ def process_ai_proposal(issue: dict):
     generate_map_svg(today)
     generate_world_md(state, law_number, today)
     update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
+    update_proposal_cooldown(effect_data, today)
 
     Path(f"world/laws/law-{law_number:03d}.md").write_text(
         f"# Law {law_number:03d}: {clean_title}\n\n"
@@ -1178,6 +1194,8 @@ def process_feedback(issue: dict) -> bool:
         return False
 
     effect_data = parse_effect(body)
+    active_event_now = load_active_event()
+    effect_data = apply_crisis_multiplier(effect_data, active_event_now)
     if effect_data and effect_data.get("type") == "policy":
         changes = effect_data.get("changes", {})
         state = read_state()
@@ -1289,6 +1307,21 @@ def process_issue(issue: dict):
                      f"Current treasury: **{treasury} {currency}**.\n\n"
                      f"Pass a treasury replenishment proposal first:\n"
                      f"```yaml\ntype: state_patch\npatch:\n  treasury: {treasury + POLICY_COST + 200}\n```"])
+                run(["gh", "issue", "edit", str(number), "--repo", REPO,
+                     "--add-label", "rejected", "--remove-label", "proposal"])
+                run(["gh", "issue", "close", str(number), "--repo", REPO])
+                return
+
+        if effect_data and effect_data.get("type") == "policy":
+            ok, reason = check_proposal_cooldown(effect_data)
+            if not ok:
+                print(f"  #{number}: COOLDOWN BLOCKED at tally — {reason}")
+                stats = read_stats()
+                stats["proposals_total"]    = stats.get("proposals_total", 0) + 1
+                stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
+                write_stats(stats)
+                run(["gh", "issue", "comment", str(number), "--repo", REPO,
+                     "--body", f"**Proposal blocked: metric on cooldown.**\n\n{reason}"])
                 run(["gh", "issue", "edit", str(number), "--repo", REPO,
                      "--add-label", "rejected", "--remove-label", "proposal"])
                 run(["gh", "issue", "close", str(number), "--repo", REPO])
@@ -1491,8 +1524,10 @@ def select_weekly_representatives():
 # ── World annals ──────────────────────────────────────────────────────────────
 
 def generate_annals(history: list):
-    tick_num = len(history)
-    if tick_num == 0 or tick_num % ANNALS_INTERVAL != 0:
+    if not history:
+        return
+    tick_num = history[-1].get("tick", len(history))
+    if tick_num % ANNALS_INTERVAL != 0:
         return
     chapter_num = tick_num // ANNALS_INTERVAL
     chapter_path = Path(f"world/annals/chapter-{chapter_num:03d}.md")
@@ -1549,7 +1584,7 @@ def fire_chained_event(resolved_event: dict, responded: bool):
     print(f"  Event chain: {resolved_event.get('title')} → {next_evt['title']}")
     apply_event_effects(next_evt, "immediate_effects")
     issue_num = open_event_issue(next_evt)
-    next_evt = dict(next_evt)
+    next_evt = json.loads(json.dumps(next_evt))
     next_evt["fired_at"] = datetime.now(timezone.utc).isoformat()
     next_evt["issue_number"] = issue_num
     next_evt["chained_from"] = resolved_event.get("id")
@@ -1689,6 +1724,17 @@ def main():
 
     # AI citizen narrator (weekly)
     generate_citizen_narrator()
+
+    # Compute and store next tick time in state
+    _now = datetime.now(timezone.utc)
+    _next_hour = ((_now.hour // 4) + 1) * 4
+    if _next_hour >= 24:
+        _next_tick = _now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+    else:
+        _next_tick = _now.replace(hour=_next_hour, minute=0, second=0, microsecond=0)
+    _state = read_state()
+    _state["next_tick_at"] = _next_tick.strftime("%Y-%m-%d %H:%M:%S")
+    write_state(_state)
 
     # Commit any uncommitted world/ changes
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")

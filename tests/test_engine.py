@@ -674,7 +674,7 @@ class TestAnnalsGeneration:
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world/annals").mkdir(parents=True)
         (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
-        history = [{"tick": i} for i in range(9)]
+        history = [{"tick": i + 1} for i in range(9)]  # ticks 1-9, last is 9 → 9%10≠0
         tv.generate_annals(history)
         assert not list((tmp_path / "world/annals").glob("*.md"))
 
@@ -689,8 +689,8 @@ class TestAnnalsGeneration:
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world/annals").mkdir(parents=True)
         (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
-        history = [{"tick": i, "laws_count": 0, "population": 1000,
-                    "treasury": 0, "era": "Founding Era"} for i in range(10)]
+        history = [{"tick": i + 1, "laws_count": 0, "population": 1000,
+                    "treasury": 0, "era": "Founding Era"} for i in range(10)]  # ticks 1-10
         mock_client = MagicMock()
         mock_client.chat.completions.create.return_value.choices[0].message.content = (
             "# World Annals — Chapter 1\n\nTest content."
@@ -706,8 +706,8 @@ class TestAnnalsGeneration:
         (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
         chapter = tmp_path / "world/annals/chapter-001.md"
         chapter.write_text("existing content\n")
-        history = [{"tick": i, "laws_count": 0, "population": 1000,
-                    "treasury": 0} for i in range(10)]
+        history = [{"tick": i + 1, "laws_count": 0, "population": 1000,
+                    "treasury": 0} for i in range(10)]  # ticks 1-10 → chapter-001 already exists
         mock_client = MagicMock()
         with patch.object(tv, "client", mock_client), \
              patch.object(tv, "run", return_value=""):
