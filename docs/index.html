@@ -1292,8 +1292,11 @@ function startTickCountdown(nextTickAt) {
   if (_tickTimer) clearInterval(_tickTimer);
   const el = document.getElementById('tick-countdown');
   if (!nextTickAt) { el.textContent = ''; return; }
-  const raw = nextTickAt.includes('Z') ? nextTickAt : nextTickAt + 'Z';
+  // Normalise: space-separated → T-separated, append Z if no tz
+  const norm = nextTickAt.replace(' ', 'T');
+  const raw  = (norm.includes('Z') || norm.includes('+')) ? norm : norm + 'Z';
   const target = new Date(raw);
+  if (isNaN(target.getTime())) { el.textContent = ''; return; }
   function tick() {
     const rem = target - Date.now();
     if (rem <= 0) { el.textContent = 'ticking now…'; return; }

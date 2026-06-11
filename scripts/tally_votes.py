@@ -1924,7 +1924,7 @@ def main():
     else:
         _next_tick = _now.replace(hour=_next_hour, minute=0, second=0, microsecond=0)
     _state = read_state()
-    _state["next_tick_at"] = _next_tick.strftime("%Y-%m-%d %H:%M:%S")
+    _state["next_tick_at"] = _next_tick.strftime("%Y-%m-%dT%H:%M:%SZ")
     write_state(_state)
 
     # Commit any uncommitted world/ changes
