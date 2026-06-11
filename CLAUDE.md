@@ -1,10 +1,10 @@
 # Gitizens
 
-## Project rules
+GitHub-native civilization simulator. Issues are proposals, reactions are votes, a cron workflow tallies votes every 4 hours and updates world state.
 
-- Never modify world/ files manually outside of tests — all changes go through `scripts/tally_votes.py` or GitHub Issues
-- Never push directly to master with force
-- Always run syntax check after editing tally_votes.py: `python -c "import ast; ast.parse(open('scripts/tally_votes.py').read()); print('OK')"`
-- Run tests before committing engine changes: `python -m pytest tests/ -q`
+## Core constraints
+
+- `world/` files are modified only via `scripts/tally_votes.py` or GitHub Actions — never edit manually
+- Never force-push master
 - Never commit `scripts/__pycache__/` or `*.pyc` files
-- Revert world/state.json after local test runs: `git checkout world/state.json`
+- After any local test run: `git checkout world/state.json`

@@ -12,6 +12,9 @@ Key rules:
   - Run tests before engine changes: python -m pytest tests/ -q
   - Syntax check after editing tally_votes.py: python -c \"import ast; ast.parse(open('scripts/tally_votes.py').read()); print('OK')\"
   - Never force-push master; never add Co-Authored-By trailers
+  - All source code, comments, print statements, and messages must be in English
+  - No emoji in Python source code (print statements, comments, docstrings)
+  - Every feature requires: tests passing + syntax check + one live GitHub execution before done
 
 Commit types: world | feat | fix | docs | data | test | ci | chore"
 

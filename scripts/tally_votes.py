@@ -13,6 +13,7 @@ import tempfile
 import yaml
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from urllib.parse import quote as _url_quote
 from openai import OpenAI
 
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
@@ -1036,22 +1037,50 @@ def generate_world_md(state: dict, law_number: int | None, date: str):
     Path("world/WORLD.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def _badge_url_val(s: str) -> str:
+    return _url_quote(str(s).replace(" ", "_"), safe="")
+
+
 def update_readme(state: dict, stats: dict, law_number: int | None = None, date: str = ""):
     readme_path = Path("README.md")
     content = readme_path.read_text(encoding="utf-8")
+
+    # Update prose state block
     era = state.get("era", "")
     laws_count = state.get("laws_count", 0)
     next_tick = state.get("next_tick_at", "—")
-    block = (
+    prose_block = (
         f"**Era:** {era} | **Laws enacted:** {laws_count} | [World state](world/WORLD.md)  \n"
         f"**Next tick:** {next_tick} UTC"
     )
-    new_content = re.sub(
+    content = re.sub(
         r"<!-- STATE_START -->.*?<!-- STATE_END -->",
-        f"<!-- STATE_START -->\n{block}\n<!-- STATE_END -->",
+        f"<!-- STATE_START -->\n{prose_block}\n<!-- STATE_END -->",
         content, flags=re.DOTALL,
     )
-    readme_path.write_text(new_content, encoding="utf-8")
+
+    # Update shields.io badge block — keep in sync with state.json in every commit
+    era_b   = _badge_url_val(era)
+    pop_b   = str(state.get("population", 0))
+    trs_b   = str(state.get("treasury", 0))
+    stb_b   = str(state.get("stability", 0))
+    laws_b  = str(laws_count)
+    pol_b   = str(state.get("pollution", 0))
+    badges = "\n".join([
+        f"![Era](https://img.shields.io/badge/Era-{era_b}-e3b341?style=flat-square&logo=github)",
+        f"![Population](https://img.shields.io/badge/Population-{pop_b}-3fb950?style=flat-square)",
+        f"![Treasury](https://img.shields.io/badge/Treasury-{trs_b}_GC-388bfd?style=flat-square)",
+        f"![Stability](https://img.shields.io/badge/Stability-{stb_b}%2F100-bc8cff?style=flat-square)",
+        f"![Pollution](https://img.shields.io/badge/Pollution-{pol_b}%2F100-f85149?style=flat-square)",
+        f"![Laws](https://img.shields.io/badge/Laws-{laws_b}_enacted-8b949e?style=flat-square)",
+    ])
+    content = re.sub(
+        r"<!-- WORLD-STATE-START -->.*?<!-- WORLD-STATE-END -->",
+        f"<!-- WORLD-STATE-START -->\n{badges}\n<!-- WORLD-STATE-END -->",
+        content, flags=re.DOTALL,
+    )
+
+    readme_path.write_text(content, encoding="utf-8")
 
 
 def append_history(law_number: int | None, title: str, issue_number: int,
@@ -1187,19 +1216,9 @@ def _load_entity_names() -> set[str]:
     return names
 
 
-_METRIC_EMOJI = {
-    "education":    "📚",
-    "industry":     "🏭",
-    "welfare":      "🏠",
-    "green_policy": "🌿",
-    "defense":      "⚔️",
-    "pollution":    "☁️",
-}
-
-
 def _build_gap_dashboard(state: dict,
                          entity_names: set[str] | None = None) -> str:
-    """Return a '🎯 What Needs Your Vote' Markdown block for the Chronicle."""
+    """Return a 'What Needs Your Vote' Markdown block for the Chronicle."""
     if entity_names is None:
         entity_names = _load_entity_names()
 
@@ -1217,16 +1236,14 @@ def _build_gap_dashboard(state: dict,
         elif exists and value <= remove + 4:
             at_risk.append((metric, value, remove, name))
 
-    lines: list[str] = ["## 🎯 What Needs Your Vote\n"]
+    lines: list[str] = ["## What Needs Your Vote\n"]
 
     pending.sort()
     for gap, metric, value, appear, name in pending[:3]:
-        emoji = _METRIC_EMOJI.get(metric, "📌")
-        lines.append(f"- {emoji} **{name}** — {metric} {value}/{appear} (needs +{gap})")
+        lines.append(f"- **{name}** — {metric} {value}/{appear} (needs +{gap})")
 
     for metric, value, remove, name in at_risk:
-        emoji = _METRIC_EMOJI.get(metric, "📌")
-        lines.append(f"- ⚠️ **{name}** at risk — {metric} {value} (removal if < {remove})")
+        lines.append(f"- **{name}** at risk — {metric} {value} (removal if < {remove})")
 
     applied = state.get("tags_applied", [])
     for field, direction, threshold, tag_name in THRESHOLD_TAGS:
@@ -1236,18 +1253,16 @@ def _build_gap_dashboard(state: dict,
         if direction == "above":
             gap = threshold - value
             if 0 < gap <= 10:
-                emoji = _METRIC_EMOJI.get(field, "🏆")
-                lines.append(f"- {emoji} Milestone **{tag_name}** — {field} {value}/{threshold} "
+                lines.append(f"- Milestone **{tag_name}** — {field} {value}/{threshold} "
                               f"(needs +{gap})")
         elif direction == "below":
             gap = value - threshold
             if 0 < gap <= 10:
-                emoji = _METRIC_EMOJI.get(field, "🏆")
-                lines.append(f"- {emoji} Milestone **{tag_name}** — {field} {value} → {threshold} "
+                lines.append(f"- Milestone **{tag_name}** — {field} {value} → {threshold} "
                               f"(needs -{gap})")
 
     if len(lines) == 1:
-        lines.append("- ✅ All near-threshold goals reached — explore new frontiers!")
+        lines.append("- All near-threshold goals reached — explore new frontiers!")
 
     return "\n".join(lines)
 
@@ -1438,7 +1453,7 @@ def process_ai_proposal(issue: dict):
     issue_url = f"https://github.com/{REPO}/issues/{number}"
 
     if against_votes > 0:
-        print(f"  AI-proposal #{number}: VETOED ({against_votes} 👎)")
+        print(f"  AI-proposal #{number}: VETOED ({against_votes} against)")
         stats = read_stats()
         stats["proposals_total"] = stats.get("proposals_total", 0) + 1
         stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
@@ -1543,7 +1558,7 @@ def process_feedback(issue: dict) -> bool:
     track_citizen_activity(for_voters, against_voters)
 
     if against_votes > 0:
-        print(f"  Feedback #{number}: DISMISSED ({against_votes} 👎)")
+        print(f"  Feedback #{number}: DISMISSED ({against_votes} against)")
         run(["gh", "issue", "comment", str(number), "--repo", REPO,
              "--body", f"**Feedback dismissed** by citizens ({against_votes} 👎). No effect applied."])
         run(["gh", "issue", "edit", str(number), "--repo", REPO,
@@ -2081,14 +2096,14 @@ def main():
         if read_state().get("laws_count", 0) > laws_before:
             laws_this_tick += 1
 
-    # Process AI proposals (default pass, 👎 vetoes)
+    # Process AI proposals (default pass, thumbs-down vetoes)
     for ai_proposal in get_ai_proposals():
         laws_before = read_state().get("laws_count", 0)
         process_ai_proposal(ai_proposal)
         if read_state().get("laws_count", 0) > laws_before:
             laws_this_tick += 1
 
-    # Process citizen feedbacks (default apply, 👎 dismisses)
+    # Process citizen feedbacks (default apply, thumbs-down dismisses)
     feedbacks_applied = 0
     for feedback in get_feedbacks():
         if process_feedback(feedback):

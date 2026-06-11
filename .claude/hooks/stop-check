@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# stop-check: block Claude's final response when Python files are staged but tests not yet confirmed.
+
+staged_py=$(git diff --cached --name-only 2>/dev/null | grep -c '\.py$' 2>/dev/null || echo 0)
+
+if [ "$staged_py" -gt 0 ]; then
+    reason="Python files are staged for commit. Confirm all three steps before finishing:\\n"
+    reason+="  1. python -m pytest tests/ -q  (all tests pass)\\n"
+    reason+="  2. python -c \\\"import ast; ast.parse(open('scripts/tally_votes.py').read()); print('OK')\\\"\\n"
+    reason+="  3. End-to-end execution on GitHub confirmed.\\n"
+    reason+="If all steps are done, state it explicitly. If not, complete them first."
+    printf '{"decision":"block","reason":"%s"}' "$reason"
+    exit 0
+fi
+
+exit 0
