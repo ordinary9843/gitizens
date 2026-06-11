@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="../docs/logo.png" alt="Gitizens" width="120" />
+</div>
+
 # World State
 
 *Last updated: 2026-06-11*

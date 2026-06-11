@@ -1,4 +1,6 @@
-[![Gitizens](docs/banner.svg)](https://ordinary9843.github.io/gitizens/)
+<div align="center">
+  <img src="docs/logo.png" alt="Gitizens" width="160" />
+</div>
 
 ---
 
