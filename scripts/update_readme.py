@@ -3,12 +3,18 @@
 import json
 import re
 from pathlib import Path
+from urllib.parse import quote
+
+
+def _badge_val(s: str) -> str:
+    """Encode a value for shields.io badge URLs (space→_, other special chars → %XX)."""
+    return quote(str(s).replace(" ", "_"), safe="")
 
 
 def main():
     state = json.loads(Path("world/state.json").read_text(encoding="utf-8"))
 
-    era    = state.get("era", "Founding Era").replace(" ", "_")
+    era    = _badge_val(state.get("era", "Founding Era"))
     pop    = str(state.get("population", 0))
     trs    = str(state.get("treasury", 0))
     stb    = str(state.get("stability", 0))
