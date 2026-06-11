@@ -1076,7 +1076,40 @@ def update_laws_index(law_number: int, title: str, issue_number: int,
 
 # ── World dispatch ─────────────────────────────────────────────────────────────
 
+def _get_bot_login() -> str:
+    try:
+        return run(["gh", "api", "user", "--jq", ".login"]).strip()
+    except Exception:
+        return ""
+
+
+def upsert_bot_comment(issue_num: int, body: str):
+    """Edit the first bot-owned comment on issue_num, or post a new one if none exists."""
+    bot_login = _get_bot_login()
+    if bot_login:
+        comments = gh_json([
+            "api", f"repos/{REPO}/issues/{issue_num}/comments",
+            "--paginate",
+        ])
+        for c in comments:
+            if c.get("user", {}).get("login") == bot_login:
+                tmp = Path("scripts/_patch_body.txt")
+                tmp.write_text(body, encoding="utf-8")
+                run(["gh", "api", "--method", "PATCH",
+                     f"repos/{REPO}/issues/comments/{c['id']}",
+                     "--field", f"body=@{tmp}"])
+                tmp.unlink(missing_ok=True)
+                print(f"  Updated pinned comment on issue #{issue_num}")
+                return
+    tmp = Path("scripts/_comment_body.txt")
+    tmp.write_text(body, encoding="utf-8")
+    run(["gh", "issue", "comment", str(issue_num), "--repo", REPO, "--body-file", str(tmp)])
+    tmp.unlink(missing_ok=True)
+    print(f"  Posted new comment to issue #{issue_num}")
+
+
 def get_or_create_dispatch_issue() -> int:
+    """Return the single persistent World Chronicle issue (never archived)."""
     issues = gh_json([
         "issue", "list", "--repo", REPO, "--label", "dispatch",
         "--state", "open", "--json", "number", "--limit", "1",
@@ -1084,10 +1117,9 @@ def get_or_create_dispatch_issue() -> int:
     if issues:
         return issues[0]["number"]
     body = (
-        "This issue is the permanent news feed for **Gitizens**.\n\n"
-        "Every 4 hours, the world narrator posts a dispatch summarizing "
-        "what happened in the latest tick — laws passed, events fired, "
-        "population changes, and more.\n\n"
+        "World news dispatch for **Gitizens**.\n\n"
+        "Every 4 hours, the world narrator updates this post with the latest "
+        "tick summary — laws passed, events fired, population changes, and more.\n\n"
         "*React with 👍 to follow the chronicle.*"
     )
     tmp = Path("scripts/_dispatch_body.txt")
@@ -1098,9 +1130,56 @@ def get_or_create_dispatch_issue() -> int:
                   "--body-file", str(tmp)])
     tmp.unlink(missing_ok=True)
     try:
-        return int(result.strip().split("/")[-1])
+        num = int(result.strip().split("/")[-1])
+        print(f"  Opened World Chronicle (#{num})")
+        return num
     except (ValueError, IndexError):
         return 0
+
+
+def _build_chronicle_body() -> str:
+    """Build the World Chronicle pinned comment from the last 5 dispatches + representatives."""
+    dispatches_path = Path("world/dispatches.json")
+    try:
+        dispatches = json.loads(dispatches_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        dispatches = []
+
+    lines = ["## World Chronicle — Latest Dispatches\n"]
+    for d in reversed(dispatches[-5:]):
+        tick = d.get("tick", "?")
+        date = d.get("date", "")
+        narrative = d.get("narrative", "")
+        metrics = d.get("metrics", "")
+        changes = d.get("changes", "")
+        lines.append(f"**Tick {tick} · {date}**  ")
+        lines.append(f"{narrative}\n")
+        if metrics:
+            lines.append(f"**Metrics:** {metrics}  ")
+        if changes:
+            lines.append(f"**Changes:** {changes}")
+        lines.append("\n---\n")
+
+    reps_path = Path("world/representatives.json")
+    if reps_path.exists():
+        try:
+            reps = json.loads(reps_path.read_text(encoding="utf-8"))
+            representatives = reps.get("representatives", [])
+            if representatives:
+                names = ", ".join(f"@{r}" for r in representatives)
+                selected_at = reps.get("selected_at", "")
+                lines.append(f"### Current Representatives\n")
+                lines.append(f"{names} — elected {selected_at}\n")
+                lines.append("\n---\n")
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    updated = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    lines.append(
+        f"*Last updated: {updated} — full history in "
+        "[dispatches.json](../../world/dispatches.json)*"
+    )
+    return "\n".join(lines)
 
 
 def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
@@ -1111,7 +1190,7 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
         history = json.loads(Path("world/history.json").read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         pass
-    tick_num = (history[-1]["tick"] + 1) if history else 1  # this tick hasn't been snapshotted yet
+    tick_num = (history[-1]["tick"] + 1) if history else 1
 
     metrics_str = (
         f"population {state.get('population',0):,} · "
@@ -1145,18 +1224,6 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
     )
     narrative = response.choices[0].message.content.strip()
 
-    comment = (
-        f"## Dispatch — {today} · Tick {tick_num}\n\n"
-        f"{narrative}\n\n"
-        f"**Metrics:** {metrics_str}  \n"
-        f"**This tick:** {changes_summary}"
-    )
-
-    issue_num = get_or_create_dispatch_issue()
-    if issue_num:
-        run(["gh", "issue", "comment", str(issue_num), "--repo", REPO, "--body", comment])
-        print(f"  Dispatch posted to issue #{issue_num}")
-
     dispatches_path = Path("world/dispatches.json")
     try:
         dispatches = json.loads(dispatches_path.read_text(encoding="utf-8"))
@@ -1167,10 +1234,16 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
         "date": today,
         "narrative": narrative,
         "changes": changes_summary,
+        "metrics": metrics_str,
     })
     if len(dispatches) > 10:
         dispatches = dispatches[-10:]
     dispatches_path.write_text(json.dumps(dispatches, indent=2) + "\n", encoding="utf-8")
+
+    issue_num = get_or_create_dispatch_issue()
+    if issue_num:
+        upsert_bot_comment(issue_num, _build_chronicle_body())
+        print(f"  Chronicle updated on issue #{issue_num}")
 
 
 # ── Star income ───────────────────────────────────────────────────────────────
@@ -1702,11 +1775,6 @@ def select_weekly_representatives():
                     "representatives": representatives}, indent=2) + "\n",
         encoding="utf-8",
     )
-    if representatives:
-        names = ", ".join(f"@{r}" for r in representatives)
-        dispatch_num = get_or_create_dispatch_issue()
-        run(["gh", "issue", "comment", str(dispatch_num), "--repo", REPO,
-             "--body", f"**Weekly Representatives elected:** {names}\n\nThese citizens showed the highest engagement this cycle."])
     print(f"  Representatives: {representatives}")
 
 
@@ -1798,6 +1866,35 @@ def apply_crisis_multiplier(effect_data: dict | None, active_event: dict) -> dic
 
 # ── AI citizen narrator ───────────────────────────────────────────────────────
 
+def _get_or_create_citizen_voices_issue() -> int:
+    """Return the single persistent Citizen Voices issue (never replaced)."""
+    run(["gh", "label", "create", "citizen-voices", "--repo", REPO,
+         "--color", "d93f0b", "--description", "Weekly citizen diary", "--force"])
+    issues = gh_json([
+        "issue", "list", "--repo", REPO, "--label", "citizen-voices",
+        "--state", "open", "--json", "number", "--limit", "1",
+    ])
+    if issues:
+        return issues[0]["number"]
+    tmp = Path("scripts/_cv_body.txt")
+    tmp.write_text(
+        "Weekly diary entries from fictional Gitizens citizens, "
+        "updated every 7 days by the world engine.",
+        encoding="utf-8",
+    )
+    result = run(["gh", "issue", "create", "--repo", REPO,
+                  "--title", "[Citizen Voices] Weekly Diary",
+                  "--label", "citizen-voices",
+                  "--body-file", str(tmp)])
+    tmp.unlink(missing_ok=True)
+    try:
+        num = int(result.strip().split("/")[-1])
+        print(f"  Opened Citizen Voices issue (#{num})")
+        return num
+    except (ValueError, IndexError):
+        return 0
+
+
 def generate_citizen_narrator():
     state = read_state()
     last_narrator = state.get("last_narrator_date")
@@ -1825,17 +1922,15 @@ def generate_citizen_narrator():
     body = (
         f"## Citizen Voices — {today_str}\n\n"
         f"{narrative}\n\n"
-        f"*These are fictional citizen perspectives generated by the world engine.*"
+        f"*These are fictional citizen perspectives generated by the world engine. "
+        f"Updated weekly.*"
     )
-    run(["gh", "label", "create", "citizen-voices", "--repo", REPO,
-         "--color", "d93f0b", "--description", "Weekly citizen diary", "--force"])
-    run(["gh", "issue", "create", "--repo", REPO,
-         "--title", f"[Citizen Voices] {today_str}",
-         "--label", "citizen-voices",
-         "--body", body])
+    issue_num = _get_or_create_citizen_voices_issue()
+    if issue_num:
+        upsert_bot_comment(issue_num, body)
     state["last_narrator_date"] = datetime.now(timezone.utc).isoformat()
     write_state(state)
-    print("  Citizen narrator posted")
+    print("  Citizen narrator updated")
 
 
 def main():
