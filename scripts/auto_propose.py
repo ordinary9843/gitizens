@@ -16,6 +16,8 @@ MAX_DELTA_FEEDBACK = 2
 
 def _run(cmd: list[str]) -> str:
     result = subprocess.run(cmd, capture_output=True, encoding="utf-8", errors="replace")
+    if result.returncode != 0 and result.stderr.strip():
+        print(f"  [WARN] {cmd[0]} {cmd[1] if len(cmd) > 1 else ''}: {result.stderr.strip()[:200]}")
     return result.stdout.strip()
 
 

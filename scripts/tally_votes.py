@@ -568,10 +568,12 @@ def generate_dashboard_svg(stats: dict, date: str):
     total = passed + rejected
     pass_rate = round(passed / max(total, 1) * 100)
 
-    total_entities = sum(
-        read_json(Path(f"world/entities/{cat}/_index.json")).get("count", 0)
-        for cat, _ in CATEGORIES
-    )
+    total_entities = 0
+    for cat, _ in CATEGORIES:
+        try:
+            total_entities += read_json(Path(f"world/entities/{cat}/_index.json")).get("count", 0)
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            pass
 
     max_bar = 580
     scale = max_bar / max(passed, rejected, 1)
@@ -696,9 +698,12 @@ def generate_map_svg(date: str):
     categories_data = []
     total_entities = 0
     for cat, label in CATEGORIES:
-        idx = read_json(Path(f"world/entities/{cat}/_index.json"))
-        entities = [e for e in idx.get("entities", [])
-                    if Path(f"world/entities/{cat}/{e}.json").exists()]
+        try:
+            idx = read_json(Path(f"world/entities/{cat}/_index.json"))
+            entities = [e for e in idx.get("entities", [])
+                        if Path(f"world/entities/{cat}/{e}.json").exists()]
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            entities = []
         categories_data.append((cat, label, entities))
         total_entities += len(entities)
 
@@ -817,6 +822,13 @@ def apply_tags(effect_data: dict | None, state_before: dict, state_after: dict,
 
 # ── LLM helpers ───────────────────────────────────────────────────────────────
 
+_LLM_EXCLUDE = {"known_stargazers", "tags_applied"}
+
+def _state_for_llm(state: dict) -> dict:
+    """Return state dict with large/irrelevant fields stripped for LLM prompts."""
+    return {k: v for k, v in state.items() if k not in _LLM_EXCLUDE}
+
+
 def generate_narrative(title: str, for_votes: int, against_votes: int, state: dict) -> str:
     metrics_str = " | ".join(f"{k}={state.get(k, 0)}" for k in sorted(POLICY_METRICS))
     response = client.chat.completions.create(
@@ -841,7 +853,7 @@ def update_world_summary(state: dict) -> str:
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": (
             "You are summarizing the state of a GitHub-based civilization called Gitizens.\n"
-            f"Current state: {json.dumps(state, ensure_ascii=False)}\n\n"
+            f"Current state: {json.dumps(_state_for_llm(state), ensure_ascii=False)}\n\n"
             "Write a single sentence (max 25 words) describing the current state of the nation. "
             "Mention notable policy levels or emerging structures if relevant. No emoji."
         )}],
@@ -879,7 +891,10 @@ def generate_world_md(state: dict, law_number: int | None, date: str):
 
     lines += ["", "---", "", "## Entities", ""]
     for cat, label in CATEGORIES:
-        idx = read_json(Path(f"world/entities/{cat}/_index.json"))
+        try:
+            idx = read_json(Path(f"world/entities/{cat}/_index.json"))
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            idx = {}
         entity_ids = idx.get("entities", [])
         lines.append(f"### {label}")
         lines.append("")
@@ -898,7 +913,10 @@ def generate_world_md(state: dict, law_number: int | None, date: str):
         lines.append("")
 
     lines += ["---", "", "## Archive", ""]
-    archived = sorted(f for f in Path("world/archive").glob("*.json") if f.name != ".gitkeep")
+    try:
+        archived = sorted(f for f in Path("world/archive").glob("*.json") if f.name != ".gitkeep")
+    except OSError:
+        archived = []
     if archived:
         lines += ["| ID | Name | Demolished by | Reason |", "|----|------|---------------|--------|"]
         for f in archived:
@@ -933,7 +951,11 @@ def update_readme(state: dict, stats: dict, law_number: int | None = None, date:
 def append_history(law_number: int | None, title: str, issue_number: int,
                    for_votes: int, against_votes: int, passed: bool, date: str):
     path = Path("history/INDEX.md")
-    content = path.read_text(encoding="utf-8")
+    try:
+        content = path.read_text(encoding="utf-8")
+    except (FileNotFoundError, OSError):
+        print(f"  [WARN] history/INDEX.md not found — skipping history append")
+        return
     issue_link = f"[#{issue_number}](https://github.com/{REPO}/issues/{issue_number})"
     if passed:
         law_link = f"[law-{law_number:03d}](../world/laws/law-{law_number:03d}.md)"
@@ -948,7 +970,10 @@ def append_history(law_number: int | None, title: str, issue_number: int,
 def update_laws_index(law_number: int, title: str, issue_number: int,
                       issue_url: str, era: str, date: str):
     path = Path("world/laws_index.json")
-    data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+    except (json.JSONDecodeError, OSError):
+        data = []
     data.append({
         "number": law_number,
         "title": title,
@@ -1575,7 +1600,10 @@ def select_weekly_representatives():
     citizens_path = Path("world/citizens.json")
     if not citizens_path.exists():
         return
-    citizens = json.loads(citizens_path.read_text(encoding="utf-8"))
+    try:
+        citizens = json.loads(citizens_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return
     if not citizens:
         return
     top3 = sorted(citizens.items(), key=lambda x: x[1].get("total_votes", 0), reverse=True)[:3]
@@ -1623,7 +1651,7 @@ def generate_annals(history: list):
             "You are the official historian of Gitizens.\n"
             f"Write World Annals Chapter {chapter_num}, covering ticks {summary_data['ticks']}.\n"
             f"Data: {json.dumps(summary_data)}\n"
-            f"Current world: {json.dumps(state)}\n\n"
+            f"Current world: {json.dumps(_state_for_llm(state))}\n\n"
             "Format:\n"
             f"# World Annals — Chapter {chapter_num}\n\n"
             "## Summary\n<3-4 sentences of narrative history>\n\n"
@@ -1697,7 +1725,7 @@ def generate_citizen_narrator():
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": (
             "You are writing citizen perspectives for Gitizens.\n"
-            f"World state: {json.dumps(state)}\n\n"
+            f"World state: {json.dumps(_state_for_llm(state))}\n\n"
             "Write 3 short diary entries (2-3 sentences each) from 3 different fictional citizens:\n"
             "1. A government official\n2. A factory worker\n3. A teacher\n\n"
             "Each entry: '**[Name], [Occupation]:**\\n<diary entry>'\n"

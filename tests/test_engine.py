@@ -1052,3 +1052,95 @@ class TestAutonomousTickTreasuryCap:
             tv.world_autonomous_tick()
             written = ws.call_args[0][0]
         assert written["treasury"] <= 100_000
+
+
+# ===========================================================================
+# _state_for_llm — strips large fields before LLM prompts
+# ===========================================================================
+
+class TestStateForLlm:
+    def test_known_stargazers_stripped(self):
+        state = {**BASE_STATE, "known_stargazers": ["alice", "bob", "carol"],
+                 "tags_applied": ["era/founding-era"]}
+        result = tv._state_for_llm(state)
+        assert "known_stargazers" not in result
+        assert "tags_applied" not in result
+
+    def test_policy_metrics_preserved(self):
+        state = {**BASE_STATE, "known_stargazers": ["x"]}
+        result = tv._state_for_llm(state)
+        assert result["education"] == BASE_STATE["education"]
+        assert result["treasury"] == BASE_STATE["treasury"]
+
+    def test_empty_state_no_crash(self):
+        result = tv._state_for_llm({})
+        assert result == {}
+
+    def test_original_not_mutated(self):
+        state = {**BASE_STATE, "known_stargazers": ["alice"]}
+        tv._state_for_llm(state)
+        assert "known_stargazers" in state  # original unchanged
+
+
+# ===========================================================================
+# update_readme — STATE_START/END markers
+# ===========================================================================
+
+class TestUpdateReadme:
+    def test_state_block_replaced(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        readme = tmp_path / "README.md"
+        readme.write_text(
+            "# Header\n\n"
+            "<!-- STATE_START -->\nold content\n<!-- STATE_END -->\n\n"
+            "Footer",
+            encoding="utf-8",
+        )
+        state = {**BASE_STATE, "era": "Industrial Era", "laws_count": 5,
+                 "next_tick_at": "2026-06-12 00:00:00"}
+        stats = {"proposals_passed": 3, "proposals_rejected": 1}
+        tv.update_readme(state, stats, None, "2026-06-11")
+        content = readme.read_text(encoding="utf-8")
+        assert "<!-- STATE_START -->" in content
+        assert "<!-- STATE_END -->" in content
+        assert "old content" not in content
+        assert "Industrial Era" in content
+        assert "2026-06-12 00:00:00" in content
+
+    def test_missing_markers_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        readme = tmp_path / "README.md"
+        original = "# No markers here\n"
+        readme.write_text(original, encoding="utf-8")
+        state = {**BASE_STATE}
+        tv.update_readme(state, {}, None, "2026-06-11")
+        assert readme.read_text(encoding="utf-8") == original  # unchanged, no crash
+
+
+# ===========================================================================
+# append_history — FileNotFoundError guard
+# ===========================================================================
+
+class TestAppendHistoryGuard:
+    def test_missing_index_no_crash(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        # history/INDEX.md does NOT exist
+        tv.append_history(1, "Test Law", 42, 3, 1, True, "2026-06-11")
+        out = capsys.readouterr().out
+        assert "WARN" in out  # warning printed, no exception
+
+
+# ===========================================================================
+# update_laws_index — JSONDecodeError guard
+# ===========================================================================
+
+class TestUpdateLawsIndexGuard:
+    def test_corrupted_json_resets_gracefully(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/laws_index.json").write_text("NOT_JSON")
+        # Should not raise; instead starts fresh
+        tv.update_laws_index(5, "Test", 10, "http://x", "Founding Era", "2026-06-11")
+        data = json.loads((tmp_path / "world/laws_index.json").read_text())
+        assert len(data) == 1
+        assert data[0]["number"] == 5

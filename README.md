@@ -24,9 +24,12 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 ![Laws](https://img.shields.io/badge/Laws-8_enacted-8b949e?style=flat-square)
 <!-- WORLD-STATE-END -->
 
-[![Gitizens Dashboard](world/stats.svg)](https://ordinary9843.github.io/gitizens/)
+<!-- STATE_START -->
+**Era:** Founding Era | **Laws enacted:** 9 | [World state](world/WORLD.md)  
+**Next tick:** — UTC
+<!-- STATE_END -->
 
-> *Updated every 4 hours automatically · [View world history](world/WORLD.md)*
+[![Gitizens Dashboard](world/stats.svg)](https://ordinary9843.github.io/gitizens/)
 
 ---
 

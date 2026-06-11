@@ -219,8 +219,12 @@ def validate():
                         fail(f"state_patch `founded_date` must be a valid ISO date, got '{val}'.")
 
     # LLM contextual validation
+    _LLM_EXCLUDE = {"known_stargazers", "tags_applied"}
     ctx = load_world_context()
-    state_summary = json.dumps(ctx["state"], ensure_ascii=False)
+    state_summary = json.dumps(
+        {k: v for k, v in ctx["state"].items() if k not in _LLM_EXCLUDE},
+        ensure_ascii=False,
+    )
     entity_lines = [f"{c}: {', '.join(n)}" for c, n in ctx["entities"].items() if n]
     entity_summary = "\n".join(entity_lines) if entity_lines else "No structures built yet."
     effect_summary = ""
