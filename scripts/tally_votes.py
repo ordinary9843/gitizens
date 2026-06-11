@@ -5,6 +5,7 @@ Called by tally-votes.yml every 6 hours.
 """
 import os
 import json
+import math
 import re
 import random
 import subprocess
@@ -547,6 +548,68 @@ def apply_effect(effect_data: dict | None, law_number: int):
         write_state(state)
 
 
+# ── SVG helpers ──────────────────────────────────────────────────────────────
+
+def svg_radar(cx: float, cy: float, r: float,
+              vals: list[float], colors: list[str], labels: list[str],
+              font_size: int = 7) -> str:
+    """Return SVG markup for a mini pentagon radar chart (L)."""
+    n = len(vals)
+    angles = [-math.pi / 2 + 2 * math.pi * i / n for i in range(n)]
+    parts: list[str] = []
+
+    # Background grid rings
+    for frac in (0.25, 0.5, 0.75, 1.0):
+        pts = " ".join(
+            f"{cx + r * frac * math.cos(a):.1f},{cy + r * frac * math.sin(a):.1f}"
+            for a in angles
+        )
+        parts.append(f'<polygon points="{pts}" fill="none" stroke="#30363d" stroke-width="0.5"/>')
+
+    # Axis spokes
+    for a in angles:
+        ax, ay = cx + r * math.cos(a), cy + r * math.sin(a)
+        parts.append(
+            f'<line x1="{cx:.1f}" y1="{cy:.1f}" x2="{ax:.1f}" y2="{ay:.1f}"'
+            f' stroke="#30363d" stroke-width="0.5"/>'
+        )
+
+    # Data polygon (filled area)
+    data_pts = " ".join(
+        f"{cx + r * (v / 100) * math.cos(a):.1f},{cy + r * (v / 100) * math.sin(a):.1f}"
+        for v, a in zip(vals, angles)
+    )
+    parts.append(
+        f'<polygon points="{data_pts}" fill="rgba(56,139,253,0.14)" stroke="#388bfd" stroke-width="1.2"/>'
+    )
+
+    # Data point dots
+    for v, a, c in zip(vals, angles, colors):
+        dx, dy = cx + r * (v / 100) * math.cos(a), cy + r * (v / 100) * math.sin(a)
+        parts.append(f'<circle cx="{dx:.1f}" cy="{dy:.1f}" r="2.2" fill="{c}"/>')
+
+    # Axis labels at outer edge
+    for lbl, a in zip(labels, angles):
+        lx = cx + (r + 9) * math.cos(a)
+        ly = cy + (r + 9) * math.sin(a)
+        if math.cos(a) > 0.3:
+            anchor = "start"
+        elif math.cos(a) < -0.3:
+            anchor = "end"
+        else:
+            anchor = "middle"
+        dy_attr = ' dy="0.35em"' if abs(math.sin(a)) < 0.3 else (
+            ' dy="0.7em"' if math.sin(a) > 0 else ' dy="-0.2em"'
+        )
+        parts.append(
+            f'<text x="{lx:.1f}" y="{ly:.1f}"{dy_attr} fill="#484f58"'
+            f' font-family="monospace" font-size="{font_size}"'
+            f' text-anchor="{anchor}">{lbl}</text>'
+        )
+
+    return "\n  ".join(parts)
+
+
 # ── SVG: dashboard ───────────────────────────────────────────────────────────
 
 def generate_dashboard_svg(stats: dict, date: str):
@@ -595,6 +658,9 @@ def generate_dashboard_svg(stats: dict, date: str):
     def bar_w(val, max_w=270):
         return max(int(val / 100 * max_w), 2 if val > 0 else 0)
 
+    def bar_w_sm(val):  # compact bar for right column
+        return bar_w(val, max_w=130)
+
     def mc(val):  # metric color
         if val >= 60: return "#3fb950"
         if val >= 30: return "#e3b341"
@@ -603,6 +669,13 @@ def generate_dashboard_svg(stats: dict, date: str):
     pol_color = "#f85149" if pol >= 60 else "#e3b341" if pol >= 30 else "#3fb950"
     pop_str   = f"{pop:,}" if pop else "—"
     stb_color = "#3fb950" if stb >= 60 else "#e3b341" if stb >= 40 else "#f85149"
+
+    radar = svg_radar(
+        660, 183, 50,
+        [edu, ind, wel, grn, dfn],
+        ["#388bfd", "#bc8cff", "#3fb950", "#2dd4bf", "#f0883e"],
+        ["EDU", "IND", "WEL", "GRN", "DEF"],
+    )
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="760" height="370">
   <rect width="760" height="370" rx="8" fill="#161b22"/>
@@ -642,12 +715,14 @@ def generate_dashboard_svg(stats: dict, date: str):
   <text x="{56 + bar_w(wel) + 4}" y="204" fill="{mc(wel)}" font-family="monospace" font-size="10">{wel}</text>
 
   <text x="400" y="168" fill="#8b949e" font-family="monospace" font-size="10">GRN</text>
-  <rect x="432" y="158" width="{bar_w(grn)}" height="12" rx="2" fill="{mc(grn)}"/>
-  <text x="{432 + bar_w(grn) + 4}" y="168" fill="{mc(grn)}" font-family="monospace" font-size="10">{grn}</text>
+  <rect x="432" y="158" width="{bar_w_sm(grn)}" height="12" rx="2" fill="{mc(grn)}"/>
+  <text x="{432 + bar_w_sm(grn) + 4}" y="168" fill="{mc(grn)}" font-family="monospace" font-size="10">{grn}</text>
 
   <text x="400" y="186" fill="#8b949e" font-family="monospace" font-size="10">DEF</text>
-  <rect x="432" y="176" width="{bar_w(dfn)}" height="12" rx="2" fill="{mc(dfn)}"/>
-  <text x="{432 + bar_w(dfn) + 4}" y="186" fill="{mc(dfn)}" font-family="monospace" font-size="10">{dfn}</text>
+  <rect x="432" y="176" width="{bar_w_sm(dfn)}" height="12" rx="2" fill="{mc(dfn)}"/>
+  <text x="{432 + bar_w_sm(dfn) + 4}" y="186" fill="{mc(dfn)}" font-family="monospace" font-size="10">{dfn}</text>
+
+  {radar}
 
   <line x1="24" y1="218" x2="736" y2="218" stroke="#30363d" stroke-width="1"/>
 

@@ -182,8 +182,46 @@
     }
     #refresh-btn:hover { background: var(--border); }
 
-    /* ── Smoke / tree CSS fallback (only used if Canvas unavailable) ── */
-    @keyframes treeSway { 0%,100%{transform:rotate(-2deg);transform-origin:50% 100%} 50%{transform:rotate(2deg);transform-origin:50% 100%} }
+    /* ── Delta flash (J) ── */
+    .delta-badge {
+      font-size: 9px; font-weight: bold; margin-left: 5px;
+      display: inline-block; vertical-align: middle;
+      animation: deltaFadeUp 1.8s ease-out forwards;
+    }
+    @keyframes deltaFadeUp {
+      0%   { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-16px); }
+    }
+
+    /* ── Building tooltip (F) ── */
+    #building-tooltip {
+      position: fixed; display: none; z-index: 200;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 7px 12px; font-size: 11px;
+      pointer-events: none; white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+
+    /* ── Era progress (C) ── */
+    #era-progress-wrap { margin-top: 10px; }
+    #era-progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    #era-progress-fill { height: 100%; border-radius: 2px; transition: width 0.7s ease; background: var(--blue); }
+    #era-next { font-size: 9px; color: var(--dim); margin-top: 3px; }
+
+    /* ── World Chronicle dispatches (A) ── */
+    .dispatch-item { padding: 10px 0; border-bottom: 1px solid #21262d; }
+    .dispatch-item:last-child { border-bottom: none; }
+    .dispatch-meta { font-size: 10px; color: var(--dim); margin-bottom: 4px; }
+    .dispatch-text { font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .dispatch-changes { font-size: 10px; color: var(--dim); margin-top: 4px; font-style: italic; }
+
+    /* ── Vote distribution bar (I) ── */
+    .vote-bar-wrap {
+      height: 3px; background: var(--border); border-radius: 2px;
+      margin-top: 5px; overflow: hidden; display: flex;
+    }
+    .vote-bar-for     { background: var(--green); }
+    .vote-bar-against { background: var(--red); }
 
     @media (max-width: 780px) {
       #panels { grid-template-columns: 1fr; }
@@ -232,6 +270,10 @@
   <div class="panel">
     <h2>WORLD STATE</h2>
     <div id="world-stats"></div>
+    <div id="era-progress-wrap">
+      <div id="era-progress-bar"><div id="era-progress-fill" style="width:0%"></div></div>
+      <div id="era-next"></div>
+    </div>
   </div>
   <div class="panel">
     <h2>STRUCTURES  ·  POLICY → CIVILIZATION</h2>
@@ -260,6 +302,11 @@
   <div id="recent-laws-list"><p class="no-data">Loading…</p></div>
 </div>
 
+<div class="landing-section" id="dispatch-section">
+  <h2>WORLD CHRONICLE</h2>
+  <div id="dispatch-list"><p class="no-data">Loading…</p></div>
+</div>
+
 <div class="landing-section">
   <h2>WHAT IS GITIZENS</h2>
   <p class="intro-text">
@@ -286,6 +333,8 @@
     </div>
   </div>
 </div>
+
+<div id="building-tooltip"></div>
 
 <div id="footer">
   <span id="last-updated">—</span>
@@ -359,6 +408,28 @@ let _radarChart = null, _histChart = null;
 let _bgCtx = null, _fgCtx = null, _cityW = 900, _cityH = 320, _cityGY = 240;
 let _S = {};
 let _animFrame = null;
+let _animTime = 0;           // G: frame counter for sin oscillation
+
+// G: star data for fg twinkle
+let _stars = [];
+
+// E: weather system
+let _weatherType = null;     // null | 'rain' | 'drought' | 'crisis'
+const _rain = [];
+
+// F: building hover hit areas
+let _buildingHits = [];
+
+// H: entrance animation
+let _entranceDone = true;
+let _entranceStart = 0;
+
+// D: active event expiry for countdown
+let _eventExpiry = null;
+let _eventCountdownTimer = null;
+
+// J: previous metrics for delta flash
+let _prevMetrics = null;
 
 // ── Smoke particle system ─────────────────────────────────────────────────────
 
@@ -390,6 +461,47 @@ function drawSmoke(ctx) {
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ── Rain particle system (E) ──────────────────────────────────────────────────
+
+function setWeatherFromEvent(evt) {
+  if (!evt || !evt.id) { _weatherType = null; return; }
+  const t = ((evt.title || '') + ' ' + (evt.description || '')).toLowerCase();
+  if (evt.is_crisis) _weatherType = 'crisis';
+  else if (/storm|rain|flood|hurricane|typhoon/.test(t)) _weatherType = 'rain';
+  else if (/drought|dry|heat|arid|wildfir/.test(t)) _weatherType = 'drought';
+  else _weatherType = null;
+}
+
+function spawnRain() {
+  if (_rain.length > 250) return;
+  for (let i = 0; i < 5; i++) {
+    _rain.push({
+      x: Math.random() * (_cityW + 80) - 40,
+      y: -8,
+      vy: 9 + Math.random() * 5,
+      vx: -1.5 - Math.random() * 0.8,
+      len: 9 + Math.random() * 7,
+      alpha: 0.25 + Math.random() * 0.3,
+    });
+  }
+}
+
+function drawRain(ctx) {
+  ctx.strokeStyle = '#7ec8e3';
+  ctx.lineWidth = 1;
+  for (let i = _rain.length - 1; i >= 0; i--) {
+    const p = _rain[i];
+    p.x += p.vx; p.y += p.vy;
+    if (p.y > _cityH + 10) { _rain.splice(i, 1); continue; }
+    ctx.globalAlpha = p.alpha;
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    ctx.lineTo(p.x + p.vx * (p.len / p.vy), p.y + p.len);
+    ctx.stroke();
   }
   ctx.globalAlpha = 1;
 }
@@ -735,18 +847,22 @@ function renderCityBg(state) {
   skyGrd.addColorStop(0, skyTop); skyGrd.addColorStop(1, skyBot);
   ctx.fillStyle = skyGrd; ctx.fillRect(0, 0, W, H);
 
-  // Stars
+  // Stars (G: populate _stars for fg twinkle; bg draws dim base)
   const starOp = Math.max(0, (50 - pol) / 50 * 0.85);
-  if (starOp > 0.05) {
-    [[.05,.4],[.14,.15],[.24,.75],[.35,.25],[.46,.08],[.55,.65],[.64,.18],
-     [.73,.72],[.83,.35],[.93,.08],[.10,.65],[.29,.55],[.42,.28],[.61,.48],[.76,.68]
-    ].forEach(([fx, fy], i) => {
-      ctx.globalAlpha = starOp * (0.5 + (i % 3) * 0.166);
+  _stars = [];
+  [[.05,.4],[.14,.15],[.24,.75],[.35,.25],[.46,.08],[.55,.65],[.64,.18],
+   [.73,.72],[.83,.35],[.93,.08],[.10,.65],[.29,.55],[.42,.28],[.61,.48],[.76,.68]
+  ].forEach(([fx, fy], i) => {
+    const sx = ~~(fx*W), sy = ~~(fy*60+7);
+    const baseAlpha = starOp * (0.5 + (i % 3) * 0.166);
+    _stars.push({x: sx, y: sy, r: 1.4, phase: i * 0.74, baseAlpha});
+    if (baseAlpha > 0.05) {
+      ctx.globalAlpha = baseAlpha * 0.35;
       ctx.fillStyle = 'white';
-      ctx.beginPath(); ctx.arc(~~(fx*W), ~~(fy*60+7), 1.4, 0, Math.PI*2); ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-  }
+      ctx.beginPath(); ctx.arc(sx, sy, 1.4, 0, Math.PI*2); ctx.fill();
+    }
+  });
+  ctx.globalAlpha = 1;
 
   // Moon
   if (pol < 70) {
@@ -756,6 +872,14 @@ function renderCityBg(state) {
     ctx.beginPath(); ctx.arc(mx, 36, 20, 0, Math.PI*2); ctx.fill();
     ctx.globalAlpha = mOp; ctx.fillStyle = skyTop;
     ctx.beginPath(); ctx.arc(mx+12, 30, 19, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // E: Drought sky tint
+  if (_weatherType === 'drought') {
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = '#f0883e';
+    ctx.fillRect(0, 0, W, GY);
     ctx.globalAlpha = 1;
   }
 
@@ -781,6 +905,7 @@ function renderCityBg(state) {
 
   // Buildings
   _chimneys = [];
+  _buildingHits = [];
   const active = activeStructures(state)
     .map(s => ({...s, b: BUILDINGS[s.name]}))
     .filter(s => s.b)
@@ -794,7 +919,7 @@ function renderCityBg(state) {
     const GAP  = 16;
     const totW = active.reduce((s,a) => s + a.b.w + GAP, -GAP);
     let cx = Math.max(20, (W - totW) / 2);
-    active.forEach(({b, m}) => {
+    active.forEach(({b, m, name}) => {
       ctx.save();
       b.draw(ctx, cx, GY, state);
       ctx.restore();
@@ -807,21 +932,45 @@ function renderCityBg(state) {
         ctx.fillText(mm.abbr, cx + b.w/2, GY+15);
         ctx.globalAlpha = 1; ctx.textAlign = 'left';
       }
+      // F: track hit area for tooltip
+      _buildingHits.push({x: cx, w: b.w, name, metric: m, value: state[m]||0});
       cx += b.w + GAP;
     });
   }
 
   document.getElementById('loading').style.display = 'none';
+
+  // H: trigger entrance animation
+  _entranceDone = false;
+  _entranceStart = performance.now();
 }
 
-// ── Animation loop (foreground: walkers + smoke) ──────────────────────────────
+// ── Animation loop (foreground: walkers, smoke, weather, stars, entrance) ─────
 
 function animLoop() {
   const ctx = _fgCtx;
   if (!ctx) { _animFrame = null; return; }
+  _animTime++;
   ctx.clearRect(0, 0, _cityW, _cityH);
+
+  // G: Star twinkle (drawn under everything so walkers are in front)
+  if (_stars.length && _cityGY > 0) {
+    ctx.fillStyle = 'white';
+    _stars.forEach(s => {
+      const alpha = s.baseAlpha * (0.5 + Math.sin(_animTime * 0.04 + s.phase) * 0.5);
+      if (alpha <= 0.02) return;
+      ctx.globalAlpha = Math.min(alpha, 1);
+      const r = s.r * (0.85 + Math.sin(_animTime * 0.025 + s.phase + 1) * 0.15);
+      ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  // Smoke
   spawnSmoke();
   drawSmoke(ctx);
+
+  // Walkers
   _walkers.forEach(w => {
     w.x += w.speed * w.dir;
     w.phase = (w.phase + w.speed * 0.09) % (Math.PI * 2);
@@ -829,6 +978,32 @@ function animLoop() {
     if (w.x < -24)         w.x = _cityW + 24;
     drawWalker(ctx, w);
   });
+
+  // E: Weather effects
+  if (_weatherType === 'rain') {
+    spawnRain();
+    drawRain(ctx);
+  } else if (_weatherType === 'crisis') {
+    const pulse = (Math.sin(_animTime * 0.035) * 0.5 + 0.5) * 0.1;
+    ctx.globalAlpha = pulse;
+    ctx.fillStyle = '#f85149';
+    ctx.fillRect(0, 0, _cityW, _cityH);
+    ctx.globalAlpha = 1;
+  }
+
+  // H: Entrance animation — dark overlay fades out over 700ms
+  if (!_entranceDone) {
+    const elapsed = performance.now() - _entranceStart;
+    if (elapsed < 700) {
+      const t = elapsed / 700;
+      const alpha = (1 - t) * (1 - t) * 0.97; // quadratic ease-out
+      ctx.fillStyle = `rgba(13,17,23,${alpha})`;
+      ctx.fillRect(0, 0, _cityW, _cityH);
+    } else {
+      _entranceDone = true;
+    }
+  }
+
   _animFrame = requestAnimationFrame(animLoop);
 }
 
@@ -915,6 +1090,16 @@ function renderHistoryChart(history) {
     data: history.map(h => h[key] != null ? h[key] : null),
     borderWidth: 1.5, fill: true, tension: 0.4,
     pointRadius: 0, pointHoverRadius: 4, spanGaps: true,
+    yAxisID: 'y',
+  });
+
+  // B: population + treasury on right y-axis (dashed, no fill)
+  const mkDs2 = (key, color, label) => ({
+    label, borderColor: color, backgroundColor: 'transparent',
+    data: history.map(h => h[key] != null ? h[key] : null),
+    borderWidth: 1.5, borderDash: [4, 3], fill: false, tension: 0.4,
+    pointRadius: 0, pointHoverRadius: 4, spanGaps: true,
+    yAxisID: 'y1',
   });
 
   _histChart = new Chart(document.getElementById('history-canvas'), {
@@ -929,6 +1114,8 @@ function renderHistoryChart(history) {
         mkDs('defense',      '#f0883e', 'Defense'),
         mkDs('pollution',    '#f85149', 'Pollution'),
         mkDs('stability',    '#e3b341', 'Stability'),
+        mkDs2('population',  '#c9d1d9', 'Population'),
+        mkDs2('treasury',    '#e3b341', 'Treasury GC'),
       ],
     },
     options: {
@@ -947,8 +1134,16 @@ function renderHistoryChart(history) {
         },
       },
       scales: {
-        x: { ticks:{color:'#484f58',maxTicksLimit:10,font:{size:9}}, grid:{color:'#21262d'} },
-        y: { min:0, max:100, ticks:{stepSize:25,color:'#484f58',font:{size:9}}, grid:{color:'#21262d'} },
+        x:  { ticks:{color:'#484f58',maxTicksLimit:10,font:{size:9}}, grid:{color:'#21262d'} },
+        y:  { min:0, max:100, ticks:{stepSize:25,color:'#484f58',font:{size:9}}, grid:{color:'#21262d'} },
+        y1: {
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: {
+            color: '#484f58', font:{size:9}, maxTicksLimit: 5,
+            callback: v => v >= 1000 ? Math.round(v/1000) + 'k' : v,
+          },
+        },
       },
     },
   });
@@ -982,17 +1177,71 @@ function renderHistorySVGFallback(history) {
 function renderWorldStats(state) {
   const stb = state.stability || 0;
   const stbClr = stb >= 60 ? '#3fb950' : stb >= 40 ? '#e3b341' : '#f85149';
+
+  function deltaBadge(key) {
+    if (!_prevMetrics) return '';
+    const d = (state[key]||0) - (_prevMetrics[key]||0);
+    if (d === 0) return '';
+    const sign = d > 0 ? '+' : '';
+    const col  = d > 0 ? '#3fb950' : '#f85149';
+    return `<span class="delta-badge" style="color:${col}">${sign}${d}</span>`;
+  }
+
   document.getElementById('world-stats').innerHTML = [
-    { label:'Population', value:(state.population||0).toLocaleString(),         color:'#c9d1d9' },
-    { label:'Stability',  value:`${stb}/100`,                                   color:stbClr    },
-    { label:'Treasury',   value:`${(state.treasury||0).toLocaleString()} GC`,   color:'#e3b341' },
-    { label:'Laws',       value: state.laws_count || 0,                          color:'#c9d1d9' },
-    { label:'Era',        value: state.era || '—',                              color:'#8b949e' },
-  ].map(({label,value,color}) => `
+    { label:'Population', key:'population', value:(state.population||0).toLocaleString(), color:'#c9d1d9' },
+    { label:'Stability',  key:'stability',  value:`${stb}/100`,                           color:stbClr    },
+    { label:'Treasury',   key:'treasury',   value:`${(state.treasury||0).toLocaleString()} GC`, color:'#e3b341' },
+    { label:'Laws',       key:'laws_count', value: state.laws_count || 0,                 color:'#c9d1d9' },
+    { label:'Era',        key:'era',        value: state.era || '—',                      color:'#8b949e' },
+  ].map(({label, key, value, color}) => `
     <div class="stat-row">
       <span class="stat-label">${label}</span>
-      <span class="stat-value" style="color:${color}">${value}</span>
+      <span class="stat-value" style="color:${color}">${value}${key !== 'era' ? deltaBadge(key) : ''}</span>
     </div>`).join('');
+
+  _prevMetrics = Object.assign({}, state); // J: store for next diff
+  updateEraProgress(state);               // C
+}
+
+// C: era progress bar
+function updateEraProgress(state) {
+  const ms = ['education','industry','welfare','green_policy','defense'];
+  const vals = ms.map(m => state[m] || 0);
+  const pol = state.pollution || 0;
+  const stb = state.stability || 0;
+  const ind = state.industry || 0;
+  const edu = state.education || 0;
+
+  let pct = 0, label = '', color = '#388bfd';
+
+  if (pol >= 75 || stb <= 25) {
+    // Crisis Age — show recovery
+    const recov = pol >= 75 ? (100 - pol) / 25 : stb / 25;
+    pct = Math.round(Math.min(recov, 1) * 100);
+    label = `Crisis — recovery ${pct}%`; color = '#f85149';
+  } else if (vals.every(v => v >= 80) && stb >= 80) {
+    pct = 100; label = 'Golden Age — peak civilization'; color = '#e3b341';
+  } else if (vals.every(v => v >= 65)) {
+    // Modern → Golden Age: need all ≥80 and stb ≥80
+    const minTo80 = Math.min(...vals, stb);
+    pct = Math.round(Math.min(minTo80 / 80, 1) * 100);
+    label = `Modern Era → Golden Age (${pct}%)`; color = '#2dd4bf';
+  } else if (ind >= 60 && edu >= 50) {
+    // Industrial → Modern: need all ≥65
+    const minTo65 = Math.min(...vals);
+    pct = Math.round(Math.min(minTo65 / 65, 1) * 100);
+    label = `Industrial Era → Modern Era (${pct}%)`; color = '#bc8cff';
+  } else {
+    // Founding → Industrial: need ind≥60 and edu≥50
+    const progress = Math.min(ind / 60, 1) * 0.5 + Math.min(edu / 50, 1) * 0.5;
+    pct = Math.round(progress * 100);
+    label = `Founding Era → Industrial Era (${pct}%)`; color = '#388bfd';
+  }
+
+  const fill = document.getElementById('era-progress-fill');
+  const next = document.getElementById('era-next');
+  if (fill) { fill.style.width = pct + '%'; fill.style.background = color; }
+  if (next) next.textContent = label;
 }
 
 function renderStructures(state) {
@@ -1061,29 +1310,47 @@ function startTickCountdown(nextTickAt) {
 // ── Active Event banner ───────────────────────────────────────────────────────
 
 async function loadActiveEvent() {
+  if (_eventCountdownTimer) { clearInterval(_eventCountdownTimer); _eventCountdownTimer = null; }
   try {
     const r = await fetch(`${RAW}/world/active_event.json`, {cache:'no-cache'});
-    if (!r.ok) return;
+    if (!r.ok) { setWeatherFromEvent(null); return; }
     const evt = await r.json();
-    if (!evt.id) return;
-    const firedAt = new Date(evt.fired_at);
-    const expiresAt = new Date(firedAt.getTime() + (evt.duration_hours||4)*3600000);
-    const rem = expiresAt - Date.now();
-    if (rem <= 0) return;
-    const hh = Math.floor(rem/3600000), mm = Math.floor((rem%3600000)/60000);
-    const isCrisis = evt.is_crisis;
+    if (!evt.id) { setWeatherFromEvent(null); return; }
+
+    setWeatherFromEvent(evt);   // E: set weather type based on event
+
+    const firedAt  = new Date(evt.fired_at);
+    _eventExpiry   = new Date(firedAt.getTime() + (evt.duration_hours||4)*3600000);
+    const rem = _eventExpiry - Date.now();
+    if (rem <= 0) { setWeatherFromEvent(null); return; }
+
+    const isCrisis = !!evt.is_crisis;
     const color = isCrisis ? '#f85149' : '#e3b341';
     const banner = document.getElementById('event-banner');
     banner.style.borderLeftColor = color;
+
+    function updateBannerTime() {
+      const timeEl = banner.querySelector('.ev-meta-time');
+      if (!timeEl || !_eventExpiry) return;
+      const r2 = _eventExpiry - Date.now();
+      if (r2 <= 0) { banner.style.display = 'none'; clearInterval(_eventCountdownTimer); return; }
+      const hh = Math.floor(r2/3600000), mm = Math.floor((r2%3600000)/60000);
+      timeEl.textContent = `${hh}h ${mm}m remaining`;
+    }
+
+    const hh = Math.floor(rem/3600000), mm = Math.floor((rem%3600000)/60000);
     banner.style.display = 'block';
     banner.innerHTML = `
       <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
-        <span class="ev-title" style="color:${color}">${isCrisis?'[CRISIS]':''} ${evt.title}</span>
-        <span class="ev-meta">${hh}h ${mm}m remaining</span>
-        ${isCrisis ? '<span class="ev-meta" style="color:#f85149">policy effects x1.5</span>':'' }
+        <span class="ev-title" style="color:${color}">${isCrisis?'[CRISIS] ':''}${evt.title}</span>
+        <span class="ev-meta ev-meta-time">${hh}h ${mm}m remaining</span>
+        ${isCrisis ? '<span class="ev-meta" style="color:#f85149">policy effects ×1.5</span>' : ''}
       </div>
       <div class="ev-desc">${evt.description||''}</div>`;
-  } catch(_) {}
+
+    // D: refresh countdown every 30s
+    _eventCountdownTimer = setInterval(updateBannerTime, 30000);
+  } catch(_) { setWeatherFromEvent(null); }
 }
 
 // ── Citizens leaderboard + Representatives ────────────────────────────────────
@@ -1150,9 +1417,21 @@ async function loadProposals() {
     document.getElementById('proposals-list').innerHTML = issues.map(i => {
       const age = Math.floor((Date.now() - new Date(i.created_at)) / 3600000);
       const ageStr = age < 24 ? `${age}h ago` : `${Math.floor(age/24)}d ago`;
+      const forVotes = i.reactions?.['+1'] ?? 0;
+      const againstVotes = i.reactions?.['-1'] ?? 0;
+      const total = forVotes + againstVotes;
+      const forPct = total > 0 ? Math.round(forVotes / total * 100) : 0;
+      const voteBar = total > 0 ? `
+        <div class="vote-bar-wrap">
+          <div class="vote-bar-for"     style="width:${forPct}%"></div>
+          <div class="vote-bar-against" style="width:${100-forPct}%"></div>
+        </div>` : '';
       return `<div class="proposal-item">
-        <span class="proposal-votes">+${i.reactions?.['+1']??0}</span>
-        <span class="proposal-title">${i.title.replace(/^\[(PROPOSAL|AI-PROPOSAL|FEEDBACK)\]\s*/,'')}</span>
+        <span class="proposal-votes">+${forVotes}${againstVotes > 0 ? ` -${againstVotes}` : ''}</span>
+        <span class="proposal-title" style="flex:1">
+          ${i.title.replace(/^\[(PROPOSAL|AI-PROPOSAL|FEEDBACK)\]\s*/,'')}
+          ${voteBar}
+        </span>
         <span style="color:var(--dim);font-size:10px">${ageStr}</span>
         <a class="proposal-link" href="${i.html_url}" target="_blank">Vote →</a>
       </div>`;
@@ -1187,6 +1466,27 @@ async function loadRecentLaws() {
   }
 }
 
+// ── World Chronicle dispatches (A) ───────────────────────────────────────────
+
+async function loadDispatches() {
+  const el = document.getElementById('dispatch-list');
+  try {
+    const r = await fetch(`${RAW}/world/dispatches.json`, {cache:'no-cache'});
+    if (!r.ok) { el.innerHTML = '<p class="no-data">No dispatches yet.</p>'; return; }
+    const all = await r.json();
+    const recent = (Array.isArray(all) ? all : []).slice(-3).reverse();
+    if (!recent.length) { el.innerHTML = '<p class="no-data">No dispatches yet.</p>'; return; }
+    el.innerHTML = recent.map(d => `
+      <div class="dispatch-item">
+        <div class="dispatch-meta">Tick ${d.tick ?? '—'} &middot; ${d.date || '—'}</div>
+        <div class="dispatch-text">${d.narrative || ''}</div>
+        ${d.changes ? `<div class="dispatch-changes">${d.changes}</div>` : ''}
+      </div>`).join('');
+  } catch(_) {
+    el.innerHTML = '<p class="no-data">No dispatches yet.</p>';
+  }
+}
+
 // ── History ───────────────────────────────────────────────────────────────────
 
 async function loadHistory() {
@@ -1196,12 +1496,53 @@ async function loadHistory() {
   } catch(_) {}
 }
 
-// ── State fetch ───────────────────────────────────────────────────────────────
+// ── State fetch with localStorage cache (K) ───────────────────────────────────
+
+const _STATE_KEY = 'gz_state_v1';
+const _STATE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function _readCache() {
+  try {
+    const raw = localStorage.getItem(_STATE_KEY);
+    if (!raw) return null;
+    const { t, d } = JSON.parse(raw);
+    if (Date.now() - t < _STATE_TTL) return d;
+  } catch(_) {}
+  return null;
+}
+
+function _writeCache(data) {
+  try { localStorage.setItem(_STATE_KEY, JSON.stringify({t: Date.now(), d: data})); } catch(_) {}
+}
 
 async function fetchState() {
-  const r = await fetch(`${RAW}/world/state.json`, {cache:'no-cache'});
-  if (r.ok) return r.json();
-  throw new Error('Cannot load state.json');
+  const cached = _readCache();
+
+  const fetchFresh = async () => {
+    const r = await fetch(`${RAW}/world/state.json`, {cache:'no-cache'});
+    if (!r.ok) throw new Error('state.json unavailable');
+    const data = await r.json();
+    _writeCache(data);
+    return data;
+  };
+
+  if (cached) {
+    // Return cached immediately; silently refresh in background
+    fetchFresh().then(fresh => {
+      if (JSON.stringify(fresh) !== JSON.stringify(cached)) {
+        // State changed — re-render panels with fresh data
+        lastState = fresh;
+        renderHeader(fresh);
+        renderCityBg(fresh);
+        renderRadar(fresh);
+        renderWorldStats(fresh);
+        renderStructures(fresh);
+      }
+    }).catch(_=>_);
+    return cached;
+  }
+
+  return fetchFresh();
 }
 
 // ── Main load ─────────────────────────────────────────────────────────────────
@@ -1246,6 +1587,7 @@ async function load() {
     loadProposals(),
     loadRecentLaws(),
     loadCitizens(),
+    loadDispatches(),
   ]);
 
   // Refresh countdown
@@ -1259,6 +1601,34 @@ async function load() {
 
 let _refreshTimer = null;
 let _resizeTimer  = null;
+
+// ── Building hover tooltip (F) ────────────────────────────────────────────────
+
+(function setupBuildingTooltip() {
+  const container = document.getElementById('city-container');
+  const tooltip   = document.getElementById('building-tooltip');
+
+  container.addEventListener('mousemove', e => {
+    const rect = container.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    if (my > _cityGY || !_buildingHits.length) { tooltip.style.display = 'none'; return; }
+    const hit = _buildingHits.find(h => mx >= h.x && mx <= h.x + h.w);
+    if (hit) {
+      const mm = METRIC_META[hit.metric];
+      tooltip.innerHTML = `<strong>${hit.name}</strong>`
+        + `<span style="color:var(--muted);margin-left:8px">${mm ? mm.label : hit.metric}: ${hit.value}</span>`;
+      // Keep tooltip inside viewport
+      const tx = Math.min(e.clientX + 14, window.innerWidth - 200);
+      tooltip.style.left = tx + 'px';
+      tooltip.style.top  = (e.clientY - 12) + 'px';
+      tooltip.style.display = 'block';
+    } else {
+      tooltip.style.display = 'none';
+    }
+  });
+  container.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+})();
 
 window.addEventListener('resize', () => {
   clearTimeout(_resizeTimer);
