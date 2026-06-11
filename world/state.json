@@ -4,7 +4,7 @@
   "last_enacted": "2026-06-11",
   "founded_date": "2026-06-10",
   "world_summary": "In the Founding Era, Gitizens thrive with balanced welfare and education levels, a stable treasury, and a growing population of 1,300.",
-  "treasury": 333,
+  "treasury": 339,
   "currency": "Git Coins",
   "stars_last_counted": 3,
   "education": 58,
@@ -12,9 +12,9 @@
   "welfare": 60,
   "green_policy": 60,
   "defense": 35,
-  "population": 1450,
-  "pollution": 2,
-  "stability": 60,
+  "population": 1500,
+  "pollution": 1,
+  "stability": 59,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society"
@@ -25,5 +25,5 @@
     "sykar-f"
   ],
   "last_narrator_date": "2026-06-11T04:26:11.329012+00:00",
-  "next_tick_at": "2026-06-11T12:00:00Z"
+  "next_tick_at": "2026-06-11T16:00:00Z"
 }
