@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-11*
+*Last updated: 2026-06-11 — [Law 010](laws/law-010.md)*
 
 ---
 
@@ -9,20 +9,20 @@
 | Field | Value |
 |-------|-------|
 | Era | Founding Era |
-| Laws enacted | 9 |
+| Laws enacted | 10 |
 | Last enacted | 2026-06-11 |
-| Treasury | 339 Git Coins |
+| Treasury | 245 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 58/100 |
+| Education | 63/100 |
 | Industry | 33/100 |
-| Welfare | 60/100 |
+| Welfare | 68/100 |
 | Green Policy | 60/100 |
 | Defense | 35/100 |
-| Pollution *(derived)* | 1/100 |
+| Pollution *(derived)* | 0/100 |
 
 ---
 
@@ -39,6 +39,7 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `dst-001` | City Park | [Law 006](laws/law-006.md) | green_policy >= 35 |
+| `dst-002` | Social Housing District | [Law 010](laws/law-010.md) | welfare >= 60 |
 
 ### Buildings
 

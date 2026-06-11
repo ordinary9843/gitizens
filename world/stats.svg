@@ -7,13 +7,13 @@
   <line x1="24" y1="70" x2="736" y2="70" stroke="#30363d" stroke-width="1"/>
 
   <text x="24"  y="90"  fill="#484f58" font-family="monospace" font-size="10">LAWS ENACTED</text>
-  <text x="24"  y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">9</text>
+  <text x="24"  y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">10</text>
 
   <text x="210" y="90"  fill="#484f58" font-family="monospace" font-size="10">STRUCTURES</text>
-  <text x="210" y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">6</text>
+  <text x="210" y="116" fill="#c9d1d9" font-family="monospace" font-size="26" font-weight="bold">7</text>
 
   <text x="396" y="90"  fill="#484f58" font-family="monospace" font-size="10">TREASURY</text>
-  <text x="396" y="116" fill="#e3b341" font-family="monospace" font-size="26" font-weight="bold">339</text>
+  <text x="396" y="116" fill="#e3b341" font-family="monospace" font-size="26" font-weight="bold">245</text>
 
   <text x="582" y="90"  fill="#484f58" font-family="monospace" font-size="10">PASS RATE</text>
   <text x="582" y="116" fill="#3fb950" font-family="monospace" font-size="26" font-weight="bold">100%</text>
@@ -21,19 +21,19 @@
   <line x1="24" y1="132" x2="736" y2="132" stroke="#30363d" stroke-width="1"/>
 
   <text x="24"  y="150" fill="#484f58" font-family="monospace" font-size="10">POLICY METRICS</text>
-  <text x="700" y="150" fill="#3fb950" font-family="monospace" font-size="10" text-anchor="end">POLLUTION 1/100</text>
+  <text x="700" y="150" fill="#3fb950" font-family="monospace" font-size="10" text-anchor="end">POLLUTION 0/100</text>
 
   <text x="24"  y="168" fill="#8b949e" font-family="monospace" font-size="10">EDU</text>
-  <rect x="56"  y="158" width="156" height="12" rx="2" fill="#e3b341"/>
-  <text x="216" y="168" fill="#e3b341" font-family="monospace" font-size="10">58</text>
+  <rect x="56"  y="158" width="170" height="12" rx="2" fill="#3fb950"/>
+  <text x="230" y="168" fill="#3fb950" font-family="monospace" font-size="10">63</text>
 
   <text x="24"  y="186" fill="#8b949e" font-family="monospace" font-size="10">IND</text>
   <rect x="56"  y="176" width="89" height="12" rx="2" fill="#e3b341"/>
   <text x="149" y="186" fill="#e3b341" font-family="monospace" font-size="10">33</text>
 
   <text x="24"  y="204" fill="#8b949e" font-family="monospace" font-size="10">WEL</text>
-  <rect x="56"  y="194" width="162" height="12" rx="2" fill="#3fb950"/>
-  <text x="222" y="204" fill="#3fb950" font-family="monospace" font-size="10">60</text>
+  <rect x="56"  y="194" width="183" height="12" rx="2" fill="#3fb950"/>
+  <text x="243" y="204" fill="#3fb950" font-family="monospace" font-size="10">68</text>
 
   <text x="400" y="168" fill="#8b949e" font-family="monospace" font-size="10">GRN</text>
   <rect x="432" y="158" width="78" height="12" rx="2" fill="#3fb950"/>
@@ -52,10 +52,10 @@
   <line x1="660.0" y1="183.0" x2="689.4" y2="223.5" stroke="#30363d" stroke-width="0.5"/>
   <line x1="660.0" y1="183.0" x2="630.6" y2="223.5" stroke="#30363d" stroke-width="0.5"/>
   <line x1="660.0" y1="183.0" x2="612.4" y2="167.5" stroke="#30363d" stroke-width="0.5"/>
-  <polygon points="660.0,154.0 675.7,177.9 677.6,207.3 642.4,207.3 643.4,177.6" fill="rgba(56,139,253,0.14)" stroke="#388bfd" stroke-width="1.2"/>
-  <circle cx="660.0" cy="154.0" r="2.2" fill="#388bfd"/>
+  <polygon points="660.0,151.5 675.7,177.9 680.0,210.5 642.4,207.3 643.4,177.6" fill="rgba(56,139,253,0.14)" stroke="#388bfd" stroke-width="1.2"/>
+  <circle cx="660.0" cy="151.5" r="2.2" fill="#388bfd"/>
   <circle cx="675.7" cy="177.9" r="2.2" fill="#bc8cff"/>
-  <circle cx="677.6" cy="207.3" r="2.2" fill="#3fb950"/>
+  <circle cx="680.0" cy="210.5" r="2.2" fill="#3fb950"/>
   <circle cx="642.4" cy="207.3" r="2.2" fill="#2dd4bf"/>
   <circle cx="643.4" cy="177.6" r="2.2" fill="#f0883e"/>
   <text x="660.0" y="124.0" dy="-0.2em" fill="#484f58" font-family="monospace" font-size="7" text-anchor="middle">EDU</text>
@@ -68,7 +68,7 @@
 
   <text x="24" y="238" fill="#8b949e" font-family="monospace" font-size="11">Passed  </text>
   <rect x="100" y="225" width="580" height="20" rx="3" fill="#3fb950"/>
-  <text x="688" y="240" fill="#3fb950" font-family="monospace" font-size="11">9</text>
+  <text x="688" y="240" fill="#3fb950" font-family="monospace" font-size="11">10</text>
 
   <text x="24" y="274" fill="#8b949e" font-family="monospace" font-size="11">Rejected</text>
   <rect x="100" y="261" width="0" height="20" rx="3" fill="#f85149"/>
@@ -80,9 +80,9 @@
   <text x="280" y="314" fill="#484f58" font-family="monospace" font-size="10">POLLUTION</text>
   <text x="536" y="314" fill="#484f58" font-family="monospace" font-size="10">STABILITY</text>
 
-  <text x="24"  y="334" fill="#c9d1d9" font-family="monospace" font-size="18" font-weight="bold">1,500</text>
-  <text x="280" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">1/100</text>
-  <text x="536" y="334" fill="#e3b341" font-family="monospace" font-size="18" font-weight="bold">59/100</text>
+  <text x="24"  y="334" fill="#c9d1d9" font-family="monospace" font-size="18" font-weight="bold">1,550</text>
+  <text x="280" y="334" fill="#3fb950" font-family="monospace" font-size="18" font-weight="bold">0/100</text>
+  <text x="536" y="334" fill="#e3b341" font-family="monospace" font-size="18" font-weight="bold">58/100</text>
 
-  <text x="24" y="358" fill="#484f58" font-family="monospace" font-size="10">Total proposals: 9 | Updated: 2026-06-11</text>
+  <text x="24" y="358" fill="#484f58" font-family="monospace" font-size="10">Total proposals: 10 | Updated: 2026-06-11</text>
 </svg>

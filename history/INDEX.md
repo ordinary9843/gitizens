@@ -19,3 +19,4 @@
 | 7 | [law-007](../world/laws/law-007.md) | [#6](https://github.com/ordinary9843/gitizens/issues/6) Jumpstart Industrial Development — Factory District Initiative | 1+1 0-1 | 2026-06-10 |
 | 8 | [law-008](../world/laws/law-008.md) | [#7](https://github.com/ordinary9843/gitizens/issues/7) Establish the National Defense Corps | 1+1 0-1 | 2026-06-10 |
 | 9 | [law-009](../world/laws/law-009.md) | [#9](https://github.com/ordinary9843/gitizens/issues/9) Enforce the Green Standard — Industrial Emission Limits | 1+1 0-1 | 2026-06-11 |
+| 10 | [law-010](../world/laws/law-010.md) | [#15](https://github.com/ordinary9843/gitizens/issues/15) Public Arts Grant Program | 1+1 0-1 | 2026-06-11 |
