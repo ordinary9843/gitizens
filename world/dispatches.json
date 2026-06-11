@@ -45,5 +45,12 @@
     "narrative": "In a significant development for the Gitizens, the Founding Era has welcomed a new law aimed at enhancing civic engagement, following two citizen feedbacks that shaped its creation. With a population now at 1,700 and a treasury of 52 GC, the nation remains stable at 55 out of 100, despite facing the challenges of zero pollution. In a promising turn of events, the recent Foreign Direct Investment has the potential to boost both economic growth and public morale.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Foreign Direct Investment",
     "metrics": "population 1,700 \u00b7 treasury 52 GC \u00b7 stability 55/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 14,
+    "date": "2026-06-11",
+    "narrative": "In a significant development for Gitizens, the population has reached 1,850, reflecting a steady growth during the Founding Era. With a treasury of 59 Gold Coins and stability holding at 53 out of 100, recent citizen feedback indicates an engaged community. However, the arrival of Foreign Direct Investment presents both opportunities and challenges, as the nation navigates the delicate balance between progress and stability amid rising ambitions.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Foreign Direct Investment",
+    "metrics": "population 1,850 \u00b7 treasury 59 GC \u00b7 stability 53/100 \u00b7 pollution 0/100"
   }
 ]

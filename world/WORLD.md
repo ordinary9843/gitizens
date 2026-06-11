@@ -11,7 +11,7 @@
 | Era | Founding Era |
 | Laws enacted | 12 |
 | Last enacted | 2026-06-11 |
-| Treasury | 52 Git Coins |
+| Treasury | 59 Git Coins |
 
 ### Policy
 
@@ -20,7 +20,7 @@
 | Education | 63/100 |
 | Industry | 40/100 |
 | Welfare | 68/100 |
-| Green Policy | 63/100 |
+| Green Policy | 65/100 |
 | Defense | 41/100 |
 | Pollution *(derived)* | 0/100 |
 
@@ -40,6 +40,7 @@
 |----|------|----------|---------|
 | `dst-001` | City Park | [Law 006](laws/law-006.md) | green_policy >= 35 |
 | `dst-002` | Social Housing District | [Law 010](laws/law-010.md) | welfare >= 60 |
+| `dst-003` | Nature Reserve | — | green_policy >= 65 |
 
 ### Buildings
 
