@@ -57,7 +57,18 @@ from engine import (
 )
 
 
+def _validate_state():
+    path = Path("world/state.json")
+    if not path.exists():
+        raise SystemExit("[FATAL] world/state.json missing — cannot run tally")
+    try:
+        json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        raise SystemExit(f"[FATAL] world/state.json is corrupted: {e}")
+
+
 def main():
+    _validate_state()
     _ensure_labels()
     collect_star_income()
     tick_changed = world_autonomous_tick()
@@ -66,16 +77,22 @@ def main():
     print(f"Open proposals: {len(proposals)}")
     laws_this_tick = 0
     for proposal in proposals:
-        laws_before = read_state().get("laws_count", 0)
-        process_issue(proposal)
-        if read_state().get("laws_count", 0) > laws_before:
-            laws_this_tick += 1
+        try:
+            laws_before = read_state().get("laws_count", 0)
+            process_issue(proposal)
+            if read_state().get("laws_count", 0) > laws_before:
+                laws_this_tick += 1
+        except Exception as e:
+            print(f"  [ERROR] proposal #{proposal.get('number')}: {e}")
 
     for ai_proposal in get_ai_proposals():
-        laws_before = read_state().get("laws_count", 0)
-        process_ai_proposal(ai_proposal)
-        if read_state().get("laws_count", 0) > laws_before:
-            laws_this_tick += 1
+        try:
+            laws_before = read_state().get("laws_count", 0)
+            process_ai_proposal(ai_proposal)
+            if read_state().get("laws_count", 0) > laws_before:
+                laws_this_tick += 1
+        except Exception as e:
+            print(f"  [ERROR] ai-proposal #{ai_proposal.get('number')}: {e}")
 
     feedbacks_applied = 0
     for feedback in get_feedbacks():
@@ -104,10 +121,13 @@ def main():
 
     from auto_propose import should_generate, generate_ai_proposal, generate_feedbacks as gen_feedbacks
     should_prop, should_fb = should_generate(REPO)
-    if should_prop:
-        generate_ai_proposal(client, read_state(), REPO)
-    if should_fb:
-        gen_feedbacks(client, read_state(), REPO)
+    try:
+        if should_prop:
+            generate_ai_proposal(client, read_state(), REPO)
+        if should_fb:
+            gen_feedbacks(client, read_state(), REPO)
+    except Exception as e:
+        print(f"  [ERROR] auto_propose: {e}")
 
     save_dispatch(
         read_state(), tick_changed, laws_this_tick,

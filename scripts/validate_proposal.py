@@ -93,7 +93,8 @@ def load_world_context() -> dict:
     ctx: dict = {}
     try:
         ctx["state"] = read_json(Path("world/state.json"))
-    except Exception:
+    except Exception as e:
+        print(f"  [WARN] load_world_context: failed to read state: {e}")
         ctx["state"] = {}
     entities: dict[str, list[str]] = {}
     for cat in ("buildings", "districts", "institutions", "sectors"):
@@ -106,7 +107,8 @@ def load_world_context() -> dict:
                     e = read_json(p)
                     names.append(f"{eid}: {e.get('name', eid)}")
             entities[cat] = names
-        except Exception:
+        except Exception as e:
+            print(f"  [WARN] load_world_context: failed to read {cat}: {e}")
             entities[cat] = []
     ctx["entities"] = entities
     return ctx
@@ -281,8 +283,8 @@ def validate():
                           f"This proposal will be blocked at tally unless the treasury is replenished.")
             gh("issue", "comment", ISSUE_NUMBER, "--repo", REPO, "--body",
                f"**Cost notice:** Enacting this policy costs **{POLICY_COST} {currency}**.\n\n{status}")
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  [WARN] treasury notice failed: {e}")
 
     print("VALID — applying proposal label")
     gh("issue", "edit", ISSUE_NUMBER, "--repo", REPO, "--add-label", "proposal")

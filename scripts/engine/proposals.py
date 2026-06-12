@@ -141,7 +141,6 @@ def process_issue(issue: dict):
         state["last_enacted"] = today
         state["world_summary"] = update_world_summary(state)
         threshold_tags = check_threshold_tags(state_before, state)
-        write_state(state)
 
         stats = read_stats()
         stats["proposals_total"]  = stats.get("proposals_total", 0) + 1
@@ -161,20 +160,25 @@ def process_issue(issue: dict):
         proposer = issue.get("author", {}).get("login") or ""
         proposer_display = f"@{proposer}" if proposer else "*(unknown)*"
         signatories_block = format_signatories(for_voters, against_voters)
-        Path(f"world/laws/law-{law_number:03d}.md").write_text(
-            f"# Law {law_number:03d}: {clean_title}\n\n"
-            f"**Enacted:** {today}  \n"
-            f"**Proposal:** [#{number}]({issue_url})  \n"
-            f"**Proposed by:** {proposer_display}  \n"
-            f"**Vote:** {for_votes} for, {against_votes} against  \n"
-            f"{cost_line}"
-            f"{signatories_block}\n"
-            "\n---\n\n"
-            f"{body}\n\n"
-            "---\n\n"
-            f"*{narrative}*\n",
-            encoding="utf-8",
-        )
+        try:
+            Path(f"world/laws/law-{law_number:03d}.md").write_text(
+                f"# Law {law_number:03d}: {clean_title}\n\n"
+                f"**Enacted:** {today}  \n"
+                f"**Proposal:** [#{number}]({issue_url})  \n"
+                f"**Proposed by:** {proposer_display}  \n"
+                f"**Vote:** {for_votes} for, {against_votes} against  \n"
+                f"{cost_line}"
+                f"{signatories_block}\n"
+                "\n---\n\n"
+                f"{body}\n\n"
+                "---\n\n"
+                f"*{narrative}*\n",
+                encoding="utf-8",
+            )
+        except OSError as e:
+            print(f"  [ERROR] Failed to write law file for #{number}: {e} — aborting")
+            return
+        write_state(state)
 
         append_history(law_number, clean_title, number, for_votes, against_votes, True, today)
         update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
@@ -274,7 +278,6 @@ def process_ai_proposal(issue: dict):
     state["last_enacted"]  = today
     state["world_summary"] = update_world_summary(state)
     threshold_tags = check_threshold_tags(state_before, state)
-    write_state(state)
 
     stats = read_stats()
     stats["proposals_total"]  = stats.get("proposals_total", 0) + 1
@@ -287,18 +290,23 @@ def process_ai_proposal(issue: dict):
     update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
     update_proposal_cooldown(effect_data, today)
 
-    Path(f"world/laws/law-{law_number:03d}.md").write_text(
-        f"# Law {law_number:03d}: {clean_title}\n\n"
-        f"**Enacted:** {today}  \n"
-        f"**Proposal:** [#{number}]({issue_url})  \n"
-        f"**Proposed by:** AI citizen  \n"
-        f"**Vote:** auto-passed (no veto)  \n"
-        "\n---\n\n"
-        f"{body}\n\n"
-        "---\n\n"
-        f"*{narrative}*\n",
-        encoding="utf-8",
-    )
+    try:
+        Path(f"world/laws/law-{law_number:03d}.md").write_text(
+            f"# Law {law_number:03d}: {clean_title}\n\n"
+            f"**Enacted:** {today}  \n"
+            f"**Proposal:** [#{number}]({issue_url})  \n"
+            f"**Proposed by:** AI citizen  \n"
+            f"**Vote:** auto-passed (no veto)  \n"
+            "\n---\n\n"
+            f"{body}\n\n"
+            "---\n\n"
+            f"*{narrative}*\n",
+            encoding="utf-8",
+        )
+    except OSError as e:
+        print(f"  [ERROR] Failed to write law file for AI-proposal #{number}: {e} — aborting")
+        return
+    write_state(state)
     append_history(law_number, clean_title, number, 0, 0, True, today)
     run(["git", "add", "-A"])
     run(["git", "commit", "-m", f"[LAW] law-{law_number:03d}: {clean_title} (AI, #{number})"])

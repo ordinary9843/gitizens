@@ -59,8 +59,8 @@ def _load_entity_names() -> set[str]:
                 if p.exists():
                     e = read_json(p)
                     names.add(e.get("name", "").strip().lower())
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  [WARN] _load_entity_names: {e}")
     return names
 
 
@@ -183,8 +183,8 @@ def _build_chronicle_body() -> str:
         entity_names = _load_entity_names()
         lines.append(_build_gap_dashboard(state, entity_names))
         lines.append("\n---\n")
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"  [WARN] _build_chronicle_body: {e}")
 
     updated = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     lines.append(
@@ -231,20 +231,24 @@ def save_dispatch(state: dict, tick_changed: bool, laws_passed: int,
         changes_parts.append(f"event: {event_title}")
     changes_summary = " · ".join(changes_parts) if changes_parts else "quiet tick"
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": (
-            "You are the narrator of Gitizens, a GitHub-based civilization.\n"
-            f"Tick #{tick_num} just completed on {today}.\n"
-            f"World state: era={state.get('era')}, {metrics_str}\n"
-            f"This tick: {changes_summary}\n\n"
-            "Write a 2-3 sentence news dispatch in the style of a newspaper. "
-            "Mention specific numbers. Tone: serious but vivid. No emoji, no markdown headers."
-        )}],
-        max_tokens=120,
-        temperature=0.7,
-    )
-    narrative = response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": (
+                "You are the narrator of Gitizens, a GitHub-based civilization.\n"
+                f"Tick #{tick_num} just completed on {today}.\n"
+                f"World state: era={state.get('era')}, {metrics_str}\n"
+                f"This tick: {changes_summary}\n\n"
+                "Write a 2-3 sentence news dispatch in the style of a newspaper. "
+                "Mention specific numbers. Tone: serious but vivid. No emoji, no markdown headers."
+            )}],
+            max_tokens=120,
+            temperature=0.7,
+        )
+        narrative = response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"  [WARN] save_dispatch LLM failed: {e}")
+        narrative = f"Tick {tick_num}: {changes_summary}."
 
     dispatches.append({
         "tick": tick_num,
@@ -279,6 +283,9 @@ def collect_star_income():
 
     raw = run(["gh", "api", f"repos/{REPO}/stargazers", "--paginate",
                "--jq", ".[].login"])
+    if not raw or not raw.strip():
+        print("  [WARN] collect_star_income: stargazers API returned empty — skipping")
+        return
     current_logins = {line.strip() for line in raw.splitlines() if line.strip()}
 
     if state.get("known_stargazers") is None:

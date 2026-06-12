@@ -27,36 +27,44 @@ def _state_for_llm(state: dict) -> dict:
 
 def generate_narrative(title: str, for_votes: int, against_votes: int, state: dict) -> str:
     metrics_str = " | ".join(f"{k}={state.get(k, 0)}" for k in sorted(POLICY_METRICS))
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": (
-            "You are the narrator of a GitHub-based civilization called Gitizens.\n"
-            "A new law has just been enacted by citizen vote.\n\n"
-            f"World state: era={state.get('era')}, laws={state.get('laws_count')}, {metrics_str}\n"
-            f"Title: {title}\n"
-            f"Vote: {for_votes} for, {against_votes} against\n\n"
-            "Write a 2-sentence news bulletin announcing this law's passage. "
-            "Tone: serious newspaper. No emoji, no markdown headers."
-        )}],
-        max_tokens=150,
-        temperature=0.7,
-    )
-    return response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": (
+                "You are the narrator of a GitHub-based civilization called Gitizens.\n"
+                "A new law has just been enacted by citizen vote.\n\n"
+                f"World state: era={state.get('era')}, laws={state.get('laws_count')}, {metrics_str}\n"
+                f"Title: {title}\n"
+                f"Vote: {for_votes} for, {against_votes} against\n\n"
+                "Write a 2-sentence news bulletin announcing this law's passage. "
+                "Tone: serious newspaper. No emoji, no markdown headers."
+            )}],
+            max_tokens=150,
+            temperature=0.7,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"  [WARN] generate_narrative failed: {e}")
+        return f"Law enacted: {title}."
 
 
 def update_world_summary(state: dict) -> str:
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": (
-            "You are summarizing the state of a GitHub-based civilization called Gitizens.\n"
-            f"Current state: {json.dumps(_state_for_llm(state), ensure_ascii=False)}\n\n"
-            "Write a single sentence (max 25 words) describing the current state of the nation. "
-            "Mention notable policy levels or emerging structures if relevant. No emoji."
-        )}],
-        max_tokens=70,
-        temperature=0.7,
-    )
-    return response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": (
+                "You are summarizing the state of a GitHub-based civilization called Gitizens.\n"
+                f"Current state: {json.dumps(_state_for_llm(state), ensure_ascii=False)}\n\n"
+                "Write a single sentence (max 25 words) describing the current state of the nation. "
+                "Mention notable policy levels or emerging structures if relevant. No emoji."
+            )}],
+            max_tokens=70,
+            temperature=0.7,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"  [WARN] update_world_summary failed: {e}")
+        return ""
 
 
 def generate_world_md(state: dict, law_number: int | None, date: str):
@@ -188,23 +196,27 @@ def generate_annals(history: list):
         "pop_change": recent[-1].get("population", 0) - recent[0].get("population", 0),
         "treasury_change": recent[-1].get("treasury", 0) - recent[0].get("treasury", 0),
     }
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": (
-            "You are the official historian of Gitizens.\n"
-            f"Write World Annals Chapter {chapter_num}, covering ticks {summary_data['ticks']}.\n"
-            f"Data: {json.dumps(summary_data)}\n"
-            f"Current world: {json.dumps(_state_for_llm(state))}\n\n"
-            "Format:\n"
-            f"# World Annals — Chapter {chapter_num}\n\n"
-            "## Summary\n<3-4 sentences of narrative history>\n\n"
-            "## Key Events\n<bullet points of notable changes>\n\n"
-            "## Citizen Voices\n<2 short quotes from fictional citizens, different perspectives>"
-        )}],
-        max_tokens=400,
-        temperature=0.7,
-    )
-    text = response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": (
+                "You are the official historian of Gitizens.\n"
+                f"Write World Annals Chapter {chapter_num}, covering ticks {summary_data['ticks']}.\n"
+                f"Data: {json.dumps(summary_data)}\n"
+                f"Current world: {json.dumps(_state_for_llm(state))}\n\n"
+                "Format:\n"
+                f"# World Annals — Chapter {chapter_num}\n\n"
+                "## Summary\n<3-4 sentences of narrative history>\n\n"
+                "## Key Events\n<bullet points of notable changes>\n\n"
+                "## Citizen Voices\n<2 short quotes from fictional citizens, different perspectives>"
+            )}],
+            max_tokens=400,
+            temperature=0.7,
+        )
+        text = response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"  [WARN] generate_annals LLM failed: {e}")
+        return
     chapter_path.parent.mkdir(parents=True, exist_ok=True)
     chapter_path.write_text(text + "\n", encoding="utf-8")
     print(f"  Annals chapter {chapter_num} written to {chapter_path}")
@@ -293,20 +305,24 @@ def generate_citizen_narrator():
         if (datetime.now(timezone.utc) - last_dt).days < 7:
             return
     today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": (
-            "You are writing citizen perspectives for Gitizens.\n"
-            f"World state: {json.dumps(_state_for_llm(state))}\n\n"
-            "Write 3 short diary entries (2-3 sentences each) from 3 different fictional citizens:\n"
-            "1. A government official\n2. A factory worker\n3. A teacher\n\n"
-            "Each entry: '**[Name], [Occupation]:**\\n<diary entry>'\n"
-            "Make them react to the current world metrics and recent laws. Tone: vivid, personal. No emoji."
-        )}],
-        max_tokens=300,
-        temperature=0.9,
-    )
-    narrative = response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": (
+                "You are writing citizen perspectives for Gitizens.\n"
+                f"World state: {json.dumps(_state_for_llm(state))}\n\n"
+                "Write 3 short diary entries (2-3 sentences each) from 3 different fictional citizens:\n"
+                "1. A government official\n2. A factory worker\n3. A teacher\n\n"
+                "Each entry: '**[Name], [Occupation]:**\\n<diary entry>'\n"
+                "Make them react to the current world metrics and recent laws. Tone: vivid, personal. No emoji."
+            )}],
+            max_tokens=300,
+            temperature=0.9,
+        )
+        narrative = response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"  [WARN] generate_citizen_narrator failed: {e}")
+        return
     body = (
         f"## Citizen Voices — {today_str}\n\n"
         f"{narrative}\n\n"

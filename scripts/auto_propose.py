@@ -60,31 +60,32 @@ def generate_ai_proposal(client: OpenAI, state: dict, repo: str) -> int:
     weakest_val = state.get(weakest, 0)
     metrics_str = ", ".join(f"{m}={state.get(m,0)}" for m in POLICY_METRICS)
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": (
-            "You are an AI citizen of Gitizens, a GitHub-based civilization.\n"
-            f"Current world: era={state.get('era')}, treasury={state.get('treasury')} GC, "
-            f"population={state.get('population')}, stability={state.get('stability')}\n"
-            f"Policy metrics: {metrics_str}\n\n"
-            f"The weakest metric is '{weakest}' at {weakest_val}/100. "
-            "Propose a policy law to address this.\n\n"
-            "Respond in JSON with exactly these keys:\n"
-            '{"title": "short law title (no prefix)", '
-            '"description": "2-3 sentence description of what this law does and why", '
-            f'"delta": <integer +5 to +{MAX_DELTA_PROPOSAL} for the metric>}}\n\n'
-            "The title should be creative and specific. No markdown in title."
-        )}],
-        max_tokens=200,
-        temperature=0.8,
-        response_format={"type": "json_object"},
-    )
     try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": (
+                "You are an AI citizen of Gitizens, a GitHub-based civilization.\n"
+                f"Current world: era={state.get('era')}, treasury={state.get('treasury')} GC, "
+                f"population={state.get('population')}, stability={state.get('stability')}\n"
+                f"Policy metrics: {metrics_str}\n\n"
+                f"The weakest metric is '{weakest}' at {weakest_val}/100. "
+                "Propose a policy law to address this.\n\n"
+                "Respond in JSON with exactly these keys:\n"
+                '{"title": "short law title (no prefix)", '
+                '"description": "2-3 sentence description of what this law does and why", '
+                f'"delta": <integer +5 to +{MAX_DELTA_PROPOSAL} for the metric>}}\n\n'
+                "The title should be creative and specific. No markdown in title."
+            )}],
+            max_tokens=200,
+            temperature=0.8,
+            response_format={"type": "json_object"},
+        )
         data = json.loads(response.choices[0].message.content)
         title = data.get("title", f"Strengthen {weakest.replace('_',' ').title()}")
         description = data.get("description", "An AI citizen proposal to improve national policy.")
         delta = max(3, min(MAX_DELTA_PROPOSAL, int(data.get("delta", 5))))
-    except (json.JSONDecodeError, ValueError, TypeError):
+    except Exception as e:
+        print(f"  [WARN] AI proposal generation failed: {e}")
         title = f"Strengthen {weakest.replace('_', ' ').title()}"
         description = f"An AI citizen proposal to improve {weakest} from {weakest_val} to {weakest_val + 5}."
         delta = 5
@@ -107,31 +108,32 @@ def generate_feedbacks(client: OpenAI, state: dict, repo: str, count: int = 2) -
     pollution = state.get("pollution", 0)
     stability = state.get("stability", 80)
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": (
-            "You are generating citizen feedback for Gitizens, a GitHub-based civilization.\n"
-            f"World: era={state.get('era')}, population={state.get('population')}, "
-            f"pollution={pollution}, stability={stability}\n"
-            f"Policy metrics: {metrics_str}\n\n"
-            f"Generate exactly {count} distinct citizen feedback items. "
-            "Each is a small real-world observation from a citizen's perspective "
-            "(noise complaints, local events, small social changes, etc.).\n\n"
-            "Respond in JSON with key 'feedbacks' as an array. Each item:\n"
-            '{"title": "short event title", '
-            '"description": "1-2 sentence citizen observation", '
-            '"metric": "<one of: education,industry,welfare,green_policy,defense,stability,pollution>", '
-            '"delta": <integer -2 to +2, nonzero>}\n\n'
-            "Mix positive and negative. Keep deltas small (±1 or ±2)."
-        )}],
-        max_tokens=400,
-        temperature=0.9,
-        response_format={"type": "json_object"},
-    )
     try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": (
+                "You are generating citizen feedback for Gitizens, a GitHub-based civilization.\n"
+                f"World: era={state.get('era')}, population={state.get('population')}, "
+                f"pollution={pollution}, stability={stability}\n"
+                f"Policy metrics: {metrics_str}\n\n"
+                f"Generate exactly {count} distinct citizen feedback items. "
+                "Each is a small real-world observation from a citizen's perspective "
+                "(noise complaints, local events, small social changes, etc.).\n\n"
+                "Respond in JSON with key 'feedbacks' as an array. Each item:\n"
+                '{"title": "short event title", '
+                '"description": "1-2 sentence citizen observation", '
+                '"metric": "<one of: education,industry,welfare,green_policy,defense,stability,pollution>", '
+                '"delta": <integer -2 to +2, nonzero>}\n\n'
+                "Mix positive and negative. Keep deltas small (±1 or ±2)."
+            )}],
+            max_tokens=400,
+            temperature=0.9,
+            response_format={"type": "json_object"},
+        )
         data = json.loads(response.choices[0].message.content)
         feedbacks = data.get("feedbacks", [])[:count]
-    except (json.JSONDecodeError, TypeError):
+    except Exception as e:
+        print(f"  [WARN] Feedback generation failed: {e}")
         feedbacks = []
 
     valid_metrics = set(POLICY_METRICS) | {"stability", "pollution"}
