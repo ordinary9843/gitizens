@@ -8,7 +8,7 @@ from .constants import (
     WORLD_GENERATION_RULES, THRESHOLD_TAGS,
 )
 from .state import read_json, write_json, read_state, write_state
-from .gh import run
+from .gh import run, SKIP_TIMING
 
 
 def slugify(text: str) -> str:
@@ -94,6 +94,17 @@ def auto_remove_entity(category: str, entity_id: str, law_number: int, reason: s
 
 def world_autonomous_tick() -> bool:
     state = read_state()
+
+    if not SKIP_TIMING:
+        next_tick_at = state.get("next_tick_at")
+        if next_tick_at:
+            try:
+                next_dt = datetime.fromisoformat(next_tick_at.replace("Z", "+00:00"))
+                if datetime.now(timezone.utc) < next_dt:
+                    print(f"  Tick skipped — next tick at {next_tick_at}")
+                    return False
+            except ValueError:
+                pass
 
     ind = state.get("industry", 0)
     grn = state.get("green_policy", 0)

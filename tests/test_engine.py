@@ -1063,6 +1063,51 @@ class TestAutonomousTickTreasuryCap:
 
 
 # ===========================================================================
+# world_autonomous_tick — timing guard (next_tick_at)
+# ===========================================================================
+
+class TestAutonomousTickTimingGuard:
+    def _state_with_next_tick(self, tmp_path, delta_seconds):
+        from datetime import timedelta
+        (tmp_path / "world").mkdir(exist_ok=True)
+        next_tick = (datetime.now(timezone.utc) + timedelta(seconds=delta_seconds)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+        state = {**BASE_STATE, "next_tick_at": next_tick}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        return state
+
+    def test_skips_when_before_next_tick_at(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._state_with_next_tick(tmp_path, delta_seconds=3600)  # 1 hour from now
+        with patch.object(_engine_world, "SKIP_TIMING", False), \
+             patch.object(_engine_world, "write_state") as ws:
+            result = tv.world_autonomous_tick()
+        assert result is False
+        ws.assert_not_called()
+
+    def test_runs_when_past_next_tick_at(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._state_with_next_tick(tmp_path, delta_seconds=-3600)  # 1 hour ago
+        with patch.object(_engine_world, "SKIP_TIMING", False), \
+             patch.object(_engine_world, "write_state") as ws, \
+             patch.object(_engine_world, "run", return_value=""):
+            result = tv.world_autonomous_tick()
+        assert result is True
+        ws.assert_called_once()
+
+    def test_skip_timing_overrides_guard(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._state_with_next_tick(tmp_path, delta_seconds=3600)  # 1 hour from now
+        with patch.object(_engine_world, "SKIP_TIMING", True), \
+             patch.object(_engine_world, "write_state") as ws, \
+             patch.object(_engine_world, "run", return_value=""):
+            result = tv.world_autonomous_tick()
+        assert result is True
+        ws.assert_called_once()
+
+
+# ===========================================================================
 # _state_for_llm — strips large fields before LLM prompts
 # ===========================================================================
 
