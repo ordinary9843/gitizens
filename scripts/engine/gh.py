@@ -1,6 +1,7 @@
 import os
 import json
 import subprocess
+import time
 
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 REPO = os.environ["GITHUB_REPOSITORY"]
@@ -17,6 +18,24 @@ def run(cmd: list[str]) -> str:
 def gh_json(cmd: list[str]) -> list | dict:
     out = run(["gh", *cmd])
     return json.loads(out) if out else []
+
+
+def push_with_retry(max_attempts: int = 3) -> bool:
+    for i in range(max_attempts):
+        if i > 0:
+            time.sleep(5 * i)
+        run(["git", "pull", "--rebase", "origin", "master"])
+        result = subprocess.run(
+            ["git", "push", "origin", "master", "--follow-tags"],
+            capture_output=True, encoding="utf-8", errors="replace",
+        )
+        if result.returncode == 0:
+            print("  Pushed.")
+            return True
+        print(f"  [WARN] Push attempt {i + 1}/{max_attempts} failed: "
+              f"{result.stderr.strip()[:200]}")
+    print("  [ERROR] All push attempts failed — dispatch will not be published")
+    return False
 
 
 def get_reactions(issue_number: int) -> tuple[int, int, list[str], list[str]]:

@@ -1,7 +1,7 @@
 # Re-export public API for backward compatibility.
 # Tests and external callers may import from this package directly.
 from .constants import *
-from .gh import run, gh_json, get_reactions, REPO, GITHUB_TOKEN, SKIP_TIMING
+from .gh import run, gh_json, get_reactions, push_with_retry, REPO, GITHUB_TOKEN, SKIP_TIMING
 from .state import (
     read_json, write_json, read_state, write_state,
     read_stats, write_stats,
@@ -27,7 +27,8 @@ from .content import (
 )
 from .chronicle import (
     get_or_create_dispatch_issue, _load_entity_names,
-    _build_gap_dashboard, _build_chronicle_body, post_world_dispatch,
+    _build_gap_dashboard, _build_chronicle_body,
+    save_dispatch, publish_dispatch, post_world_dispatch,
     append_history, update_laws_index,
     collect_star_income,
 )

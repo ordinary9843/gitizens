@@ -194,8 +194,8 @@ def _build_chronicle_body() -> str:
     return "\n".join(lines)
 
 
-def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
-                        event_title: str, feedback_count: int):
+def save_dispatch(state: dict, tick_changed: bool, laws_passed: int,
+                  event_title: str, feedback_count: int):
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     history = []
     try:
@@ -203,6 +203,16 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
     except (FileNotFoundError, json.JSONDecodeError):
         pass
     tick_num = (history[-1]["tick"] + 1) if history else 1
+
+    dispatches_path = Path("world/dispatches.json")
+    try:
+        dispatches = json.loads(dispatches_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        dispatches = []
+
+    if dispatches and dispatches[-1].get("tick") == tick_num:
+        print(f"  Dispatch for tick {tick_num} already saved — skipping")
+        return
 
     metrics_str = (
         f"population {state.get('population', 0):,} · "
@@ -236,11 +246,6 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
     )
     narrative = response.choices[0].message.content.strip()
 
-    dispatches_path = Path("world/dispatches.json")
-    try:
-        dispatches = json.loads(dispatches_path.read_text(encoding="utf-8"))
-    except (FileNotFoundError, json.JSONDecodeError):
-        dispatches = []
     dispatches.append({
         "tick": tick_num,
         "date": today,
@@ -251,11 +256,20 @@ def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
     if len(dispatches) > 10:
         dispatches = dispatches[-10:]
     dispatches_path.write_text(json.dumps(dispatches, indent=2) + "\n", encoding="utf-8")
+    print(f"  Dispatch for tick {tick_num} saved")
 
+
+def publish_dispatch():
     issue_num = get_or_create_dispatch_issue()
     if issue_num:
         upsert_bot_comment(issue_num, _build_chronicle_body())
-        print(f"  Chronicle updated on issue #{issue_num}")
+        print(f"  Chronicle published on issue #{issue_num}")
+
+
+def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
+                        event_title: str, feedback_count: int):
+    save_dispatch(state, tick_changed, laws_passed, event_title, feedback_count)
+    publish_dispatch()
 
 
 def collect_star_income():

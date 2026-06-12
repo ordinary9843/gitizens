@@ -21,7 +21,7 @@ from engine import (
     POLICY_METRICS, POLICY_COST, BASE_STATE_FIELDS, WORLD_GENERATION_RULES,
     THRESHOLD_TAGS, RARITY_WEIGHTS,
     # gh
-    run, gh_json, get_reactions, REPO, GITHUB_TOKEN, SKIP_TIMING,
+    run, gh_json, get_reactions, push_with_retry, REPO, GITHUB_TOKEN, SKIP_TIMING,
     # state
     read_json, write_json, read_state, write_state,
     read_stats, write_stats,
@@ -43,7 +43,7 @@ from engine import (
     _LLM_EXCLUDE, _state_for_llm,
     _PINNED_IDS_PATH, _load_pinned_ids, _get_or_create_citizen_voices_issue,
     # chronicle
-    get_or_create_dispatch_issue, post_world_dispatch,
+    get_or_create_dispatch_issue, save_dispatch, publish_dispatch,
     append_history, update_laws_index, collect_star_income,
     _load_entity_names, _build_gap_dashboard, _build_chronicle_body,
     # citizens
@@ -109,7 +109,7 @@ def main():
     if should_fb:
         gen_feedbacks(client, read_state(), REPO)
 
-    post_world_dispatch(
+    save_dispatch(
         read_state(), tick_changed, laws_this_tick,
         active_event_title, feedbacks_applied,
     )
@@ -154,11 +154,8 @@ def main():
             commit_msg = "[WORLD] state update"
         run(["git", "commit", "-m", commit_msg])
 
-    unpushed = run(["git", "log", "origin/master..HEAD", "--oneline"])
-    if unpushed:
-        run(["git", "pull", "--rebase", "origin", "master"])
-        run(["git", "push", "origin", "master", "--follow-tags"])
-        print("Pushed.")
+    if push_with_retry():
+        publish_dispatch()
 
 
 if __name__ == "__main__":
