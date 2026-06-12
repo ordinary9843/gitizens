@@ -449,7 +449,7 @@
   <p class="intro-text">
     A civilization that lives inside a GitHub repo. Citizens propose laws as GitHub Issues,
     vote with 👍 reactions, and watch their world evolve in real time.<br>
-    The world runs on its own every 4 hours — random events strike, eras rise and fall,
+    The world runs on its own every 2 hours — random events strike, eras rise and fall,
     buildings emerge from policy. No one controls it. Everyone shapes it.
   </p>
   <div class="how-cards" style="margin-top:18px">
@@ -1534,7 +1534,7 @@ async function loadCooldowns() {
     const cd = await r.json();
     const today = new Date();
     Object.entries(cd).forEach(([metric, dateStr]) => {
-      const daysLeft = 14 - Math.floor((today - new Date(dateStr)) / 86400000);
+      const daysLeft = 3 - Math.floor((today - new Date(dateStr)) / 86400000);
       if (daysLeft > 0) {
         document.querySelectorAll(`.cooldown-badge[data-cooldown="${metric}"]`).forEach(el => {
           el.textContent = ` 🔒${daysLeft}d`;

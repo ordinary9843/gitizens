@@ -30,7 +30,7 @@ REQUIRED_FIELDS = {
     "declaration": [],
 }
 
-COOLDOWN_DAYS = 14
+COOLDOWN_DAYS = 3
 
 # state_patch allowlist — any key outside this set is rejected
 _PATCH_ALLOWED = {

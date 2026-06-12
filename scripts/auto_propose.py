@@ -93,7 +93,7 @@ def generate_ai_proposal(client: OpenAI, state: dict, repo: str) -> int:
     body = (
         f"## Description\n\n{description}\n\n"
         f"*This proposal was submitted by an AI citizen. "
-        f"React with 👎 within 4 hours to veto it.*\n\n"
+        f"React with 👎 within 2 hours to veto it.*\n\n"
         f"## Effect\n\n"
         f"```yaml\ntype: policy\nchanges:\n  {weakest}: +{delta}\n```\n"
     )
@@ -155,7 +155,7 @@ def generate_feedbacks(client: OpenAI, state: dict, repo: str, count: int = 2) -
         body = (
             f"## Description\n\n{description}\n\n"
             f"*Citizens report this small change in Gitizens. "
-            f"React with 👎 within 4 hours to dismiss it.*\n\n"
+            f"React with 👎 within 2 hours to dismiss it.*\n\n"
             f"## Effect\n\n"
             f"```yaml\ntype: policy\nchanges:\n  {metric}: {sign}{delta}\n```\n"
         )

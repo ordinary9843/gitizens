@@ -133,7 +133,7 @@ class TestProposalCooldown:
     def test_cooldown_expired_allows(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        old_date = (datetime.now(timezone.utc) - timedelta(days=15)).strftime("%Y-%m-%d")
+        old_date = (datetime.now(timezone.utc) - timedelta(days=4)).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": old_date}))
         effect = {"type": "policy", "changes": {"education": 10}}
@@ -287,7 +287,7 @@ class TestValidateCooldown:
         from datetime import datetime, timezone, timedelta
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        old = (datetime.now(timezone.utc) - timedelta(days=15)).strftime("%Y-%m-%d")
+        old = (datetime.now(timezone.utc) - timedelta(days=4)).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": old}))
         ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
