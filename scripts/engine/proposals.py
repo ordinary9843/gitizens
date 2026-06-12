@@ -270,7 +270,8 @@ def process_ai_proposal(issue: dict):
             print(f"  AI-proposal #{number}: COOLDOWN BLOCKED — {reason}")
             run(["gh", "issue", "comment", str(number), "--repo", REPO,
                  "--body", f"**AI proposal blocked: metric on cooldown.**\n\n{reason}"])
-            run(["gh", "issue", "edit", str(number), "--repo", REPO, "--remove-label", "ai-proposal"])
+            run(["gh", "issue", "edit", str(number), "--repo", REPO,
+                 "--add-label", "rejected", "--remove-label", "ai-proposal"])
             run(["gh", "issue", "close", str(number), "--repo", REPO])
             return
 
