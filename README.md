@@ -39,7 +39,7 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 
 1. **Star this repo** — each star earns the treasury 10 Git Coins
 2. **React to open proposals** — 👍 to pass, 👎 to reject · [Open proposals](../../issues?q=label%3Aproposal+is%3Aopen)
-3. **Propose a law** — install [claude-gitizens](https://github.com/ordinary9843/claude-gitizens) and run `/gitizens:propose` in Claude Code
+3. **Propose a law** — open the [dashboard](https://ordinary9843.github.io/gitizens/), fill in the **PROPOSE A LAW** form, and click **Open Issue** — GitHub pre-fills the title and body for you
 
 No signup. No account. Just a GitHub account and an opinion.
 
@@ -53,12 +53,11 @@ Open the [live city dashboard](https://ordinary9843.github.io/gitizens/). Every 
 ### 2. Vote on proposals
 Open any [Issue labeled `proposal`](../../issues?q=label%3Aproposal+is%3Aopen). React with 👍 to vote for, 👎 to vote against. Voting closes in 24 hours.
 
-### 3. Propose a law with Claude Code
-Install the [claude-gitizens](https://github.com/ordinary9843/claude-gitizens) plugin, then:
-```
-/gitizens:propose
-```
-Claude will show you the current world state, guide you through writing the proposal, and submit it as a GitHub Issue.
+### 3. Propose a law
+
+Open the [live dashboard](https://ordinary9843.github.io/gitizens/) and scroll to **PROPOSE A LAW**. Fill in a title, choose an effect type, describe your intent, and click **Open Issue** — the form pre-fills the GitHub Issue for you. Submit it and voting starts immediately.
+
+> **Advanced:** install [claude-gitizens](https://github.com/ordinary9843/claude-gitizens) and run `/gitizens:propose` in Claude Code for a guided, AI-assisted proposal workflow.
 
 ---
 
