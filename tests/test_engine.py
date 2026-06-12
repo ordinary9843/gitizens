@@ -1881,3 +1881,131 @@ class TestCheckEventExpiryVoting:
              patch.object(_engine_events, "fire_chained_event"):
             tv.check_event_expiry(0)
             mock_apply.assert_called_once_with(evt, "default_consequence")
+
+
+# ===========================================================================
+# save_dispatch — idempotency and file writes
+# ===========================================================================
+
+class TestSaveDispatch:
+    def _mock_llm(self, monkeypatch):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "Test narrative."
+        )
+        monkeypatch.setattr(_engine_chronicle, "client", mock_client)
+        return mock_client
+
+    def test_saves_dispatch_to_file(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        (tmp_path / "world/history.json").write_text(
+            json.dumps([{"tick": 5, "date": "2026-06-11T00:00:00Z"}])
+        )
+        self._mock_llm(monkeypatch)
+        tv.save_dispatch({**BASE_STATE}, True, 0, "", 0)
+        dispatches = json.loads((tmp_path / "world/dispatches.json").read_text())
+        assert len(dispatches) == 1
+        assert dispatches[0]["tick"] == 6
+
+    def test_idempotent_skips_duplicate_tick(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/history.json").write_text(
+            json.dumps([{"tick": 9, "date": "2026-06-11T00:00:00Z"}])
+        )
+        # dispatches.json already has tick 10
+        existing = [{"tick": 10, "date": "2026-06-11", "narrative": "Old.",
+                     "changes": "quiet tick", "metrics": "pop 1000"}]
+        (tmp_path / "world/dispatches.json").write_text(json.dumps(existing))
+        mock_client = self._mock_llm(monkeypatch)
+        tv.save_dispatch({**BASE_STATE}, False, 0, "", 0)
+        # LLM must not be called; dispatches.json must be unchanged
+        mock_client.chat.completions.create.assert_not_called()
+        dispatches = json.loads((tmp_path / "world/dispatches.json").read_text())
+        assert len(dispatches) == 1
+        assert dispatches[0]["narrative"] == "Old."
+
+    def test_caps_at_ten_entries(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        existing = [{"tick": i, "date": "2026-06-11", "narrative": f"N{i}.",
+                     "changes": "quiet tick", "metrics": ""} for i in range(1, 11)]
+        (tmp_path / "world/dispatches.json").write_text(json.dumps(existing))
+        (tmp_path / "world/history.json").write_text(
+            json.dumps([{"tick": 10, "date": "2026-06-11T00:00:00Z"}])
+        )
+        self._mock_llm(monkeypatch)
+        tv.save_dispatch({**BASE_STATE}, True, 0, "", 0)
+        dispatches = json.loads((tmp_path / "world/dispatches.json").read_text())
+        assert len(dispatches) == 10
+        assert dispatches[-1]["tick"] == 11
+
+
+# ===========================================================================
+# publish_dispatch — only posts to GitHub, reads from dispatches.json
+# ===========================================================================
+
+class TestPublishDispatch:
+    def test_calls_upsert_with_chronicle_body(self, monkeypatch):
+        posted = []
+        monkeypatch.setattr(_engine_chronicle, "get_or_create_dispatch_issue",
+                            lambda: 42)
+        monkeypatch.setattr(_engine_chronicle, "upsert_bot_comment",
+                            lambda issue, body: posted.append((issue, body)))
+        monkeypatch.setattr(_engine_chronicle, "_build_chronicle_body",
+                            lambda: "BODY")
+        tv.publish_dispatch()
+        assert posted == [(42, "BODY")]
+
+    def test_skips_when_no_issue(self, monkeypatch):
+        posted = []
+        monkeypatch.setattr(_engine_chronicle, "get_or_create_dispatch_issue",
+                            lambda: 0)
+        monkeypatch.setattr(_engine_chronicle, "upsert_bot_comment",
+                            lambda issue, body: posted.append((issue, body)))
+        tv.publish_dispatch()
+        assert posted == []
+
+
+# ===========================================================================
+# push_with_retry — retry logic and return value
+# ===========================================================================
+
+class TestPushWithRetry:
+    def _make_result(self, returncode, stderr=""):
+        r = MagicMock()
+        r.returncode = returncode
+        r.stderr = stderr
+        return r
+
+    def test_returns_true_on_first_success(self, monkeypatch):
+        monkeypatch.setattr(_engine_gh, "run", lambda cmd: "")
+        with patch("engine.gh.subprocess.run",
+                   return_value=self._make_result(0)) as mock_push:
+            result = tv.push_with_retry()
+        assert result is True
+        assert mock_push.call_count == 1
+
+    def test_retries_on_failure_and_succeeds(self, monkeypatch):
+        monkeypatch.setattr(_engine_gh, "run", lambda cmd: "")
+        monkeypatch.setattr(_engine_gh, "time", MagicMock())
+        calls = []
+        def fake_push(cmd, **kwargs):
+            calls.append(1)
+            if len(calls) < 3:
+                return self._make_result(1, "rejected")
+            return self._make_result(0)
+        with patch("engine.gh.subprocess.run", side_effect=fake_push):
+            result = tv.push_with_retry(max_attempts=3)
+        assert result is True
+        assert len(calls) == 3
+
+    def test_returns_false_after_all_attempts_fail(self, monkeypatch):
+        monkeypatch.setattr(_engine_gh, "run", lambda cmd: "")
+        monkeypatch.setattr(_engine_gh, "time", MagicMock())
+        with patch("engine.gh.subprocess.run",
+                   return_value=self._make_result(1, "remote rejected")):
+            result = tv.push_with_retry(max_attempts=2)
+        assert result is False
