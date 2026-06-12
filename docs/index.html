@@ -236,6 +236,36 @@
       #history-wrap { height: 160px; }
       #radar-wrap { width: 160px; height: 160px; }
     }
+
+    /* ── Propose form ── */
+    .propose-form { max-width: 720px; }
+    .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; flex: 1; }
+    .form-label { font-size: 9px; color: var(--dim); letter-spacing: 2px; }
+    .form-input {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-size: 12px;
+      padding: 7px 10px; border-radius: 4px; outline: none; width: 100%;
+    }
+    .form-input:focus { border-color: var(--blue); }
+    textarea.form-input { resize: vertical; min-height: 72px; }
+    .form-input option { background: var(--surface); }
+    .propose-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-size: 11px;
+      padding: 8px 18px; cursor: pointer; border-radius: 4px; letter-spacing: 1px;
+    }
+    .propose-btn:hover { background: var(--border); }
+    .propose-btn-submit {
+      background: var(--blue); border-color: var(--blue); color: #fff; font-weight: bold;
+    }
+    .propose-btn-submit:hover { background: #58a6ff; border-color: #58a6ff; }
+    #p-preview-body {
+      background: #0d1117; border: 1px solid var(--border);
+      padding: 12px 14px; border-radius: 4px; font-size: 11px;
+      color: var(--muted); white-space: pre-wrap; word-break: break-word;
+      line-height: 1.7; max-height: 220px; overflow-y: auto; margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -307,6 +337,111 @@
 <div class="landing-section" id="dispatch-section">
   <h2>WORLD CHRONICLE</h2>
   <div id="dispatch-list"><p class="no-data">Loading…</p></div>
+</div>
+
+<div class="landing-section" id="propose-section">
+  <h2>PROPOSE A LAW</h2>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.7">
+    Fill in the form below, click <strong style="color:var(--text)">Open Issue →</strong>,
+    then Submit on GitHub. The title and body will be pre-filled for you.
+  </p>
+  <div class="propose-form">
+    <div class="form-row">
+      <div class="form-group" style="flex:2;min-width:200px">
+        <label class="form-label">TITLE</label>
+        <input id="p-title" class="form-input" type="text"
+               placeholder="Short law title (no prefix needed)" maxlength="80">
+      </div>
+      <div class="form-group" style="min-width:160px">
+        <label class="form-label">EFFECT TYPE</label>
+        <select id="p-type" class="form-input" onchange="onTypeChange()">
+          <option value="policy">Policy Change</option>
+          <option value="declaration">Declaration</option>
+          <option value="state_patch">State Patch</option>
+          <option value="evolve">Evolve Entity</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">DESCRIPTION <span style="font-weight:normal">(min 30 chars)</span></label>
+      <textarea id="p-desc" class="form-input" rows="3"
+                placeholder="What does this law do and why should citizens vote for it?"></textarea>
+    </div>
+
+    <div id="p-policy-fields">
+      <div class="form-row">
+        <div class="form-group" style="flex:1;min-width:140px">
+          <label class="form-label">METRIC</label>
+          <select id="p-metric" class="form-input">
+            <option value="education">Education</option>
+            <option value="industry">Industry</option>
+            <option value="welfare">Welfare</option>
+            <option value="green_policy">Green Policy</option>
+            <option value="defense">Defense</option>
+          </select>
+        </div>
+        <div class="form-group" style="max-width:140px">
+          <label class="form-label">DELTA (±50)</label>
+          <input id="p-delta" class="form-input" type="number" value="10" min="-50" max="50">
+        </div>
+      </div>
+    </div>
+
+    <div id="p-patch-fields" style="display:none">
+      <div class="form-row">
+        <div class="form-group" style="flex:1;min-width:160px">
+          <label class="form-label">KEY</label>
+          <select id="p-patch-key" class="form-input">
+            <option value="treasury">Treasury (0–100000)</option>
+            <option value="population">Population (0–10M)</option>
+            <option value="currency">Currency (string)</option>
+            <option value="education">Education (0–100)</option>
+            <option value="industry">Industry (0–100)</option>
+            <option value="welfare">Welfare (0–100)</option>
+            <option value="green_policy">Green Policy (0–100)</option>
+            <option value="defense">Defense (0–100)</option>
+            <option value="pollution">Pollution (0–100)</option>
+            <option value="stability">Stability (0–100)</option>
+            <option value="founded_date">Founded Date (ISO)</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1;min-width:120px">
+          <label class="form-label">VALUE</label>
+          <input id="p-patch-val" class="form-input" type="text" placeholder="e.g. 5000">
+        </div>
+      </div>
+    </div>
+
+    <div id="p-evolve-fields" style="display:none">
+      <div class="form-row">
+        <div class="form-group" style="flex:1;min-width:130px">
+          <label class="form-label">ENTITY ID</label>
+          <input id="p-evolve-id" class="form-input" type="text"
+                 placeholder="e.g. public-school">
+        </div>
+        <div class="form-group" style="flex:1;min-width:110px">
+          <label class="form-label">FIELD</label>
+          <input id="p-evolve-field" class="form-input" type="text" placeholder="e.g. name">
+        </div>
+        <div class="form-group" style="flex:1;min-width:110px">
+          <label class="form-label">VALUE</label>
+          <input id="p-evolve-val" class="form-input" type="text" placeholder="new value">
+        </div>
+      </div>
+    </div>
+
+    <div id="p-preview" style="display:none;margin-bottom:14px">
+      <div class="form-label">PREVIEW</div>
+      <pre id="p-preview-body"></pre>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="propose-btn" onclick="previewProposal()">Preview</button>
+      <button class="propose-btn propose-btn-submit" onclick="submitProposal()">Open Issue →</button>
+      <span id="p-error" style="color:var(--red);font-size:11px"></span>
+    </div>
+  </div>
 </div>
 
 <div class="landing-section">
@@ -1647,6 +1782,71 @@ window.addEventListener('resize', () => {
     animLoop();
   }, 150);
 });
+
+// ── Proposal quick-create ────────────────────────────────────────────────────
+
+function onTypeChange() {
+  const t = document.getElementById('p-type').value;
+  document.getElementById('p-policy-fields').style.display = t === 'policy'      ? '' : 'none';
+  document.getElementById('p-patch-fields').style.display  = t === 'state_patch' ? '' : 'none';
+  document.getElementById('p-evolve-fields').style.display = t === 'evolve'      ? '' : 'none';
+  document.getElementById('p-preview').style.display = 'none';
+  document.getElementById('p-error').textContent = '';
+}
+
+function _buildProposalBody() {
+  const desc = document.getElementById('p-desc').value.trim();
+  const type = document.getElementById('p-type').value;
+  let effectYaml = '';
+
+  if (type === 'policy') {
+    const metric = document.getElementById('p-metric').value;
+    const delta  = parseInt(document.getElementById('p-delta').value, 10) || 10;
+    const sign   = delta >= 0 ? '+' : '';
+    effectYaml = `type: policy\nchanges:\n  ${metric}: ${sign}${delta}`;
+  } else if (type === 'state_patch') {
+    const key = document.getElementById('p-patch-key').value;
+    const val = document.getElementById('p-patch-val').value.trim();
+    effectYaml = `type: state_patch\npatch:\n  ${key}: ${val || 0}`;
+  } else if (type === 'evolve') {
+    const id    = document.getElementById('p-evolve-id').value.trim();
+    const field = document.getElementById('p-evolve-field').value.trim();
+    const val   = document.getElementById('p-evolve-val').value.trim();
+    if (id && field) effectYaml = `type: evolve\nid: ${id}\nchanges:\n  ${field}: ${val}`;
+  }
+
+  let body = `## Description\n\n${desc}`;
+  if (effectYaml) body += `\n\n## Effect\n\n\`\`\`yaml\n${effectYaml}\n\`\`\``;
+  return body;
+}
+
+function _validateProposalInputs() {
+  const title = document.getElementById('p-title').value.trim();
+  const desc  = document.getElementById('p-desc').value.trim();
+  const err   = document.getElementById('p-error');
+  if (!title)           { err.textContent = 'Title is required.'; return false; }
+  if (desc.length < 30) { err.textContent = 'Description must be at least 30 characters.'; return false; }
+  err.textContent = '';
+  return true;
+}
+
+function previewProposal() {
+  if (!_validateProposalInputs()) return;
+  const title = document.getElementById('p-title').value.trim();
+  const body  = _buildProposalBody();
+  document.getElementById('p-preview-body').textContent = `Title: [PROPOSAL] ${title}\n\n${body}`;
+  document.getElementById('p-preview').style.display = 'block';
+}
+
+function submitProposal() {
+  if (!_validateProposalInputs()) return;
+  const title = document.getElementById('p-title').value.trim();
+  const body  = _buildProposalBody();
+  const url   = `https://github.com/ordinary9843/gitizens/issues/new`
+              + `?title=${encodeURIComponent('[PROPOSAL] ' + title)}`
+              + `&body=${encodeURIComponent(body)}`;
+  window.open(url, '_blank');
+}
 
 load();
 </script>
