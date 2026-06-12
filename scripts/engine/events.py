@@ -9,6 +9,19 @@ from .gh import run, gh_json, get_reactions, REPO
 from .state import load_event_pool, load_active_event, save_active_event
 from .world import apply_event_effects
 
+# Per-category weight multipliers driven by world state.
+# Format: category -> list of (metric, direction, threshold, multiplier)
+# "low"  means  state[metric] < threshold  -> apply multiplier
+# "high" means  state[metric] >= threshold -> apply multiplier
+CATEGORY_MULTIPLIERS: dict[str, list[tuple[str, str, int | float, float]]] = {
+    "natural":    [("green_policy", "low",  40, 2.0), ("green_policy", "high", 70, 0.6)],
+    "economic":   [("industry",     "high", 60, 1.5), ("treasury",     "low",  50, 1.4)],
+    "health":     [("welfare",      "low",  35, 2.0), ("welfare",      "high", 65, 0.6)],
+    "security":   [("defense",      "low",  35, 2.0)],
+    "scientific": [("education",    "high", 65, 1.5)],
+    "social":     [("welfare",      "low",  40, 1.5), ("stability",    "low",  40, 1.5)],
+}
+
 
 def fire_random_event(state: dict) -> dict | None:
     if random.random() > 0.15:
@@ -34,6 +47,15 @@ def fire_random_event(state: dict) -> dict | None:
         (edu_bonus if e.get("rarity") in ("rare", "legendary") else 0)
         for e in eligible
     ]
+    # Apply category-based multipliers so event frequency responds to world state.
+    for i, event in enumerate(eligible):
+        cat = event.get("category", "")
+        for metric, direction, threshold, mult in CATEGORY_MULTIPLIERS.get(cat, []):
+            val = state.get(metric, 0)
+            if direction == "low" and val < threshold:
+                weights[i] *= mult
+            elif direction == "high" and val >= threshold:
+                weights[i] *= mult
     return random.choices(eligible, weights=weights, k=1)[0]
 
 

@@ -114,6 +114,90 @@ def _build_gap_dashboard(state: dict,
     return "\n".join(lines)
 
 
+def write_gap_dashboard_json(state: dict):
+    entity_names = _load_entity_names()
+    pending: list[dict] = []
+    at_risk: list[dict] = []
+
+    for metric, appear, _cat, name, remove in WORLD_GENERATION_RULES:
+        if metric == "pollution":
+            continue
+        value = state.get(metric, 0)
+        exists = name.strip().lower() in entity_names
+        if not exists and value < appear:
+            gap = appear - value
+            pending.append({"name": name, "metric": metric, "current": value,
+                            "target": appear, "gap": gap})
+        elif exists and value <= remove + 4:
+            at_risk.append({"name": name, "metric": metric, "current": value,
+                            "removal_at": remove})
+
+    pending.sort(key=lambda x: x["gap"])
+
+    milestones_achieved = state.get("tags_applied", [])
+    milestones_pending: list[dict] = []
+    for field, direction, threshold, tag_name in THRESHOLD_TAGS:
+        if tag_name in milestones_achieved:
+            continue
+        value = state.get(field, 0)
+        if direction == "above":
+            gap = threshold - value
+        else:
+            gap = value - threshold
+        if gap > 0:
+            milestones_pending.append({"tag": tag_name, "metric": field,
+                                       "current": value, "target": threshold, "gap": gap})
+
+    data = {
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "pending": pending[:3],
+        "at_risk": at_risk,
+        "milestones_pending": milestones_pending,
+        "milestones_achieved": milestones_achieved,
+    }
+    Path("world/gap_dashboard.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def generate_leaderboard():
+    citizens_path = Path("world/citizens.json")
+    if not citizens_path.exists():
+        return
+    try:
+        citizens = json.loads(citizens_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return
+
+    reps: list[str] = []
+    reps_path = Path("world/representatives.json")
+    if reps_path.exists():
+        try:
+            reps = json.loads(reps_path.read_text(encoding="utf-8")).get("representatives", [])
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    sorted_citizens = sorted(
+        citizens.items(),
+        key=lambda x: (x[1].get("total_votes", 0), x[1].get("total_proposals", 0)),
+        reverse=True,
+    )
+
+    lines = [
+        "# Leaderboard\n",
+        "| Rank | Citizen | Votes | Proposals | Achievements |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for rank, (username, data) in enumerate(sorted_citizens, 1):
+        rep_badge = " [REP]" if username in reps else ""
+        achievements = ", ".join(data.get("achievements", []))
+        lines.append(
+            f"| {rank} | @{username}{rep_badge} | {data.get('total_votes', 0)} | "
+            f"{data.get('total_proposals', 0)} | {achievements or '—'} |"
+        )
+
+    Path("world/LEADERBOARD.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"  Leaderboard updated ({len(sorted_citizens)} citizens)")
+
+
 def get_or_create_dispatch_issue() -> int:
     issues = gh_json([
         "issue", "list", "--repo", REPO, "--label", "dispatch",
@@ -195,7 +279,9 @@ def _build_chronicle_body() -> str:
 
 
 def save_dispatch(state: dict, tick_changed: bool, laws_passed: int,
-                  event_title: str, feedback_count: int):
+                  event_title: str, feedback_count: int,
+                  proposers: list[str] | None = None,
+                  new_achievements: dict[str, list[str]] | None = None):
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     history = []
     try:
@@ -238,7 +324,9 @@ def save_dispatch(state: dict, tick_changed: bool, laws_passed: int,
                 "You are the narrator of Gitizens, a GitHub-based civilization.\n"
                 f"Tick #{tick_num} just completed on {today}.\n"
                 f"World state: era={state.get('era')}, {metrics_str}\n"
-                f"This tick: {changes_summary}\n\n"
+                f"This tick: {changes_summary}\n"
+                f"Proposers: {', '.join(f'@{p}' for p in (proposers or [])) or 'none'}.\n"
+                f"New achievements: {', '.join(f'@{u}: {a}' for u, ach in (new_achievements or {}).items() for a in ach) or 'none'}.\n\n"
                 "Write a 2-3 sentence news dispatch in the style of a newspaper. "
                 "Mention specific numbers. Tone: serious but vivid. No emoji, no markdown headers."
             )}],
@@ -271,8 +359,12 @@ def publish_dispatch():
 
 
 def post_world_dispatch(state: dict, tick_changed: bool, laws_passed: int,
-                        event_title: str, feedback_count: int):
-    save_dispatch(state, tick_changed, laws_passed, event_title, feedback_count)
+                        event_title: str, feedback_count: int,
+                        proposers: list[str] | None = None,
+                        new_achievements: dict[str, list[str]] | None = None):
+    write_gap_dashboard_json(state)
+    save_dispatch(state, tick_changed, laws_passed, event_title, feedback_count,
+                  proposers, new_achievements)
     publish_dispatch()
 
 

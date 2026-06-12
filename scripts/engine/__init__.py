@@ -28,6 +28,7 @@ from .content import (
 from .chronicle import (
     get_or_create_dispatch_issue, _load_entity_names,
     _build_gap_dashboard, _build_chronicle_body,
+    write_gap_dashboard_json, generate_leaderboard,
     save_dispatch, publish_dispatch, post_world_dispatch,
     append_history, update_laws_index,
     collect_star_income,

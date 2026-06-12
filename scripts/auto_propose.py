@@ -9,9 +9,39 @@ import subprocess
 from pathlib import Path
 from openai import OpenAI
 
+from engine.state import load_active_event
+from engine.chronicle import _load_entity_names
+
 POLICY_METRICS = ["education", "industry", "welfare", "green_policy", "defense"]
 MAX_DELTA_PROPOSAL = 8
 MAX_DELTA_FEEDBACK = 2
+
+
+def _load_extra_context() -> tuple[str, str, str]:
+    """Return (buildings_context, laws_context, event_context) strings for prompt enrichment."""
+    try:
+        entity_names = _load_entity_names()
+        buildings_context = f"Built structures: {', '.join(sorted(entity_names)) or 'none'}. "
+    except Exception:
+        buildings_context = ""
+
+    try:
+        laws_path = Path("world/laws_index.json")
+        recent_laws = []
+        if laws_path.exists():
+            idx = json.loads(laws_path.read_text(encoding="utf-8"))
+            recent_laws = [e["title"] for e in idx[-3:]]
+        laws_context = f"Recent laws: {', '.join(recent_laws)}. " if recent_laws else ""
+    except Exception:
+        laws_context = ""
+
+    try:
+        active_event = load_active_event() or {}
+        event_context = f"Active event: {active_event['title']}. " if active_event.get("title") else ""
+    except Exception:
+        event_context = ""
+
+    return buildings_context, laws_context, event_context
 
 
 def _run(cmd: list[str]) -> str:
@@ -59,6 +89,7 @@ def generate_ai_proposal(client: OpenAI, state: dict, repo: str) -> int:
     weakest = min(POLICY_METRICS, key=lambda m: state.get(m, 0))
     weakest_val = state.get(weakest, 0)
     metrics_str = ", ".join(f"{m}={state.get(m,0)}" for m in POLICY_METRICS)
+    buildings_context, laws_context, event_context = _load_extra_context()
 
     try:
         response = client.chat.completions.create(
@@ -67,7 +98,8 @@ def generate_ai_proposal(client: OpenAI, state: dict, repo: str) -> int:
                 "You are an AI citizen of Gitizens, a GitHub-based civilization.\n"
                 f"Current world: era={state.get('era')}, treasury={state.get('treasury')} GC, "
                 f"population={state.get('population')}, stability={state.get('stability')}\n"
-                f"Policy metrics: {metrics_str}\n\n"
+                f"Policy metrics: {metrics_str}\n"
+                f"{buildings_context}{laws_context}{event_context}\n"
                 f"The weakest metric is '{weakest}' at {weakest_val}/100. "
                 "Propose a policy law to address this.\n\n"
                 "Respond in JSON with exactly these keys:\n"
@@ -107,6 +139,7 @@ def generate_feedbacks(client: OpenAI, state: dict, repo: str, count: int = 2) -
     metrics_str = ", ".join(f"{m}={state.get(m,0)}" for m in POLICY_METRICS)
     pollution = state.get("pollution", 0)
     stability = state.get("stability", 80)
+    buildings_context, laws_context, event_context = _load_extra_context()
 
     try:
         response = client.chat.completions.create(
@@ -115,7 +148,8 @@ def generate_feedbacks(client: OpenAI, state: dict, repo: str, count: int = 2) -
                 "You are generating citizen feedback for Gitizens, a GitHub-based civilization.\n"
                 f"World: era={state.get('era')}, population={state.get('population')}, "
                 f"pollution={pollution}, stability={stability}\n"
-                f"Policy metrics: {metrics_str}\n\n"
+                f"Policy metrics: {metrics_str}\n"
+                f"{buildings_context}{laws_context}{event_context}\n"
                 f"Generate exactly {count} distinct citizen feedback items. "
                 "Each is a small real-world observation from a citizen's perspective "
                 "(noise complaints, local events, small social changes, etc.).\n\n"

@@ -66,7 +66,16 @@ def process_issue(issue: dict):
     created_at = datetime.fromisoformat(issue["createdAt"].replace("Z", "+00:00"))
     now = datetime.now(timezone.utc)
 
-    if not SKIP_TIMING and (now - created_at) < timedelta(days=VOTING_PERIOD_DAYS):
+    reps: list[str] = []
+    reps_path = Path("world/representatives.json")
+    if reps_path.exists():
+        try:
+            reps = json.loads(reps_path.read_text(encoding="utf-8")).get("representatives", [])
+        except Exception:
+            pass
+    proposer_login = issue.get("author", {}).get("login", "") or ""
+    voting_hours = 12 if proposer_login in reps else VOTING_PERIOD_DAYS * 24
+    if not SKIP_TIMING and (now - created_at) < timedelta(hours=voting_hours):
         print(f"  #{number}: voting period not over, skipping")
         return
 

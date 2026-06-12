@@ -375,3 +375,71 @@ class TestCheckEventExpiryVoting:
              patch.object(_engine_events, "fire_chained_event"):
             tv.check_event_expiry(0)
             mock_apply.assert_called_once_with(evt, "default_consequence")
+
+
+# ===========================================================================
+# CATEGORY_MULTIPLIERS — event weights respond to world state
+# ===========================================================================
+
+class TestCategoryMultipliers:
+    _NATURAL_EVENT = {
+        "id": "evt-nat", "category": "natural", "rarity": "common",
+        "trigger_conditions": {},
+        "immediate_effects": {}, "default_consequence": {}, "response_consequence": {},
+    }
+    _ECONOMIC_EVENT = {
+        "id": "evt-eco", "category": "economic", "rarity": "common",
+        "trigger_conditions": {},
+        "immediate_effects": {}, "default_consequence": {}, "response_consequence": {},
+    }
+    _HEALTH_EVENT = {
+        "id": "evt-hlt", "category": "health", "rarity": "common",
+        "trigger_conditions": {},
+        "immediate_effects": {}, "default_consequence": {}, "response_consequence": {},
+    }
+    _WEIRD_EVENT = {
+        "id": "evt-weird", "category": "weird", "rarity": "common",
+        "trigger_conditions": {},
+        "immediate_effects": {}, "default_consequence": {}, "response_consequence": {},
+    }
+
+    def _get_weights(self, pool, state):
+        captured = {}
+        def _capture(eligible, weights, k):
+            captured["weights"] = list(weights)
+            return [eligible[0]]
+        with patch.object(_engine_events, "load_event_pool", return_value=pool), \
+             patch("engine.events.random.random", return_value=0.05), \
+             patch("engine.events.random.choices", side_effect=_capture):
+            tv.fire_random_event(state)
+        return captured.get("weights", [])
+
+    def test_low_green_boosts_natural_weight(self):
+        state = {**BASE_STATE, "green_policy": 20}
+        weights = self._get_weights([self._NATURAL_EVENT, self._ECONOMIC_EVENT], state)
+        # natural: base 60 * 2.0 (green_policy=20 < 40)
+        # economic: base 60, no green_policy multiplier
+        assert weights[0] == 120.0
+        assert weights[1] == 60
+
+    def test_high_industry_boosts_economic_weight(self):
+        # green_policy=50: above "low" threshold (40) and below "high" threshold (70)
+        # so natural event gets no multiplier and stays at base 60
+        state = {**BASE_STATE, "industry": 80, "treasury": 100, "green_policy": 50}
+        weights = self._get_weights([self._NATURAL_EVENT, self._ECONOMIC_EVENT], state)
+        # economic: base 60 * 1.5 (industry=80 >= 60)
+        # natural: unaffected by industry, green_policy=50 is neutral
+        assert weights[1] == 90.0
+        assert weights[0] == 60
+
+    def test_multipliers_stack_correctly(self):
+        # economic with both industry>=60 AND treasury<50: mult = 1.5 * 1.4 = 2.1
+        state = {**BASE_STATE, "industry": 70, "treasury": 20}
+        weights = self._get_weights([self._ECONOMIC_EVENT], state)
+        assert abs(weights[0] - 60 * 1.5 * 1.4) < 0.01
+
+    def test_unaffected_category_unchanged(self):
+        # "weird" is not in CATEGORY_MULTIPLIERS — weight stays at base 60
+        state = {**BASE_STATE, "green_policy": 5, "welfare": 5, "defense": 5}
+        weights = self._get_weights([self._WEIRD_EVENT], state)
+        assert weights[0] == 60

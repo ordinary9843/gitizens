@@ -96,3 +96,70 @@ class TestSelectRepresentatives:
             tv.select_weekly_representatives()
         reps = json.loads((tmp_path / "world/representatives.json").read_text())
         assert len(reps["representatives"]) == 1
+
+
+# ===========================================================================
+# Achievement system
+# ===========================================================================
+
+class TestAchievements:
+    def test_first_vote_awarded(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        result = tv.track_citizen_activity(["alice"], [])
+        assert "alice" in result
+        assert "first_vote" in result["alice"]
+
+    def test_civic_duty_awarded_at_threshold(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {"alice": {"total_votes": 9, "total_proposals": 0,
+                              "last_active": "2026-06-01T00:00:00+00:00",
+                              "achievements": ["first_vote"]}}
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        result = tv.track_citizen_activity(["alice"], [])
+        assert "civic_duty" in result.get("alice", [])
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "civic_duty" in data["alice"]["achievements"]
+
+    def test_no_duplicate_awards(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {"alice": {"total_votes": 5, "total_proposals": 0,
+                              "last_active": "2026-06-01T00:00:00+00:00",
+                              "achievements": ["first_vote"]}}
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        result = tv.track_citizen_activity(["alice"], [])
+        assert result.get("alice", []) == []
+
+    def test_legislator_awarded_on_proposal(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        awarded = tv.track_citizen_proposal("alice")
+        assert "legislator" in awarded
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "legislator" in data["alice"]["achievements"]
+
+    def test_achievements_persist_in_json(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        tv.track_citizen_activity(["alice"], [])
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "achievements" in data["alice"]
+        assert isinstance(data["alice"]["achievements"], list)
+        assert "first_vote" in data["alice"]["achievements"]
+
+    def test_representative_achievement_on_election(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "alice": {"total_votes": 50, "total_proposals": 0,
+                      "last_active": "2026-06-01T00:00:00+00:00", "achievements": []},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        (tmp_path / "world/representatives.json").write_text(json.dumps({"selected_at": None}))
+        with patch.object(tv, "get_or_create_dispatch_issue", return_value=13), \
+             patch.object(tv, "run", return_value=""):
+            tv.select_weekly_representatives()
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "representative" in data["alice"]["achievements"]

@@ -477,3 +477,109 @@ class TestBuildGapDashboard:
         result = tv._build_gap_dashboard(self._state(), entity_names=set())
         assert "What Needs Your Vote" in result
         assert isinstance(result, str)
+
+
+# ===========================================================================
+# write_gap_dashboard_json
+# ===========================================================================
+
+class TestWriteGapDashboardJson:
+    def _state(self, **overrides):
+        base = {**BASE_STATE, "tags_applied": []}
+        base.update(overrides)
+        return base
+
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir()
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world/entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+
+    def test_gap_json_created(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        state = self._state(education=40)
+        tv.write_gap_dashboard_json(state)
+        data = json.loads((tmp_path / "world/gap_dashboard.json").read_text())
+        assert "pending" in data
+        names = [e["name"] for e in data["pending"]]
+        assert any("University" in n or "School" in n for n in names), \
+            f"Expected education-related entity in pending, got: {names}"
+
+    def test_milestones_achieved_from_tags_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        state = self._state(tags_applied=["milestone/industrial-age"])
+        tv.write_gap_dashboard_json(state)
+        data = json.loads((tmp_path / "world/gap_dashboard.json").read_text())
+        assert "milestone/industrial-age" in data["milestones_achieved"]
+
+    def test_at_risk_entity_included(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        # Build Nature Reserve by writing an entity file at the expected path
+        cat_path = tmp_path / "world/entities/buildings"
+        (cat_path / "_index.json").write_text(
+            json.dumps({"next_seq": 2, "count": 1, "entities": ["bld-001"]}))
+        (cat_path / "bld-001.json").write_text(
+            json.dumps({"id": "bld-001", "name": "Nature Reserve"}))
+        # green_policy at 30 — Nature Reserve removal threshold is 25, so 30 <= 25+4 = 29? No.
+        # Let's find the actual remove value from WORLD_GENERATION_RULES
+        remove_val = next(
+            (r[4] for r in tv.WORLD_GENERATION_RULES if r[3] == "Nature Reserve"), 0)
+        state = self._state(green_policy=remove_val + 2)
+        tv.write_gap_dashboard_json(state)
+        data = json.loads((tmp_path / "world/gap_dashboard.json").read_text())
+        at_risk_names = [e["name"] for e in data["at_risk"]]
+        assert "Nature Reserve" in at_risk_names
+
+
+# ===========================================================================
+# generate_leaderboard
+# ===========================================================================
+
+class TestGenerateLeaderboard:
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir()
+
+    def test_leaderboard_created(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        citizens = {
+            "alice": {"total_votes": 10, "total_proposals": 2, "achievements": ["first_vote"]},
+            "bob":   {"total_votes": 3,  "total_proposals": 0, "achievements": []},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.generate_leaderboard()
+        content = (tmp_path / "world/LEADERBOARD.md").read_text(encoding="utf-8")
+        assert "@alice" in content
+        assert "@bob" in content
+        assert "10" in content
+
+    def test_representative_marked(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        citizens = {
+            "alice": {"total_votes": 10, "total_proposals": 0, "achievements": ["representative"]},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"representatives": ["alice"]}))
+        tv.generate_leaderboard()
+        content = (tmp_path / "world/LEADERBOARD.md").read_text(encoding="utf-8")
+        assert "[REP]" in content
+
+    def test_achievements_in_leaderboard(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        citizens = {
+            "alice": {"total_votes": 5, "total_proposals": 1,
+                      "achievements": ["first_vote", "legislator"]},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.generate_leaderboard()
+        content = (tmp_path / "world/LEADERBOARD.md").read_text(encoding="utf-8")
+        assert "first_vote" in content
+        assert "legislator" in content

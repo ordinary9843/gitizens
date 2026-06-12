@@ -59,7 +59,8 @@ def fail(reason: str):
     print(f"INVALID: {reason}", file=sys.stderr)
     gh("issue", "comment", ISSUE_NUMBER, "--repo", REPO, "--body",
        f"This proposal was automatically closed.\n\n**Reason:** {reason}\n\n"
-       "Use `/gitizens:propose` to submit a valid proposal.")
+       "Open the [dashboard](https://ordinary9843.github.io/gitizens/) "
+       "and use the **PROPOSE A LAW** form to submit a valid proposal.")
     gh("issue", "close", ISSUE_NUMBER, "--repo", REPO)
     gh("issue", "edit", ISSUE_NUMBER, "--repo", REPO, "--add-label", "invalid")
     sys.exit(0)
@@ -131,7 +132,18 @@ def validate():
         try:
             effect_data = yaml.safe_load(effect_match.group(1).strip())
         except yaml.YAMLError as exc:
-            fail(f"Invalid YAML in `## Effect` section: {exc}")
+            fail(
+                f"Invalid YAML in `## Effect` section: {exc}\n\n"
+                "The section must look exactly like this:\n"
+                "````\n"
+                "## Effect\n\n"
+                "```yaml\n"
+                "type: policy\n"
+                "changes:\n"
+                "  education: +10\n"
+                "```\n"
+                "````"
+            )
             return
 
         if not isinstance(effect_data, dict):
@@ -139,7 +151,15 @@ def validate():
 
         effect_type = effect_data.get("type")
         if effect_type not in VALID_TYPES:
-            fail(f"Unknown effect type `{effect_type}`. Valid types: {', '.join(sorted(VALID_TYPES))}")
+            fail(
+                f"Unknown effect type `{effect_type}`. Valid types: "
+                f"{', '.join(sorted(VALID_TYPES))}.\n\n"
+                "Examples:\n"
+                "- `type: policy` + `changes: {education: +10}` — costs 100 GC\n"
+                "- `type: declaration` — free, symbolic\n"
+                "- `type: evolve` + `id: bld-001` + `changes: {name: New Name}` — free\n"
+                "- `type: state_patch` + `patch: {treasury: 200}` — free"
+            )
 
         for field in REQUIRED_FIELDS.get(effect_type, []):
             if field not in effect_data:
@@ -151,8 +171,14 @@ def validate():
                 fail("Policy `changes` must be a non-empty mapping.")
             for key in changes:
                 if key not in POLICY_METRICS:
-                    fail(f"Unknown policy metric `{key}`. "
-                         f"Valid metrics: {', '.join(sorted(POLICY_METRICS))}")
+                    fail(
+                        f"Unknown policy metric `{key}`. Valid metrics:\n"
+                        "- `education` (schools, universities)\n"
+                        "- `industry` (factories, industrial zones)\n"
+                        "- `welfare` (community centers, housing)\n"
+                        "- `green_policy` (parks, nature reserves)\n"
+                        "- `defense` (barracks, defense ministry)"
+                    )
             for key, val in changes.items():
                 try:
                     delta = int(val)
@@ -168,8 +194,20 @@ def validate():
                 for cat in ("buildings", "districts", "institutions", "sectors")
             )
             if not found:
-                fail(f"Entity `{entity_id}` does not exist. "
-                     "Check [world/WORLD.md](world/WORLD.md) for valid entity IDs.")
+                ctx_for_ids = load_world_context()
+                all_ids = [
+                    name.split(":")[0].strip()
+                    for names in ctx_for_ids["entities"].values()
+                    for name in names
+                ]
+                ids_hint = (
+                    f"Currently active entities: {', '.join(sorted(all_ids))}"
+                    if all_ids else "No entities built yet."
+                )
+                fail(
+                    f"Entity `{entity_id}` does not exist. {ids_hint}\n\n"
+                    "Check [world/WORLD.md](world/WORLD.md) for the full list."
+                )
             evo_changes = effect_data.get("changes", {})
             if not isinstance(evo_changes, dict) or not evo_changes:
                 fail("evolve `changes` must be a non-empty mapping.")

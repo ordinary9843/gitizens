@@ -169,6 +169,38 @@
     .citizen-votes { color: var(--green); }
     .citizen-props { color: var(--dim); }
 
+    /* ── Achievement badges ── */
+    .ach-badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 3px; }
+    .ach-badge {
+      font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: bold;
+      display: inline-block; white-space: nowrap;
+    }
+    .ach-vote   { background: #1a4a2a; color: #3fb950; }
+    .ach-civic  { background: #0d3a5c; color: #58a6ff; }
+    .ach-active { background: #3a2a0d; color: #e3b341; }
+    .ach-leg    { background: #2a0d3a; color: #bc8cff; }
+    .ach-rep    { background: #3a1a0d; color: #ff9456; }
+
+    /* ── Milestone badges ── */
+    .milestone-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+    .ms-badge {
+      font-size: 9px; padding: 2px 6px; border-radius: 3px;
+      border: 1px solid; white-space: nowrap;
+    }
+    .ms-done    { background: #1a3a1a; border-color: #3fb950; color: #3fb950; }
+    .ms-pending { background: #1c2128; border-color: #444; color: var(--dim); }
+
+    /* ── Gap dashboard ── */
+    .gap-item {
+      font-size: 11px; padding: 5px 0; border-bottom: 1px solid #21262d;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .gap-item:last-child { border-bottom: none; }
+    .gap-name { color: var(--text); flex: 1; }
+    .gap-detail { color: var(--dim); font-size: 10px; text-align: right; }
+    .gap-at-risk { color: var(--red); }
+    .gap-need { color: var(--green); }
+
     /* ── Footer ── */
     #footer {
       padding: 10px 24px; display: flex; align-items: center; gap: 14px;
@@ -306,6 +338,7 @@
       <div id="era-progress-bar"><div id="era-progress-fill" style="width:0%"></div></div>
       <div id="era-next"></div>
     </div>
+    <div id="milestone-grid" class="milestone-grid"></div>
   </div>
   <div class="panel">
     <h2>STRUCTURES  ·  POLICY → CIVILIZATION</h2>
@@ -337,6 +370,11 @@
 <div class="landing-section" id="dispatch-section">
   <h2>WORLD CHRONICLE</h2>
   <div id="dispatch-list"><p class="no-data">Loading…</p></div>
+</div>
+
+<div class="landing-section" id="gap-section">
+  <h2>WHAT NEEDS YOUR VOTE</h2>
+  <div id="gap-list"><p class="no-data">Loading…</p></div>
 </div>
 
 <div class="landing-section" id="propose-section">
@@ -1506,6 +1544,25 @@ async function loadActiveEvent() {
 
 // ── Citizens leaderboard + Representatives ────────────────────────────────────
 
+const ACH_META = {
+  first_vote:         {label:'1V',   cls:'ach-vote',   title:'First Vote'},
+  civic_duty:         {label:'CV',   cls:'ach-civic',  title:'Civic Duty'},
+  active_citizen:     {label:'AC',   cls:'ach-active', title:'Active Citizen'},
+  legislator:         {label:'LEG',  cls:'ach-leg',    title:'Legislator'},
+  veteran_legislator: {label:'VL',   cls:'ach-leg',    title:'Veteran Legislator'},
+  representative:     {label:'REP',  cls:'ach-rep',    title:'Representative'},
+};
+
+function renderAchBadges(achievements) {
+  if (!achievements || !achievements.length) return '';
+  const badges = achievements.map(id => {
+    const m = ACH_META[id];
+    if (!m) return '';
+    return `<span class="ach-badge ${m.cls}" title="${m.title}">${m.label}</span>`;
+  }).join('');
+  return badges ? `<div class="ach-badges">${badges}</div>` : '';
+}
+
 async function loadCitizens() {
   try {
     const [cRes, rRes] = await Promise.all([
@@ -1518,11 +1575,14 @@ async function loadCitizens() {
         .sort((a,b) => b[1].total_votes - a[1].total_votes).slice(0,5);
       document.getElementById('citizens-list').innerHTML = top5.length
         ? top5.map(([u,d],i) => `
-          <div class="citizen-row">
-            <span class="citizen-rank">${i+1}</span>
-            <a class="citizen-name" href="https://github.com/${u}" target="_blank">@${u}</a>
-            <span class="citizen-votes">${d.total_votes}v</span>
-            <span class="citizen-props">${d.total_proposals}p</span>
+          <div class="citizen-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+            <div style="display:flex;align-items:baseline;gap:8px;width:100%">
+              <span class="citizen-rank">${i+1}</span>
+              <a class="citizen-name" href="https://github.com/${u}" target="_blank">@${u}</a>
+              <span class="citizen-votes">${d.total_votes}v</span>
+              <span class="citizen-props">${d.total_proposals}p</span>
+            </div>
+            ${renderAchBadges(d.achievements)}
           </div>`).join('')
         : '<p class="no-data">No citizen data yet.</p>';
     }
@@ -1534,6 +1594,69 @@ async function loadCitizens() {
   } catch(_) {
     document.getElementById('citizens-list').innerHTML = '<p class="no-data">No citizen data yet.</p>';
   }
+}
+
+// ── Gap dashboard ─────────────────────────────────────────────────────────────
+
+async function loadGapDashboard() {
+  try {
+    const r = await fetch(`${RAW}/world/gap_dashboard.json`, {cache:'no-cache'});
+    if (!r.ok) { document.getElementById('gap-list').innerHTML = '<p class="no-data">No data yet.</p>'; return; }
+    const gap = await r.json();
+    const items = [];
+    (gap.pending || []).forEach(p => {
+      items.push(`<div class="gap-item">
+        <span class="gap-name">${p.name}</span>
+        <span class="gap-detail gap-need">${p.metric} ${p.current}/${p.target} <b>need +${p.gap}</b></span>
+      </div>`);
+    });
+    (gap.at_risk || []).forEach(p => {
+      items.push(`<div class="gap-item">
+        <span class="gap-name gap-at-risk">${p.name} at risk</span>
+        <span class="gap-detail gap-at-risk">${p.metric} ${p.current} (removal &lt; ${p.removal_at})</span>
+      </div>`);
+    });
+    (gap.milestones_pending || []).filter(m => m.gap <= 10).forEach(m => {
+      items.push(`<div class="gap-item">
+        <span class="gap-name">Milestone: ${m.tag.replace(/.*\//,'')}</span>
+        <span class="gap-detail gap-need">${m.metric} ${m.current}→${m.target} <b>need ${m.gap > 0 ? '+' : ''}${m.gap}</b></span>
+      </div>`);
+    });
+    document.getElementById('gap-list').innerHTML = items.length
+      ? items.join('')
+      : '<p class="no-data">All near-threshold goals reached.</p>';
+  } catch(_) {
+    document.getElementById('gap-list').innerHTML = '<p class="no-data">No data yet.</p>';
+  }
+}
+
+// ── Milestone badges in ERA PROGRESS panel ────────────────────────────────────
+
+const THRESHOLD_TAGS_JS = [
+  {metric:'education',    dir:'above', threshold:50,   tag:'milestone/educated-society'},
+  {metric:'industry',     dir:'above', threshold:50,   tag:'milestone/industrial-age'},
+  {metric:'green_policy', dir:'above', threshold:60,   tag:'milestone/green-era'},
+  {metric:'defense',      dir:'above', threshold:50,   tag:'milestone/militarized-state'},
+  {metric:'welfare',      dir:'above', threshold:60,   tag:'milestone/welfare-state'},
+  {metric:'pollution',    dir:'above', threshold:60,   tag:'crisis/pollution-crisis'},
+  {metric:'pollution',    dir:'below', threshold:20,   tag:'recovery/air-cleaned'},
+  {metric:'population',   dir:'above', threshold:2000, tag:'milestone/population-boom'},
+];
+
+function renderMilestoneBadges(state) {
+  const applied = state.tags_applied || [];
+  const badges = THRESHOLD_TAGS_JS.map(t => {
+    const val = state[t.metric] || 0;
+    const done = applied.includes(t.tag);
+    const shortTag = t.tag.replace(/.*\//, '');
+    if (done) {
+      return `<span class="ms-badge ms-done" title="${t.tag}">✓ ${shortTag}</span>`;
+    }
+    const gap = t.dir === 'above' ? t.threshold - val : val - t.threshold;
+    if (gap <= 0) return '';
+    return `<span class="ms-badge ms-pending" title="${t.tag}">${shortTag} +${gap}</span>`;
+  }).filter(Boolean);
+  document.getElementById('milestone-grid').innerHTML = badges.join('');
 }
 
 // ── Cooldown indicators ───────────────────────────────────────────────────────
@@ -1688,6 +1811,7 @@ async function fetchState() {
         renderRadar(fresh);
         renderWorldStats(fresh);
         renderStructures(fresh);
+        renderMilestoneBadges(fresh);
       }
     }).catch(_=>_);
     return cached;
@@ -1724,6 +1848,7 @@ async function load() {
   renderRadar(s);
   renderWorldStats(s);
   renderStructures(s);
+  renderMilestoneBadges(s);
   document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
 
   // Phase 2: secondary (parallel)
@@ -1739,6 +1864,7 @@ async function load() {
     loadRecentLaws(),
     loadCitizens(),
     loadDispatches(),
+    loadGapDashboard(),
   ]);
 
   // Refresh countdown

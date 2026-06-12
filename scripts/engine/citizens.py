@@ -5,6 +5,34 @@ from pathlib import Path
 from .constants import SIGNATURE_THRESHOLD, COOLDOWN_DAYS, REPRESENTATIVE_DAYS
 
 
+# Achievements awarded based on citizen activity thresholds.
+# Each entry: (id, display_name, condition_fn(citizen_data) -> bool)
+ACHIEVEMENTS: list[tuple[str, str, object]] = [
+    ("first_vote",         "First Vote",         lambda d: d.get("total_votes", 0) >= 1),
+    ("civic_duty",         "Civic Duty",         lambda d: d.get("total_votes", 0) >= 10),
+    ("active_citizen",     "Active Citizen",     lambda d: d.get("total_votes", 0) >= 25),
+    ("legislator",         "Legislator",         lambda d: d.get("total_proposals", 0) >= 1),
+    ("veteran_legislator", "Veteran Legislator", lambda d: d.get("total_proposals", 0) >= 5),
+    ("representative",     "Representative",     lambda d: d.get("was_representative", False)),
+]
+
+
+def _award_achievements(data: dict) -> list[str]:
+    """Check all achievement conditions and award any newly earned ones.
+
+    Mutates data["achievements"] in place.
+    Returns list of newly awarded achievement IDs (empty if none).
+    """
+    earned = set(data.get("achievements", []))
+    newly_earned = [ach_id for ach_id, _, condition in ACHIEVEMENTS
+                    if ach_id not in earned and condition(data)]
+    if newly_earned:
+        data["achievements"] = sorted(earned | set(newly_earned),
+                                      key=lambda x: [a[0] for a in ACHIEVEMENTS].index(x)
+                                      if x in [a[0] for a in ACHIEVEMENTS] else 999)
+    return newly_earned
+
+
 def format_signatories(for_voters: list[str], against_voters: list[str]) -> str:
     total = len(for_voters) + len(against_voters)
     for_str     = (", ".join(f"@{u}" for u in for_voters)     or "—")
@@ -23,25 +51,47 @@ def format_signatories(for_voters: list[str], against_voters: list[str]) -> str:
     )
 
 
-def track_citizen_activity(for_voters: list[str], against_voters: list[str]):
+def track_citizen_activity(for_voters: list[str], against_voters: list[str]) -> dict[str, list[str]]:
+    """Track voting activity and award any newly earned achievements.
+
+    Returns mapping of username -> list of newly awarded achievement IDs.
+    """
     path = Path("world/citizens.json")
     data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     now_iso = datetime.now(timezone.utc).isoformat()
+    new_achievements: dict[str, list[str]] = {}
     for user in for_voters + against_voters:
-        entry = data.setdefault(user, {"total_votes": 0, "total_proposals": 0, "last_active": now_iso})
+        entry = data.setdefault(user, {"total_votes": 0, "total_proposals": 0,
+                                       "last_active": now_iso, "achievements": []})
+        entry.setdefault("achievements", [])
         entry["total_votes"] += 1
         entry["last_active"] = now_iso
+        awarded = _award_achievements(entry)
+        if awarded:
+            new_achievements[user] = awarded
+            print(f"  Achievement(s) awarded to @{user}: {', '.join(awarded)}")
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return new_achievements
 
 
-def track_citizen_proposal(proposer: str):
+def track_citizen_proposal(proposer: str) -> list[str]:
+    """Track proposal submission and award any newly earned achievements.
+
+    Returns list of newly awarded achievement IDs for the proposer.
+    """
     path = Path("world/citizens.json")
     data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     now_iso = datetime.now(timezone.utc).isoformat()
-    entry = data.setdefault(proposer, {"total_votes": 0, "total_proposals": 0, "last_active": now_iso})
+    entry = data.setdefault(proposer, {"total_votes": 0, "total_proposals": 0,
+                                        "last_active": now_iso, "achievements": []})
+    entry.setdefault("achievements", [])
     entry["total_proposals"] += 1
     entry["last_active"] = now_iso
+    awarded = _award_achievements(entry)
+    if awarded:
+        print(f"  Achievement(s) awarded to @{proposer}: {', '.join(awarded)}")
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return awarded
 
 
 def check_proposal_cooldown(effect_data: dict | None) -> tuple[bool, str]:
@@ -110,3 +160,17 @@ def select_weekly_representatives():
         encoding="utf-8",
     )
     print(f"  Representatives: {representatives}")
+    # Award representative achievement to newly elected citizens.
+    try:
+        for username in representatives:
+            entry = citizens.get(username)
+            if entry is None:
+                continue
+            entry.setdefault("achievements", [])
+            entry["was_representative"] = True
+            awarded = _award_achievements(entry)
+            if awarded:
+                print(f"  Achievement(s) awarded to @{username}: {', '.join(awarded)}")
+        citizens_path.write_text(json.dumps(citizens, indent=2) + "\n", encoding="utf-8")
+    except Exception as e:
+        print(f"  [WARN] select_weekly_representatives: failed to award achievements: {e}")

@@ -46,6 +46,7 @@ from engine import (
     get_or_create_dispatch_issue, save_dispatch, publish_dispatch,
     append_history, update_laws_index, collect_star_income,
     _load_entity_names, _build_gap_dashboard, _build_chronicle_body,
+    write_gap_dashboard_json, generate_leaderboard,
     # citizens
     format_signatories, track_citizen_activity, track_citizen_proposal,
     check_proposal_cooldown, update_proposal_cooldown, select_weekly_representatives,
@@ -76,12 +77,16 @@ def main():
     proposals = get_open_proposals()
     print(f"Open proposals: {len(proposals)}")
     laws_this_tick = 0
+    proposers_this_tick: list[str] = []
     for proposal in proposals:
         try:
             laws_before = read_state().get("laws_count", 0)
             process_issue(proposal)
             if read_state().get("laws_count", 0) > laws_before:
                 laws_this_tick += 1
+                author = (proposal.get("author") or {}).get("login", "")
+                if author:
+                    proposers_this_tick.append(author)
         except Exception as e:
             print(f"  [ERROR] proposal #{proposal.get('number')}: {e}")
 
@@ -132,6 +137,7 @@ def main():
     save_dispatch(
         read_state(), tick_changed, laws_this_tick,
         active_event_title, feedbacks_applied,
+        proposers=proposers_this_tick or None,
     )
 
     append_history_snapshot(read_state())
@@ -143,6 +149,8 @@ def main():
     generate_annals(hist_data)
 
     select_weekly_representatives()
+    generate_leaderboard()
+    write_gap_dashboard_json(read_state())
     generate_citizen_narrator()
 
     _now = datetime.now(timezone.utc)

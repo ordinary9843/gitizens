@@ -1,5 +1,1 @@
-blank_issues_enabled: false
-contact_links:
-  - name: Propose a law
-    url: https://github.com/ordinary9843/claude-gitizens
-    about: Install the claude-gitizens plugin and run /gitizens:propose
+blank_issues_enabled: true

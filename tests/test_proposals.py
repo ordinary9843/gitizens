@@ -322,3 +322,70 @@ class TestValidateCooldown:
         ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 10}})
         assert ok
+
+
+# ===========================================================================
+# Representative 12h voting period
+# ===========================================================================
+
+class TestRepresentativeVotingPeriod:
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        (tmp_path / "world/citizens.json").write_text("{}")
+        (tmp_path / "world/active_event.json").write_text("{}")
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world/entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+
+    def _issue(self, age_hours: float, author: str) -> dict:
+        created = (datetime.now(timezone.utc) - timedelta(hours=age_hours)).isoformat()
+        return {
+            "number": 1, "title": "[PROPOSAL] Test", "createdAt": created,
+            "author": {"login": author},
+            "body": "## Description\n\nSome law text here.\n\n",
+        }
+
+    def test_representative_passes_after_12h(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"representatives": ["alice"]}))
+        reactions_called = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          side_effect=lambda n: reactions_called.append(n) or (0, 0, [], [])), \
+             patch.object(_engine_proposals, "run", return_value=""):
+            _engine_proposals.SKIP_TIMING = False
+            tv.process_issue(self._issue(13, "alice"))
+            _engine_proposals.SKIP_TIMING = True
+        assert reactions_called, "get_reactions should be called — 13h > 12h rep window"
+
+    def test_non_representative_blocked_at_13h(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"representatives": ["alice"]}))
+        reactions_called = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          side_effect=lambda n: reactions_called.append(n) or (0, 0, [], [])), \
+             patch.object(_engine_proposals, "run", return_value=""):
+            _engine_proposals.SKIP_TIMING = False
+            tv.process_issue(self._issue(13, "bob"))
+            _engine_proposals.SKIP_TIMING = True
+        assert not reactions_called, "bob is not a rep — 13h < 24h window, should be skipped"
+
+    def test_non_representative_passes_after_24h(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"representatives": ["alice"]}))
+        reactions_called = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          side_effect=lambda n: reactions_called.append(n) or (0, 0, [], [])), \
+             patch.object(_engine_proposals, "run", return_value=""):
+            _engine_proposals.SKIP_TIMING = False
+            tv.process_issue(self._issue(25, "bob"))
+            _engine_proposals.SKIP_TIMING = True
+        assert reactions_called, "25h > 24h window — non-rep bob should be tallied"
