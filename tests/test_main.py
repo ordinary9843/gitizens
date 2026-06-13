@@ -112,3 +112,48 @@ class TestMainOrdering:
         with patch.multiple(tv, **patches):
             tv.main()
         assert 2 in processed
+
+    def test_update_world_summary_called_every_tick(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world(tmp_path)
+        patches = self._common_patches(
+            update_world_summary=MagicMock(return_value="Fresh summary"),
+            write_state=MagicMock(),
+        )
+        with patch.multiple(tv, **patches):
+            tv.main()
+        patches["update_world_summary"].assert_called_once()
+
+
+# ===========================================================================
+# _validate_state() — file existence and JSON integrity checks
+# ===========================================================================
+
+class TestValidateState:
+    def test_valid_state_passes(self, tmp_path, monkeypatch):
+        """A well-formed world/state.json must not raise."""
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(
+            json.dumps(BASE_STATE), encoding="utf-8"
+        )
+        # Should complete without raising.
+        tv._validate_state()
+
+    def test_missing_state_raises_system_exit(self, tmp_path, monkeypatch):
+        """Absence of world/state.json must raise SystemExit."""
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        # Do not create state.json.
+        with pytest.raises(SystemExit):
+            tv._validate_state()
+
+    def test_corrupted_json_raises_system_exit(self, tmp_path, monkeypatch):
+        """world/state.json containing invalid JSON must raise SystemExit."""
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(
+            "{not valid json}", encoding="utf-8"
+        )
+        with pytest.raises(SystemExit):
+            tv._validate_state()
