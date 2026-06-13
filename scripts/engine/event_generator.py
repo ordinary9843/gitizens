@@ -225,7 +225,7 @@ def generate_chained_event(resolved_event: dict, responded: bool, state: dict) -
         outcome = "responded" if responded else "defaulted"
         consequence_key = "response_consequence" if responded else "default_consequence"
         effects = resolved_event.get(consequence_key, {})
-        effects_str = ", ".join(f"{k}: {v:+d}" for k, v in effects.items()) if effects else "none"
+        effects_str = ", ".join(f"{k}: {int(v):+d}" for k, v in effects.items()) if effects else "none"
         history = read_history()
         trend = _build_world_trend(history)
         chain_prompt = (
@@ -239,6 +239,7 @@ def generate_chained_event(resolved_event: dict, responded: bool, state: dict) -
             f"Rarity guide: {_RARITY_GUIDE}\n\n"
             f"Output schema:\n{_OUTPUT_SCHEMA}"
         )
+        # guide the LLM to output the correct chained_from value in its schema example
         chain_prompt = chain_prompt.replace(
             '"chained_from": null',
             f'"chained_from": "{resolved_event.get("id", "unknown")}"'
