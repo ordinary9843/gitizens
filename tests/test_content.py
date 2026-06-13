@@ -183,3 +183,368 @@ class TestUpsertBotComment:
         assert len(posted) == 1
         ids = json.loads((tmp_path / "world/pinned_comment_ids.json").read_text())
         assert ids.get("7") == 222
+
+
+# ===========================================================================
+# generate_narrative
+# ===========================================================================
+
+class TestGenerateNarrative:
+    def test_calls_llm_with_correct_args(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "A new law was passed. Citizens rejoice."
+        )
+        with patch.object(_engine_content, "client", mock_client):
+            result = tv.generate_narrative("Build a Park", 10, 2, BASE_STATE)
+        mock_client.chat.completions.create.assert_called_once()
+        call_kwargs = mock_client.chat.completions.create.call_args
+        messages = call_kwargs[1]["messages"] if call_kwargs[1] else call_kwargs[0][1]
+        prompt_text = messages[0]["content"]
+        assert "Build a Park" in prompt_text
+        assert "10 for" in prompt_text
+        assert "2 against" in prompt_text
+
+    def test_returns_string(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "  The law was enacted today.  "
+        )
+        with patch.object(_engine_content, "client", mock_client):
+            result = tv.generate_narrative("New Tax", 5, 1, BASE_STATE)
+        assert isinstance(result, str)
+        assert result == "The law was enacted today."
+
+    def test_returns_fallback_on_llm_exception(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.side_effect = RuntimeError("LLM unavailable")
+        with patch.object(_engine_content, "client", mock_client):
+            result = tv.generate_narrative("Fallback Law", 3, 1, BASE_STATE)
+        assert "Fallback Law" in result
+        assert isinstance(result, str)
+
+    def test_state_metrics_in_prompt(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = "ok"
+        state = {**BASE_STATE, "era": "Industrial Era", "laws_count": 42}
+        with patch.object(_engine_content, "client", mock_client):
+            tv.generate_narrative("Test Law", 8, 4, state)
+        call_kwargs = mock_client.chat.completions.create.call_args
+        messages = call_kwargs[1]["messages"] if call_kwargs[1] else call_kwargs[0][1]
+        prompt_text = messages[0]["content"]
+        assert "Industrial Era" in prompt_text
+        assert "42" in prompt_text
+
+
+# ===========================================================================
+# update_world_summary
+# ===========================================================================
+
+class TestUpdateWorldSummary:
+    def test_calls_llm(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "The nation prospers under stable governance."
+        )
+        with patch.object(_engine_content, "client", mock_client):
+            result = tv.update_world_summary(BASE_STATE)
+        mock_client.chat.completions.create.assert_called_once()
+
+    def test_returns_string(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "  Stable nation.  "
+        )
+        with patch.object(_engine_content, "client", mock_client):
+            result = tv.update_world_summary(BASE_STATE)
+        assert isinstance(result, str)
+        assert result == "Stable nation."
+
+    def test_returns_empty_string_on_exception(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.side_effect = ConnectionError("Network error")
+        with patch.object(_engine_content, "client", mock_client):
+            result = tv.update_world_summary(BASE_STATE)
+        assert result == ""
+
+    def test_state_serialized_in_prompt(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = "ok"
+        state = {**BASE_STATE, "era": "Space Age"}
+        with patch.object(_engine_content, "client", mock_client):
+            tv.update_world_summary(state)
+        call_kwargs = mock_client.chat.completions.create.call_args
+        messages = call_kwargs[1]["messages"] if call_kwargs[1] else call_kwargs[0][1]
+        prompt_text = messages[0]["content"]
+        assert "Space Age" in prompt_text
+
+
+# ===========================================================================
+# generate_world_md
+# ===========================================================================
+
+class TestGenerateWorldMd:
+    def _setup_world_dirs(self, tmp_path):
+        (tmp_path / "world" / "annals").mkdir(parents=True)
+        (tmp_path / "world" / "archive").mkdir(parents=True)
+        for cat, _ in [("institutions", "Institutions"), ("districts", "Districts"),
+                       ("buildings", "Buildings"), ("sectors", "Sectors")]:
+            (tmp_path / "world" / "entities" / cat).mkdir(parents=True)
+            (tmp_path / "world" / "entities" / cat / "_index.json").write_text(
+                '{"entities": []}', encoding="utf-8"
+            )
+
+    def test_writes_world_md(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        state = {**BASE_STATE}
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        assert (tmp_path / "world" / "WORLD.md").exists()
+
+    def test_contains_expected_content(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        state = {**BASE_STATE, "era": "Industrial Era", "laws_count": 5,
+                 "treasury": 1234, "currency": "Git Coins"}
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "# World State" in content
+        assert "Industrial Era" in content
+        assert "2026-06-13" in content
+        assert "1,234 Git Coins" in content
+
+    def test_law_number_link_present(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        state = {**BASE_STATE}
+        tv.generate_world_md(state, law_number=7, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "Law 007" in content
+        assert "laws/law-007.md" in content
+
+    def test_no_law_number_no_link(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        state = {**BASE_STATE}
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "laws/law-" not in content
+        assert "2026-06-13" in content
+
+    def test_entities_section_present(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        state = {**BASE_STATE}
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "## Entities" in content
+        assert "## Archive" in content
+
+    def test_entity_listed_in_output(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        ent_path = tmp_path / "world" / "entities" / "buildings"
+        (ent_path / "_index.json").write_text(
+            '{"entities": ["b001"]}', encoding="utf-8"
+        )
+        (ent_path / "b001.json").write_text(
+            json.dumps({"name": "Town Hall", "built_law": 3, "auto_trigger": "—"}),
+            encoding="utf-8",
+        )
+        state = {**BASE_STATE}
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "Town Hall" in content
+        assert "b001" in content
+
+
+# ===========================================================================
+# _badge_url_val
+# ===========================================================================
+
+class TestBadgeUrlVal:
+    def test_spaces_replaced_with_underscore(self):
+        result = _engine_content._badge_url_val("Founding Era")
+        assert " " not in result
+        assert "Founding_Era" in result
+
+    def test_special_chars_encoded(self):
+        result = _engine_content._badge_url_val("hello/world")
+        assert "/" not in result
+
+    def test_ampersand_encoded(self):
+        result = _engine_content._badge_url_val("War & Peace")
+        assert "&" not in result
+
+    def test_plain_string_unchanged(self):
+        result = _engine_content._badge_url_val("SimpleValue")
+        assert result == "SimpleValue"
+
+    def test_non_string_input_converted(self):
+        result = _engine_content._badge_url_val(42)
+        assert result == "42"
+
+    def test_empty_string(self):
+        result = _engine_content._badge_url_val("")
+        assert result == ""
+
+
+# ===========================================================================
+# _load_pinned_ids
+# ===========================================================================
+
+class TestLoadPinnedIds:
+    def test_reads_existing_file(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world" / "pinned_comment_ids.json").write_text(
+            '{"5": 99, "12": 200}', encoding="utf-8"
+        )
+        result = tv._load_pinned_ids()
+        assert result == {"5": 99, "12": 200}
+
+    def test_missing_file_returns_empty_dict(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        result = tv._load_pinned_ids()
+        assert result == {}
+
+    def test_invalid_json_returns_empty_dict(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world" / "pinned_comment_ids.json").write_text(
+            "not valid json", encoding="utf-8"
+        )
+        result = tv._load_pinned_ids()
+        assert result == {}
+
+    def test_empty_file_returns_empty_dict(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world" / "pinned_comment_ids.json").write_text(
+            "{}", encoding="utf-8"
+        )
+        result = tv._load_pinned_ids()
+        assert result == {}
+
+
+# ===========================================================================
+# generate_citizen_narrator
+# ===========================================================================
+
+class TestGenerateCitizenNarrator:
+    def _make_state_file(self, tmp_path, state):
+        (tmp_path / "world").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "world" / "state.json").write_text(
+            json.dumps(state), encoding="utf-8"
+        )
+
+    def test_skipped_if_called_recently(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        recent_date = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
+        state = {**BASE_STATE, "last_narrator_date": recent_date}
+        self._make_state_file(tmp_path, state)
+        mock_client = MagicMock()
+        with patch.object(_engine_content, "client", mock_client), \
+             patch.object(_engine_content, "_get_or_create_citizen_voices_issue",
+                          return_value=1):
+            tv.generate_citizen_narrator()
+        mock_client.chat.completions.create.assert_not_called()
+
+    def test_runs_when_no_last_narrator_date(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        state = {**BASE_STATE}
+        self._make_state_file(tmp_path, state)
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "**Alice, Official:**\nAll is well.\n\n"
+            "**Bob, Worker:**\nHard times.\n\n"
+            "**Carol, Teacher:**\nThe children thrive."
+        )
+        fake_run_calls = []
+        def fake_run(cmd):
+            fake_run_calls.append(cmd)
+            if "issue" in cmd and "comment" in cmd:
+                return "https://github.com/test/repo/issues/1#issuecomment-100"
+            return ""
+        with patch.object(_engine_content, "client", mock_client), \
+             patch.object(_engine_content, "_get_or_create_citizen_voices_issue",
+                          return_value=1), \
+             patch.object(_engine_content, "run", fake_run):
+            tv.generate_citizen_narrator()
+        mock_client.chat.completions.create.assert_called_once()
+
+    def test_runs_when_last_narrator_over_7_days_ago(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        old_date = (datetime.now(timezone.utc) - timedelta(days=8)).isoformat()
+        state = {**BASE_STATE, "last_narrator_date": old_date}
+        self._make_state_file(tmp_path, state)
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "Citizen voices narrative."
+        )
+        def fake_run(cmd):
+            if "issue" in cmd and "comment" in cmd:
+                return "https://github.com/test/repo/issues/2#issuecomment-200"
+            return ""
+        with patch.object(_engine_content, "client", mock_client), \
+             patch.object(_engine_content, "_get_or_create_citizen_voices_issue",
+                          return_value=2), \
+             patch.object(_engine_content, "run", fake_run):
+            tv.generate_citizen_narrator()
+        mock_client.chat.completions.create.assert_called_once()
+
+    def test_returns_early_on_llm_exception(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        state = {**BASE_STATE}
+        self._make_state_file(tmp_path, state)
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.side_effect = RuntimeError("LLM down")
+        mock_get_issue = MagicMock(return_value=1)
+        with patch.object(_engine_content, "client", mock_client), \
+             patch.object(_engine_content, "_get_or_create_citizen_voices_issue",
+                          mock_get_issue):
+            tv.generate_citizen_narrator()
+        mock_get_issue.assert_not_called()
+
+    def test_narrator_issue_updated_when_successful(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        state = {**BASE_STATE}
+        self._make_state_file(tmp_path, state)
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "Three voices speak."
+        )
+        comment_calls = []
+        def fake_run(cmd):
+            comment_calls.append(cmd)
+            if "issue" in cmd and "comment" in cmd:
+                return "https://github.com/test/repo/issues/3#issuecomment-300"
+            return ""
+        with patch.object(_engine_content, "client", mock_client), \
+             patch.object(_engine_content, "_get_or_create_citizen_voices_issue",
+                          return_value=3), \
+             patch.object(_engine_content, "run", fake_run):
+            tv.generate_citizen_narrator()
+        posted = [c for c in comment_calls if "issue" in c and "comment" in c]
+        assert len(posted) == 1
+
+    def test_state_updated_with_narrator_date(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        state = {**BASE_STATE}
+        self._make_state_file(tmp_path, state)
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "Today's voices."
+        )
+        def fake_run(cmd):
+            if "issue" in cmd and "comment" in cmd:
+                return "https://github.com/test/repo/issues/4#issuecomment-400"
+            return ""
+        with patch.object(_engine_content, "client", mock_client), \
+             patch.object(_engine_content, "_get_or_create_citizen_voices_issue",
+                          return_value=4), \
+             patch.object(_engine_content, "run", fake_run):
+            tv.generate_citizen_narrator()
+        updated = json.loads((tmp_path / "world" / "state.json").read_text())
+        assert "last_narrator_date" in updated
