@@ -395,8 +395,6 @@
         <select id="p-type" class="form-input" onchange="onTypeChange()">
           <option value="policy">Policy Change</option>
           <option value="declaration">Declaration</option>
-          <option value="state_patch">State Patch</option>
-          <option value="evolve">Evolve Entity</option>
         </select>
       </div>
     </div>
@@ -515,7 +513,7 @@
     <div class="how-card">
       <div class="step">03</div>
       <h3>Propose</h3>
-      <p>Open Claude Code and type <code>/gitizens:propose</code>. It will guide you through writing and submitting a law.</p>
+      <p>Use the form below, or open Claude Code and type <code>/gitizens:propose</code> for a guided experience.</p>
     </div>
   </div>
 </div>
@@ -1926,6 +1924,17 @@ let _resizeTimer  = null;
   });
   container.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
 })();
+
+// Advanced propose options (?advanced=1)
+if (new URLSearchParams(location.search).get('advanced') === '1') {
+  const sel = document.getElementById('p-type');
+  ['state_patch', 'evolve'].forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = v === 'state_patch' ? 'State Patch' : 'Evolve Entity';
+    sel.appendChild(opt);
+  });
+}
 
 window.addEventListener('resize', () => {
   clearTimeout(_resizeTimer);
