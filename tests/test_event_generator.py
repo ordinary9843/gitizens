@@ -101,6 +101,22 @@ class TestValidateEvent:
         event = {k: v for k, v in VALID_EVENT.items() if k != "duration_hours"}
         assert _gen.validate_event(event) is False
 
+    def test_missing_id_fails(self):
+        event = {k: v for k, v in VALID_EVENT.items() if k != "id"}
+        assert _gen.validate_event(event) is False
+
+    def test_missing_category_fails(self):
+        event = {k: v for k, v in VALID_EVENT.items() if k != "category"}
+        assert _gen.validate_event(event) is False
+
+    def test_missing_rarity_fails(self):
+        event = {k: v for k, v in VALID_EVENT.items() if k != "rarity"}
+        assert _gen.validate_event(event) is False
+
+    def test_missing_description_fails(self):
+        event = {k: v for k, v in VALID_EVENT.items() if k != "description"}
+        assert _gen.validate_event(event) is False
+
     def test_invalid_rarity_fails(self):
         assert _gen.validate_event({**VALID_EVENT, "rarity": "mythic"}) is False
 

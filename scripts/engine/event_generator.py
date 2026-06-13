@@ -51,7 +51,7 @@ def validate_event(event: dict) -> bool:
             return False
     try:
         duration = float(event["duration_hours"])
-        event["duration_hours"] = duration if duration > 0 else 4.0
+        event["duration_hours"] = duration if duration >= 0 else 4.0
     except (TypeError, ValueError):
         event["duration_hours"] = 4.0
     return True
