@@ -160,6 +160,7 @@ def main():
         _next_tick = _now.replace(hour=_next_hour, minute=0, second=0, microsecond=0)
     _state = read_state()
     _state["next_tick_at"] = _next_tick.strftime("%Y-%m-%dT%H:%M:%SZ")
+    _state["world_summary"] = update_world_summary(_state)
     write_state(_state)
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
