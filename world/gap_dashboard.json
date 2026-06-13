@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-06-13T21:21:17.687844+00:00",
+  "updated_at": "2026-06-13T23:11:26.366345+00:00",
   "pending": [
+    {
+      "name": "Defense Ministry",
+      "metric": "defense",
+      "current": 59,
+      "target": 65,
+      "gap": 6
+    },
     {
       "name": "Academy of Sciences",
       "metric": "education",
@@ -14,13 +21,6 @@
       "current": 45,
       "target": 55,
       "gap": 10
-    },
-    {
-      "name": "Defense Ministry",
-      "metric": "defense",
-      "current": 53,
-      "target": 65,
-      "gap": 12
     }
   ],
   "at_risk": [],

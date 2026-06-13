@@ -21,7 +21,7 @@
 | Industry | 45/100 |
 | Welfare | 77/100 |
 | Green Policy | 67/100 |
-| Defense | 53/100 |
+| Defense | 59/100 |
 | Pollution *(derived)* | 0/100 |
 
 ---
