@@ -1,1 +1,23 @@
-{}
+{
+  "id": "evt-llm-1023",
+  "category": "social",
+  "rarity": "uncommon",
+  "title": "The Unseen Artist",
+  "description": "A mysterious figure known only as 'The Unseen Artist' begins creating public murals overnight, infusing the city with vibrant colors and unexpected themes. The murals provoke a wave of artistic expression and community pride, but also simmering debates about the boundaries of public art.",
+  "flavor": "Each morning, Gitizens awaken to new surprises adorning their streets.",
+  "immediate_effects": {
+    "education": 5,
+    "welfare": 3
+  },
+  "response_consequence": {
+    "stability": -5
+  },
+  "default_consequence": {
+    "stability": 2
+  },
+  "response_hint": "Implementing regulations on public art could help maintain order, but it risks stifling creativity.",
+  "duration_hours": 72.0,
+  "chained_from": null,
+  "fired_at": "2026-06-13T09:24:10.781012+00:00",
+  "issue_number": 45
+}

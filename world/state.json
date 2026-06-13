@@ -3,18 +3,18 @@
   "laws_count": 12,
   "last_enacted": "2026-06-11",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Founding Era, Gitizens enjoy stable welfare and education, with a population of 1,700, a treasury of 52 Git Coins, and low pollution levels.",
-  "treasury": 111,
+  "world_summary": "In the Founding Era, Gitizens thrive with stable welfare (72) and education (71), supported by a treasury of 120 Git Coins and zero pollution.",
+  "treasury": 120,
   "currency": "Git Coins",
   "stars_last_counted": 5,
-  "education": 66,
+  "education": 71,
   "industry": 45,
-  "welfare": 68,
+  "welfare": 72,
   "green_policy": 67,
   "defense": 41,
-  "population": 2450,
+  "population": 2600,
   "pollution": 0,
-  "stability": 48,
+  "stability": 45,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -28,5 +28,5 @@
     "sykar-f"
   ],
   "last_narrator_date": "2026-06-12T12:40:11.860044+00:00",
-  "next_tick_at": "2026-06-13T08:00:00Z"
+  "next_tick_at": "2026-06-13T12:00:00Z"
 }

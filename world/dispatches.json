@@ -1,12 +1,5 @@
 [
   {
-    "tick": 9,
-    "date": "2026-06-11",
-    "narrative": "In a decisive advancement for the Gitizens, the population has surged to 1,400, reflecting a promising growth during the Founding Era. However, with a treasury of only 269 GC and stability at a precarious 61 out of 100, concerns about governance and resource management loom large. As pollution levels remain at 3 out of 100, the delicate balance of progress and preservation hangs in the balance.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 1,400 \u00b7 treasury 269 GC \u00b7 stability 61/100 \u00b7 pollution 3/100"
-  },
-  {
     "tick": 10,
     "date": "2026-06-11",
     "narrative": "In a significant development for Gitizens, the recent Foreign Direct Investment has injected 150 gold coins into the treasury, bringing the total to 483 GC. With a population of 1,450 now thriving in the Founding Era, the civilization's stability holds steady at 60 out of 100, though concerns rise as pollution levels creep to 2 out of 100. As the community grapples with growth and environmental impact, leaders must navigate this delicate balance moving forward.",
@@ -68,5 +61,12 @@
     "narrative": "In the aftermath of Tick #18, completed on June 13, 2026, Gitizens face a critical moment in their Founding Era, with a burgeoning population now at 2,450. The treasury, holding 111 GC, reflects a cautious optimism, yet stability remains precarious at 48 out of 100, urging leaders to address the burgeoning challenges of governance and resource management. As pollution levels remain at a hopeful 0, the path forward hinges on the community's collective efforts to secure a sustainable future.",
     "changes": "autonomous tick applied",
     "metrics": "population 2,450 \u00b7 treasury 111 GC \u00b7 stability 48/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 19,
+    "date": "2026-06-13",
+    "narrative": "In a significant development for Gitizens, Tick #19 concluded on June 13, 2026, with the population now at 2,600 and a treasury holding steady at 120 GC. Amidst rising stability concerns, currently at 45 out of 100, the recent event dubbed \"The Unseen Artist\" has sparked both intrigue and debate among citizens, as they navigate the complexities of their burgeoning civilization in this Founding Era.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: The Unseen Artist",
+    "metrics": "population 2,600 \u00b7 treasury 120 GC \u00b7 stability 45/100 \u00b7 pollution 0/100"
   }
 ]
