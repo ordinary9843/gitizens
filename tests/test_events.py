@@ -3,7 +3,7 @@ import sys
 import tempfile
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 
 import pytest
 
@@ -13,7 +13,7 @@ from tests.helpers import (
     _engine_chronicle, _engine_content, _engine_proposals,
     _make_category,
 )
-from engine.events import fire_chained_event
+from engine.events import fire_chained_event, open_event_issue, close_event_issue
 
 
 # ===========================================================================
@@ -388,3 +388,146 @@ class TestCategoryMultipliers:
             with patch("engine.events.generate_event", return_value=None) as mock_gen:
                 tv.fire_random_event(state)
         mock_gen.assert_called_once_with(state)
+
+
+# ===========================================================================
+# open_event_issue
+# ===========================================================================
+
+class TestOpenEventIssue:
+    _BASE_EVENT = {
+        "title": "Great Flood",
+        "description": "Waters rise across the lowlands.",
+        "flavor": "The rivers speak.",
+        "category": "natural",
+        "rarity": "rare",
+        "immediate_effects": {"welfare": -10, "treasury": -5},
+        "response_consequence": {"stability": 10},
+        "default_consequence": {"stability": -5},
+        "response_hint": "React to mobilise rescue teams.",
+    }
+
+    def test_returns_issue_number_from_url(self):
+        # run() returns a GitHub issue URL; the function extracts the last segment.
+        with patch("engine.events.run", return_value="https://github.com/test/repo/issues/77"):
+            result = open_event_issue(self._BASE_EVENT)
+        assert result == 77
+
+    def test_calls_gh_issue_create_with_title(self):
+        with patch("engine.events.run", return_value="https://github.com/test/repo/issues/10") as mock_run:
+            open_event_issue(self._BASE_EVENT)
+        # At least one call should contain the issue title with [EVENT] prefix.
+        all_calls = [str(c) for c in mock_run.call_args_list]
+        assert any("[EVENT] Great Flood" in c for c in all_calls)
+
+    def test_calls_gh_issue_create_with_event_label(self):
+        with patch("engine.events.run", return_value="https://github.com/test/repo/issues/10") as mock_run:
+            open_event_issue(self._BASE_EVENT)
+        all_calls_flat = [arg for c in mock_run.call_args_list for arg in c[0][0]]
+        assert "event" in all_calls_flat
+
+    def test_body_contains_description(self):
+        captured_bodies = []
+
+        def fake_run(cmd):
+            # Capture body file path from --body-file arg.
+            if "--body-file" in cmd:
+                idx = cmd.index("--body-file")
+                body_path = cmd[idx + 1]
+                with open(body_path, encoding="utf-8") as f:
+                    captured_bodies.append(f.read())
+            return "https://github.com/test/repo/issues/5"
+
+        with patch("engine.events.run", side_effect=fake_run):
+            open_event_issue(self._BASE_EVENT)
+
+        assert len(captured_bodies) == 1
+        assert "Waters rise across the lowlands." in captured_bodies[0]
+        assert "Great Flood" in captured_bodies[0]
+
+    def test_returns_zero_on_unparseable_url(self):
+        with patch("engine.events.run", return_value="not-a-url"):
+            result = open_event_issue(self._BASE_EVENT)
+        assert result == 0
+
+    def test_returns_zero_on_empty_run_output(self):
+        with patch("engine.events.run", return_value=""):
+            result = open_event_issue(self._BASE_EVENT)
+        assert result == 0
+
+    def test_event_with_no_immediate_effects(self):
+        event = {**self._BASE_EVENT, "immediate_effects": {}}
+        with patch("engine.events.run", return_value="https://github.com/test/repo/issues/3"):
+            result = open_event_issue(event)
+        assert result == 3
+
+
+# ===========================================================================
+# close_event_issue
+# ===========================================================================
+
+class TestCloseEventIssue:
+    _BASE_EVENT = {
+        "title": "Great Flood",
+        "description": "Waters rise.",
+        "response_consequence": {"stability": 10, "treasury": 5},
+        "default_consequence": {"stability": -5},
+    }
+
+    def test_calls_comment_close_and_remove_label(self):
+        with patch("engine.events.run") as mock_run:
+            close_event_issue(42, True, self._BASE_EVENT)
+        assert mock_run.call_count == 3
+        cmds = [c[0][0] for c in mock_run.call_args_list]
+        # First: comment; second: close; third: remove label
+        assert "comment" in cmds[0]
+        assert "close" in cmds[1]
+        assert "edit" in cmds[2]
+
+    def test_passes_correct_issue_number(self):
+        with patch("engine.events.run") as mock_run:
+            close_event_issue(99, False, self._BASE_EVENT)
+        all_calls_flat = [arg for c in mock_run.call_args_list for arg in c[0][0]]
+        assert "99" in all_calls_flat
+
+    def test_early_return_when_issue_number_is_zero(self):
+        with patch("engine.events.run") as mock_run:
+            close_event_issue(0, True, self._BASE_EVENT)
+        mock_run.assert_not_called()
+
+    def test_responded_true_applies_response_consequence(self):
+        captured = []
+
+        def fake_run(cmd):
+            captured.append(cmd)
+
+        with patch("engine.events.run", side_effect=fake_run):
+            close_event_issue(42, True, self._BASE_EVENT)
+
+        # The comment body (third arg of the comment call) should mention response effects.
+        comment_cmd = captured[0]
+        body_idx = comment_cmd.index("--body")
+        body_text = comment_cmd[body_idx + 1]
+        assert "stability" in body_text
+        assert "treasury" in body_text
+
+    def test_responded_false_applies_default_consequence(self):
+        captured = []
+
+        def fake_run(cmd):
+            captured.append(cmd)
+
+        with patch("engine.events.run", side_effect=fake_run):
+            close_event_issue(42, False, self._BASE_EVENT)
+
+        comment_cmd = captured[0]
+        body_idx = comment_cmd.index("--body")
+        body_text = comment_cmd[body_idx + 1]
+        assert "stability" in body_text
+
+    def test_repo_flag_present_in_all_calls(self):
+        with patch("engine.events.run") as mock_run:
+            close_event_issue(10, True, self._BASE_EVENT)
+        for c in mock_run.call_args_list:
+            cmd = c[0][0]
+            assert "--repo" in cmd
