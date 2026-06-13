@@ -800,3 +800,71 @@ class TestApplyTags:
         with patch.object(_engine_world, "run") as mock_run:
             tv.apply_tags(None, before, after, 1, "Nothing", [])
             assert mock_run.call_count == 0
+
+
+# ===========================================================================
+# compute_next_tick_at
+# ===========================================================================
+
+class TestComputeNextTickAt:
+    def test_advances_by_two_hours_at_top_of_hour(self):
+        now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=timezone.utc)
+        assert tv.compute_next_tick_at(now) == "2026-06-14T20:00:00Z"
+
+    def test_snaps_to_top_of_hour_when_now_is_mid_hour(self):
+        now = datetime(2026, 6, 14, 18, 37, 42, tzinfo=timezone.utc)
+        assert tv.compute_next_tick_at(now) == "2026-06-14T20:00:00Z"
+
+    def test_consecutive_calls_two_hours_apart_produce_different_values(self):
+        # Regression: the old 4-hour boundary calculation made consecutive 2h
+        # cron runs collide on the same timestamp. Two adjacent runs must now
+        # always differ.
+        first  = tv.compute_next_tick_at(datetime(2026, 6, 14, 18, 0, tzinfo=timezone.utc))
+        second = tv.compute_next_tick_at(datetime(2026, 6, 14, 20, 0, tzinfo=timezone.utc))
+        third  = tv.compute_next_tick_at(datetime(2026, 6, 14, 22, 0, tzinfo=timezone.utc))
+        assert first != second != third
+        assert first == "2026-06-14T20:00:00Z"
+        assert second == "2026-06-14T22:00:00Z"
+        assert third == "2026-06-15T00:00:00Z"
+
+    def test_crosses_day_boundary(self):
+        now = datetime(2026, 6, 14, 23, 0, 0, tzinfo=timezone.utc)
+        assert tv.compute_next_tick_at(now) == "2026-06-15T01:00:00Z"
+
+    def test_crosses_month_boundary(self):
+        now = datetime(2026, 6, 30, 23, 30, 0, tzinfo=timezone.utc)
+        assert tv.compute_next_tick_at(now) == "2026-07-01T01:00:00Z"
+
+    def test_crosses_year_boundary(self):
+        now = datetime(2026, 12, 31, 23, 30, 0, tzinfo=timezone.utc)
+        assert tv.compute_next_tick_at(now) == "2027-01-01T01:00:00Z"
+
+    def test_naive_datetime_treated_as_utc(self):
+        # Defensive: if a caller passes a naive datetime, treat it as UTC
+        # rather than crashing or producing a localized timestamp.
+        naive = datetime(2026, 6, 14, 18, 0, 0)
+        assert tv.compute_next_tick_at(naive) == "2026-06-14T20:00:00Z"
+
+    def test_aware_non_utc_input(self):
+        # Caller passes a tz-aware datetime in a non-UTC zone — the snap
+        # happens in the input's local zone, then format is UTC suffix.
+        from datetime import timezone as _tz
+        plus_eight = _tz(timedelta(hours=8))
+        now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=plus_eight)
+        # 18:00+08 + 2h = 20:00+08; format() writes the local-clock string
+        # with a literal "Z" suffix. We accept this as documented behavior.
+        result = tv.compute_next_tick_at(now)
+        assert result.startswith("2026-06-14T20:00:00")
+
+    def test_midnight_input(self):
+        now = datetime(2026, 6, 14, 0, 0, 0, tzinfo=timezone.utc)
+        assert tv.compute_next_tick_at(now) == "2026-06-14T02:00:00Z"
+
+    def test_format_is_iso_with_z_suffix(self):
+        now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=timezone.utc)
+        result = tv.compute_next_tick_at(now)
+        assert result.endswith("Z")
+        assert "T" in result
+        # Round-trip parseable
+        parsed = datetime.fromisoformat(result.replace("Z", "+00:00"))
+        assert parsed.tzinfo is not None

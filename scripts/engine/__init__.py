@@ -13,6 +13,7 @@ from .world import (
     next_entity_id, entity_exists_by_name, auto_create_entity, auto_remove_entity,
     world_autonomous_tick, run_world_engine, apply_effect, apply_event_effects,
     determine_era, check_threshold_tags, apply_tags,
+    compute_next_tick_at, TICK_INTERVAL_HOURS,
 )
 from .events import (
     fire_random_event, open_event_issue, close_event_issue,

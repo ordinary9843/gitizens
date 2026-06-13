@@ -1,6 +1,6 @@
 import re
 import random
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .constants import (
@@ -11,8 +11,26 @@ from .state import read_json, write_json, read_state, write_state
 from .gh import run, SKIP_TIMING
 
 
+TICK_INTERVAL_HOURS = 2
+
+
 def slugify(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+
+
+def compute_next_tick_at(now: datetime) -> str:
+    """Return ISO timestamp for the next bot tick.
+
+    Advances `now` by `TICK_INTERVAL_HOURS` and snaps to the top of that hour.
+    Cron runs every 2 hours; this guarantees every consecutive run produces a
+    different timestamp, so `world/state.json` always becomes dirty on tick.
+    """
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
+    target = (now + timedelta(hours=TICK_INTERVAL_HOURS)).replace(
+        minute=0, second=0, microsecond=0
+    )
+    return target.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def pollution_level(state: dict) -> int:
