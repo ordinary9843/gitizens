@@ -504,6 +504,7 @@ class TestFireRandomEvent:
                 from engine.events import fire_random_event
                 result = fire_random_event(BASE_STATE)
         assert result == expected
+        mock_gen.assert_called_once()
 
     def test_returns_none_when_generate_event_returns_none(self):
         with patch("engine.events.random") as mock_random:
