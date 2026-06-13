@@ -1,3 +1,4 @@
+import copy
 import json
 import random
 import tempfile
@@ -131,7 +132,7 @@ def fire_chained_event(resolved_event: dict, responded: bool):
     print(f"  Event chain: {resolved_event.get('title')} -> {next_evt.get('title')}")
     apply_event_effects(next_evt, "immediate_effects")
     issue_num = open_event_issue(next_evt)
-    next_evt = json.loads(json.dumps(next_evt))
+    next_evt = copy.deepcopy(next_evt)
     next_evt["fired_at"] = datetime.now(timezone.utc).isoformat()
     next_evt["issue_number"] = issue_num
     save_active_event(next_evt)
