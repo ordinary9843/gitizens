@@ -323,8 +323,85 @@ class TestBuildPrompt:
 
 
 # ===========================================================================
-# Group 5: generate_chained_event (added in Task 4)
+# Group 5: generate_chained_event
 # ===========================================================================
+
+class TestGenerateChainedEvent:
+    def _resolved_event(self):
+        return {
+            **VALID_EVENT,
+            "id": "evt-resolved-001",
+            "title": "Economic Crisis",
+            "category": "economic",
+            "response_consequence": {"treasury": 10, "stability": 5},
+            "default_consequence": {"treasury": -20, "stability": -10},
+        }
+
+    def test_returns_chained_event_on_successful_llm(self):
+        resolved = self._resolved_event()
+        chained = {**VALID_EVENT, "id": "evt-llm-chain-001", "chained_from": None}
+        mock_response = MagicMock()
+        mock_response.choices[0].message.content = json.dumps(chained)
+        with patch("engine.event_generator.build_prompt", return_value="prompt"):
+            with patch("engine.content.client") as mock_client:
+                mock_client.chat.completions.create.return_value = mock_response
+                with patch("engine.state.read_history", return_value=[]):
+                    result = _gen.generate_chained_event(resolved, True, BASE_STATE)
+        assert isinstance(result, dict)
+        assert result["chained_from"] == "evt-resolved-001"
+
+    def test_returns_none_on_llm_exception(self):
+        resolved = self._resolved_event()
+        with patch("engine.content.client") as mock_client:
+            mock_client.chat.completions.create.side_effect = Exception("LLM down")
+            with patch("engine.state.read_history", return_value=[]):
+                result = _gen.generate_chained_event(resolved, True, BASE_STATE)
+        assert result is None
+
+    def test_returns_none_on_invalid_llm_output(self):
+        resolved = self._resolved_event()
+        mock_response = MagicMock()
+        mock_response.choices[0].message.content = "not json"
+        with patch("engine.content.client") as mock_client:
+            mock_client.chat.completions.create.return_value = mock_response
+            with patch("engine.state.read_history", return_value=[]):
+                result = _gen.generate_chained_event(resolved, False, BASE_STATE)
+        assert result is None
+
+    def test_responded_true_uses_response_consequence(self):
+        resolved = self._resolved_event()
+        chained = {**VALID_EVENT, "id": "evt-llm-chain-002", "chained_from": None}
+        mock_response = MagicMock()
+        mock_response.choices[0].message.content = json.dumps(chained)
+        captured_prompt = {}
+        def capture_create(**kwargs):
+            captured_prompt["messages"] = kwargs["messages"]
+            return mock_response
+        with patch("engine.content.client") as mock_client:
+            mock_client.chat.completions.create.side_effect = capture_create
+            with patch("engine.state.read_history", return_value=[]):
+                _gen.generate_chained_event(resolved, True, BASE_STATE)
+        user_msg = captured_prompt["messages"][1]["content"]
+        assert "responded" in user_msg
+        assert "treasury: +10" in user_msg
+
+    def test_responded_false_uses_default_consequence(self):
+        resolved = self._resolved_event()
+        chained = {**VALID_EVENT, "id": "evt-llm-chain-003", "chained_from": None}
+        mock_response = MagicMock()
+        mock_response.choices[0].message.content = json.dumps(chained)
+        captured_prompt = {}
+        def capture_create(**kwargs):
+            captured_prompt["messages"] = kwargs["messages"]
+            return mock_response
+        with patch("engine.content.client") as mock_client:
+            mock_client.chat.completions.create.side_effect = capture_create
+            with patch("engine.state.read_history", return_value=[]):
+                _gen.generate_chained_event(resolved, False, BASE_STATE)
+        user_msg = captured_prompt["messages"][1]["content"]
+        assert "defaulted" in user_msg
+        assert "treasury: -20" in user_msg
+
 
 # ===========================================================================
 # Group 6: generate_event + _fallback_from_pool

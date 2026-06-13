@@ -217,6 +217,51 @@ def generate_event(state: dict) -> dict | None:
     return _fallback_from_pool(state)
 
 
+def generate_chained_event(resolved_event: dict, responded: bool, state: dict) -> dict | None:
+    """Generate a follow-up chained event via LLM after a resolved event."""
+    try:
+        from .content import client
+        from .state import read_history
+        outcome = "responded" if responded else "defaulted"
+        consequence_key = "response_consequence" if responded else "default_consequence"
+        effects = resolved_event.get(consequence_key, {})
+        effects_str = ", ".join(f"{k}: {v:+d}" for k, v in effects.items()) if effects else "none"
+        history = read_history()
+        trend = _build_world_trend(history)
+        chain_prompt = (
+            f"A world event just resolved. Citizens {outcome} to it.\n"
+            f"Resolved event: '{resolved_event.get('title', 'Unknown')}'\n"
+            f"Outcome effects: {effects_str}\n"
+            f"Current world trend: {trend}\n\n"
+            f"Generate a NEW follow-up event that naturally emerges from this outcome.\n"
+            f"The follow-up must feel causally connected — a direct consequence or ripple effect.\n"
+            f"It should have at least 20% chance of being a different category than '{resolved_event.get('category', 'natural')}'.\n\n"
+            f"Rarity guide: {_RARITY_GUIDE}\n\n"
+            f"Output schema:\n{_OUTPUT_SCHEMA}"
+        )
+        chain_prompt = chain_prompt.replace(
+            '"chained_from": null',
+            f'"chained_from": "{resolved_event.get("id", "unknown")}"'
+        )
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user", "content": chain_prompt},
+            ],
+            temperature=1.1,
+            max_tokens=600,
+        )
+        raw = response.choices[0].message.content or ""
+        event = parse_llm_output(raw)
+        if event and validate_event(event):
+            event["chained_from"] = resolved_event.get("id", "unknown")
+            return apply_clamps(event, state)
+    except Exception:
+        pass
+    return None
+
+
 def build_prompt(state: dict, history: list[dict]) -> str:
     """Build the user-turn prompt for LLM event generation."""
     metrics_lines = "\n".join(
