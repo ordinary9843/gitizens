@@ -1608,6 +1608,30 @@ function renderHeader(state) {
 // ── Next Tick countdown ───────────────────────────────────────────────────────
 
 let _tickTimer = null;
+let _tickPollTimer = null;
+
+function _startTickPoll(staleNextTickAt) {
+  if (_tickPollTimer) return;
+  _tickPollTimer = setInterval(async () => {
+    try {
+      const r = await fetch(`${RAW}/world/state.json`, {cache:'no-cache'});
+      if (!r.ok) return;
+      const fresh = await r.json();
+      if (fresh.next_tick_at && fresh.next_tick_at !== staleNextTickAt) {
+        clearInterval(_tickPollTimer);
+        _tickPollTimer = null;
+        lastState = fresh;
+        _writeCache(fresh);
+        renderHeader(fresh);
+        renderCityBg(fresh);
+        renderRadar(fresh);
+        renderWorldStats(fresh);
+        renderStructures(fresh);
+        renderMilestoneBadges(fresh);
+      }
+    } catch(_) {}
+  }, 60 * 1000);
+}
 
 function startTickCountdown(nextTickAt) {
   if (_tickTimer) clearInterval(_tickTimer);
@@ -1620,7 +1644,13 @@ function startTickCountdown(nextTickAt) {
   if (isNaN(target.getTime())) { el.textContent = ''; return; }
   function tick() {
     const rem = target - Date.now();
-    if (rem <= 0) { el.textContent = 'ticking now…'; return; }
+    if (rem <= 0) {
+      el.textContent = 'ticking now…';
+      clearInterval(_tickTimer);
+      _tickTimer = null;
+      _startTickPoll(nextTickAt);
+      return;
+    }
     const h = Math.floor(rem / 3600000);
     const m = Math.floor((rem % 3600000) / 60000);
     const s = Math.floor((rem % 60000) / 1000);
