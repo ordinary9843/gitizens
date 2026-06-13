@@ -351,6 +351,11 @@
   <div id="history-wrap"><canvas id="history-canvas"></canvas></div>
 </div>
 
+<div class="landing-section" id="gap-section">
+  <h2>WHAT NEEDS YOUR VOTE</h2>
+  <div id="gap-list"><p class="no-data">Loading…</p></div>
+</div>
+
 <div id="social-grid">
   <div class="landing-section">
     <h2>OPEN PROPOSALS</h2>
@@ -370,11 +375,6 @@
 <div class="landing-section" id="dispatch-section">
   <h2>WORLD CHRONICLE</h2>
   <div id="dispatch-list"><p class="no-data">Loading…</p></div>
-</div>
-
-<div class="landing-section" id="gap-section">
-  <h2>WHAT NEEDS YOUR VOTE</h2>
-  <div id="gap-list"><p class="no-data">Loading…</p></div>
 </div>
 
 <div class="landing-section" id="propose-section">
@@ -1468,6 +1468,19 @@ function renderHeader(state) {
   document.getElementById('era-day').textContent = `${dayStr}  ·  ${state.laws_count||0} laws`;
   document.getElementById('world-summary').textContent = state.world_summary || '';
   startTickCountdown(state.next_tick_at);
+
+  if (state.next_tick_at) {
+    try {
+      const raw = state.next_tick_at.replace(' ', 'T');
+      const nextTick = new Date((raw.includes('Z') || raw.includes('+')) ? raw : raw + 'Z');
+      const lastTick = new Date(nextTick.getTime() - 2 * 3600 * 1000);
+      const minsAgo = Math.round((Date.now() - lastTick.getTime()) / 60000);
+      const agoStr = minsAgo < 60
+        ? `${minsAgo}m ago`
+        : `${Math.floor(minsAgo / 60)}h ${String(minsAgo % 60).padStart(2,'0')}m ago`;
+      document.getElementById('last-updated').textContent = `World state from ${agoStr}`;
+    } catch(_) {}
+  }
 }
 
 // ── Next Tick countdown ───────────────────────────────────────────────────────
@@ -1680,36 +1693,44 @@ async function loadCooldowns() {
 
 // ── Proposals ────────────────────────────────────────────────────────────────
 
+function _renderProposalItems(issues) {
+  if (!issues.length) {
+    document.getElementById('proposals-list').innerHTML = '<p class="no-data">No open proposals right now.</p>'; return;
+  }
+  document.getElementById('proposals-list').innerHTML = issues.map(i => {
+    const age = Math.floor((Date.now() - new Date(i.created_at)) / 3600000);
+    const ageStr = age < 24 ? `${age}h ago` : `${Math.floor(age/24)}d ago`;
+    const forVotes = (i.reactions?.['+1'] ?? i.reactions?.plus1) ?? 0;
+    const againstVotes = (i.reactions?.['-1'] ?? i.reactions?.minus1) ?? 0;
+    const total = forVotes + againstVotes;
+    const forPct = total > 0 ? Math.round(forVotes / total * 100) : 0;
+    const voteBar = total > 0 ? `
+      <div class="vote-bar-wrap">
+        <div class="vote-bar-for"     style="width:${forPct}%"></div>
+        <div class="vote-bar-against" style="width:${100-forPct}%"></div>
+      </div>` : '';
+    return `<div class="proposal-item">
+      <span class="proposal-votes">+${forVotes}${againstVotes > 0 ? ` -${againstVotes}` : ''}</span>
+      <span class="proposal-title" style="flex:1">
+        ${i.title.replace(/^\[(PROPOSAL|AI-PROPOSAL|FEEDBACK)\]\s*/,'')}
+        ${voteBar}
+      </span>
+      <span style="color:var(--dim);font-size:10px">${ageStr}</span>
+      <a class="proposal-link" href="${i.html_url}" target="_blank">Vote →</a>
+    </div>`;
+  }).join('');
+}
+
 async function loadProposals() {
+  try {
+    const r = await fetch(`${RAW}/world/proposals.json`, {cache:'no-cache'});
+    if (r.ok) { _renderProposalItems(await r.json()); return; }
+  } catch(_) {}
+  // Fallback: live GitHub API (rate-limited, last resort)
   try {
     const r = await fetch(`${REPO_API}/issues?labels=proposal&state=open&per_page=8`, {cache:'no-cache'});
     if (!r.ok) throw new Error();
-    const issues = await r.json();
-    if (!issues.length) {
-      document.getElementById('proposals-list').innerHTML = '<p class="no-data">No open proposals right now.</p>'; return;
-    }
-    document.getElementById('proposals-list').innerHTML = issues.map(i => {
-      const age = Math.floor((Date.now() - new Date(i.created_at)) / 3600000);
-      const ageStr = age < 24 ? `${age}h ago` : `${Math.floor(age/24)}d ago`;
-      const forVotes = i.reactions?.['+1'] ?? 0;
-      const againstVotes = i.reactions?.['-1'] ?? 0;
-      const total = forVotes + againstVotes;
-      const forPct = total > 0 ? Math.round(forVotes / total * 100) : 0;
-      const voteBar = total > 0 ? `
-        <div class="vote-bar-wrap">
-          <div class="vote-bar-for"     style="width:${forPct}%"></div>
-          <div class="vote-bar-against" style="width:${100-forPct}%"></div>
-        </div>` : '';
-      return `<div class="proposal-item">
-        <span class="proposal-votes">+${forVotes}${againstVotes > 0 ? ` -${againstVotes}` : ''}</span>
-        <span class="proposal-title" style="flex:1">
-          ${i.title.replace(/^\[(PROPOSAL|AI-PROPOSAL|FEEDBACK)\]\s*/,'')}
-          ${voteBar}
-        </span>
-        <span style="color:var(--dim);font-size:10px">${ageStr}</span>
-        <a class="proposal-link" href="${i.html_url}" target="_blank">Vote →</a>
-      </div>`;
-    }).join('');
+    _renderProposalItems(await r.json());
   } catch(_) {
     document.getElementById('proposals-list').innerHTML = '<p class="no-data">Unable to load proposals.</p>';
   }
@@ -1849,7 +1870,6 @@ async function load() {
   renderWorldStats(s);
   renderStructures(s);
   renderMilestoneBadges(s);
-  document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
 
   // Phase 2: secondary (parallel)
   Promise.all([

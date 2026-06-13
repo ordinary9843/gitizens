@@ -398,3 +398,25 @@ def _ensure_labels():
     for name, color, desc in labels:
         run(["gh", "label", "create", name, "--repo", REPO,
              "--color", color, "--description", desc, "--force"])
+
+
+def save_proposals_json():
+    issues = gh_json([
+        "api", f"repos/{REPO}/issues?labels=proposal&state=open&per_page=10",
+    ])
+    minimal = [
+        {
+            "number": i["number"],
+            "title": i["title"],
+            "html_url": i["html_url"],
+            "created_at": i["created_at"],
+            "reactions": {
+                "+1": (i.get("reactions") or {}).get("+1", 0),
+                "-1": (i.get("reactions") or {}).get("-1", 0),
+            },
+        }
+        for i in (issues if isinstance(issues, list) else [])
+    ]
+    Path("world/proposals.json").write_text(
+        json.dumps(minimal, indent=2), encoding="utf-8"
+    )

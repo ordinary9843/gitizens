@@ -41,5 +41,5 @@ from .proposals import (
     parse_effect, next_law_number,
     get_open_proposals, get_ai_proposals, get_feedbacks,
     process_issue, process_ai_proposal, process_feedback,
-    _ensure_labels,
+    _ensure_labels, save_proposals_json,
 )

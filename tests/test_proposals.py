@@ -389,3 +389,57 @@ class TestRepresentativeVotingPeriod:
             tv.process_issue(self._issue(25, "bob"))
             _engine_proposals.SKIP_TIMING = True
         assert reactions_called, "25h > 24h window — non-rep bob should be tallied"
+
+
+# ===========================================================================
+# save_proposals_json
+# ===========================================================================
+
+class TestSaveProposalsJson:
+    def _setup(self, tmp_path):
+        (tmp_path / "world").mkdir(parents=True, exist_ok=True)
+
+    def test_writes_minimal_fields(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup(tmp_path)
+        api_response = [
+            {
+                "number": 5,
+                "title": "[PROPOSAL] Build Park",
+                "html_url": "https://github.com/org/repo/issues/5",
+                "created_at": "2026-06-13T00:00:00Z",
+                "reactions": {"+1": 3, "-1": 1, "total_count": 4},
+            }
+        ]
+        with patch.object(_engine_proposals, "gh_json", return_value=api_response):
+            _engine_proposals.save_proposals_json()
+        out = json.loads((tmp_path / "world/proposals.json").read_text())
+        assert len(out) == 1
+        assert out[0]["number"] == 5
+        assert out[0]["reactions"]["+1"] == 3
+        assert out[0]["reactions"]["-1"] == 1
+        assert set(out[0].keys()) == {"number", "title", "html_url", "created_at", "reactions"}
+
+    def test_handles_empty_response(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup(tmp_path)
+        with patch.object(_engine_proposals, "gh_json", return_value=[]):
+            _engine_proposals.save_proposals_json()
+        out = json.loads((tmp_path / "world/proposals.json").read_text())
+        assert out == []
+
+    def test_handles_missing_reactions(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup(tmp_path)
+        api_response = [
+            {
+                "number": 7,
+                "title": "[PROPOSAL] Tax Cut",
+                "html_url": "https://github.com/org/repo/issues/7",
+                "created_at": "2026-06-13T00:00:00Z",
+            }
+        ]
+        with patch.object(_engine_proposals, "gh_json", return_value=api_response):
+            _engine_proposals.save_proposals_json()
+        out = json.loads((tmp_path / "world/proposals.json").read_text())
+        assert out[0]["reactions"] == {"+1": 0, "-1": 0}
