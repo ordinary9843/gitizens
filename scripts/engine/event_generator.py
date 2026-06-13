@@ -166,6 +166,58 @@ def _load_recent_event_history(n: int = 3) -> list[str]:
         return []
 
 
+def _fallback_from_pool(state: dict) -> dict | None:
+    """Select a random event from world/event_pool.json, weighted by CATEGORY_MULTIPLIERS."""
+    try:
+        import random
+        from pathlib import Path
+        from .constants import CATEGORY_MULTIPLIERS
+        pool_path = Path(__file__).parent.parent.parent / "world" / "event_pool.json"
+        pool = json.loads(pool_path.read_text(encoding="utf-8"))
+        if not pool:
+            return None
+        weights = []
+        for evt in pool:
+            cat = evt.get("category", "")
+            weight = 1.0
+            rules = CATEGORY_MULTIPLIERS.get(cat, [])
+            for metric, direction, threshold, multiplier in rules:
+                val = state.get(metric, 50)
+                if direction == "low" and val < threshold:
+                    weight *= multiplier
+                elif direction == "high" and val >= threshold:
+                    weight *= multiplier
+            weights.append(weight)
+        return random.choices(pool, weights=weights, k=1)[0]
+    except Exception:
+        return None
+
+
+def generate_event(state: dict) -> dict | None:
+    """Generate a world event via LLM, falling back to the pool on any failure."""
+    try:
+        from .content import client
+        from .state import read_history
+        history = read_history()
+        prompt = build_prompt(state, history)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=1.0,
+            max_tokens=600,
+        )
+        raw = response.choices[0].message.content or ""
+        event = parse_llm_output(raw)
+        if event and validate_event(event):
+            return apply_clamps(event, state)
+    except Exception:
+        pass
+    return _fallback_from_pool(state)
+
+
 def build_prompt(state: dict, history: list[dict]) -> str:
     """Build the user-turn prompt for LLM event generation."""
     metrics_lines = "\n".join(

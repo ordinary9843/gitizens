@@ -64,3 +64,12 @@ THRESHOLD_TAGS = [
 ]
 
 RARITY_WEIGHTS = {"common": 60, "uncommon": 25, "rare": 10, "legendary": 5}
+
+CATEGORY_MULTIPLIERS: dict[str, list[tuple[str, str, int | float, float]]] = {
+    "natural":    [("green_policy", "low",  40, 2.0), ("green_policy", "high", 70, 0.6)],
+    "economic":   [("industry",     "high", 60, 1.5), ("treasury",     "low",  50, 1.4)],
+    "health":     [("welfare",      "low",  35, 2.0), ("welfare",      "high", 65, 0.6)],
+    "security":   [("defense",      "low",  35, 2.0)],
+    "scientific": [("education",    "high", 65, 1.5)],
+    "social":     [("welfare",      "low",  40, 1.5), ("stability",    "low",  40, 1.5)],
+}

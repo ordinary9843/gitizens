@@ -55,6 +55,14 @@ def save_active_event(event: dict):
     )
 
 
+def read_history() -> list:
+    hist_path = Path("world/history.json")
+    try:
+        return json.loads(hist_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
 def append_history_snapshot(state: dict):
     hist_path = Path("world/history.json")
     try:
