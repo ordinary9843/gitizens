@@ -482,3 +482,33 @@ class TestGenerateEvent:
                         result = _gen.generate_event(BASE_STATE)
         assert isinstance(result, dict)
         assert result["id"] == "evt-llm-001"
+
+
+# ===========================================================================
+# Group 7: fire_random_event integration (via events.py)
+# ===========================================================================
+
+class TestFireRandomEvent:
+    def test_returns_none_when_random_above_threshold(self):
+        with patch("engine.events.random") as mock_random:
+            mock_random.random.return_value = 0.9
+            from engine.events import fire_random_event
+            result = fire_random_event(BASE_STATE)
+        assert result is None
+
+    def test_calls_generate_event_when_triggered(self):
+        expected = dict(VALID_EVENT)
+        with patch("engine.events.random") as mock_random:
+            mock_random.random.return_value = 0.05
+            with patch("engine.events.generate_event", return_value=expected) as mock_gen:
+                from engine.events import fire_random_event
+                result = fire_random_event(BASE_STATE)
+        assert result == expected
+
+    def test_returns_none_when_generate_event_returns_none(self):
+        with patch("engine.events.random") as mock_random:
+            mock_random.random.return_value = 0.05
+            with patch("engine.events.generate_event", return_value=None):
+                from engine.events import fire_random_event
+                result = fire_random_event(BASE_STATE)
+        assert result is None

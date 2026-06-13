@@ -13,71 +13,52 @@ from tests.helpers import (
     _engine_chronicle, _engine_content, _engine_proposals,
     _make_category,
 )
+from engine.events import fire_chained_event
 
 
 # ===========================================================================
-# Event pool loading and eligibility
+# fire_random_event — LLM-delegating implementation
 # ===========================================================================
 
 class TestEventEligibility:
-    SAMPLE_POOL = [
-        {"id": "evt-test-common", "rarity": "common", "trigger_conditions": {},
-         "immediate_effects": {}, "default_consequence": {}, "response_consequence": {}},
-        {"id": "evt-test-edu", "rarity": "rare", "trigger_conditions": {"education": {"min": 70}},
-         "immediate_effects": {}, "default_consequence": {}, "response_consequence": {}},
-        {"id": "evt-test-asteroid", "rarity": "legendary",
-         "trigger_conditions": {"education": {"min": 70}},
-         "immediate_effects": {}, "default_consequence": {}, "response_consequence": {}},
-    ]
-
-    def test_eligible_without_conditions(self):
-        state = {**BASE_STATE, "education": 30}
-        with patch.object(_engine_events, "load_event_pool", return_value=self.SAMPLE_POOL):
-            # 15% chance — force it by mocking random
-            with patch("engine.events.random.random", return_value=0.05):
-                with patch("engine.events.random.choices",
-                           side_effect=lambda pop, weights, k: [pop[0]]) as mock_choices:
-                    result = tv.fire_random_event(state)
-                    chosen_pool = mock_choices.call_args[0][0]
-                    # edu=30 < 70, so evt-test-edu and evt-test-asteroid must be excluded
-                    assert all(e["id"] == "evt-test-common" for e in chosen_pool)
-
-    def test_high_education_unlocks_events(self):
-        state = {**BASE_STATE, "education": 75}
-        with patch.object(_engine_events, "load_event_pool", return_value=self.SAMPLE_POOL):
-            with patch("engine.events.random.random", return_value=0.05):
-                with patch("engine.events.random.choices",
-                           side_effect=lambda pop, weights, k: [pop[0]]) as mock_choices:
-                    tv.fire_random_event(state)
-                    chosen_pool = mock_choices.call_args[0][0]
-                    assert len(chosen_pool) == 3  # all three eligible
-
-    def test_edu_bonus_increases_rare_weight(self):
-        state = {**BASE_STATE, "education": 75}  # >70 → edu_bonus = 5
-        with patch.object(_engine_events, "load_event_pool", return_value=self.SAMPLE_POOL):
-            with patch("engine.events.random.random", return_value=0.05):
-                with patch("engine.events.random.choices",
-                           side_effect=lambda pop, weights, k: [pop[0]]) as mock_choices:
-                    tv.fire_random_event(state)
-                    weights = mock_choices.call_args[1]["weights"]
-                    # rare weight = 10 + 5 = 15, legendary = 5 + 5 = 10, common = 60
-                    assert weights[1] == 15   # rare + edu_bonus
-                    assert weights[2] == 10   # legendary + edu_bonus
-                    assert weights[0] == 60   # common unchanged
-
-    def test_no_trigger_at_15_percent_boundary(self):
+    def test_no_trigger_above_threshold(self):
         state = {**BASE_STATE}
-        with patch.object(_engine_events, "load_event_pool", return_value=self.SAMPLE_POOL):
-            with patch("engine.events.random.random", return_value=0.16):
-                result = tv.fire_random_event(state)
-                assert result is None
+        with patch("engine.events.random.random", return_value=0.16):
+            result = tv.fire_random_event(state)
+            assert result is None
 
-    def test_empty_pool_returns_none(self):
+    def test_no_trigger_at_boundary(self):
         state = {**BASE_STATE}
-        with patch.object(_engine_events, "load_event_pool", return_value=[]):
-            with patch("engine.events.random.random", return_value=0.05):
-                result = tv.fire_random_event(state)
-                assert result is None
+        with patch("engine.events.random.random", return_value=0.16):
+            result = tv.fire_random_event(state)
+            assert result is None
+
+    def test_triggers_and_returns_generate_event_result(self):
+        expected = {"id": "evt-llm-1", "title": "Storm", "category": "natural"}
+        with patch("engine.events.random.random", return_value=0.05):
+            with patch("engine.events.generate_event", return_value=expected) as mock_gen:
+                result = tv.fire_random_event(BASE_STATE)
+        assert result == expected
+        mock_gen.assert_called_once_with(BASE_STATE)
+
+    def test_returns_none_when_generate_event_returns_none(self):
+        with patch("engine.events.random.random", return_value=0.05):
+            with patch("engine.events.generate_event", return_value=None):
+                result = tv.fire_random_event(BASE_STATE)
+        assert result is None
+
+    def test_probability_threshold_is_15_percent(self):
+        # random() == 0.15 means random() > 0.15 is False, so event fires
+        with patch("engine.events.random.random", return_value=0.15):
+            with patch("engine.events.generate_event", return_value={"id": "x"}) as mock_gen:
+                tv.fire_random_event(BASE_STATE)
+        mock_gen.assert_called_once()
+
+    def test_random_above_threshold_skips_generate(self):
+        with patch("engine.events.random.random", return_value=0.9):
+            with patch("engine.events.generate_event") as mock_gen:
+                tv.fire_random_event(BASE_STATE)
+        mock_gen.assert_not_called()
 
 
 # ===========================================================================
@@ -182,67 +163,64 @@ class TestCrisisMultiplier:
 # ===========================================================================
 
 class TestEventChain:
-    BASE_CHAIN_EVENT = {
-        "id": "evt-recovery",
-        "title": "Recovery",
-        "immediate_effects": {},
-        "trigger_conditions": {},
-        "rarity": "common",
-        "duration_hours": 4,
-        "default_consequence": {},
-        "response_consequence": {},
-    }
+    def _resolved(self):
+        return {
+            "id": "evt-001",
+            "title": "Flood",
+            "category": "natural",
+            "immediate_effects": {"welfare": -10},
+            "response_consequence": {"treasury": 5},
+            "default_consequence": {"treasury": -5},
+            "duration_hours": 4,
+            "issue_number": 42,
+        }
 
-    def test_no_chain_field_does_nothing(self, tmp_path, monkeypatch):
-        monkeypatch.chdir(tmp_path)
-        (tmp_path / "world").mkdir()
-        (tmp_path / "world/active_event.json").write_text("{}")
-        (tmp_path / "world/event_pool.json").write_text("[]")
-        tv.fire_chained_event({"id": "evt-drought", "title": "Drought"}, responded=True)
-        assert json.loads((tmp_path / "world/active_event.json").read_text()) == {}
+    def test_chain_fires_when_llm_returns_event(self):
+        chained = {
+            "id": "evt-chain-001",
+            "title": "Rescue Effort",
+            "category": "social",
+            "rarity": "common",
+            "description": "Citizens rally.",
+            "flavor": "",
+            "immediate_effects": {"welfare": 5},
+            "response_consequence": {},
+            "default_consequence": {},
+            "response_hint": "",
+            "duration_hours": 4,
+            "chained_from": "evt-001",
+        }
+        with patch("engine.events.generate_chained_event", return_value=chained) as mock_gen:
+            with patch("engine.events.load_active_event", return_value=None):
+                with patch("engine.events.read_state", return_value={"treasury": 200}):
+                    with patch("engine.events.apply_event_effects"):
+                        with patch("engine.events.open_event_issue", return_value=99):
+                            with patch("engine.events.save_active_event") as mock_save:
+                                fire_chained_event(self._resolved(), True)
+        mock_gen.assert_called_once()
+        mock_save.assert_called_once()
 
-    def test_chain_on_response_fires_next(self, tmp_path, monkeypatch):
-        monkeypatch.chdir(tmp_path)
-        (tmp_path / "world").mkdir()
-        (tmp_path / "world/active_event.json").write_text("{}")
-        (tmp_path / "world/event_pool.json").write_text(json.dumps([self.BASE_CHAIN_EVENT]))
-        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
-        event = {"id": "evt-drought", "title": "Drought",
-                 "triggers_next_on_response": "evt-recovery"}
-        with patch.object(_engine_events, "open_event_issue", return_value=99), \
-             patch.object(_engine_events, "apply_event_effects"):
-            tv.fire_chained_event(event, responded=True)
-        active = json.loads((tmp_path / "world/active_event.json").read_text())
-        assert active.get("id") == "evt-recovery"
-        assert active.get("chained_from") == "evt-drought"
-        assert active.get("issue_number") == 99
+    def test_chain_skipped_when_llm_returns_none(self):
+        with patch("engine.events.generate_chained_event", return_value=None):
+            with patch("engine.events.load_active_event", return_value=None):
+                with patch("engine.events.read_state", return_value={}):
+                    with patch("engine.events.save_active_event") as mock_save:
+                        fire_chained_event(self._resolved(), False)
+        mock_save.assert_not_called()
 
-    def test_chain_on_default_fires_different(self, tmp_path, monkeypatch):
-        monkeypatch.chdir(tmp_path)
-        (tmp_path / "world").mkdir()
-        (tmp_path / "world/active_event.json").write_text("{}")
-        famine = {**self.BASE_CHAIN_EVENT, "id": "evt-famine", "title": "Famine"}
-        (tmp_path / "world/event_pool.json").write_text(json.dumps([famine]))
-        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
-        event = {"id": "evt-drought", "title": "Drought",
-                 "triggers_next_on_default": "evt-famine"}
-        with patch.object(_engine_events, "open_event_issue", return_value=42), \
-             patch.object(_engine_events, "apply_event_effects"):
-            tv.fire_chained_event(event, responded=False)
-        active = json.loads((tmp_path / "world/active_event.json").read_text())
-        assert active.get("id") == "evt-famine"
+    def test_no_chain_when_event_already_active(self):
+        with patch("engine.events.load_active_event", return_value={"id": "active"}):
+            with patch("engine.events.generate_chained_event") as mock_gen:
+                fire_chained_event(self._resolved(), True)
+        mock_gen.assert_not_called()
 
-    def test_no_chain_when_event_already_active(self, tmp_path, monkeypatch):
-        monkeypatch.chdir(tmp_path)
-        (tmp_path / "world").mkdir()
-        existing = {**self.BASE_CHAIN_EVENT, "id": "evt-existing", "fired_at": "2026-01-01T00:00:00+00:00"}
-        (tmp_path / "world/active_event.json").write_text(json.dumps(existing))
-        (tmp_path / "world/event_pool.json").write_text(json.dumps([self.BASE_CHAIN_EVENT]))
-        event = {"id": "evt-drought", "title": "Drought",
-                 "triggers_next_on_response": "evt-recovery"}
-        with patch.object(tv, "open_event_issue") as mock_open:
-            tv.fire_chained_event(event, responded=True)
-            mock_open.assert_not_called()
+    def test_chain_response_true_passed_to_generator(self):
+        with patch("engine.events.generate_chained_event", return_value=None) as mock_gen:
+            with patch("engine.events.load_active_event", return_value=None):
+                with patch("engine.events.read_state", return_value={}):
+                    fire_chained_event(self._resolved(), True)
+        args = mock_gen.call_args
+        assert args[0][1] is True  # responded=True passed through
 
 
 # ===========================================================================
@@ -378,68 +356,35 @@ class TestCheckEventExpiryVoting:
 
 
 # ===========================================================================
-# CATEGORY_MULTIPLIERS — event weights respond to world state
+# fire_random_event — probability threshold edge cases
 # ===========================================================================
 
 class TestCategoryMultipliers:
-    _NATURAL_EVENT = {
-        "id": "evt-nat", "category": "natural", "rarity": "common",
-        "trigger_conditions": {},
-        "immediate_effects": {}, "default_consequence": {}, "response_consequence": {},
-    }
-    _ECONOMIC_EVENT = {
-        "id": "evt-eco", "category": "economic", "rarity": "common",
-        "trigger_conditions": {},
-        "immediate_effects": {}, "default_consequence": {}, "response_consequence": {},
-    }
-    _HEALTH_EVENT = {
-        "id": "evt-hlt", "category": "health", "rarity": "common",
-        "trigger_conditions": {},
-        "immediate_effects": {}, "default_consequence": {}, "response_consequence": {},
-    }
-    _WEIRD_EVENT = {
-        "id": "evt-weird", "category": "weird", "rarity": "common",
-        "trigger_conditions": {},
-        "immediate_effects": {}, "default_consequence": {}, "response_consequence": {},
-    }
+    """Verify the 15% probability gate is the sole logic in fire_random_event."""
 
-    def _get_weights(self, pool, state):
-        captured = {}
-        def _capture(eligible, weights, k):
-            captured["weights"] = list(weights)
-            return [eligible[0]]
-        with patch.object(_engine_events, "load_event_pool", return_value=pool), \
-             patch("engine.events.random.random", return_value=0.05), \
-             patch("engine.events.random.choices", side_effect=_capture):
-            tv.fire_random_event(state)
-        return captured.get("weights", [])
+    def test_exactly_015_triggers_event(self):
+        # random() == 0.15 means 0.15 > 0.15 is False, so the event fires
+        with patch("engine.events.random.random", return_value=0.15):
+            with patch("engine.events.generate_event", return_value={"id": "x"}) as mock_gen:
+                tv.fire_random_event(BASE_STATE)
+        mock_gen.assert_called_once()
 
-    def test_low_green_boosts_natural_weight(self):
-        state = {**BASE_STATE, "green_policy": 20}
-        weights = self._get_weights([self._NATURAL_EVENT, self._ECONOMIC_EVENT], state)
-        # natural: base 60 * 2.0 (green_policy=20 < 40)
-        # economic: base 60, no green_policy multiplier
-        assert weights[0] == 120.0
-        assert weights[1] == 60
+    def test_just_above_015_skips_event(self):
+        with patch("engine.events.random.random", return_value=0.151):
+            with patch("engine.events.generate_event") as mock_gen:
+                result = tv.fire_random_event(BASE_STATE)
+        assert result is None
+        mock_gen.assert_not_called()
 
-    def test_high_industry_boosts_economic_weight(self):
-        # green_policy=50: above "low" threshold (40) and below "high" threshold (70)
-        # so natural event gets no multiplier and stays at base 60
-        state = {**BASE_STATE, "industry": 80, "treasury": 100, "green_policy": 50}
-        weights = self._get_weights([self._NATURAL_EVENT, self._ECONOMIC_EVENT], state)
-        # economic: base 60 * 1.5 (industry=80 >= 60)
-        # natural: unaffected by industry, green_policy=50 is neutral
-        assert weights[1] == 90.0
-        assert weights[0] == 60
+    def test_zero_always_triggers(self):
+        with patch("engine.events.random.random", return_value=0.0):
+            with patch("engine.events.generate_event", return_value={"id": "y"}) as mock_gen:
+                tv.fire_random_event(BASE_STATE)
+        mock_gen.assert_called_once()
 
-    def test_multipliers_stack_correctly(self):
-        # economic with both industry>=60 AND treasury<50: mult = 1.5 * 1.4 = 2.1
-        state = {**BASE_STATE, "industry": 70, "treasury": 20}
-        weights = self._get_weights([self._ECONOMIC_EVENT], state)
-        assert abs(weights[0] - 60 * 1.5 * 1.4) < 0.01
-
-    def test_unaffected_category_unchanged(self):
-        # "weird" is not in CATEGORY_MULTIPLIERS — weight stays at base 60
-        state = {**BASE_STATE, "green_policy": 5, "welfare": 5, "defense": 5}
-        weights = self._get_weights([self._WEIRD_EVENT], state)
-        assert weights[0] == 60
+    def test_generate_event_receives_full_state(self):
+        state = {**BASE_STATE, "treasury": 999}
+        with patch("engine.events.random.random", return_value=0.05):
+            with patch("engine.events.generate_event", return_value=None) as mock_gen:
+                tv.fire_random_event(state)
+        mock_gen.assert_called_once_with(state)

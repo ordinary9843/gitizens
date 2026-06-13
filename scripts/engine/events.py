@@ -6,44 +6,15 @@ from pathlib import Path
 
 from .constants import RARITY_WEIGHTS, CATEGORY_MULTIPLIERS
 from .gh import run, gh_json, get_reactions, REPO
-from .state import load_event_pool, load_active_event, save_active_event
+from .state import load_event_pool, load_active_event, save_active_event, read_state
 from .world import apply_event_effects
+from .event_generator import generate_event, generate_chained_event
 
 
 def fire_random_event(state: dict) -> dict | None:
     if random.random() > 0.15:
         return None
-    pool = load_event_pool()
-    if not pool:
-        return None
-    edu = state.get("education", 0)
-    edu_bonus = 5 if edu > 70 else 0
-    eligible = []
-    for event in pool:
-        conds = event.get("trigger_conditions", {})
-        ok = all(
-            (state.get(f, 0) >= r.get("min", 0) and state.get(f, 0) <= r.get("max", 999))
-            for f, r in conds.items()
-        )
-        if ok:
-            eligible.append(event)
-    if not eligible:
-        return None
-    weights = [
-        RARITY_WEIGHTS.get(e.get("rarity", "common"), 60) +
-        (edu_bonus if e.get("rarity") in ("rare", "legendary") else 0)
-        for e in eligible
-    ]
-    # Apply category-based multipliers so event frequency responds to world state.
-    for i, event in enumerate(eligible):
-        cat = event.get("category", "")
-        for metric, direction, threshold, mult in CATEGORY_MULTIPLIERS.get(cat, []):
-            val = state.get(metric, 0)
-            if direction == "low" and val < threshold:
-                weights[i] *= mult
-            elif direction == "high" and val >= threshold:
-                weights[i] *= mult
-    return random.choices(eligible, weights=weights, k=1)[0]
+    return generate_event(state)
 
 
 def open_event_issue(event: dict) -> int:
@@ -151,21 +122,18 @@ def check_event_expiry(laws_enacted_this_tick: int) -> bool:
 
 
 def fire_chained_event(resolved_event: dict, responded: bool):
-    chain_key = "triggers_next_on_response" if responded else "triggers_next_on_default"
-    next_evt_id = resolved_event.get(chain_key)
-    if not next_evt_id:
+    if load_active_event():
         return
-    pool = load_event_pool()
-    next_evt = next((e for e in pool if e.get("id") == next_evt_id), None)
-    if not next_evt or load_active_event():
+    state = read_state()
+    next_evt = generate_chained_event(resolved_event, responded, state)
+    if not next_evt:
         return
-    print(f"  Event chain: {resolved_event.get('title')} -> {next_evt['title']}")
+    print(f"  Event chain: {resolved_event.get('title')} -> {next_evt.get('title')}")
     apply_event_effects(next_evt, "immediate_effects")
     issue_num = open_event_issue(next_evt)
     next_evt = json.loads(json.dumps(next_evt))
     next_evt["fired_at"] = datetime.now(timezone.utc).isoformat()
     next_evt["issue_number"] = issue_num
-    next_evt["chained_from"] = resolved_event.get("id")
     save_active_event(next_evt)
 
 
