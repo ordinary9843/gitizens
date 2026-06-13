@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-13T19:43:42.198800+00:00",
+  "updated_at": "2026-06-13T21:21:17.687844+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -16,11 +16,11 @@
       "gap": 10
     },
     {
-      "name": "Eco-Research Center",
-      "metric": "green_policy",
-      "current": 67,
-      "target": 85,
-      "gap": 18
+      "name": "Defense Ministry",
+      "metric": "defense",
+      "current": 53,
+      "target": 65,
+      "gap": 12
     }
   ],
   "at_risk": [],
@@ -31,13 +31,6 @@
       "current": 45,
       "target": 50,
       "gap": 5
-    },
-    {
-      "tag": "milestone/militarized-state",
-      "metric": "defense",
-      "current": 47,
-      "target": 50,
-      "gap": 3
     },
     {
       "tag": "crisis/pollution-crisis",

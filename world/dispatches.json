@@ -1,12 +1,5 @@
 [
   {
-    "tick": 16,
-    "date": "2026-06-11",
-    "narrative": "In a significant development for the Gitizens, the autonomous tick has successfully concluded, bringing the population to 2,150 and stabilizing the treasury at 75 GC. With a current stability rating of 50 out of 100 and pollution levels remaining at a clean 0, the Founding Era continues to lay the groundwork for future growth and governance.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 2,150 \u00b7 treasury 75 GC \u00b7 stability 50/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 17,
     "date": "2026-06-13",
     "narrative": "In a significant progression for the Gitizens, the latest tick has brought the population to a robust 2,300, yet stability remains precariously low at 49 out of 100. With a treasury holding steady at 103 GC and no new proposals or achievements to report, the Founding Era teeters on the brink, raising concerns about the future sustainability of this burgeoning civilization.",
@@ -68,5 +61,12 @@
     "narrative": "In a pivotal moment for the Gitizens, the Founding Era witnesses its latest tick, bringing the population to 2,995 as stability remains tenuous at 44 out of 100. With a modest treasury of 9 GC and no significant proposals or achievements emerging, the community grapples with the enigmatic event dubbed \"The Unseen Artist,\" casting a shadow over the burgeoning civilization. As pollution levels remain at a pristine 0, the future hangs in delicate balance, urging the citizens to harness their creativity and resolve.",
     "changes": "autonomous tick applied \u00b7 event: The Unseen Artist",
     "metrics": "population 2,995 \u00b7 treasury 9 GC \u00b7 stability 44/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 26,
+    "date": "2026-06-13",
+    "narrative": "In a significant development for the Gitizens, the population has reached a milestone of 3,029 as the Founding Era progresses, though stability remains precarious at 43 out of 100. The recent event, \"The Unseen Artist,\" has left citizens pondering the implications of creativity in their burgeoning society, as they strive to balance innovation with the challenges of governance. With the treasury still at 0 GC and pollution levels at a steady 0, the community stands at a crossroads, awaiting direction in these formative times.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: The Unseen Artist",
+    "metrics": "population 3,029 \u00b7 treasury 0 GC \u00b7 stability 43/100 \u00b7 pollution 0/100"
   }
 ]
