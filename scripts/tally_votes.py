@@ -32,6 +32,7 @@ from engine import (
     next_entity_id, entity_exists_by_name, auto_create_entity, auto_remove_entity,
     world_autonomous_tick, run_world_engine, apply_effect, apply_event_effects,
     determine_era, check_threshold_tags, apply_tags,
+    compute_next_tick_at,
     # events
     fire_random_event, open_event_issue, close_event_issue,
     check_event_expiry, fire_chained_event, apply_crisis_multiplier,
@@ -152,14 +153,8 @@ def main():
     save_proposals_json()
     generate_citizen_narrator()
 
-    _now = datetime.now(timezone.utc)
-    _next_hour = ((_now.hour // 4) + 1) * 4
-    if _next_hour >= 24:
-        _next_tick = _now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
-    else:
-        _next_tick = _now.replace(hour=_next_hour, minute=0, second=0, microsecond=0)
     _state = read_state()
-    _state["next_tick_at"] = _next_tick.strftime("%Y-%m-%dT%H:%M:%SZ")
+    _state["next_tick_at"] = compute_next_tick_at(datetime.now(timezone.utc))
     _state["world_summary"] = update_world_summary(_state)
     write_state(_state)
 

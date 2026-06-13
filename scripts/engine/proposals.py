@@ -99,29 +99,9 @@ def process_issue(issue: dict):
         law_number   = next_law_number()
         state_before = read_state()
 
+        extra_cost = 0
         if effect_data and effect_data.get("type") == "policy":
-            treasury = state_before.get("treasury", 0)
-            currency = state_before.get("currency", "Git Coins")
-            if treasury < POLICY_COST:
-                print(f"  #{number}: TREASURY BLOCKED — needs {POLICY_COST}, has {treasury}")
-                stats = read_stats()
-                stats["proposals_total"]    = stats.get("proposals_total", 0) + 1
-                stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
-                write_stats(stats)
-                run(["gh", "issue", "comment", str(number), "--repo", REPO,
-                     "--body",
-                     f"**Proposal blocked: insufficient treasury.**\n\n"
-                     f"Enacting this policy costs **{POLICY_COST} {currency}**.\n"
-                     f"Current treasury: **{treasury} {currency}**.\n\n"
-                     f"Pass a treasury replenishment proposal first:\n"
-                     f"```yaml\ntype: state_patch\npatch:\n  treasury: {treasury + POLICY_COST + 200}\n```"])
-                run(["gh", "issue", "edit", str(number), "--repo", REPO,
-                     "--add-label", "rejected", "--remove-label", "proposal"])
-                run(["gh", "issue", "close", str(number), "--repo", REPO])
-                return
-
-        if effect_data and effect_data.get("type") == "policy":
-            ok, reason = check_proposal_cooldown(effect_data)
+            ok, reason, extra_cost = check_proposal_cooldown(effect_data)
             if not ok:
                 print(f"  #{number}: COOLDOWN BLOCKED at tally — {reason}")
                 stats = read_stats()
@@ -135,12 +115,37 @@ def process_issue(issue: dict):
                 run(["gh", "issue", "close", str(number), "--repo", REPO])
                 return
 
+            treasury = state_before.get("treasury", 0)
+            currency = state_before.get("currency", "Git Coins")
+            total_cost = POLICY_COST + extra_cost
+            if treasury < total_cost:
+                print(f"  #{number}: TREASURY BLOCKED — needs {total_cost}, has {treasury}")
+                stats = read_stats()
+                stats["proposals_total"]    = stats.get("proposals_total", 0) + 1
+                stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
+                write_stats(stats)
+                penalty_note = (
+                    f" (base **{POLICY_COST}** + repeat-touch surcharge **{extra_cost}**)"
+                    if extra_cost > 0 else ""
+                )
+                run(["gh", "issue", "comment", str(number), "--repo", REPO,
+                     "--body",
+                     f"**Proposal blocked: insufficient treasury.**\n\n"
+                     f"Enacting this policy costs **{total_cost} {currency}**{penalty_note}.\n"
+                     f"Current treasury: **{treasury} {currency}**.\n\n"
+                     f"Pass a treasury replenishment proposal first:\n"
+                     f"```yaml\ntype: state_patch\npatch:\n  treasury: {treasury + total_cost + 200}\n```"])
+                run(["gh", "issue", "edit", str(number), "--repo", REPO,
+                     "--add-label", "rejected", "--remove-label", "proposal"])
+                run(["gh", "issue", "close", str(number), "--repo", REPO])
+                return
+
         print(f"  #{number}: PASSED ({for_votes}+1 {against_votes}-1) -> law-{law_number:03d}")
         narrative = generate_narrative(clean_title, for_votes, against_votes, state_before)
 
         active_event_now = load_active_event()
         effect_data = apply_crisis_multiplier(effect_data, active_event_now)
-        apply_effect(effect_data, law_number)
+        apply_effect(effect_data, law_number, extra_cost=extra_cost)
         world_changes = run_world_engine(law_number)
 
         state = read_state()
@@ -162,7 +167,14 @@ def process_issue(issue: dict):
         cost_line = ""
         if effect_data and effect_data.get("type") == "policy":
             currency  = state_before.get("currency", "Git Coins")
-            cost_line = f"**Treasury:** -{POLICY_COST} {currency} (balance: {state.get('treasury', 0)} {currency})  \n"
+            total_cost = POLICY_COST + extra_cost
+            cost_breakdown = (
+                f" (base {POLICY_COST} + surcharge {extra_cost})" if extra_cost > 0 else ""
+            )
+            cost_line = (
+                f"**Treasury:** -{total_cost} {currency}{cost_breakdown} "
+                f"(balance: {state.get('treasury', 0)} {currency})  \n"
+            )
 
         proposer = issue.get("author", {}).get("login") or ""
         proposer_display = f"@{proposer}" if proposer else "*(unknown)*"
@@ -261,8 +273,9 @@ def process_ai_proposal(issue: dict):
     state_before = read_state()
     effect_data  = parse_effect(body)
 
+    extra_cost = 0
     if effect_data and effect_data.get("type") == "policy":
-        ok, reason = check_proposal_cooldown(effect_data)
+        ok, reason, extra_cost = check_proposal_cooldown(effect_data)
         if not ok:
             print(f"  AI-proposal #{number}: COOLDOWN BLOCKED — {reason}")
             run(["gh", "issue", "comment", str(number), "--repo", REPO,
@@ -276,7 +289,7 @@ def process_ai_proposal(issue: dict):
     narrative = generate_narrative(clean_title, 0, 0, state_before)
     active_event_now = load_active_event()
     effect_data = apply_crisis_multiplier(effect_data, active_event_now)
-    apply_effect(effect_data, law_number)
+    apply_effect(effect_data, law_number, extra_cost=extra_cost)
     world_changes = run_world_engine(law_number)
 
     state = read_state()

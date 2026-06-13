@@ -1746,27 +1746,45 @@ function renderHeader(state) {
 let _tickTimer = null;
 let _tickPollTimer = null;
 
+let _tickStuckSince = null;
+
+async function _pollFreshState(staleNextTickAt) {
+  try {
+    const url = `${RAW}/world/state.json?t=${Date.now()}`;
+    const r = await fetch(url, {cache:'no-store'});
+    if (!r.ok) return false;
+    const fresh = await r.json();
+    if (fresh.next_tick_at && fresh.next_tick_at !== staleNextTickAt) {
+      if (_tickPollTimer) { clearInterval(_tickPollTimer); _tickPollTimer = null; }
+      _tickStuckSince = null;
+      lastState = fresh;
+      _writeCache(fresh);
+      renderHeader(fresh);
+      renderCityBg(fresh);
+      renderRadar(fresh);
+      renderWorldStats(fresh);
+      renderStructures(fresh);
+      renderMilestoneBadges(fresh);
+      return true;
+    }
+  } catch(_) {}
+  return false;
+}
+
 function _startTickPoll(staleNextTickAt) {
   if (_tickPollTimer) return;
-  _tickPollTimer = setInterval(async () => {
-    try {
-      const r = await fetch(`${RAW}/world/state.json`, {cache:'no-cache'});
-      if (!r.ok) return;
-      const fresh = await r.json();
-      if (fresh.next_tick_at && fresh.next_tick_at !== staleNextTickAt) {
-        clearInterval(_tickPollTimer);
-        _tickPollTimer = null;
-        lastState = fresh;
-        _writeCache(fresh);
-        renderHeader(fresh);
-        renderCityBg(fresh);
-        renderRadar(fresh);
-        renderWorldStats(fresh);
-        renderStructures(fresh);
-        renderMilestoneBadges(fresh);
+  _tickStuckSince = _tickStuckSince || Date.now();
+  _pollFreshState(staleNextTickAt);
+  _tickPollTimer = setInterval(() => {
+    _pollFreshState(staleNextTickAt).then(updated => {
+      if (updated) return;
+      const stuckMin = Math.floor((Date.now() - _tickStuckSince) / 60000);
+      if (stuckMin >= 5) {
+        const el = document.getElementById('tick-countdown');
+        if (el) el.textContent = `waiting for tick (${stuckMin}m)`;
       }
-    } catch(_) {}
-  }, 60 * 1000);
+    });
+  }, 30 * 1000);
 }
 
 function startTickCountdown(nextTickAt) {

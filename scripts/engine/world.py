@@ -1,6 +1,6 @@
 import re
 import random
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .constants import (
@@ -11,8 +11,76 @@ from .state import read_json, write_json, read_state, write_state
 from .gh import run, SKIP_TIMING
 
 
+TICK_INTERVAL_HOURS = 2
+
+# Population dynamics — fractional per-tick rates. New population is
+# pop + births - deaths + migration + noise, floored at POPULATION_FLOOR.
+POPULATION_FLOOR = 100
+POPULATION_NOISE_PCT = 0.02  # ±2% uniform jitter per tick
+
+
+def compute_population_delta(
+    pop: int,
+    welfare: int,
+    pollution: int,
+    stability: int,
+    defense: int,
+    treasury: int,
+    rng: random.Random | None = None,
+) -> int:
+    """Return the new population after one tick of bidirectional dynamics.
+
+    Inputs are clamped at 0 for safety. Result is floored at POPULATION_FLOOR
+    so the civilization can never go extinct (gameplay sanity).
+    """
+    pop = max(0, int(pop))
+    welfare    = max(0, int(welfare))
+    pollution  = max(0, int(pollution))
+    stability  = max(0, int(stability))
+    defense    = max(0, int(defense))
+    treasury   = max(0, int(treasury))
+    rng = rng or random
+
+    birth_rate = 0.010
+    if welfare > 60:    birth_rate += 0.005
+    if treasury > 1000: birth_rate += 0.005
+    if stability > 70:  birth_rate += 0.003
+
+    death_rate = 0.008
+    if pollution > 70:  death_rate += 0.010
+    elif pollution > 50: death_rate += 0.006
+    if welfare < 30:    death_rate += 0.004
+
+    migration_rate = 0.0
+    if stability < 30:  migration_rate -= 0.015
+    if defense < 30:    migration_rate -= 0.008
+    if welfare > 70 and pollution < 30: migration_rate += 0.005
+
+    births    = round(pop * birth_rate)
+    deaths    = round(pop * death_rate)
+    migration = round(pop * migration_rate)
+    noise     = round(pop * rng.uniform(-POPULATION_NOISE_PCT, POPULATION_NOISE_PCT))
+
+    return max(POPULATION_FLOOR, pop + births - deaths + migration + noise)
+
+
 def slugify(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+
+
+def compute_next_tick_at(now: datetime) -> str:
+    """Return ISO timestamp for the next bot tick.
+
+    Advances `now` by `TICK_INTERVAL_HOURS` and snaps to the top of that hour.
+    Cron runs every 2 hours; this guarantees every consecutive run produces a
+    different timestamp, so `world/state.json` always becomes dirty on tick.
+    """
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
+    target = (now + timedelta(hours=TICK_INTERVAL_HOURS)).replace(
+        minute=0, second=0, microsecond=0
+    )
+    return target.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def pollution_level(state: dict) -> int:
@@ -118,12 +186,10 @@ def world_autonomous_tick() -> bool:
     pol_delta = +1 if ind - grn >= 20 else (-1 if grn - ind >= 20 else 0)
     new_pol = max(0, min(100, pol + pol_delta))
 
-    pop_delta = 50 if wel >= 40 else 0
-    if wel > 60:
-        pop_delta += 100
-    if new_pol >= 70:
-        pop_delta -= 50
-    new_pop = max(0, pop + pop_delta)
+    new_pop = compute_population_delta(
+        pop=pop, welfare=wel, pollution=new_pol,
+        stability=stb, defense=dfn, treasury=treasury,
+    )
 
     target_stb = max(0, min(100, 30 + wel // 5 + dfn // 10 - new_pol // 10))
     new_stb = stb + (1 if stb < target_stb else (-1 if stb > target_stb else 0))
@@ -195,7 +261,7 @@ def apply_event_effects(event: dict, consequence_key: str):
     write_state(state)
 
 
-def apply_effect(effect_data: dict | None, law_number: int):
+def apply_effect(effect_data: dict | None, law_number: int, extra_cost: int = 0):
     if not effect_data:
         return
     etype = effect_data.get("type", "declaration")
@@ -211,7 +277,7 @@ def apply_effect(effect_data: dict | None, law_number: int):
                 current = state.get(metric, 0)
                 state[metric] = max(0, min(100, current + int(delta)))
         if state.get("treasury") is not None:
-            state["treasury"] = max(0, state["treasury"] - POLICY_COST)
+            state["treasury"] = max(0, state["treasury"] - POLICY_COST - max(0, int(extra_cost)))
         write_state(state)
 
     elif etype == "evolve":
