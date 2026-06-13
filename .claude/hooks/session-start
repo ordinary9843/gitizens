@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
-# session-start: inject skill directory and project context into Claude Code session
-# Exit 0 = success, non-zero = failure (session continues regardless)
+# session-start: inject pointer to canonical project rules into Claude Code session.
+# Keep this hook minimal — canonical content lives in CLAUDE.md and .claude/rules/.
+# Exit 0 = success, non-zero = failure (session continues regardless).
 
 context="Gitizens — git-native civilization simulator.
 
-Available commands:
-  /git   — enforce conventional commit messages (<type>: <description>)
+Canonical references (read on demand):
+  - CLAUDE.md                    core constraints (world/ write rules, branch protection)
+  - .claude/rules/testing.md     three-step verification per change
+  - .claude/rules/python.md      source-code language and emoji rules
+  - .claude/skills/git/SKILL.md  commit message format and types
 
-Key rules:
-  - world/ files are only modified by scripts/tally_votes.py or GitHub Actions
-  - Run tests before engine changes: python -m pytest tests/ -q
-  - Syntax check after editing tally_votes.py: python -c \"import ast; ast.parse(open('scripts/tally_votes.py').read()); print('OK')\"
-  - Never force-push master; never add Co-Authored-By trailers
-  - All source code, comments, print statements, and messages must be in English
-  - No emoji in Python source code (print statements, comments, docstrings)
-  - Every feature requires: tests passing + syntax check + one live GitHub execution before done
+Slash commands:
+  /git — compose a conventional commit message from the staged diff"
 
-Commit types: world | feat | fix | docs | data | test | ci | chore"
-
-# Escape for JSON: backslashes, quotes, newlines, tabs
+# Escape for JSON: backslashes, quotes, newlines, tabs.
 escaped="${context//\\/\\\\}"
 escaped="${escaped//\"/\\\"}"
 escaped="${escaped//$'\n'/\\n}"
