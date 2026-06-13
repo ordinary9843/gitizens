@@ -8,72 +8,165 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:       #070b10;
-      --surface:  #0d1117;
-      --surface2: #161b22;
-      --border:   #21262d;
-      --border2:  #30363d;
-      --text:     #e6edf3;
-      --muted:    #8b949e;
-      --dim:      #484f58;
-      --blue:     #388bfd;
-      --green:    #3fb950;
-      --yellow:   #e3b341;
-      --purple:   #bc8cff;
-      --red:      #f85149;
-      --orange:   #f0883e;
-      --teal:     #2dd4bf;
-      --glow-blue:   rgba(56,139,253,0.18);
-      --glow-green:  rgba(63,185,80,0.18);
-      --glow-yellow: rgba(227,179,65,0.18);
-      --glow-purple: rgba(188,140,255,0.18);
-      --glow-red:    rgba(248,81,73,0.18);
-      --glow-orange: rgba(240,136,62,0.18);
-      --glow-teal:   rgba(45,212,191,0.18);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      width: 100%; background: var(--bg); color: var(--text);
-      font-family: 'Inter', -apple-system, sans-serif;
-      min-height: 100vh; display: flex; flex-direction: column;
+      --bg:           #040810;
+      --surface:      #070e1c;
+      --surface2:     #0b1528;
+      --surface3:     #0f1e38;
+      --border:       #162236;
+      --border2:      #1e3050;
+      --border3:      #2a4468;
+      --text:         #bcd2ec;
+      --muted:        #4e6e94;
+      --dim:          #283c56;
+      --gold:         #c8820a;
+      --gold-light:   #e8a020;
+      --gold-bright:  #ffc040;
+      --gold-glow:    rgba(200,130,10,0.22);
+      --gold-dim:     rgba(200,130,10,0.10);
+      --cyan:         #00b8e0;
+      --cyan-glow:    rgba(0,184,224,0.18);
+      --green:        #10d870;
+      --green-glow:   rgba(16,216,112,0.18);
+      --red:          #f03040;
+      --red-glow:     rgba(240,48,64,0.18);
+      --purple:       #b058f8;
+      --purple-glow:  rgba(176,88,248,0.16);
+      --orange:       #f07830;
+      --orange-glow:  rgba(240,120,48,0.18);
+      --teal:         #00d4bc;
+      --teal-glow:    rgba(0,212,188,0.18);
+      /* legacy compat */
+      --blue:         #00b8e0;
+      --yellow:       #e8a020;
+      --glow-blue:    rgba(0,184,224,0.18);
+      --glow-green:   rgba(16,216,112,0.18);
+      --glow-yellow:  rgba(232,160,32,0.18);
+      --glow-purple:  rgba(176,88,248,0.16);
+      --glow-red:     rgba(240,48,64,0.18);
+      --glow-orange:  rgba(240,120,48,0.18);
+      --glow-teal:    rgba(0,212,188,0.18);
     }
 
-    /* ── Header ── */
-    #header {
-      padding: 14px 28px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      background: linear-gradient(180deg, rgba(56,139,253,0.06) 0%, transparent 100%);
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Exo 2', -apple-system, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    #header h1 {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 22px; font-weight: 700; letter-spacing: 6px;
-      background: linear-gradient(135deg, #e6edf3 30%, #8b949e 100%);
+
+    /* scanline overlay */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px, transparent 1px,
+        rgba(0,0,0,0.07) 1px, rgba(0,0,0,0.07) 2px
+      );
+    }
+
+    /* ── Game HUD Header ── */
+    #header {
+      display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+      background: linear-gradient(180deg, #0a1428 0%, #060e1c 100%);
+      border-bottom: 2px solid var(--border2);
+      box-shadow: 0 2px 24px rgba(0,0,0,0.7), inset 0 -1px 0 rgba(200,130,10,0.12);
+      position: relative; z-index: 10;
+      min-height: 52px;
+    }
+
+    .hud-brand {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 22px 10px 18px;
+      border-right: 1px solid var(--border2);
+      background: linear-gradient(135deg, rgba(200,130,10,0.08) 0%, transparent 60%);
+      flex-shrink: 0; position: relative;
+    }
+    .hud-brand::after {
+      content: '';
+      position: absolute; bottom: 0; left: 18px; right: 22px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
+    }
+    .hud-brand h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 17px; font-weight: 900; letter-spacing: 5px;
+      background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold-light) 50%, var(--gold) 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    #era-day { font-size: 12px; color: var(--muted); font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 1px; }
-    #reps-display { font-size: 10px; color: var(--dim); }
-    #tick-countdown { font-size: 11px; color: var(--teal); margin-left: auto; font-family: 'Space Mono', monospace; }
-    #world-summary  { font-size: 11px; color: var(--dim); max-width: 320px;
-                      text-align: right; font-style: italic; }
 
-    /* ── Event banner ── */
-    #event-banner {
-      display: none; padding: 10px 24px;
-      border-left: 3px solid var(--yellow);
-      background: var(--surface); border-bottom: 1px solid var(--border);
+    .hud-info {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 8px 20px; border-right: 1px solid var(--border);
+      gap: 2px; flex-shrink: 0;
     }
-    #event-banner .ev-title { font-size: 11px; font-weight: bold; letter-spacing: 1px; }
-    #event-banner .ev-desc  { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+    #era-day {
+      font-family: 'Exo 2', sans-serif; font-weight: 600;
+      font-size: 12px; color: var(--gold-light); letter-spacing: 1px;
+    }
+    #reps-display { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; }
+
+    .hud-clock-wrap {
+      display: flex; align-items: center;
+      padding: 0 20px; border-right: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #tick-countdown {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px; color: var(--teal); letter-spacing: 1px;
+    }
+
+    .hud-lore { flex: 1; padding: 0 20px; display: flex; align-items: center; }
+    #world-summary {
+      font-size: 11px; color: var(--muted); font-style: italic;
+      line-height: 1.4; max-width: 400px;
+    }
+
+    /* ── Event Banner ── */
+    #event-banner {
+      display: none; padding: 10px 24px 10px 44px;
+      border-left: 3px solid var(--gold);
+      background: linear-gradient(90deg, rgba(200,130,10,0.10) 0%, transparent 50%);
+      border-bottom: 1px solid var(--border2);
+      position: relative;
+    }
+    #event-banner::before {
+      content: '⚠'; position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+      color: var(--gold); font-size: 14px; opacity: 0.8;
+    }
+    #event-banner .ev-title {
+      font-family: 'Exo 2', sans-serif; font-weight: 700;
+      font-size: 12px; letter-spacing: 1.5px; color: var(--gold-light);
+    }
+    #event-banner .ev-desc  { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
     #event-banner .ev-meta  { font-size: 10px; color: var(--dim); margin-left: 12px; }
 
-    /* ── City canvas ── */
+    /* ── City Canvas ── */
+    #city-frame {
+      position: relative;
+      border-bottom: 1px solid var(--border2);
+    }
+    #city-frame::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold-glow) 20%, var(--gold-glow) 80%, transparent 100%);
+      z-index: 5; pointer-events: none;
+    }
+    #city-frame::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(0,212,188,0.18) 20%, rgba(0,212,188,0.18) 80%, transparent 100%);
+      z-index: 5; pointer-events: none;
+    }
     #city-container {
-      width: 100%; border-bottom: 1px solid var(--border);
-      background: var(--bg); position: relative; overflow: hidden;
+      width: 100%; position: relative; overflow: hidden;
       flex-shrink: 0; height: 360px;
     }
     #city-bg, #city-fg { width: 100%; height: 360px; display: block; }
@@ -81,44 +174,101 @@
     #loading {
       position: absolute; inset: 0; display: flex;
       align-items: center; justify-content: center;
-      color: var(--dim); font-size: 13px;
+      color: var(--muted); font-size: 11px; letter-spacing: 3px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    /* teal glow at base of city */
+    #city-container::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px;
+      background: linear-gradient(0deg, rgba(0,212,188,0.07) 0%, transparent 100%);
+      pointer-events: none; z-index: 3;
     }
 
-    /* ── Panels ── */
+    /* ── Section headers ── */
+    .game-section-head {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px; font-weight: 700;
+      color: var(--muted); letter-spacing: 4px;
+      padding-bottom: 10px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .game-section-head::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--border2) 0%, transparent 100%);
+    }
+    .game-section-head .gsh-icon { color: var(--gold); font-size: 11px; opacity: 0.9; }
+
+    /* ── Panels Row ── */
     #panels {
       display: grid;
-      grid-template-columns: 220px 200px 1fr;
+      grid-template-columns: 220px 210px 1fr;
       width: 100%; border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(7,14,28,0.95) 0%, var(--bg) 100%);
     }
     .panel {
       padding: 20px 22px; border-right: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(22,27,34,0.5) 0%, transparent 60%);
+      position: relative;
     }
     .panel:last-child { border-right: none; }
-    .panel h2 {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 11px; font-weight: 600; color: var(--dim);
-      letter-spacing: 3px; margin-bottom: 16px;
-      padding-bottom: 10px; border-bottom: 1px solid var(--border);
-    }
+    .panel h2 { display: none; }
 
-    /* radar panel */
+    /* radar */
     #radar-wrap { width: 180px; height: 180px; }
     .metric-row { display: flex; align-items: center; margin-top: 8px; gap: 8px; }
-    .metric-label { font-size: 10px; width: 30px; flex-shrink: 0; }
-    .metric-bar-bg { flex: 1; height: 9px; background: var(--border); border-radius: 3px; overflow: hidden; }
-    .metric-bar-fill { height: 100%; border-radius: 3px; transition: width 0.7s ease; }
-    .metric-value { font-size: 10px; width: 26px; text-align: right; flex-shrink: 0; }
+    .metric-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; width: 30px; flex-shrink: 0; letter-spacing: 1px;
+    }
+    .metric-bar-bg {
+      flex: 1; height: 8px;
+      background: var(--surface3); border: 1px solid var(--border);
+      overflow: hidden; position: relative;
+    }
+    .metric-bar-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 24%, rgba(0,0,0,0.5) 24%, rgba(0,0,0,0.5) 25%);
+      pointer-events: none;
+    }
+    .metric-bar-fill { height: 100%; transition: width 0.7s ease; }
+    .metric-value {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; width: 24px; text-align: right; flex-shrink: 0;
+    }
 
-    /* world state panel */
+    /* world state */
     .stat-row {
       display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 11px; gap: 8px;
+      margin-bottom: 10px; gap: 8px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
     }
-    .stat-label { font-size: 11px; color: var(--dim); letter-spacing: 0.3px; }
-    .stat-value { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; }
+    .stat-row:last-child { border-bottom: none; margin-bottom: 0; }
+    .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; font-weight: 500; }
+    .stat-value { font-family: 'Share Tech Mono', monospace; font-size: 14px; }
 
-    /* structures panel */
+    /* era progress */
+    #era-progress-wrap { margin-top: 12px; }
+    #era-progress-bar {
+      height: 6px; background: var(--surface3); border: 1px solid var(--border);
+      overflow: hidden; position: relative;
+    }
+    #era-progress-bar::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 19%, rgba(0,0,0,0.5) 19%, rgba(0,0,0,0.5) 20%);
+      pointer-events: none;
+    }
+    #era-progress-fill { height: 100%; transition: width 0.7s ease; box-shadow: 0 0 8px currentColor; }
+    #era-next { font-size: 9px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
+
+    /* milestone badges */
+    .milestone-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+    .ms-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px; padding: 2px 6px; border: 1px solid; white-space: nowrap; letter-spacing: 0.5px;
+    }
+    .ms-done    { background: rgba(16,216,112,0.10); border-color: var(--green); color: var(--green); }
+    .ms-pending { background: var(--surface3); border-color: var(--border2); color: var(--dim); }
+
+    /* structures */
     #structures-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
@@ -126,178 +276,135 @@
     }
     .mg-header {
       display: flex; justify-content: space-between; align-items: center;
-      font-size: 10px; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 3px;
+      font-family: 'Exo 2', sans-serif; font-weight: 600;
+      font-size: 10px; letter-spacing: 1.5px; margin-bottom: 4px;
     }
-    .mg-bar-wrap { height: 3px; background: var(--border); border-radius: 2px;
-                   margin-bottom: 6px; overflow: hidden; }
-    .mg-bar-fill { height: 100%; border-radius: 2px; transition: width 0.7s ease; }
-    .struct-row {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 10px; padding: 2px 0; line-height: 1.4;
+    .mg-bar-wrap {
+      height: 4px; background: var(--surface3); border: 1px solid var(--border);
+      margin-bottom: 6px; overflow: hidden; position: relative;
     }
-    .struct-row.locked { opacity: 0.3; }
+    .mg-bar-wrap::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 24%, rgba(0,0,0,0.5) 24%, rgba(0,0,0,0.5) 25%);
+      pointer-events: none;
+    }
+    .mg-bar-fill { height: 100%; transition: width 0.7s ease; }
+    .struct-row { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 2px 0; line-height: 1.4; }
+    .struct-row.locked { opacity: 0.28; }
     .struct-check { font-size: 9px; width: 10px; flex-shrink: 0; }
-    .struct-name  { flex: 1; }
-    .struct-threshold { color: var(--dim); font-size: 9px; flex-shrink: 0; }
+    .struct-name  { flex: 1; color: var(--text); }
+    .struct-threshold { color: var(--dim); font-family: 'Share Tech Mono', monospace; font-size: 9px; flex-shrink: 0; }
     .cooldown-badge { font-size: 9px; color: var(--red); margin-left: 4px; }
 
-    /* ── History chart ── */
+    /* ── Landing sections ── */
+    .landing-section { padding: 22px 28px; border-bottom: 1px solid var(--border); }
+    .landing-section h2 { display: none; }
+    .ls-head {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px; font-weight: 700;
+      color: var(--muted); letter-spacing: 4px;
+      padding-bottom: 10px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ls-head::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border2) 0%, transparent 100%); }
+    .ls-head .lsh-gem { color: var(--gold); font-size: 11px; }
+
     #history-wrap { height: 220px; position: relative; }
 
-    /* ── Social grid ── */
-    #social-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      border-bottom: 1px solid var(--border);
-    }
-    #social-grid .landing-section {
-      border-bottom: none; border-right: 1px solid var(--border);
-    }
+    #social-grid { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); }
+    #social-grid .landing-section { border-bottom: none; border-right: 1px solid var(--border); }
     #social-grid .landing-section:last-child { border-right: none; }
 
-    /* ── Landing sections ── */
-    .landing-section {
-      padding: 24px 28px; border-bottom: 1px solid var(--border);
-    }
-    .landing-section h2 {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 11px; font-weight: 600; color: var(--muted);
-      letter-spacing: 3px; margin-bottom: 16px;
-      padding-bottom: 10px; border-bottom: 1px solid var(--border);
-    }
-
-    .intro-text { font-size: 13px; color: var(--text); line-height: 1.8; max-width: 700px; }
-    .how-cards { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
-    .how-card {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 18px 20px; flex: 1; min-width: 200px;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .how-card:hover { border-color: var(--border2); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-    .how-card .step {
-      font-family: 'Space Mono', monospace; font-size: 11px;
-      color: var(--blue); margin-bottom: 8px; letter-spacing: 1px;
-    }
-    .how-card h3 { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-    .how-card p  { font-size: 11px; color: var(--muted); line-height: 1.7; }
-    .how-card code { background: #21262d; padding: 2px 6px; border-radius: 3px;
-                     font-size: 10px; color: var(--yellow); }
-
-    /* proposal / law rows */
+    /* ── Proposal cards ── */
     .proposal-item {
       display: flex; align-items: center; gap: 10px;
       padding: 10px 14px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--blue);
-      border-radius: 6px;
-      margin-bottom: 7px;
-      font-size: 12px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-left: 3px solid var(--cyan);
+      margin-bottom: 7px; font-size: 12px;
       transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
-      cursor: pointer;
+      cursor: pointer; position: relative;
+    }
+    .proposal-item::before {
+      content: ''; position: absolute; top: -1px; left: -1px;
+      width: 8px; height: 8px;
+      border-top: 1px solid var(--cyan); border-left: 1px solid var(--cyan);
     }
     .proposal-item:hover {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 1px var(--border2), 0 4px 16px rgba(0,0,0,0.4), 0 0 20px var(--glow-blue);
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 1px var(--border2), 0 4px 16px rgba(0,0,0,0.5), 0 0 20px var(--cyan-glow);
       transform: translateY(-1px);
     }
     .proposal-item:last-child { margin-bottom: 0; }
-    .proposal-votes {
-      font-family: 'Space Mono', monospace;
-      color: var(--green); font-size: 11px; flex-shrink: 0; min-width: 32px;
-    }
+    .proposal-votes { font-family: 'Share Tech Mono', monospace; color: var(--green); font-size: 11px; flex-shrink: 0; min-width: 32px; }
     .proposal-title { flex: 1; color: var(--text); line-height: 1.4; }
-    .proposal-link  {
-      color: var(--blue); font-size: 10px; flex-shrink: 0; text-decoration: none;
-      background: rgba(56,139,253,0.1); border: 1px solid rgba(56,139,253,0.3);
-      padding: 3px 8px; border-radius: 4px; white-space: nowrap;
-      transition: background 0.15s;
+    .proposal-link {
+      color: var(--cyan); font-size: 10px; flex-shrink: 0; text-decoration: none;
+      background: rgba(0,184,224,0.08); border: 1px solid rgba(0,184,224,0.3);
+      padding: 3px 8px; white-space: nowrap;
+      transition: background 0.15s; font-family: 'Share Tech Mono', monospace;
     }
-    .proposal-link:hover { background: rgba(56,139,253,0.2); text-decoration: none; }
+    .proposal-link:hover { background: rgba(0,184,224,0.18); text-decoration: none; }
     .no-data { color: var(--dim); font-size: 11px; font-style: italic; }
 
-    /* citizens */
+    .vote-bar-wrap { height: 3px; background: var(--border); margin-top: 6px; overflow: hidden; display: flex; }
+    .vote-bar-for     { background: var(--green); }
+    .vote-bar-against { background: var(--red); }
+
+    /* ── Citizens ── */
     .citizen-row {
       display: flex; align-items: center; gap: 8px;
       padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px;
     }
     .citizen-row:last-child { border-bottom: none; }
-    .citizen-rank { font-family: 'Space Mono', monospace; color: var(--dim); width: 16px; flex-shrink: 0; font-size: 10px; }
-    .citizen-name { color: var(--blue); flex: 1; text-decoration: none; font-weight: 500; }
-    .citizen-name:hover { text-decoration: underline; color: #58a6ff; }
-    .citizen-votes { font-family: 'Space Mono', monospace; color: var(--green); font-size: 10px; }
-    .citizen-props { font-family: 'Space Mono', monospace; color: var(--dim); font-size: 10px; }
+    .citizen-rank { font-family: 'Share Tech Mono', monospace; color: var(--dim); width: 16px; flex-shrink: 0; font-size: 10px; }
+    .citizen-name { color: var(--cyan); flex: 1; text-decoration: none; font-weight: 500; }
+    .citizen-name:hover { text-decoration: underline; color: #40d0ff; }
+    .citizen-votes { font-family: 'Share Tech Mono', monospace; color: var(--green); font-size: 10px; }
+    .citizen-props { font-family: 'Share Tech Mono', monospace; color: var(--dim); font-size: 10px; }
 
     /* ── Achievement badges ── */
     .ach-badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 3px; }
     .ach-badge {
-      font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: bold;
-      display: inline-block; white-space: nowrap;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px; padding: 1px 5px; font-weight: bold;
+      display: inline-block; white-space: nowrap; letter-spacing: 0.5px;
     }
-    .ach-vote   { background: #1a4a2a; color: #3fb950; }
-    .ach-civic  { background: #0d3a5c; color: #58a6ff; }
-    .ach-active { background: #3a2a0d; color: #e3b341; }
-    .ach-leg    { background: #2a0d3a; color: #bc8cff; }
-    .ach-rep    { background: #3a1a0d; color: #ff9456; }
-
-    /* ── Milestone badges ── */
-    .milestone-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-    .ms-badge {
-      font-size: 9px; padding: 2px 6px; border-radius: 3px;
-      border: 1px solid; white-space: nowrap;
-    }
-    .ms-done    { background: rgba(63,185,80,0.12); border-color: #3fb950; color: #3fb950; box-shadow: 0 0 8px rgba(63,185,80,0.15); }
-    .ms-pending { background: #1c2128; border-color: #444; color: var(--dim); }
+    .ach-vote   { background: rgba(16,216,112,0.12);  color: var(--green);      border: 1px solid rgba(16,216,112,0.3); }
+    .ach-civic  { background: rgba(0,184,224,0.12);   color: var(--cyan);       border: 1px solid rgba(0,184,224,0.3); }
+    .ach-active { background: rgba(232,160,32,0.12);  color: var(--gold-light); border: 1px solid rgba(232,160,32,0.3); }
+    .ach-leg    { background: rgba(176,88,248,0.12);  color: var(--purple);     border: 1px solid rgba(176,88,248,0.3); }
+    .ach-rep    { background: rgba(240,120,48,0.12);  color: var(--orange);     border: 1px solid rgba(240,120,48,0.3); }
 
     /* ── Gap dashboard ── */
     .gap-item {
-      padding: 10px 14px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 6px; margin-bottom: 7px;
+      padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+      margin-bottom: 7px; position: relative;
+    }
+    .gap-item::before {
+      content: ''; position: absolute; top: -1px; left: -1px;
+      width: 8px; height: 8px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold);
     }
     .gap-item:last-child { margin-bottom: 0; }
-    .gap-item-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 7px;
-    }
+    .gap-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
     .gap-name { font-size: 11px; color: var(--text); font-weight: 500; }
     .gap-detail { font-size: 10px; color: var(--dim); }
-    .gap-progress-track {
-      height: 5px; background: var(--border); border-radius: 3px; overflow: hidden;
+    .gap-progress-track { height: 5px; background: var(--surface3); border: 1px solid var(--border); overflow: hidden; position: relative; }
+    .gap-progress-track::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 19%, rgba(0,0,0,0.4) 19%, rgba(0,0,0,0.4) 20%);
+      pointer-events: none;
     }
-    .gap-progress-fill { height: 100%; border-radius: 3px; transition: width 0.7s ease; }
-    .gap-label-row {
-      display: flex; justify-content: space-between;
-      font-size: 9px; color: var(--dim); margin-top: 5px;
-      font-family: 'Space Mono', monospace;
-    }
-    .gap-need-badge {
-      font-size: 9px; font-family: 'Space Mono', monospace;
-      padding: 2px 6px; border-radius: 3px; white-space: nowrap;
-    }
-    .gap-need   .gap-name      { color: var(--text); }
-    .gap-need   .gap-need-badge { background: rgba(63,185,80,0.15); color: var(--green); }
-    .gap-at-risk .gap-name     { color: var(--red); }
-    .gap-at-risk .gap-need-badge { background: rgba(248,81,73,0.15); color: var(--red); }
-    .gap-milestone .gap-need-badge { background: rgba(45,212,191,0.15); color: var(--teal); }
+    .gap-progress-fill { height: 100%; transition: width 0.7s ease; }
+    .gap-label-row { display: flex; justify-content: space-between; font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--dim); margin-top: 5px; }
+    .gap-need-badge { font-family: 'Share Tech Mono', monospace; font-size: 9px; padding: 2px 6px; white-space: nowrap; }
+    .gap-need    .gap-name     { color: var(--text); }
+    .gap-need    .gap-need-badge { background: rgba(16,216,112,0.12); color: var(--green); border: 1px solid rgba(16,216,112,0.25); }
+    .gap-at-risk .gap-name    { color: var(--red); }
+    .gap-at-risk .gap-need-badge { background: rgba(240,48,64,0.12); color: var(--red); border: 1px solid rgba(240,48,64,0.25); }
+    .gap-milestone .gap-need-badge { background: rgba(0,212,188,0.12); color: var(--teal); border: 1px solid rgba(0,212,188,0.25); }
 
-    /* ── Footer ── */
-    #footer {
-      padding: 12px 28px; display: flex; align-items: center; gap: 14px;
-      font-size: 11px; color: var(--dim); margin-top: auto;
-      border-top: 1px solid var(--border);
-      background: linear-gradient(0deg, rgba(56,139,253,0.03) 0%, transparent 100%);
-      font-family: 'Space Mono', monospace;
-    }
-    #footer a { color: var(--blue); text-decoration: none; }
-    #footer a:hover { text-decoration: underline; }
-    #refresh-btn {
-      margin-left: auto; background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); font-family: inherit; font-size: 11px;
-      padding: 4px 12px; cursor: pointer; border-radius: 4px;
-    }
-    #refresh-btn:hover { background: var(--border); }
-
-    /* ── Delta flash (J) ── */
+    /* ── Delta flash ── */
     .delta-badge {
       font-size: 9px; font-weight: bold; margin-left: 5px;
       display: inline-block; vertical-align: middle;
@@ -308,39 +415,109 @@
       100% { opacity: 0; transform: translateY(-16px); }
     }
 
-    /* ── Building tooltip (F) ── */
+    /* ── Building tooltip ── */
     #building-tooltip {
       position: fixed; display: none; z-index: 200;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 6px; padding: 7px 12px; font-size: 11px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      padding: 7px 12px; font-size: 11px;
       pointer-events: none; white-space: nowrap;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7), 0 0 12px var(--gold-glow);
+      font-family: 'Exo 2', sans-serif;
+    }
+    #building-tooltip::before {
+      content: ''; position: absolute; top: -1px; left: -1px;
+      width: 8px; height: 8px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold);
     }
 
-    /* ── Era progress (C) ── */
-    #era-progress-wrap { margin-top: 10px; }
-    #era-progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-    #era-progress-fill { height: 100%; border-radius: 2px; transition: width 0.7s ease; background: var(--blue); }
-    #era-next { font-size: 9px; color: var(--dim); margin-top: 3px; }
+    /* ── How-to cards ── */
+    .intro-text { font-size: 13px; color: var(--text); line-height: 1.9; max-width: 700px; }
+    .how-cards { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+    .how-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 18px 20px; flex: 1; min-width: 200px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+    .how-card::before {
+      content: ''; position: absolute; top: -1px; left: -1px;
+      width: 10px; height: 10px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold);
+    }
+    .how-card::after {
+      content: ''; position: absolute; bottom: -1px; right: -1px;
+      width: 10px; height: 10px; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold);
+    }
+    .how-card:hover { border-color: var(--border3); box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 20px var(--gold-dim); }
+    .how-card .step {
+      font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700;
+      color: var(--gold); margin-bottom: 10px; letter-spacing: 2px;
+    }
+    .how-card h3 { font-family: 'Exo 2', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 6px; }
+    .how-card p  { font-size: 11px; color: var(--muted); line-height: 1.7; }
+    .how-card code { background: var(--surface3); padding: 2px 6px; font-size: 10px; color: var(--gold-light); font-family: 'Share Tech Mono', monospace; }
 
-    /* ── World Chronicle dispatches (A) ── */
+    /* ── Dispatch items ── */
     .dispatch-item {
-      padding: 14px; background: var(--surface2);
-      border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px;
+      padding: 14px; background: var(--surface2); border: 1px solid var(--border);
+      margin-bottom: 8px; position: relative;
+    }
+    .dispatch-item::before {
+      content: ''; position: absolute; top: -1px; left: -1px;
+      width: 8px; height: 8px; border-top: 1px solid var(--cyan); border-left: 1px solid var(--cyan);
     }
     .dispatch-item:last-child { margin-bottom: 0; }
-    .dispatch-meta { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--blue); margin-bottom: 6px; }
+    .dispatch-meta { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--cyan); margin-bottom: 6px; letter-spacing: 1px; }
     .dispatch-text { font-size: 12px; color: var(--muted); line-height: 1.75; }
     .dispatch-changes { font-size: 10px; color: var(--dim); margin-top: 8px; font-style: italic; border-top: 1px solid var(--border); padding-top: 6px; }
 
-    /* ── Vote distribution bar (I) ── */
-    .vote-bar-wrap {
-      height: 5px; background: var(--border); border-radius: 3px;
-      margin-top: 8px; overflow: hidden; display: flex;
+    /* ── Footer ── */
+    #footer {
+      padding: 12px 28px; display: flex; align-items: center; gap: 14px;
+      font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--dim);
+      margin-top: auto; border-top: 1px solid var(--border);
+      background: linear-gradient(0deg, rgba(200,130,10,0.04) 0%, transparent 100%);
+      letter-spacing: 0.5px;
     }
-    .vote-bar-for     { background: var(--green); box-shadow: 0 0 6px var(--glow-green); }
-    .vote-bar-against { background: var(--red);   box-shadow: 0 0 6px var(--glow-red); }
+    #footer a { color: var(--cyan); text-decoration: none; }
+    #footer a:hover { text-decoration: underline; color: #40d0ff; }
+    #refresh-btn {
+      margin-left: auto; background: var(--surface2); border: 1px solid var(--border2);
+      color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      padding: 4px 14px; cursor: pointer; letter-spacing: 1.5px;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    #refresh-btn:hover { background: var(--surface3); border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
 
+    /* ── Propose form ── */
+    .propose-form { max-width: 720px; }
+    .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; flex: 1; }
+    .form-label { font-family: 'Orbitron', sans-serif; font-size: 8px; color: var(--muted); letter-spacing: 3px; font-weight: 700; }
+    .form-input {
+      background: var(--surface2); border: 1px solid var(--border2);
+      color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 12px;
+      padding: 7px 10px; outline: none; width: 100%;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-dim); }
+    textarea.form-input { resize: vertical; min-height: 72px; }
+    .form-input option { background: var(--surface2); }
+    .propose-btn {
+      background: var(--surface2); border: 1px solid var(--border2);
+      color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      padding: 8px 18px; cursor: pointer; letter-spacing: 1.5px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .propose-btn:hover { background: var(--surface3); border-color: var(--gold); }
+    .propose-btn-submit { background: var(--gold); border-color: var(--gold-light); color: #050a14; font-weight: bold; }
+    .propose-btn-submit:hover { background: var(--gold-light); border-color: var(--gold-bright); box-shadow: 0 0 16px var(--gold-glow); }
+    #p-preview-body {
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 12px 14px; font-size: 11px; font-family: 'Share Tech Mono', monospace;
+      color: var(--muted); white-space: pre-wrap; word-break: break-word;
+      line-height: 1.7; max-height: 220px; overflow-y: auto; margin-top: 4px;
+    }
+
+    /* ── Responsive ── */
     @media (max-width: 780px) {
       #panels { grid-template-columns: 1fr; }
       .panel  { border-right: none; border-bottom: 1px solid var(--border); }
@@ -353,61 +530,42 @@
       #history-wrap { height: 160px; }
       #radar-wrap { width: 160px; height: 160px; }
       #city-container, #city-bg, #city-fg { height: 220px !important; }
-    }
-
-    /* ── Propose form ── */
-    .propose-form { max-width: 720px; }
-    .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; flex: 1; }
-    .form-label { font-size: 9px; color: var(--dim); letter-spacing: 2px; }
-    .form-input {
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); font-family: inherit; font-size: 12px;
-      padding: 7px 10px; border-radius: 4px; outline: none; width: 100%;
-    }
-    .form-input:focus { border-color: var(--blue); }
-    textarea.form-input { resize: vertical; min-height: 72px; }
-    .form-input option { background: var(--surface); }
-    .propose-btn {
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); font-family: inherit; font-size: 11px;
-      padding: 8px 18px; cursor: pointer; border-radius: 4px; letter-spacing: 1px;
-    }
-    .propose-btn:hover { background: var(--border); }
-    .propose-btn-submit {
-      background: var(--blue); border-color: var(--blue); color: #fff; font-weight: bold;
-    }
-    .propose-btn-submit:hover { background: #58a6ff; border-color: #58a6ff; }
-    #p-preview-body {
-      background: #0d1117; border: 1px solid var(--border);
-      padding: 12px 14px; border-radius: 4px; font-size: 11px;
-      color: var(--muted); white-space: pre-wrap; word-break: break-word;
-      line-height: 1.7; max-height: 220px; overflow-y: auto; margin-top: 4px;
+      .hud-lore { display: none; }
     }
   </style>
 </head>
 <body>
 
 <div id="header">
-  <img src="logo.png" alt="Gitizens" height="26" style="flex-shrink:0;margin-right:-2px;vertical-align:middle">
-  <h1>GITIZENS</h1>
-  <span id="era-day">Loading…</span>
-  <span id="reps-display"></span>
-  <span id="tick-countdown"></span>
-  <span id="world-summary"></span>
+  <div class="hud-brand">
+    <img src="logo.png" alt="Gitizens" height="26" style="flex-shrink:0;filter:drop-shadow(0 0 6px rgba(200,130,10,0.5))">
+    <h1>GITIZENS</h1>
+  </div>
+  <div class="hud-info">
+    <span id="era-day">Loading…</span>
+    <span id="reps-display"></span>
+  </div>
+  <div class="hud-clock-wrap">
+    <span id="tick-countdown"></span>
+  </div>
+  <div class="hud-lore">
+    <span id="world-summary"></span>
+  </div>
 </div>
 
 <div id="event-banner"></div>
 
-<div id="city-container">
-  <div id="loading">Fetching world state…</div>
-  <canvas id="city-bg"></canvas>
-  <canvas id="city-fg"></canvas>
+<div id="city-frame">
+  <div id="city-container">
+    <div id="loading">FETCHING WORLD STATE…</div>
+    <canvas id="city-bg"></canvas>
+    <canvas id="city-fg"></canvas>
+  </div>
 </div>
 
 <div id="panels">
   <div class="panel" id="panel-policy">
-    <h2>POLICY METRICS</h2>
+    <div class="game-section-head"><span class="gsh-icon">◈</span> POLICY METRICS</div>
     <div id="radar-wrap"><canvas id="radar-canvas"></canvas></div>
     <div id="pollution-row" class="metric-row">
       <span class="metric-label" style="color:var(--red)">POL</span>
@@ -417,8 +575,9 @@
       <span id="pol-val" class="metric-value" style="color:var(--red)">0</span>
     </div>
   </div>
-  <div class="panel">
-    <h2>WORLD STATE</h2>
+
+  <div class="panel" id="panel-world">
+    <div class="game-section-head"><span class="gsh-icon">◈</span> WORLD STATE</div>
     <div id="world-stats"></div>
     <div id="era-progress-wrap">
       <div id="era-progress-bar"><div id="era-progress-fill" style="width:0%"></div></div>
@@ -426,45 +585,46 @@
     </div>
     <div id="milestone-grid" class="milestone-grid"></div>
   </div>
-  <div class="panel">
-    <h2>STRUCTURES  ·  POLICY → CIVILIZATION</h2>
+
+  <div class="panel" id="panel-structures">
+    <div class="game-section-head"><span class="gsh-icon">◈</span> STRUCTURES &nbsp;·&nbsp; POLICY → CIVILIZATION</div>
     <div id="structures-list"></div>
   </div>
 </div>
 
 <div class="landing-section">
-  <h2>WORLD HISTORY</h2>
+  <div class="ls-head"><span class="lsh-gem">◆</span> WORLD HISTORY</div>
   <div id="history-wrap"><canvas id="history-canvas"></canvas></div>
 </div>
 
 <div class="landing-section" id="gap-section">
-  <h2>WHAT NEEDS YOUR VOTE</h2>
+  <div class="ls-head"><span class="lsh-gem">◆</span> WHAT NEEDS YOUR VOTE</div>
   <div id="gap-list"><p class="no-data">Loading…</p></div>
 </div>
 
 <div id="social-grid">
   <div class="landing-section">
-    <h2>OPEN PROPOSALS</h2>
+    <div class="ls-head"><span class="lsh-gem">◆</span> OPEN PROPOSALS</div>
     <div id="proposals-list"><p class="no-data">Loading…</p></div>
   </div>
   <div class="landing-section">
-    <h2>TOP CITIZENS</h2>
+    <div class="ls-head"><span class="lsh-gem">◆</span> TOP CITIZENS</div>
     <div id="citizens-list"><p class="no-data">Loading…</p></div>
   </div>
 </div>
 
 <div class="landing-section">
-  <h2>RECENT LAWS</h2>
+  <div class="ls-head"><span class="lsh-gem">◆</span> RECENT LAWS</div>
   <div id="recent-laws-list"><p class="no-data">Loading…</p></div>
 </div>
 
 <div class="landing-section" id="dispatch-section">
-  <h2>WORLD CHRONICLE</h2>
+  <div class="ls-head"><span class="lsh-gem">◆</span> WORLD CHRONICLE</div>
   <div id="dispatch-list"><p class="no-data">Loading…</p></div>
 </div>
 
 <div class="landing-section" id="propose-section">
-  <h2>PROPOSE A LAW</h2>
+  <div class="ls-head"><span class="lsh-gem">◆</span> PROPOSE A LAW</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.7">
     Fill in the form below, click <strong style="color:var(--text)">Open Issue</strong>,
     then Submit on GitHub. The title and body will be pre-filled for you.
@@ -486,7 +646,7 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">DESCRIPTION <span style="font-weight:normal">(min 30 chars)</span></label>
+      <label class="form-label">DESCRIPTION <span style="font-weight:normal;letter-spacing:0">(min 30 chars)</span></label>
       <textarea id="p-desc" class="form-input" rows="3"
                 placeholder="What does this law do and why should citizens vote for it?"></textarea>
     </div>
@@ -539,8 +699,7 @@
       <div class="form-row">
         <div class="form-group" style="flex:1;min-width:130px">
           <label class="form-label">ENTITY ID</label>
-          <input id="p-evolve-id" class="form-input" type="text"
-                 placeholder="e.g. public-school">
+          <input id="p-evolve-id" class="form-input" type="text" placeholder="e.g. public-school">
         </div>
         <div class="form-group" style="flex:1;min-width:110px">
           <label class="form-label">FIELD</label>
@@ -578,7 +737,7 @@
 </div>
 
 <div class="landing-section">
-  <h2>WHAT IS GITIZENS</h2>
+  <div class="ls-head"><span class="lsh-gem">◆</span> WHAT IS GITIZENS</div>
   <p class="intro-text">
     A civilization that lives inside a GitHub repo. Citizens propose laws as GitHub Issues,
     vote with 👍 reactions, and watch their world evolve in real time.<br>
@@ -610,7 +769,7 @@
   <span id="last-updated">—</span>
   <a href="https://github.com/ordinary9843/gitizens" target="_blank">ordinary9843/gitizens</a>
   <span id="refresh-countdown"></span>
-  <button id="refresh-btn" onclick="load()">↻ Refresh</button>
+  <button id="refresh-btn" onclick="load()">↻ REFRESH</button>
 </div>
 
 <script>
@@ -620,12 +779,12 @@ const RAW = 'https://raw.githubusercontent.com/ordinary9843/gitizens/master';
 const REPO_API = 'https://api.github.com/repos/ordinary9843/gitizens';
 
 const METRIC_META = {
-  education:    { abbr:'EDU', label:'EDUCATION',    color:'#388bfd' },
-  industry:     { abbr:'IND', label:'INDUSTRY',     color:'#bc8cff' },
-  welfare:      { abbr:'WEL', label:'WELFARE',      color:'#3fb950' },
-  green_policy: { abbr:'GRN', label:'GREEN POLICY', color:'#2dd4bf' },
-  defense:      { abbr:'DEF', label:'DEFENSE',      color:'#f0883e' },
-  pollution:    { abbr:'POL', label:'POLLUTION',    color:'#f85149' },
+  education:    { abbr:'EDU', label:'EDUCATION',    color:'#00b8e0' },
+  industry:     { abbr:'IND', label:'INDUSTRY',     color:'#b058f8' },
+  welfare:      { abbr:'WEL', label:'WELFARE',      color:'#10d870' },
+  green_policy: { abbr:'GRN', label:'GREEN POLICY', color:'#00d4bc' },
+  defense:      { abbr:'DEF', label:'DEFENSE',      color:'#f07830' },
+  pollution:    { abbr:'POL', label:'POLLUTION',    color:'#f03040' },
 };
 
 const RULES = [
@@ -663,12 +822,12 @@ function hexAlpha(hex, a) {
 
 function wHash(a, b) { return ((a*17 + b*31) % 97); }
 
-// ── Chart.js global theme ────────────────────────────────────────────────────
+// ── Chart.js global theme ─────────────────────────────────────────────────────
 
 if (typeof Chart !== 'undefined') {
-  Chart.defaults.color = '#8b949e';
-  Chart.defaults.borderColor = '#21262d';
-  Chart.defaults.font.family = "'Courier New', Courier, monospace";
+  Chart.defaults.color = '#4e6e94';
+  Chart.defaults.borderColor = '#162236';
+  Chart.defaults.font.family = "'Share Tech Mono', 'Courier New', monospace";
 }
 
 let _radarChart = null, _histChart = null;
@@ -678,33 +837,27 @@ let _radarChart = null, _histChart = null;
 let _bgCtx = null, _fgCtx = null, _cityW = 900, _cityH = 320, _cityGY = 240;
 let _S = {};
 let _animFrame = null;
-let _animTime = 0;           // G: frame counter for sin oscillation
+let _animTime = 0;
 
-// G: star data for fg twinkle
 let _stars = [];
 
-// E: weather system
-let _weatherType = null;     // null | 'rain' | 'drought' | 'crisis'
+let _weatherType = null;
 const _rain = [];
 
-// F: building hover hit areas
 let _buildingHits = [];
 
-// H: entrance animation
 let _entranceDone = true;
 let _entranceStart = 0;
 
-// D: active event expiry for countdown
 let _eventExpiry = null;
 let _eventCountdownTimer = null;
 
-// J: previous metrics for delta flash
 let _prevMetrics = null;
 
 // ── Smoke particle system ─────────────────────────────────────────────────────
 
 const _smoke = [];
-let _chimneys = []; // [{x, y, intensity}] populated during renderCityBg
+let _chimneys = [];
 
 function spawnSmoke() {
   _chimneys.forEach(({x, y, intensity}) => {
@@ -735,7 +888,7 @@ function drawSmoke(ctx) {
   ctx.globalAlpha = 1;
 }
 
-// ── Rain particle system (E) ──────────────────────────────────────────────────
+// ── Rain particle system ──────────────────────────────────────────────────────
 
 function setWeatherFromEvent(evt) {
   if (!evt || !evt.id) { _weatherType = null; return; }
@@ -779,7 +932,7 @@ function drawRain(ctx) {
 // ── Walker system ─────────────────────────────────────────────────────────────
 
 const _walkers = [];
-const WALKER_COLS = ['#c9d1d9','#8b949e','#e3b341','#3fb950','#388bfd','#bc8cff','#f0883e','#2dd4bf'];
+const WALKER_COLS = ['#c0d4ee','#4e6e94','#e8a020','#10d870','#00b8e0','#b058f8','#f07830','#00d4bc'];
 
 function initWalkers(pop) {
   const target = Math.min(~~(pop / 55), 28);
@@ -818,7 +971,7 @@ function drawWalker(ctx, w) {
   ctx.restore();
 }
 
-// ── Buildings (Canvas 2D) ─────────────────────────────────────────────────────
+// ── Buildings ─────────────────────────────────────────────────────────────────
 
 const BUILDINGS = {
 
@@ -859,10 +1012,10 @@ const BUILDINGS = {
   'Community Center': { w:82, order:2,
     draw(ctx, x, gy) {
       ctx.fillStyle = '#1f481f'; ctx.fillRect(x, gy-47, 82, 47);
-      ctx.fillStyle = '#3fb950'; ctx.fillRect(x, gy-54, 82, 8);
+      ctx.fillStyle = '#10d870'; ctx.fillRect(x, gy-54, 82, 8);
       [6,19,32,45,58,70].forEach(wx => {
         ctx.fillStyle = '#0d1e0d'; ctx.fillRect(x+wx, gy-40, 10, 13);
-        ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 0.6; ctx.strokeRect(x+wx, gy-40, 10, 13);
+        ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.6; ctx.strokeRect(x+wx, gy-40, 10, 13);
       });
       ctx.fillStyle = '#0d1e0d'; ctx.fillRect(x+34, gy-22, 14, 22);
     }},
@@ -906,7 +1059,7 @@ const BUILDINGS = {
       ctx.fillStyle = '#0e2240'; ctx.fillRect(x+11, gy-98, 60, 98);
       ctx.fillStyle = '#163460';
       ctx.beginPath(); ctx.ellipse(x+41, gy-98, 33, 19, 0, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#388bfd'; ctx.globalAlpha = 0.5;
+      ctx.fillStyle = '#00b8e0'; ctx.globalAlpha = 0.5;
       ctx.fillRect(x, gy-68, 82, 7);
       ctx.globalAlpha = 1;
       for (let i = 0; i < 5; i++) {
@@ -914,12 +1067,12 @@ const BUILDINGS = {
           const lit = wHash(i*3+j, 7) < edu;
           ctx.fillStyle = lit ? '#0d2a50' : '#07141f';
           ctx.fillRect(x+jx, gy-91+i*18, 11, 13);
-          ctx.strokeStyle = '#388bfd'; ctx.lineWidth = 0.5; ctx.strokeRect(x+jx, gy-91+i*18, 11, 13);
+          ctx.strokeStyle = '#00b8e0'; ctx.lineWidth = 0.5; ctx.strokeRect(x+jx, gy-91+i*18, 11, 13);
         });
       }
       ctx.strokeStyle = '#c9d1d9'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x+41, gy-117); ctx.lineTo(x+41, gy-131); ctx.stroke();
-      ctx.fillStyle = '#388bfd';
+      ctx.fillStyle = '#00b8e0';
       ctx.beginPath(); ctx.arc(x+41, gy-134, 5, 0, Math.PI*2); ctx.fill();
     }},
 
@@ -933,12 +1086,12 @@ const BUILDINGS = {
         [[15,2],[48,5]].forEach(([jx, seed]) => {
           ctx.fillStyle = wHash(i, seed) < edu ? '#0e2038' : '#07111e';
           ctx.fillRect(x+jx, gy-107+i*17, 13, 12);
-          ctx.strokeStyle = '#388bfd'; ctx.lineWidth = 0.6; ctx.strokeRect(x+jx, gy-107+i*17, 13, 12);
+          ctx.strokeStyle = '#00b8e0'; ctx.lineWidth = 0.6; ctx.strokeRect(x+jx, gy-107+i*17, 13, 12);
         });
       }
       ctx.strokeStyle = '#c9d1d9'; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(x+38, gy-140); ctx.lineTo(x+38, gy-162); ctx.stroke();
-      ctx.strokeStyle = '#388bfd'; ctx.lineWidth = 2;
+      ctx.strokeStyle = '#00b8e0'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(x+38, gy-164, 4, 0, Math.PI*2); ctx.stroke();
       ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x+26, gy-156); ctx.lineTo(x+50, gy-156); ctx.stroke();
@@ -948,16 +1101,16 @@ const BUILDINGS = {
   'Military Barracks': { w:88, order:7,
     draw(ctx, x, gy) {
       ctx.fillStyle = '#29200a'; ctx.fillRect(x, gy-56, 88, 56);
-      ctx.fillStyle = '#f0883e'; ctx.globalAlpha = 0.65;
+      ctx.fillStyle = '#f07830'; ctx.globalAlpha = 0.65;
       ctx.fillRect(x, gy-60, 88, 5);
       ctx.globalAlpha = 1;
       [5,20,36,52,68].forEach(wx => {
         ctx.fillStyle = '#0d1117'; ctx.fillRect(x+wx, gy-49, 13, 13);
-        ctx.strokeStyle = '#f0883e'; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.8;
+        ctx.strokeStyle = '#f07830'; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.8;
         ctx.strokeRect(x+wx, gy-49, 13, 13); ctx.globalAlpha = 1;
       });
       ctx.fillStyle = '#0d1117'; ctx.fillRect(x+35, gy-24, 18, 24);
-      ctx.strokeStyle = '#f0883e'; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.4;
+      ctx.strokeStyle = '#f07830'; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.4;
       ctx.beginPath(); ctx.moveTo(x, gy-56); ctx.lineTo(x, gy); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(x+88, gy-56); ctx.lineTo(x+88, gy); ctx.stroke();
       ctx.globalAlpha = 1;
@@ -968,17 +1121,17 @@ const BUILDINGS = {
       ctx.fillStyle = '#1a0f05'; ctx.fillRect(x+16, gy-112, 70, 112);
       ctx.fillStyle = '#241406'; ctx.fillRect(x, gy-72, 16, 72);
       ctx.fillStyle = '#241406'; ctx.fillRect(x+86, gy-72, 16, 72);
-      ctx.fillStyle = '#f0883e'; ctx.fillRect(x+16, gy-118, 70, 7);
+      ctx.fillStyle = '#f07830'; ctx.fillRect(x+16, gy-118, 70, 7);
       for (let i = 0; i < 5; i++) {
         [22,40,58].forEach(jx => {
           ctx.fillStyle = '#0d1117'; ctx.fillRect(x+jx, gy-108+i*21, 14, 16);
-          ctx.strokeStyle = '#f0883e'; ctx.lineWidth = 0.5; ctx.strokeRect(x+jx, gy-108+i*21, 14, 16);
+          ctx.strokeStyle = '#f07830'; ctx.lineWidth = 0.5; ctx.strokeRect(x+jx, gy-108+i*21, 14, 16);
         });
       }
       ctx.fillStyle = '#0d1117'; ctx.fillRect(x+42, gy-30, 18, 30);
-      ctx.strokeStyle = '#f0883e'; ctx.lineWidth = 2;
+      ctx.strokeStyle = '#f07830'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x+51, gy-118); ctx.lineTo(x+51, gy-136); ctx.stroke();
-      ctx.fillStyle = '#f0883e';
+      ctx.fillStyle = '#f07830';
       ctx.beginPath(); ctx.moveTo(x+43, gy-136); ctx.lineTo(x+51, gy-152); ctx.lineTo(x+59, gy-136); ctx.closePath(); ctx.fill();
     }},
 
@@ -987,11 +1140,11 @@ const BUILDINGS = {
       const ind = S.industry || 35;
       const intensity = 0.15 + ind / 100 * 0.55;
       ctx.fillStyle = '#1a1020'; ctx.fillRect(x, gy-62, 98, 62);
-      ctx.fillStyle = '#bc8cff'; ctx.globalAlpha = 0.5;
+      ctx.fillStyle = '#b058f8'; ctx.globalAlpha = 0.5;
       ctx.fillRect(x, gy-67, 98, 6); ctx.globalAlpha = 1;
       [6,22,38,54,70,84].forEach(wx => {
         ctx.fillStyle = '#0d1117'; ctx.fillRect(x+wx, gy-55, 12, 19);
-        ctx.strokeStyle = '#bc8cff'; ctx.lineWidth = 0.4; ctx.strokeRect(x+wx, gy-55, 12, 19);
+        ctx.strokeStyle = '#b058f8'; ctx.lineWidth = 0.4; ctx.strokeRect(x+wx, gy-55, 12, 19);
       });
       [[18,28],[44,34],[70,25]].forEach(([cx, ch]) => {
         ctx.fillStyle = '#2a1a30'; ctx.fillRect(x+cx-5, gy-ch-62, 10, ch);
@@ -1005,7 +1158,7 @@ const BUILDINGS = {
       const intensity = 0.2 + ind / 100 * 0.5;
       ctx.fillStyle = '#150f1e'; ctx.fillRect(x, gy-82, 122, 82);
       ctx.fillStyle = '#1c1530'; ctx.fillRect(x+62, gy-88, 36, 88);
-      ctx.fillStyle = '#bc8cff'; ctx.globalAlpha = 0.6;
+      ctx.fillStyle = '#b058f8'; ctx.globalAlpha = 0.6;
       ctx.fillRect(x, gy-90, 122, 6); ctx.globalAlpha = 1;
       [8,25,42].forEach(cx => {
         ctx.fillStyle = '#22182e'; ctx.fillRect(x+cx-4, gy-118, 9, 34);
@@ -1018,7 +1171,7 @@ const BUILDINGS = {
       for (let i = 0; i < 4; i++) {
         [5,27,49].forEach(jx => {
           ctx.fillStyle = '#0a0810'; ctx.fillRect(x+jx, gy-74+i*19, 16, 13);
-          ctx.strokeStyle = '#bc8cff'; ctx.lineWidth = 0.4; ctx.strokeRect(x+jx, gy-74+i*19, 16, 13);
+          ctx.strokeStyle = '#b058f8'; ctx.lineWidth = 0.4; ctx.strokeRect(x+jx, gy-74+i*19, 16, 13);
         });
       }
     }},
@@ -1029,7 +1182,7 @@ const BUILDINGS = {
       const intensity = 0.3 + ind / 100 * 0.55;
       ctx.fillStyle = '#12091a'; ctx.fillRect(x, gy-97, 142, 97);
       ctx.fillStyle = '#18102a'; ctx.fillRect(x+42, gy-108, 52, 108);
-      ctx.fillStyle = '#bc8cff'; ctx.globalAlpha = 0.7;
+      ctx.fillStyle = '#b058f8'; ctx.globalAlpha = 0.7;
       ctx.fillRect(x, gy-103, 142, 7); ctx.globalAlpha = 1;
       [10,30,52,92,112,132].forEach(cx => {
         ctx.fillStyle = '#1e1228'; ctx.fillRect(x+cx-5, gy-140, 10, 44);
@@ -1037,7 +1190,7 @@ const BUILDINGS = {
       });
       for (let i = 0; i < 4; i++) {
         ctx.fillStyle = '#0d0a14'; ctx.fillRect(x+5, gy-88+i*22, 32, 16);
-        ctx.strokeStyle = '#bc8cff'; ctx.lineWidth = 0.4;
+        ctx.strokeStyle = '#b058f8'; ctx.lineWidth = 0.4;
         ctx.strokeRect(x+5, gy-88+i*22, 32, 16);
         ctx.fillStyle = '#0d0a14'; ctx.fillRect(x+105, gy-88+i*22, 32, 16);
         ctx.strokeRect(x+105, gy-88+i*22, 32, 16);
@@ -1049,15 +1202,15 @@ const BUILDINGS = {
       ctx.fillStyle = '#0a2010'; ctx.fillRect(x+10, gy-87, 60, 87);
       ctx.fillStyle = '#123018';
       ctx.beginPath(); ctx.ellipse(x+40, gy-87, 35, 22, 0, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#3fb950'; ctx.globalAlpha = 0.45;
+      ctx.fillStyle = '#10d870'; ctx.globalAlpha = 0.45;
       ctx.fillRect(x, gy-62, 80, 5); ctx.globalAlpha = 1;
       for (let i = 0; i < 4; i++) {
         [16,46].forEach(jx => {
           ctx.fillStyle = '#071510'; ctx.fillRect(x+jx, gy-80+i*20, 16, 15);
-          ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 0.6; ctx.strokeRect(x+jx, gy-80+i*20, 16, 15);
+          ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.6; ctx.strokeRect(x+jx, gy-80+i*20, 16, 15);
         });
       }
-      ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 2;
+      ctx.strokeStyle = '#10d870'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x+40, gy-109); ctx.lineTo(x+40, gy-126); ctx.stroke();
       ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.arc(x+40, gy-128, 5, 0, Math.PI*2); ctx.stroke();
@@ -1076,7 +1229,7 @@ const BUILDINGS = {
     }},
 };
 
-// ── Canvas init & resize ──────────────────────────────────────────────────────
+// ── Canvas init ───────────────────────────────────────────────────────────────
 
 function initCityCanvas() {
   const container = document.getElementById('city-container');
@@ -1094,7 +1247,7 @@ function initCityCanvas() {
   _cityW = W; _cityH = H;
 }
 
-// ── City background render (static, redrawn on state change) ──────────────────
+// ── City background render ────────────────────────────────────────────────────
 
 function renderCityBg(state) {
   _S = state;
@@ -1107,27 +1260,25 @@ function renderCityBg(state) {
   const stb = state.stability || 79;
   const pt  = Math.min(pol / 100, 1);
 
-  const skyTop  = lerpColor('#0d1829', '#2a1205', pt);
-  const skyMid  = lerpColor('#101e36', '#1f0e04', pt);
-  const skyBot  = lerpColor('#161e2e', '#220e06', pt);
-  const gndCol  = lerpColor('#111a10', '#1f1005', pt * 0.7);
-  const gndLine = lerpColor('#2a4022', '#3a1e08', pt);
-  const horizonGlowCol = lerpColor('rgba(56,139,253,0.22)', 'rgba(240,100,40,0.28)', pt);
+  const skyTop  = lerpColor('#040d1e', '#1e0a02', pt);
+  const skyMid  = lerpColor('#071428', '#160a04', pt);
+  const skyBot  = lerpColor('#0a1830', '#1a0a06', pt);
+  const gndCol  = lerpColor('#080e18', '#160e06', pt * 0.7);
+  const gndLine = lerpColor('#1e3828', '#3a1a06', pt);
+  const horizonGlowCol = lerpColor('rgba(0,184,224,0.20)', 'rgba(200,80,20,0.28)', pt);
 
-  // Sky — 3-stop gradient with atmosphere
   const skyGrd = ctx.createLinearGradient(0, 0, 0, GY);
   skyGrd.addColorStop(0,    skyTop);
   skyGrd.addColorStop(0.55, skyMid);
   skyGrd.addColorStop(1,    skyBot);
   ctx.fillStyle = skyGrd; ctx.fillRect(0, 0, W, H);
 
-  // Horizon atmospheric glow
   const horizGrd = ctx.createLinearGradient(0, GY - 90, 0, GY);
   horizGrd.addColorStop(0, 'rgba(0,0,0,0)');
   horizGrd.addColorStop(1, horizonGlowCol);
   ctx.fillStyle = horizGrd; ctx.fillRect(0, GY - 90, W, 90);
 
-  // Stars (G: populate _stars for fg twinkle; bg draws dim base)
+  // Stars
   const starOp = Math.max(0, (50 - pol) / 50 * 0.85);
   _stars = [];
   const STAR_DEFS = [
@@ -1155,7 +1306,7 @@ function renderCityBg(state) {
   });
   ctx.globalAlpha = 1;
 
-  // Moon with halo
+  // Moon
   if (pol < 70) {
     const mOp = Math.max(0, (70-pol)/70 * 0.9);
     const mx = ~~(W * 0.88); const my = 42;
@@ -1170,37 +1321,40 @@ function renderCityBg(state) {
     ctx.globalAlpha = 1;
   }
 
-  // E: Drought sky tint
   if (_weatherType === 'drought') {
     ctx.globalAlpha = 0.22;
-    ctx.fillStyle = '#f0883e';
+    ctx.fillStyle = '#f07830';
     ctx.fillRect(0, 0, W, GY);
     ctx.globalAlpha = 1;
   }
 
-  // Smog haze
   if (pol > 30) {
     const haze = Math.min((pol-30)/70 * 0.28, 0.28);
     ctx.globalAlpha = haze; ctx.fillStyle = '#4a2810';
     ctx.fillRect(0, 0, W, GY); ctx.globalAlpha = 1;
   }
 
-  // Stability glow
-  const stabClr = stb >= 70 ? '#3fb950' : stb >= 40 ? '#e3b341' : '#f85149';
+  const stabClr = stb >= 70 ? '#10d870' : stb >= 40 ? '#e8a020' : '#f03040';
   const stabOp  = 0.08 + stb / 100 * 0.18;
   const stabGrd = ctx.createLinearGradient(0, GY-44, 0, GY);
   stabGrd.addColorStop(0, hexAlpha(stabClr, stabOp));
   stabGrd.addColorStop(1, hexAlpha(stabClr, 0));
   ctx.fillStyle = stabGrd; ctx.fillRect(0, GY-44, W, 44);
 
-  // Ground
   ctx.fillStyle = gndCol; ctx.fillRect(0, GY, W, H-GY);
-  ctx.strokeStyle = gndLine; ctx.lineWidth = 1.5;
+
+  // Ground line with amber glow
+  const groundGrd = ctx.createLinearGradient(0, 0, W, 0);
+  groundGrd.addColorStop(0,   'rgba(0,0,0,0)');
+  groundGrd.addColorStop(0.2, gndLine);
+  groundGrd.addColorStop(0.8, gndLine);
+  groundGrd.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.strokeStyle = groundGrd; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(0, GY); ctx.lineTo(W, GY); ctx.stroke();
 
   // Ground fog
   const fogGrd = ctx.createLinearGradient(0, GY, 0, GY + 44);
-  fogGrd.addColorStop(0, 'rgba(20,40,60,0.30)');
+  fogGrd.addColorStop(0, 'rgba(10,24,48,0.35)');
   fogGrd.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = fogGrd; ctx.fillRect(0, GY, W, 44);
 
@@ -1213,8 +1367,8 @@ function renderCityBg(state) {
     .sort((a, b) => a.b.order - b.b.order);
 
   if (active.length === 0) {
-    ctx.fillStyle = '#484f58'; ctx.font = '12px monospace'; ctx.textAlign = 'center';
-    ctx.fillText('No structures yet — pass policy laws to develop the civilization', W/2, GY-30);
+    ctx.fillStyle = '#2a3e58'; ctx.font = '11px "Share Tech Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('NO STRUCTURES YET — PASS POLICY LAWS TO DEVELOP THE CIVILIZATION', W/2, GY-30);
     ctx.textAlign = 'left';
   } else {
     const GAP  = 16;
@@ -1226,21 +1380,17 @@ function renderCityBg(state) {
       ctx.restore();
       const mm = METRIC_META[m];
       if (mm) {
-        // Ground glow
         const glowGrd = ctx.createLinearGradient(cx, GY, cx, GY+38);
-        glowGrd.addColorStop(0, mm.color + '30');
+        glowGrd.addColorStop(0, mm.color + '28');
         glowGrd.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = glowGrd; ctx.fillRect(cx, GY, b.w, 38);
-        // Accent line
         ctx.globalAlpha = 0.7; ctx.fillStyle = mm.color;
         ctx.fillRect(cx, GY, b.w, 2);
-        // Label
         ctx.globalAlpha = 0.75; ctx.fillStyle = mm.color;
-        ctx.font = '8px monospace'; ctx.textAlign = 'center';
+        ctx.font = '8px "Share Tech Mono", monospace'; ctx.textAlign = 'center';
         ctx.fillText(mm.abbr, cx + b.w/2, GY+16);
         ctx.globalAlpha = 1; ctx.textAlign = 'left';
       }
-      // F: track hit area for tooltip
       _buildingHits.push({x: cx, w: b.w, name, metric: m, value: state[m]||0});
       cx += b.w + GAP;
     });
@@ -1248,12 +1398,11 @@ function renderCityBg(state) {
 
   document.getElementById('loading').style.display = 'none';
 
-  // H: trigger entrance animation
   _entranceDone = false;
   _entranceStart = performance.now();
 }
 
-// ── Animation loop (foreground: walkers, smoke, weather, stars, entrance) ─────
+// ── Animation loop ────────────────────────────────────────────────────────────
 
 function animLoop() {
   const ctx = _fgCtx;
@@ -1261,7 +1410,6 @@ function animLoop() {
   _animTime++;
   ctx.clearRect(0, 0, _cityW, _cityH);
 
-  // G: Star twinkle (drawn under everything so walkers are in front)
   if (_stars.length && _cityGY > 0) {
     ctx.fillStyle = 'white';
     _stars.forEach(s => {
@@ -1274,11 +1422,9 @@ function animLoop() {
     ctx.globalAlpha = 1;
   }
 
-  // Smoke
   spawnSmoke();
   drawSmoke(ctx);
 
-  // Walkers
   _walkers.forEach(w => {
     w.x += w.speed * w.dir;
     w.phase = (w.phase + w.speed * 0.09) % (Math.PI * 2);
@@ -1287,25 +1433,23 @@ function animLoop() {
     drawWalker(ctx, w);
   });
 
-  // E: Weather effects
   if (_weatherType === 'rain') {
     spawnRain();
     drawRain(ctx);
   } else if (_weatherType === 'crisis') {
     const pulse = (Math.sin(_animTime * 0.035) * 0.5 + 0.5) * 0.1;
     ctx.globalAlpha = pulse;
-    ctx.fillStyle = '#f85149';
+    ctx.fillStyle = '#f03040';
     ctx.fillRect(0, 0, _cityW, _cityH);
     ctx.globalAlpha = 1;
   }
 
-  // H: Entrance animation — dark overlay fades out over 700ms
   if (!_entranceDone) {
     const elapsed = performance.now() - _entranceStart;
     if (elapsed < 700) {
       const t = elapsed / 700;
-      const alpha = (1 - t) * (1 - t) * 0.97; // quadratic ease-out
-      ctx.fillStyle = `rgba(13,17,23,${alpha})`;
+      const alpha = (1 - t) * (1 - t) * 0.97;
+      ctx.fillStyle = `rgba(4,8,16,${alpha})`;
       ctx.fillRect(0, 0, _cityW, _cityH);
     } else {
       _entranceDone = true;
@@ -1315,11 +1459,11 @@ function animLoop() {
   _animFrame = requestAnimationFrame(animLoop);
 }
 
-// ── Chart.js radar (policy metrics) ──────────────────────────────────────────
+// ── Chart.js radar ────────────────────────────────────────────────────────────
 
 function renderRadar(state) {
   const pol = state.pollution || 0;
-  const polClr = pol >= 60 ? '#f85149' : pol >= 30 ? '#e3b341' : '#3fb950';
+  const polClr = pol >= 60 ? '#f03040' : pol >= 30 ? '#e8a020' : '#10d870';
   document.getElementById('pol-fill').style.width = pol + '%';
   document.getElementById('pol-val').textContent  = pol;
   document.getElementById('pol-fill').style.background = polClr;
@@ -1336,10 +1480,10 @@ function renderRadar(state) {
       labels: ['EDU', 'IND', 'WEL', 'GRN', 'DEF'],
       datasets: [{
         data: ['education','industry','welfare','green_policy','defense'].map(k => state[k] || 0),
-        borderColor: '#388bfd',
-        backgroundColor: 'rgba(56,139,253,0.12)',
+        borderColor: '#c8820a',
+        backgroundColor: 'rgba(200,130,10,0.10)',
         borderWidth: 1.5,
-        pointBackgroundColor: '#388bfd',
+        pointBackgroundColor: '#c8820a',
         pointRadius: 3,
         pointHoverRadius: 5,
       }],
@@ -1350,10 +1494,10 @@ function renderRadar(state) {
       scales: {
         r: {
           min: 0, max: 100,
-          ticks: { stepSize: 25, color:'#484f58', backdropColor:'transparent', font:{size:8} },
-          grid: { color: '#21262d' },
-          angleLines: { color: '#21262d' },
-          pointLabels: { color:'#8b949e', font:{size:10} },
+          ticks: { stepSize: 25, color:'#283c56', backdropColor:'transparent', font:{size:8} },
+          grid: { color: '#162236' },
+          angleLines: { color: '#162236' },
+          pointLabels: { color:'#4e6e94', font:{size:10, family:"'Share Tech Mono', monospace"} },
         },
       },
     },
@@ -1362,7 +1506,7 @@ function renderRadar(state) {
 
 function renderRadarFallback(state) {
   const metrics = ['education','industry','welfare','green_policy','defense'];
-  const colors  = ['#388bfd','#bc8cff','#3fb950','#2dd4bf','#f0883e'];
+  const colors  = ['#00b8e0','#b058f8','#10d870','#00d4bc','#f07830'];
   const labels  = ['EDU','IND','WEL','GRN','DEF'];
   document.getElementById('radar-canvas').style.display = 'none';
   document.getElementById('radar-wrap').innerHTML = metrics.map((k, i) => `
@@ -1376,7 +1520,7 @@ function renderRadarFallback(state) {
     document.getElementById('pollution-row').outerHTML;
 }
 
-// ── Chart.js history chart ────────────────────────────────────────────────────
+// ── History chart ─────────────────────────────────────────────────────────────
 
 function renderHistoryChart(history) {
   const wrap = document.getElementById('history-wrap');
@@ -1387,7 +1531,6 @@ function renderHistoryChart(history) {
   if (typeof Chart === 'undefined') {
     renderHistorySVGFallback(history); return;
   }
-  // Ensure canvas is present
   if (!document.getElementById('history-canvas')) {
     wrap.innerHTML = '<canvas id="history-canvas"></canvas>';
   }
@@ -1401,7 +1544,6 @@ function renderHistoryChart(history) {
     yAxisID: 'y',
   });
 
-  // B: population + treasury on right y-axis (dashed, no fill)
   const mkDs2 = (key, color, label) => ({
     label, borderColor: color, backgroundColor: 'transparent',
     data: history.map(h => h[key] != null ? h[key] : null),
@@ -1415,15 +1557,15 @@ function renderHistoryChart(history) {
     data: {
       labels: history.map(h => `T${h.tick || ''}`),
       datasets: [
-        mkDs('education',    '#388bfd', 'Education'),
-        mkDs('industry',     '#bc8cff', 'Industry'),
-        mkDs('welfare',      '#3fb950', 'Welfare'),
-        mkDs('green_policy', '#2dd4bf', 'Green Policy'),
-        mkDs('defense',      '#f0883e', 'Defense'),
-        mkDs('pollution',    '#f85149', 'Pollution'),
-        mkDs('stability',    '#e3b341', 'Stability'),
-        mkDs2('population',  '#c9d1d9', 'Population'),
-        mkDs2('treasury',    '#e3b341', 'Treasury GC'),
+        mkDs('education',    '#00b8e0', 'Education'),
+        mkDs('industry',     '#b058f8', 'Industry'),
+        mkDs('welfare',      '#10d870', 'Welfare'),
+        mkDs('green_policy', '#00d4bc', 'Green Policy'),
+        mkDs('defense',      '#f07830', 'Defense'),
+        mkDs('pollution',    '#f03040', 'Pollution'),
+        mkDs('stability',    '#e8a020', 'Stability'),
+        mkDs2('population',  '#bcd2ec', 'Population'),
+        mkDs2('treasury',    '#e8a020', 'Treasury GC'),
       ],
     },
     options: {
@@ -1432,23 +1574,23 @@ function renderHistoryChart(history) {
       plugins: {
         legend: {
           labels: { boxWidth:12, boxHeight:2, usePointStyle:true, pointStyleWidth:12,
-                    font:{size:10}, color:'#8b949e', padding:14 },
+                    font:{size:10}, color:'#4e6e94', padding:14 },
         },
         tooltip: {
-          backgroundColor: '#161b22', borderColor:'#30363d', borderWidth:1,
-          titleColor:'#c9d1d9', bodyColor:'#8b949e',
+          backgroundColor: '#0b1528', borderColor:'#1e3050', borderWidth:1,
+          titleColor:'#bcd2ec', bodyColor:'#4e6e94',
           titleFont:{size:11}, bodyFont:{size:10},
           callbacks: { title: items => `Tick ${items[0].label}` },
         },
       },
       scales: {
-        x:  { ticks:{color:'#484f58',maxTicksLimit:10,font:{size:9}}, grid:{color:'#21262d'} },
-        y:  { min:0, max:100, ticks:{stepSize:25,color:'#484f58',font:{size:9}}, grid:{color:'#21262d'} },
+        x:  { ticks:{color:'#283c56',maxTicksLimit:10,font:{size:9}}, grid:{color:'#162236'} },
+        y:  { min:0, max:100, ticks:{stepSize:25,color:'#283c56',font:{size:9}}, grid:{color:'#162236'} },
         y1: {
           position: 'right',
           grid: { drawOnChartArea: false },
           ticks: {
-            color: '#484f58', font:{size:9}, maxTicksLimit: 5,
+            color: '#283c56', font:{size:9}, maxTicksLimit: 5,
             callback: v => v >= 1000 ? Math.round(v/1000) + 'k' : v,
           },
         },
@@ -1461,16 +1603,16 @@ function renderHistorySVGFallback(history) {
   const wrap = document.getElementById('history-wrap');
   const W = 900, H = 160, PAD = 20, n = history.length;
   const lines = [
-    {key:'education',color:'#388bfd'},{key:'industry',color:'#bc8cff'},
-    {key:'welfare',color:'#3fb950'},{key:'green_policy',color:'#2dd4bf'},
-    {key:'pollution',color:'#f85149'},
+    {key:'education',color:'#00b8e0'},{key:'industry',color:'#b058f8'},
+    {key:'welfare',color:'#10d870'},{key:'green_policy',color:'#00d4bc'},
+    {key:'pollution',color:'#f03040'},
   ];
   const xOf = i => PAD + (i/(n-1)) * (W-2*PAD);
   const yOf = v => PAD + (1-v/100) * (H-2*PAD);
-  let parts = [`<rect width="${W}" height="${H}" fill="#0d1117"/>`];
+  let parts = [`<rect width="${W}" height="${H}" fill="#070e1c"/>`];
   [25,50,75].forEach(v => {
     const y = yOf(v);
-    parts.push(`<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="#21262d" stroke-width="1"/>`);
+    parts.push(`<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="#162236" stroke-width="1"/>`);
   });
   lines.forEach(({key,color}) => {
     const pts = history.map((h,i) => `${xOf(i).toFixed(1)},${yOf(h[key]||0).toFixed(1)}`).join(' ');
@@ -1484,34 +1626,33 @@ function renderHistorySVGFallback(history) {
 
 function renderWorldStats(state) {
   const stb = state.stability || 0;
-  const stbClr = stb >= 60 ? '#3fb950' : stb >= 40 ? '#e3b341' : '#f85149';
+  const stbClr = stb >= 60 ? '#10d870' : stb >= 40 ? '#e8a020' : '#f03040';
 
   function deltaBadge(key) {
     if (!_prevMetrics) return '';
     const d = (state[key]||0) - (_prevMetrics[key]||0);
     if (d === 0) return '';
     const sign = d > 0 ? '+' : '';
-    const col  = d > 0 ? '#3fb950' : '#f85149';
+    const col  = d > 0 ? '#10d870' : '#f03040';
     return `<span class="delta-badge" style="color:${col}">${sign}${d}</span>`;
   }
 
   document.getElementById('world-stats').innerHTML = [
-    { label:'Population', key:'population', value:(state.population||0).toLocaleString(), color:'#c9d1d9' },
+    { label:'Population', key:'population', value:(state.population||0).toLocaleString(), color:'#bcd2ec' },
     { label:'Stability',  key:'stability',  value:`${stb}/100`,                           color:stbClr    },
-    { label:'Treasury',   key:'treasury',   value:`${(state.treasury||0).toLocaleString()} GC`, color:'#e3b341' },
-    { label:'Laws',       key:'laws_count', value: state.laws_count || 0,                 color:'#c9d1d9' },
-    { label:'Era',        key:'era',        value: state.era || '—',                      color:'#8b949e' },
+    { label:'Treasury',   key:'treasury',   value:`${(state.treasury||0).toLocaleString()} GC`, color:'#e8a020' },
+    { label:'Laws',       key:'laws_count', value: state.laws_count || 0,                 color:'#bcd2ec' },
+    { label:'Era',        key:'era',        value: state.era || '—',                      color:'#4e6e94' },
   ].map(({label, key, value, color}) => `
     <div class="stat-row">
       <span class="stat-label">${label}</span>
       <span class="stat-value" style="color:${color}">${value}${key !== 'era' ? deltaBadge(key) : ''}</span>
     </div>`).join('');
 
-  _prevMetrics = Object.assign({}, state); // J: store for next diff
-  updateEraProgress(state);               // C
+  _prevMetrics = Object.assign({}, state);
+  updateEraProgress(state);
 }
 
-// C: era progress bar
 function updateEraProgress(state) {
   const ms = ['education','industry','welfare','green_policy','defense'];
   const vals = ms.map(m => state[m] || 0);
@@ -1520,30 +1661,26 @@ function updateEraProgress(state) {
   const ind = state.industry || 0;
   const edu = state.education || 0;
 
-  let pct = 0, label = '', color = '#388bfd';
+  let pct = 0, label = '', color = '#00b8e0';
 
   if (pol >= 75 || stb <= 25) {
-    // Crisis Age — show recovery
     const recov = pol >= 75 ? (100 - pol) / 25 : stb / 25;
     pct = Math.round(Math.min(recov, 1) * 100);
-    label = `Crisis — recovery ${pct}%`; color = '#f85149';
+    label = `Crisis — recovery ${pct}%`; color = '#f03040';
   } else if (vals.every(v => v >= 80) && stb >= 80) {
-    pct = 100; label = 'Golden Age — peak civilization'; color = '#e3b341';
+    pct = 100; label = 'Golden Age — peak civilization'; color = '#e8a020';
   } else if (vals.every(v => v >= 65)) {
-    // Modern → Golden Age: need all ≥80 and stb ≥80
     const minTo80 = Math.min(...vals, stb);
     pct = Math.round(Math.min(minTo80 / 80, 1) * 100);
-    label = `Modern Era → Golden Age (${pct}%)`; color = '#2dd4bf';
+    label = `Modern Era → Golden Age (${pct}%)`; color = '#00d4bc';
   } else if (ind >= 60 && edu >= 50) {
-    // Industrial → Modern: need all ≥65
     const minTo65 = Math.min(...vals);
     pct = Math.round(Math.min(minTo65 / 65, 1) * 100);
-    label = `Industrial Era → Modern Era (${pct}%)`; color = '#bc8cff';
+    label = `Industrial Era → Modern Era (${pct}%)`; color = '#b058f8';
   } else {
-    // Founding → Industrial: need ind≥60 and edu≥50
     const progress = Math.min(ind / 60, 1) * 0.5 + Math.min(edu / 50, 1) * 0.5;
     pct = Math.round(progress * 100);
-    label = `Founding Era → Industrial Era (${pct}%)`; color = '#388bfd';
+    label = `Founding Era → Industrial Era (${pct}%)`; color = '#00b8e0';
   }
 
   const fill = document.getElementById('era-progress-fill');
@@ -1560,11 +1697,10 @@ function renderStructures(state) {
     const val = state[g.key] || 0;
     const rows = g.rules.map(r => {
       const ok = val >= r.t;
-      const cdAttr = ok ? '' : `data-cooldown="${g.key}"`;
       return `<div class="struct-row ${ok?'':'locked'}">
         <span class="struct-check" style="color:${ok?mm.color:'var(--dim)'}">${ok?'✓':'○'}</span>
         <span class="struct-name">${r.name}</span>
-        <span class="struct-threshold" ${cdAttr}>≥${r.t}</span>
+        <span class="struct-threshold" data-cooldown="${ok?'':g.key}">≥${r.t}</span>
       </div>`;
     }).join('');
     return `<div>
@@ -1637,7 +1773,6 @@ function startTickCountdown(nextTickAt) {
   if (_tickTimer) clearInterval(_tickTimer);
   const el = document.getElementById('tick-countdown');
   if (!nextTickAt) { el.textContent = ''; return; }
-  // Normalise: space-separated → T-separated, append Z if no tz
   const norm = nextTickAt.replace(' ', 'T');
   const raw  = (norm.includes('Z') || norm.includes('+')) ? norm : norm + 'Z';
   const target = new Date(raw);
@@ -1671,7 +1806,7 @@ async function loadActiveEvent() {
     const evt = await r.json();
     if (!evt.id) { setWeatherFromEvent(null); return; }
 
-    setWeatherFromEvent(evt);   // E: set weather type based on event
+    setWeatherFromEvent(evt);
 
     const firedAt  = new Date(evt.fired_at);
     _eventExpiry   = new Date(firedAt.getTime() + (evt.duration_hours||4)*3600000);
@@ -1679,7 +1814,7 @@ async function loadActiveEvent() {
     if (rem <= 0) { setWeatherFromEvent(null); return; }
 
     const isCrisis = !!evt.is_crisis;
-    const color = isCrisis ? '#f85149' : '#e3b341';
+    const color = isCrisis ? '#f03040' : '#e8a020';
     const banner = document.getElementById('event-banner');
     banner.style.borderLeftColor = color;
 
@@ -1698,16 +1833,15 @@ async function loadActiveEvent() {
       <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
         <span class="ev-title" style="color:${color}">${isCrisis?'[CRISIS] ':''}${evt.title}</span>
         <span class="ev-meta ev-meta-time">${hh}h ${mm}m remaining</span>
-        ${isCrisis ? '<span class="ev-meta" style="color:#f85149">policy effects ×1.5</span>' : ''}
+        ${isCrisis ? '<span class="ev-meta" style="color:#f03040">policy effects ×1.5</span>' : ''}
       </div>
       <div class="ev-desc">${evt.description||''}</div>`;
 
-    // D: refresh countdown every 30s
     _eventCountdownTimer = setInterval(updateBannerTime, 30000);
   } catch(_) { setWeatherFromEvent(null); }
 }
 
-// ── Citizens leaderboard + Representatives ────────────────────────────────────
+// ── Citizens ──────────────────────────────────────────────────────────────────
 
 const ACH_META = {
   first_vote:         {label:'1V',   cls:'ach-vote',   title:'First Vote'},
@@ -1805,7 +1939,7 @@ async function loadGapDashboard() {
   }
 }
 
-// ── Milestone badges in ERA PROGRESS panel ────────────────────────────────────
+// ── Milestone badges ──────────────────────────────────────────────────────────
 
 const THRESHOLD_TAGS_JS = [
   {metric:'education',    dir:'above', threshold:50,   tag:'milestone/educated-society'},
@@ -1853,7 +1987,7 @@ async function loadCooldowns() {
   } catch(_) {}
 }
 
-// ── Proposals ────────────────────────────────────────────────────────────────
+// ── Proposals ─────────────────────────────────────────────────────────────────
 
 function _renderProposalItems(issues) {
   if (!issues.length) {
@@ -1888,7 +2022,6 @@ async function loadProposals() {
     const r = await fetch(`${RAW}/world/proposals.json`, {cache:'no-cache'});
     if (r.ok) { _renderProposalItems(await r.json()); return; }
   } catch(_) {}
-  // Fallback: live GitHub API (rate-limited, last resort)
   try {
     const r = await fetch(`${REPO_API}/issues?labels=proposal&state=open&per_page=8`, {cache:'no-cache'});
     if (!r.ok) throw new Error();
@@ -1910,20 +2043,20 @@ async function loadRecentLaws() {
       document.getElementById('recent-laws-list').innerHTML = '<p class="no-data">No laws enacted yet.</p>'; return;
     }
     document.getElementById('recent-laws-list').innerHTML = recent.map(l => `
-      <div class="proposal-item">
-        <span style="color:var(--yellow);font-size:11px">Law ${String(l.number).padStart(3,'0')}</span>
+      <div class="proposal-item" style="border-left-color:var(--gold)">
+        <span style="color:var(--gold);font-size:11px;font-family:'Share Tech Mono',monospace">Law ${String(l.number).padStart(3,'0')}</span>
         <span style="color:var(--text);font-size:11px;flex:1;margin:0 8px;
           overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.title}</span>
         <span style="color:var(--dim);font-size:10px">${l.era}</span>
         <span style="color:var(--dim);font-size:10px;margin-left:8px">${l.enacted_date}</span>
-        <a class="proposal-link" href="${l.issue_url}" target="_blank">#${l.issue_number} →</a>
+        <a class="proposal-link" style="border-color:rgba(200,130,10,0.3);color:var(--gold);background:rgba(200,130,10,0.08)" href="${l.issue_url}" target="_blank">#${l.issue_number} →</a>
       </div>`).join('');
   } catch(_) {
     document.getElementById('recent-laws-list').innerHTML = '<p class="no-data">No laws enacted yet.</p>';
   }
 }
 
-// ── World Chronicle dispatches (A) ───────────────────────────────────────────
+// ── World Chronicle ───────────────────────────────────────────────────────────
 
 async function loadDispatches() {
   const el = document.getElementById('dispatch-list');
@@ -1953,10 +2086,10 @@ async function loadHistory() {
   } catch(_) {}
 }
 
-// ── State fetch with localStorage cache (K) ───────────────────────────────────
+// ── State fetch with localStorage cache ───────────────────────────────────────
 
 const _STATE_KEY = 'gz_state_v1';
-const _STATE_TTL = 5 * 60 * 1000; // 5 minutes
+const _STATE_TTL = 5 * 60 * 1000;
 
 function _readCache() {
   try {
@@ -1984,10 +2117,8 @@ async function fetchState() {
   };
 
   if (cached) {
-    // Return cached immediately; silently refresh in background
     fetchFresh().then(fresh => {
       if (JSON.stringify(fresh) !== JSON.stringify(cached)) {
-        // State changed — re-render panels with fresh data
         lastState = fresh;
         renderHeader(fresh);
         renderCityBg(fresh);
@@ -2012,13 +2143,12 @@ async function load() {
   clearInterval(_refreshTimer);
   document.getElementById('refresh-countdown').textContent = '';
 
-  // Phase 1: critical path
   let s;
   try {
     s = await fetchState();
   } catch(e) {
     document.getElementById('loading').style.display = 'flex';
-    document.getElementById('loading').textContent = `Unable to load world state`;
+    document.getElementById('loading').textContent = 'Unable to load world state';
     return;
   }
   lastState = s;
@@ -2033,14 +2163,12 @@ async function load() {
   renderStructures(s);
   renderMilestoneBadges(s);
 
-  // Phase 2: secondary (parallel)
   Promise.all([
     loadHistory(),
     loadActiveEvent(),
     loadCooldowns(),
   ]);
 
-  // Phase 3: social (lowest priority)
   Promise.all([
     loadProposals(),
     loadRecentLaws(),
@@ -2049,7 +2177,6 @@ async function load() {
     loadGapDashboard(),
   ]);
 
-  // Refresh countdown
   let tick = 60;
   _refreshTimer = setInterval(() => {
     tick--;
@@ -2061,7 +2188,7 @@ async function load() {
 let _refreshTimer = null;
 let _resizeTimer  = null;
 
-// ── Building hover tooltip (F) ────────────────────────────────────────────────
+// ── Building hover tooltip ────────────────────────────────────────────────────
 
 (function setupBuildingTooltip() {
   const container = document.getElementById('city-container');
@@ -2077,7 +2204,6 @@ let _resizeTimer  = null;
       const mm = METRIC_META[hit.metric];
       tooltip.innerHTML = `<strong>${hit.name}</strong>`
         + `<span style="color:var(--muted);margin-left:8px">${mm ? mm.label : hit.metric}: ${hit.value}</span>`;
-      // Keep tooltip inside viewport
       const tx = Math.min(e.clientX + 14, window.innerWidth - 200);
       tooltip.style.left = tx + 'px';
       tooltip.style.top  = (e.clientY - 12) + 'px';
@@ -2113,7 +2239,7 @@ window.addEventListener('resize', () => {
   }, 150);
 });
 
-// ── Proposal quick-create ────────────────────────────────────────────────────
+// ── Proposal quick-create ─────────────────────────────────────────────────────
 
 function onTypeChange() {
   const t = document.getElementById('p-type').value;
