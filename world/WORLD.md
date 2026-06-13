@@ -1,10 +1,6 @@
-<div align="center">
-  <img src="../docs/logo.png" alt="Gitizens" width="120" />
-</div>
-
 # World State
 
-*Last updated: 2026-06-11*
+*Last updated: 2026-06-13*
 
 ---
 
@@ -15,7 +11,7 @@
 | Era | Founding Era |
 | Laws enacted | 12 |
 | Last enacted | 2026-06-11 |
-| Treasury | 67 Git Coins |
+| Treasury | 103 Git Coins |
 
 ### Policy
 

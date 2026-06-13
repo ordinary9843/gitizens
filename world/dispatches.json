@@ -1,11 +1,5 @@
 [
   {
-    "tick": 6,
-    "date": "2026-06-11",
-    "narrative": "In a surprising cultural shift, the citizens of Gitizens have embraced creativity with a sudden surge in artistic expression, as evidenced by a striking increase in community artworks. This movement coincides with the enactment of a new law aimed at fostering creativity, reflecting the population's growing enthusiasm for the arts amidst a stable treasury of 241 GC and a population of 1,300. As the Founding Era progresses, the stability remains at 63 out of 100, accompanied by a manageable pollution level of 5, indicating a society poised for both growth and innovation.",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Everyone Suddenly Starts Painting"
-  },
-  {
     "tick": 8,
     "date": "2026-06-11",
     "narrative": "In an unprecedented cultural surge, the citizens of Gitizens have collectively embraced the art of drawing, igniting a creative renaissance across the Founding Era. As the population reaches 1,350, this artistic movement has not only elevated community morale, with a stability rating of 62/100, but also reflects a growing treasury of 245 GC. However, amidst this flourishing creativity, the pollution level remains a concern at 4/100, urging leaders to balance progress with environmental stewardship.",
@@ -66,5 +60,12 @@
     "narrative": "In a significant development for the Gitizens, the autonomous tick has successfully concluded, bringing the population to 2,150 and stabilizing the treasury at 75 GC. With a current stability rating of 50 out of 100 and pollution levels remaining at a clean 0, the Founding Era continues to lay the groundwork for future growth and governance.",
     "changes": "autonomous tick applied",
     "metrics": "population 2,150 \u00b7 treasury 75 GC \u00b7 stability 50/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 17,
+    "date": "2026-06-13",
+    "narrative": "In a significant progression for the Gitizens, the latest tick has brought the population to a robust 2,300, yet stability remains precariously low at 49 out of 100. With a treasury holding steady at 103 GC and no new proposals or achievements to report, the Founding Era teeters on the brink, raising concerns about the future sustainability of this burgeoning civilization.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 2,300 \u00b7 treasury 103 GC \u00b7 stability 49/100 \u00b7 pollution 0/100"
   }
 ]

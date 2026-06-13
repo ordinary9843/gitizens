@@ -1,0 +1,55 @@
+{
+  "updated_at": "2026-06-13T02:17:15.972243+00:00",
+  "pending": [
+    {
+      "name": "Industrial Complex",
+      "metric": "industry",
+      "current": 45,
+      "target": 55,
+      "gap": 10
+    },
+    {
+      "name": "Academy of Sciences",
+      "metric": "education",
+      "current": 66,
+      "target": 80,
+      "gap": 14
+    },
+    {
+      "name": "Eco-Research Center",
+      "metric": "green_policy",
+      "current": 67,
+      "target": 85,
+      "gap": 18
+    }
+  ],
+  "at_risk": [],
+  "milestones_pending": [
+    {
+      "tag": "milestone/industrial-age",
+      "metric": "industry",
+      "current": 45,
+      "target": 50,
+      "gap": 5
+    },
+    {
+      "tag": "milestone/militarized-state",
+      "metric": "defense",
+      "current": 41,
+      "target": 50,
+      "gap": 9
+    },
+    {
+      "tag": "crisis/pollution-crisis",
+      "metric": "pollution",
+      "current": 0,
+      "target": 60,
+      "gap": 60
+    }
+  ],
+  "milestones_achieved": [
+    "era/founding-era",
+    "milestone/educated-society",
+    "milestone/welfare-state"
+  ]
+}
