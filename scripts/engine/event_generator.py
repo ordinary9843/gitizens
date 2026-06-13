@@ -1,4 +1,5 @@
 import json
+import random
 import re
 from pathlib import Path
 
@@ -169,8 +170,6 @@ def _load_recent_event_history(n: int = 3) -> list[str]:
 def _fallback_from_pool(state: dict) -> dict | None:
     """Select a random event from world/event_pool.json, weighted by CATEGORY_MULTIPLIERS."""
     try:
-        import random
-        from pathlib import Path
         from .constants import CATEGORY_MULTIPLIERS
         pool_path = Path(__file__).parent.parent.parent / "world" / "event_pool.json"
         pool = json.loads(pool_path.read_text(encoding="utf-8"))
