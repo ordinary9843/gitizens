@@ -261,7 +261,7 @@ def apply_event_effects(event: dict, consequence_key: str):
     write_state(state)
 
 
-def apply_effect(effect_data: dict | None, law_number: int):
+def apply_effect(effect_data: dict | None, law_number: int, extra_cost: int = 0):
     if not effect_data:
         return
     etype = effect_data.get("type", "declaration")
@@ -277,7 +277,7 @@ def apply_effect(effect_data: dict | None, law_number: int):
                 current = state.get(metric, 0)
                 state[metric] = max(0, min(100, current + int(delta)))
         if state.get("treasury") is not None:
-            state["treasury"] = max(0, state["treasury"] - POLICY_COST)
+            state["treasury"] = max(0, state["treasury"] - POLICY_COST - max(0, int(extra_cost)))
         write_state(state)
 
     elif etype == "evolve":

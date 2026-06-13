@@ -116,46 +116,53 @@ class TestProposalCooldown:
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
         effect = {"type": "policy", "changes": {"education": 10}}
-        ok, _ = tv.check_proposal_cooldown(effect)
+        ok, _, extra = tv.check_proposal_cooldown(effect)
         assert ok
+        assert extra == 0
 
     def test_cooldown_active_blocks(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
-            json.dumps({"education": today}))
+            json.dumps({"education": {"last_date": today, "streak": 1}}))
         effect = {"type": "policy", "changes": {"education": 10}}
-        ok, reason = tv.check_proposal_cooldown(effect)
+        ok, reason, extra = tv.check_proposal_cooldown(effect)
         assert not ok
         assert "education" in reason
+        assert extra == 0  # blocked proposals report no extra cost
 
     def test_cooldown_expired_allows(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
+        # 4 days back is well outside the 1-day hard block but within the
+        # 7-day surcharge window, so streak penalty applies.
         old_date = (datetime.now(timezone.utc) - timedelta(days=4)).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
-            json.dumps({"education": old_date}))
+            json.dumps({"education": {"last_date": old_date, "streak": 1}}))
         effect = {"type": "policy", "changes": {"education": 10}}
-        ok, _ = tv.check_proposal_cooldown(effect)
+        ok, _, extra = tv.check_proposal_cooldown(effect)
         assert ok
+        assert extra == 100  # streak 1 -> next = 2 -> penalty 100
 
     def test_non_policy_always_ok(self):
-        ok, _ = tv.check_proposal_cooldown({"type": "declaration"})
+        ok, _, extra = tv.check_proposal_cooldown({"type": "declaration"})
         assert ok
+        assert extra == 0
 
     def test_none_effect_data_always_ok(self):
-        ok, _ = tv.check_proposal_cooldown(None)
+        ok, _, extra = tv.check_proposal_cooldown(None)
         assert ok
+        assert extra == 0
 
-    def test_update_writes_date(self, tmp_path, monkeypatch):
+    def test_update_writes_record(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
         effect = {"type": "policy", "changes": {"welfare": 5, "education": 3}}
         tv.update_proposal_cooldown(effect, "2026-06-11")
         data = json.loads((tmp_path / "world/proposal_cooldowns.json").read_text())
-        assert data["welfare"] == "2026-06-11"
-        assert data["education"] == "2026-06-11"
+        assert data["welfare"]   == {"last_date": "2026-06-11", "streak": 1}
+        assert data["education"] == {"last_date": "2026-06-11", "streak": 1}
 
     def test_update_non_policy_skips(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
@@ -174,17 +181,141 @@ class TestProposalCooldownRobustness:
         (tmp_path / "world").mkdir()
         (tmp_path / "world/proposal_cooldowns.json").write_text("{ NOT VALID JSON }")
         effect = {"type": "policy", "changes": {"education": 10}}
-        ok, _ = tv.check_proposal_cooldown(effect)
-        assert ok  # corrupted file → fail open (don't block proposals)
+        ok, _, extra = tv.check_proposal_cooldown(effect)
+        assert ok  # corrupted file -> fail open (don't block proposals)
+        assert extra == 0
 
     def test_malformed_date_in_cooldowns_returns_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
         (tmp_path / "world/proposal_cooldowns.json").write_text(
-            json.dumps({"education": "not-a-date"}))
+            json.dumps({"education": {"last_date": "not-a-date", "streak": 1}}))
         effect = {"type": "policy", "changes": {"education": 10}}
-        ok, _ = tv.check_proposal_cooldown(effect)
-        assert ok  # malformed date for metric → skip that metric
+        ok, _, extra = tv.check_proposal_cooldown(effect)
+        assert ok  # malformed date for metric -> skip that metric
+        assert extra == 0
+
+
+# ===========================================================================
+# check_proposal_cooldown — streak & legacy migration (Item 6)
+# ===========================================================================
+
+class TestCooldownStreaks:
+    def _write(self, tmp_path, payload):
+        (tmp_path / "world").mkdir(exist_ok=True)
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps(payload), encoding="utf-8")
+
+    def test_legacy_string_record_migrates_on_read(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        old_date = (datetime.now(timezone.utc) - timedelta(days=3)).strftime("%Y-%m-%d")
+        self._write(tmp_path, {"education": old_date})  # old `{metric: date}` shape
+        effect = {"type": "policy", "changes": {"education": 5}}
+        ok, _, extra = tv.check_proposal_cooldown(effect)
+        assert ok
+        # Migrated record gets streak=1; touching it would make it streak=2 -> penalty 100.
+        assert extra == 100
+
+    def test_streak_penalty_doubles(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        old_date = (datetime.now(timezone.utc) - timedelta(days=2)).strftime("%Y-%m-%d")
+        # streak 4 stored -> next would be 5 -> penalty 100 * 2^(5-2) = 800
+        self._write(tmp_path, {"welfare": {"last_date": old_date, "streak": 4}})
+        effect = {"type": "policy", "changes": {"welfare": 3}}
+        ok, _, extra = tv.check_proposal_cooldown(effect)
+        assert ok
+        assert extra == 800
+
+    def test_penalty_resets_after_decay_window(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        # 8 days back is past the 7-day decay window -> no surcharge on this touch.
+        old_date = (datetime.now(timezone.utc) - timedelta(days=8)).strftime("%Y-%m-%d")
+        self._write(tmp_path, {"welfare": {"last_date": old_date, "streak": 5}})
+        effect = {"type": "policy", "changes": {"welfare": 3}}
+        ok, _, extra = tv.check_proposal_cooldown(effect)
+        assert ok
+        assert extra == 0
+
+    def test_update_increments_streak_within_window(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        old_date = (datetime.now(timezone.utc) - timedelta(days=2)).strftime("%Y-%m-%d")
+        self._write(tmp_path, {"welfare": {"last_date": old_date, "streak": 2}})
+        effect = {"type": "policy", "changes": {"welfare": 3}}
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        tv.update_proposal_cooldown(effect, today)
+        data = json.loads((tmp_path / "world/proposal_cooldowns.json").read_text())
+        assert data["welfare"]["streak"] == 3
+        assert data["welfare"]["last_date"] == today
+
+    def test_update_resets_streak_after_decay(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        old_date = (datetime.now(timezone.utc) - timedelta(days=10)).strftime("%Y-%m-%d")
+        self._write(tmp_path, {"welfare": {"last_date": old_date, "streak": 5}})
+        effect = {"type": "policy", "changes": {"welfare": 3}}
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        tv.update_proposal_cooldown(effect, today)
+        data = json.loads((tmp_path / "world/proposal_cooldowns.json").read_text())
+        assert data["welfare"]["streak"] == 1
+
+    def test_multiple_metrics_accumulate_extra_cost(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        old_date = (datetime.now(timezone.utc) - timedelta(days=2)).strftime("%Y-%m-%d")
+        self._write(tmp_path, {
+            "welfare":   {"last_date": old_date, "streak": 1},  # next=2 -> 100
+            "education": {"last_date": old_date, "streak": 2},  # next=3 -> 200
+        })
+        effect = {"type": "policy", "changes": {"welfare": 1, "education": 1}}
+        ok, _, extra = tv.check_proposal_cooldown(effect)
+        assert ok
+        assert extra == 300
+
+    def test_independent_streaks_per_metric(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        old_date = (datetime.now(timezone.utc) - timedelta(days=2)).strftime("%Y-%m-%d")
+        self._write(tmp_path, {"welfare": {"last_date": old_date, "streak": 3}})
+        # Updating education doesn't affect welfare's streak.
+        effect = {"type": "policy", "changes": {"education": 1}}
+        tv.update_proposal_cooldown(effect, datetime.now(timezone.utc).strftime("%Y-%m-%d"))
+        data = json.loads((tmp_path / "world/proposal_cooldowns.json").read_text())
+        assert data["welfare"]["streak"]   == 3
+        assert data["education"]["streak"] == 1
+
+    def test_hard_block_within_one_day(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        self._write(tmp_path, {"welfare": {"last_date": today, "streak": 2}})
+        effect = {"type": "policy", "changes": {"welfare": 1}}
+        ok, reason, _ = tv.check_proposal_cooldown(effect)
+        assert not ok
+        assert "welfare" in reason
+
+    def test_empty_changes_returns_no_cost(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        effect = {"type": "policy", "changes": {}}
+        ok, _, extra = tv.check_proposal_cooldown(effect)
+        assert ok
+        assert extra == 0
+
+    def test_update_with_invalid_date_string_falls_back_to_today(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        effect = {"type": "policy", "changes": {"welfare": 1}}
+        # Garbage date string in caller -> function falls back to today and persists it.
+        tv.update_proposal_cooldown(effect, "not-a-date")
+        data = json.loads((tmp_path / "world/proposal_cooldowns.json").read_text())
+        assert data["welfare"]["last_date"] == "not-a-date"  # stored verbatim
+        assert data["welfare"]["streak"] == 1
+
+    def test_legacy_list_payload_is_ignored(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        # Defensive: a top-level list (clearly corrupted shape) -> treat as empty.
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/proposal_cooldowns.json").write_text(json.dumps([]))
+        effect = {"type": "policy", "changes": {"welfare": 1}}
+        ok, _, extra = tv.check_proposal_cooldown(effect)
+        assert ok
+        assert extra == 0
 
 
 # ===========================================================================

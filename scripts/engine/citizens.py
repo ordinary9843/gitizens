@@ -2,7 +2,10 @@ import json
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from .constants import SIGNATURE_THRESHOLD, COOLDOWN_DAYS, REPRESENTATIVE_DAYS
+from .constants import (
+    SIGNATURE_THRESHOLD, COOLDOWN_DAYS, REPRESENTATIVE_DAYS,
+    COOLDOWN_PENALTY_BASE, COOLDOWN_PENALTY_DECAY_DAYS,
+)
 
 
 # Achievements awarded based on citizen activity thresholds.
@@ -94,40 +97,99 @@ def track_citizen_proposal(proposer: str) -> list[str]:
     return awarded
 
 
-def check_proposal_cooldown(effect_data: dict | None) -> tuple[bool, str]:
-    if not effect_data or effect_data.get("type") != "policy":
-        return True, ""
+def _load_cooldowns() -> dict:
+    """Read proposal_cooldowns.json and migrate legacy `{metric: date_str}`
+    entries to the new `{metric: {"last_date": str, "streak": int}}` shape.
+
+    Returns an empty dict on missing or corrupted file.
+    """
     path = Path("world/proposal_cooldowns.json")
     if not path.exists():
-        return True, ""
+        return {}
     try:
-        cooldowns = json.loads(path.read_text(encoding="utf-8"))
+        raw = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
-        return True, ""
+        return {}
+    if not isinstance(raw, dict):
+        return {}
+    upgraded = {}
+    for metric, value in raw.items():
+        if isinstance(value, dict) and "last_date" in value:
+            upgraded[metric] = {
+                "last_date": value.get("last_date", ""),
+                "streak":    int(value.get("streak", 1)) or 1,
+            }
+        elif isinstance(value, str):
+            upgraded[metric] = {"last_date": value, "streak": 1}
+    return upgraded
+
+
+def _streak_penalty(streak: int) -> int:
+    """Treasury surcharge for the Nth consecutive change to the same metric.
+
+    Streak 1 -> 0 (no penalty on first touch within the window).
+    Streak N -> COOLDOWN_PENALTY_BASE * 2^(N-2) for N >= 2.
+    """
+    if streak <= 1:
+        return 0
+    return COOLDOWN_PENALTY_BASE * (2 ** (streak - 2))
+
+
+def check_proposal_cooldown(effect_data: dict | None) -> tuple[bool, str, int]:
+    """Return (allowed, reason_if_blocked, extra_treasury_cost).
+
+    Blocking is hard: a metric touched within COOLDOWN_DAYS cannot be touched
+    again. Outside the hard window but within COOLDOWN_PENALTY_DECAY_DAYS, the
+    proposal pays an escalating treasury surcharge stacked across metrics.
+    """
+    if not effect_data or effect_data.get("type") != "policy":
+        return True, "", 0
+    cooldowns = _load_cooldowns()
     today = datetime.now(timezone.utc).date()
+    extra_cost = 0
     for metric in effect_data.get("changes", {}):
-        if metric not in cooldowns:
+        entry = cooldowns.get(metric)
+        if not entry:
             continue
         try:
-            last_date = datetime.fromisoformat(cooldowns[metric]).date()
-        except (ValueError, TypeError):
+            last_date = datetime.fromisoformat(entry["last_date"]).date()
+        except (ValueError, TypeError, KeyError):
             continue
-        if (today - last_date).days < COOLDOWN_DAYS:
+        gap_days = (today - last_date).days
+        if gap_days < COOLDOWN_DAYS:
             until = (last_date + timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
-            return False, f"metric '{metric}' on cooldown until {until}"
-    return True, ""
+            return False, f"metric '{metric}' on cooldown until {until}", 0
+        if gap_days < COOLDOWN_PENALTY_DECAY_DAYS:
+            # Next touch increments streak; the penalty for *this* proposal
+            # is computed at the streak it will become (current + 1).
+            extra_cost += _streak_penalty(int(entry.get("streak", 1)) + 1)
+    return True, "", extra_cost
 
 
 def update_proposal_cooldown(effect_data: dict | None, date: str):
     if not effect_data or effect_data.get("type") != "policy":
         return
     path = Path("world/proposal_cooldowns.json")
+    cooldowns = _load_cooldowns()
     try:
-        cooldowns = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
-    except (json.JSONDecodeError, OSError):
-        cooldowns = {}
+        today = datetime.fromisoformat(date).date()
+    except (ValueError, TypeError):
+        today = datetime.now(timezone.utc).date()
     for metric in effect_data.get("changes", {}):
-        cooldowns[metric] = date
+        entry = cooldowns.get(metric)
+        if entry:
+            try:
+                last_date = datetime.fromisoformat(entry["last_date"]).date()
+                gap_days = (today - last_date).days
+                if gap_days >= COOLDOWN_PENALTY_DECAY_DAYS:
+                    streak = 1
+                else:
+                    streak = int(entry.get("streak", 1)) + 1
+            except (ValueError, TypeError, KeyError):
+                streak = 1
+        else:
+            streak = 1
+        cooldowns[metric] = {"last_date": date, "streak": streak}
     path.write_text(json.dumps(cooldowns, indent=2) + "\n", encoding="utf-8")
 
 
