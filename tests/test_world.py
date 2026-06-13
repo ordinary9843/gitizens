@@ -600,3 +600,203 @@ class TestCheckThresholdTags:
         after  = {"tags_applied": []}
         tags = tv.check_threshold_tags(before, after)
         assert tags == []
+
+
+# ===========================================================================
+# pollution_level
+# ===========================================================================
+
+class TestPollutionLevel:
+    def test_explicit_pollution_field_used(self):
+        # When "pollution" key exists it is used directly
+        state = {**BASE_STATE, "pollution": 42}
+        assert tv.pollution_level(state) == 42
+
+    def test_pollution_clamped_to_0(self):
+        state = {**BASE_STATE, "pollution": -5}
+        assert tv.pollution_level(state) == 0
+
+    def test_pollution_clamped_to_100(self):
+        state = {**BASE_STATE, "pollution": 150}
+        assert tv.pollution_level(state) == 100
+
+    def test_computed_from_industry_minus_green_policy(self):
+        # No "pollution" key; derived as industry - green_policy (clamped)
+        state = {"industry": 50, "green_policy": 20}
+        assert tv.pollution_level(state) == 30
+
+    def test_computed_result_clamped_low(self):
+        state = {"industry": 5, "green_policy": 80}
+        assert tv.pollution_level(state) == 0
+
+    def test_zero_when_both_absent(self):
+        # industry and green_policy both default to 0
+        assert tv.pollution_level({}) == 0
+
+
+# ===========================================================================
+# env_bg_color
+# ===========================================================================
+
+class TestEnvBgColor:
+    def test_returns_hex_string(self):
+        color = tv.env_bg_color(0)
+        assert color.startswith("#")
+        assert len(color) == 7
+
+    def test_zero_pollution_clean_color(self):
+        # At pollution=0, color should equal the clean baseline: #161b22
+        assert tv.env_bg_color(0) == "#161b22"
+
+    def test_max_pollution_dirty_color(self):
+        # At pollution=100, color should equal the dirty baseline: #1e0e05
+        assert tv.env_bg_color(100) == "#1e0e05"
+
+    def test_midpoint_is_between_bounds(self):
+        clean = tv.env_bg_color(0)
+        dirty = tv.env_bg_color(100)
+        mid   = tv.env_bg_color(50)
+        # Mid color must differ from both extremes
+        assert mid != clean
+        assert mid != dirty
+
+    def test_pollution_clamped_below_zero(self):
+        # Values below 0 treated as 0
+        assert tv.env_bg_color(-10) == tv.env_bg_color(0)
+
+    def test_pollution_clamped_above_100(self):
+        # Values above 100 treated as 100
+        assert tv.env_bg_color(200) == tv.env_bg_color(100)
+
+    def test_monotonic_red_increases_with_pollution(self):
+        # Red channel increases as pollution rises (dirty is redder)
+        low_r  = int(tv.env_bg_color(0)[1:3],   16)
+        high_r = int(tv.env_bg_color(100)[1:3],  16)
+        assert high_r > low_r
+
+
+# ===========================================================================
+# next_entity_id
+# ===========================================================================
+
+class TestNextEntityId:
+    def test_returns_formatted_id_and_seq(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings")
+        eid, seq = tv.next_entity_id("buildings")
+        # _make_category starts next_seq at 1 for an empty category
+        assert eid == "bld-001"
+        assert seq == 1
+
+    def test_prefix_for_districts(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "districts")
+        eid, seq = tv.next_entity_id("districts")
+        assert eid.startswith("dst-")
+
+    def test_prefix_for_institutions(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "institutions")
+        eid, _ = tv.next_entity_id("institutions")
+        assert eid.startswith("ins-")
+
+    def test_prefix_for_sectors(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "sectors")
+        eid, _ = tv.next_entity_id("sectors")
+        assert eid.startswith("sec-")
+
+    def test_seq_reflects_existing_entries(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        # Place two entities; next_seq should be 3
+        _make_category(tmp_path, "buildings", [
+            {"id": "bld-001", "name": "A", "built_law": 1,
+             "built_at": "2026-01-01T00:00:00Z", "auto_trigger": "x"},
+            {"id": "bld-002", "name": "B", "built_law": 2,
+             "built_at": "2026-01-01T00:00:00Z", "auto_trigger": "x"},
+        ])
+        eid, seq = tv.next_entity_id("buildings")
+        assert seq == 3
+        assert eid == "bld-003"
+
+    def test_does_not_modify_index(self, tmp_path, monkeypatch):
+        # next_entity_id is read-only — should not increment next_seq
+        monkeypatch.chdir(tmp_path)
+        _make_category(tmp_path, "buildings")
+        tv.next_entity_id("buildings")
+        idx = json.loads(
+            (tmp_path / "world/entities/buildings/_index.json").read_text())
+        assert idx["next_seq"] == 1  # unchanged
+
+
+# ===========================================================================
+# apply_tags
+# ===========================================================================
+
+class TestApplyTags:
+    def _state(self, **kwargs):
+        return {**BASE_STATE, "tags_applied": [], **kwargs}
+
+    def test_era_transition_tag_created(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        before = self._state(era="Founding Era")
+        after  = self._state(era="Industrial Era")
+        with patch.object(_engine_world, "run") as mock_run:
+            tv.apply_tags(None, before, after, 5, "Build Factory", [])
+            # run(["git", "tag", "-a", tag_name, "-m", msg]) — tag_name is at index 3
+            tag_names = [call.args[0][3] for call in mock_run.call_args_list]
+            assert any(t.startswith("era/industrial-era") for t in tag_names)
+
+    def test_no_era_tag_when_era_unchanged(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        before = self._state(era="Founding Era")
+        after  = self._state(era="Founding Era")
+        with patch.object(_engine_world, "run") as mock_run:
+            tv.apply_tags(None, before, after, 1, "Nothing", [])
+            assert mock_run.call_count == 0
+
+    def test_threshold_tags_are_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        before = self._state(era="Founding Era")
+        after  = self._state(era="Founding Era")
+        threshold_tags = [("milestone/educated-society", "World milestone: education crossed 50")]
+        with patch.object(_engine_world, "run") as mock_run:
+            tv.apply_tags(None, before, after, 3, "Edu boost", threshold_tags)
+            tag_names = [call.args[0][3] for call in mock_run.call_args_list]
+            assert "milestone/educated-society" in tag_names
+
+    def test_declaration_tag_with_slash_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        before = self._state(era="Founding Era")
+        after  = self._state(era="Founding Era")
+        effect = {"type": "declaration", "tag": "constitution/freedom-of-speech"}
+        with patch.object(_engine_world, "run") as mock_run:
+            tv.apply_tags(effect, before, after, 7, "Free Speech", [])
+            tag_names = [call.args[0][3] for call in mock_run.call_args_list]
+            assert "constitution/freedom-of-speech" in tag_names
+
+    def test_declaration_tag_without_slash_not_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        before = self._state(era="Founding Era")
+        after  = self._state(era="Founding Era")
+        effect = {"type": "declaration", "tag": "no-slash-tag"}
+        with patch.object(_engine_world, "run") as mock_run:
+            tv.apply_tags(effect, before, after, 7, "Bad Tag", [])
+            assert mock_run.call_count == 0
+
+    def test_non_declaration_type_ignored(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        before = self._state(era="Founding Era")
+        after  = self._state(era="Founding Era")
+        effect = {"type": "policy", "tag": "some/tag"}
+        with patch.object(_engine_world, "run") as mock_run:
+            tv.apply_tags(effect, before, after, 7, "Policy", [])
+            assert mock_run.call_count == 0
+
+    def test_no_effect_data_does_not_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        before = self._state(era="Founding Era")
+        after  = self._state(era="Founding Era")
+        with patch.object(_engine_world, "run") as mock_run:
+            tv.apply_tags(None, before, after, 1, "Nothing", [])
+            assert mock_run.call_count == 0
