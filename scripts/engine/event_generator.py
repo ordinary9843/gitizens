@@ -68,3 +68,123 @@ def apply_clamps(event: dict, current_state: dict) -> dict:
                 delta = max(5 - current, -50)
             effects[metric] = delta
     return event
+
+
+# ---------------------------------------------------------------------------
+# Prompt-building helpers
+# ---------------------------------------------------------------------------
+
+_SYSTEM_PROMPT = (
+    "You are a world event generator for a civilization simulation. "
+    "Generate a single JSON world event that naturally emerges from the current world state. "
+    "The event must be surprising yet plausible given the described conditions. "
+    "Return ONLY valid JSON matching the schema exactly - no prose, no markdown."
+)
+
+_OUTPUT_SCHEMA = """{
+  "id": "evt-llm-<unique_suffix>",
+  "category": "<one of: natural|economic|health|security|scientific|social|political|cosmic|weird>",
+  "rarity": "<one of: common|uncommon|rare|legendary>",
+  "title": "<short evocative title>",
+  "description": "<2-3 sentence event description>",
+  "flavor": "<optional atmospheric sentence>",
+  "immediate_effects": {"<metric>": <integer delta>, ...},
+  "response_consequence": {"<metric>": <integer delta>, ...},
+  "default_consequence": {"<metric>": <integer delta>, ...},
+  "response_hint": "<what passing a relevant law would do>",
+  "duration_hours": <number>,
+  "chained_from": null
+}"""
+
+_RARITY_GUIDE = (
+    "Rarity distribution: 60% common, 25% uncommon, 12% rare, 3% legendary. "
+    "Legendary events may include wars, plagues, revolutions, alien contact, or catastrophic collapse. "
+    "Event intensity should scale with rarity - legendary events can have deltas up to +-40 on multiple metrics."
+)
+
+_TREND_METRICS = ["treasury", "education", "industry", "welfare", "green_policy", "defense", "stability"]
+
+
+def _build_world_trend(history: list[dict]) -> str:
+    """Derive a plain-English trend sentence from the last 6 history snapshots."""
+    if not history:
+        return "No historical data available."
+    recent = history[-6:]
+    if len(recent) < 2:
+        return "Insufficient history for trend analysis."
+    first = recent[0]
+    last = recent[-1]
+    improving = []
+    deteriorating = []
+    for metric in _TREND_METRICS:
+        first_val = first.get(metric)
+        last_val = last.get(metric)
+        if first_val is None or last_val is None:
+            continue
+        delta = last_val - first_val
+        if delta > 5:
+            improving.append(metric)
+        elif delta < -5:
+            deteriorating.append(metric)
+    parts = []
+    if improving:
+        parts.append(f"improving: {', '.join(improving)}")
+    if deteriorating:
+        parts.append(f"deteriorating: {', '.join(deteriorating)}")
+    if not parts:
+        return "World metrics are stable."
+    return "Trend - " + "; ".join(parts) + "."
+
+
+def _load_recent_laws(n: int = 5) -> list[str]:
+    """Return titles of the n most recently enacted laws."""
+    try:
+        laws_path = Path(__file__).parent.parent.parent / "world" / "laws_index.json"
+        if not laws_path.exists():
+            return []
+        data = json.loads(laws_path.read_text(encoding="utf-8"))
+        titles = [entry["title"] for entry in data if "title" in entry]
+        return titles[-n:]
+    except Exception:
+        return []
+
+
+def _load_recent_event_history(n: int = 3) -> list[str]:
+    """Return titles of the n most recent resolved events from annals."""
+    try:
+        import json as _json
+        annals_path = Path(__file__).parent.parent.parent / "world" / "annals.json"
+        if not annals_path.exists():
+            return []
+        annals = _json.loads(annals_path.read_text(encoding="utf-8"))
+        event_entries = [
+            entry for entry in annals
+            if entry.get("type") == "event"
+        ]
+        recent = event_entries[-n:]
+        return [entry.get("title", "Unknown event") for entry in recent]
+    except Exception:
+        return []
+
+
+def build_prompt(state: dict, history: list[dict]) -> str:
+    """Build the user-turn prompt for LLM event generation."""
+    metrics_lines = "\n".join(
+        f"  {k}: {v}" for k, v in state.items()
+        if k in set(_TREND_METRICS) | {"era", "laws_count", "tick_count", "world_summary"}
+    )
+    trend = _build_world_trend(history)
+    recent_laws = _load_recent_laws()
+    recent_events = _load_recent_event_history()
+
+    law_text = ", ".join(recent_laws) if recent_laws else "none"
+    event_text = ", ".join(recent_events) if recent_events else "none"
+
+    return (
+        f"Current world state:\n{metrics_lines}\n\n"
+        f"Trend: {trend}\n"
+        f"Recent laws enacted: {law_text}\n"
+        f"Recent events: {event_text}\n\n"
+        f"Rarity guide: {_RARITY_GUIDE}\n\n"
+        f"Output schema:\n{_OUTPUT_SCHEMA}"
+    )

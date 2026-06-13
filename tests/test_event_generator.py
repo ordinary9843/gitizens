@@ -225,3 +225,72 @@ class TestApplyClamps:
     def test_float_delta_rounded(self):
         event = self._evt(imm={"education": 7.6})
         assert _gen.apply_clamps(event, BASE_STATE)["immediate_effects"]["education"] == 8
+
+
+# ===========================================================================
+# Group 4: build_prompt + helpers
+# ===========================================================================
+
+class TestBuildWorldTrend:
+    def test_empty_history_returns_no_data(self):
+        assert "No historical data" in _gen._build_world_trend([])
+
+    def test_single_entry_insufficient(self):
+        result = _gen._build_world_trend([{"treasury": 50}])
+        assert "Insufficient" in result
+
+    def test_improving_metric_detected(self):
+        history = [{"treasury": 40}] + [{}] * 4 + [{"treasury": 50}]
+        result = _gen._build_world_trend(history)
+        assert "treasury" in result
+        assert "improving" in result
+
+    def test_deteriorating_metric_detected(self):
+        history = [{"education": 60}] + [{}] * 4 + [{"education": 49}]
+        result = _gen._build_world_trend(history)
+        assert "education" in result
+        assert "deteriorating" in result
+
+    def test_stable_returns_stable(self):
+        history = [{"treasury": 50}] * 6
+        result = _gen._build_world_trend(history)
+        assert "stable" in result.lower()
+
+    def test_only_last_6_entries_used(self):
+        # 10 entries: first 4 show big drop, last 6 are stable
+        history = (
+            [{"treasury": 10}] * 4 +
+            [{"treasury": 50}] * 6
+        )
+        result = _gen._build_world_trend(history)
+        assert "stable" in result.lower()
+
+    def test_missing_metric_in_first_ignored(self):
+        history = [{}] + [{}] * 4 + [{"treasury": 50}]
+        result = _gen._build_world_trend(history)
+        # should not raise, treasury not in improving/deteriorating since first_val is None
+        assert isinstance(result, str)
+
+
+class TestBuildPrompt:
+    def test_prompt_contains_metric_values(self):
+        state = {**BASE_STATE}
+        result = _gen.build_prompt(state, [])
+        assert "treasury" in result
+        assert str(BASE_STATE["treasury"]) in result
+
+    def test_prompt_contains_trend_section(self):
+        result = _gen.build_prompt(BASE_STATE, [])
+        assert "Trend" in result
+
+    def test_prompt_contains_schema(self):
+        result = _gen.build_prompt(BASE_STATE, [])
+        assert "immediate_effects" in result
+        assert "duration_hours" in result
+
+    def test_prompt_contains_rarity_guide(self):
+        result = _gen.build_prompt(BASE_STATE, [])
+        assert "legendary" in result.lower()
+
+    def test_prompt_is_string(self):
+        assert isinstance(_gen.build_prompt(BASE_STATE, []), str)
