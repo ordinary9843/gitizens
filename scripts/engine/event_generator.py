@@ -99,7 +99,7 @@ _OUTPUT_SCHEMA = """{
 _RARITY_GUIDE = (
     "Rarity distribution: 60% common, 25% uncommon, 12% rare, 3% legendary. "
     "Legendary events may include wars, plagues, revolutions, alien contact, or catastrophic collapse. "
-    "Event intensity should scale with rarity - legendary events can have deltas up to +-40 on multiple metrics."
+    "Event intensity should scale with rarity - legendary events can have deltas up to +/-40 on multiple metrics."
 )
 
 _TREND_METRICS = ["treasury", "education", "industry", "welfare", "green_policy", "defense", "stability"]
@@ -152,11 +152,10 @@ def _load_recent_laws(n: int = 5) -> list[str]:
 def _load_recent_event_history(n: int = 3) -> list[str]:
     """Return titles of the n most recent resolved events from annals."""
     try:
-        import json as _json
         annals_path = Path(__file__).parent.parent.parent / "world" / "annals.json"
         if not annals_path.exists():
             return []
-        annals = _json.loads(annals_path.read_text(encoding="utf-8"))
+        annals = json.loads(annals_path.read_text(encoding="utf-8"))
         event_entries = [
             entry for entry in annals
             if entry.get("type") == "event"
