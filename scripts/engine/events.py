@@ -5,7 +5,6 @@ import tempfile
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from .constants import RARITY_WEIGHTS, CATEGORY_MULTIPLIERS
 from .gh import run, gh_json, get_reactions, REPO
 from .state import load_event_pool, load_active_event, save_active_event, read_state
 from .world import apply_event_effects
