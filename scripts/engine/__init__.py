@@ -14,6 +14,7 @@ from .world import (
     world_autonomous_tick, run_world_engine, apply_effect, apply_event_effects,
     determine_era, check_threshold_tags, apply_tags,
     compute_next_tick_at, TICK_INTERVAL_HOURS,
+    compute_population_delta, POPULATION_FLOOR,
 )
 from .events import (
     fire_random_event, open_event_issue, close_event_issue,

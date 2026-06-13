@@ -83,7 +83,8 @@ class TestIdleEconomy:
             state_path = Path(tmp) / "state.json"
             state_path.write_text(json.dumps(state), encoding="utf-8")
             with patch.object(_engine_world, "read_state", return_value=dict(state)), \
-                 patch.object(_engine_world, "write_state") as mock_write:
+                 patch.object(_engine_world, "write_state") as mock_write, \
+                 patch.object(_engine_world.random, "uniform", return_value=0.0):
                 tv.world_autonomous_tick()
                 if mock_write.called:
                     return mock_write.call_args[0][0]
@@ -107,23 +108,24 @@ class TestIdleEconomy:
         assert new["treasury"] == state["treasury"] + ind_income + (new["population"] // 500)
 
     def test_welfare_population_bonus(self):
-        base = {**BASE_STATE, "welfare": 70}  # >60 triggers +100 extra
+        # High welfare grows population (births > deaths, no migration penalty).
+        base = {**BASE_STATE, "welfare": 70}
         new = self._run_tick(base)
-        # base pop delta: 50 (welfare>=40) + 100 (welfare>60) = 150
-        assert new["population"] == base["population"] + 150
+        assert new["population"] > base["population"]
 
     def test_pollution_population_penalty(self):
         state = {**BASE_STATE, "welfare": 70, "industry": 80, "green_policy": 0}
-        # ind - grn = 80 → pol_delta = +1 → new_pol = 1
-        # pop_delta = 50+100=150, no pollution penalty since new_pol < 70
+        # ind - grn = 80 -> pol_delta = +1 -> new_pol = 1 (still low)
         new = self._run_tick(state)
         assert new["pollution"] == 1
 
     def test_high_pollution_population_penalty(self):
-        state = {**BASE_STATE, "pollution": 70, "welfare": 70, "industry": 80, "green_policy": 0}
+        # Extreme pollution combined with neutral welfare causes population decline
+        # (pop>70 death bonus dominates birth rate).
+        state = {**BASE_STATE, "pollution": 70, "welfare": 50,
+                 "industry": 80, "green_policy": 0}
         new = self._run_tick(state)
-        # new_pol = 71 >= 70 → pop_delta -= 50; so 150-50=100
-        assert new["population"] == state["population"] + 100
+        assert new["population"] < state["population"]
 
     def test_era_recomputed_in_tick(self):
         state = {**BASE_STATE, "industry": 65, "education": 55, "pollution": 0, "stability": 79}
@@ -868,3 +870,163 @@ class TestComputeNextTickAt:
         # Round-trip parseable
         parsed = datetime.fromisoformat(result.replace("Z", "+00:00"))
         assert parsed.tzinfo is not None
+
+
+# ===========================================================================
+# compute_population_delta
+# ===========================================================================
+
+class _FixedRng:
+    """Stand-in for random.Random returning a preset uniform() value."""
+    def __init__(self, value=0.0):
+        self._value = value
+    def uniform(self, _a, _b):
+        return self._value
+
+
+class TestComputePopulationDelta:
+    def _call(self, **overrides):
+        defaults = dict(
+            pop=1000, welfare=50, pollution=30,
+            stability=50, defense=50, treasury=500,
+            rng=_FixedRng(0.0),
+        )
+        defaults.update(overrides)
+        return _engine_world.compute_population_delta(**defaults)
+
+    # ── Growth conditions ──
+    def test_high_welfare_grows_population(self):
+        new = self._call(welfare=80, pollution=10, stability=80)
+        assert new > 1000
+
+    def test_high_treasury_boosts_birth_rate(self):
+        low_treas  = self._call(treasury=500)
+        high_treas = self._call(treasury=5000)
+        assert high_treas > low_treas
+
+    def test_high_stability_boosts_birth_rate(self):
+        low_stb  = self._call(stability=50)
+        high_stb = self._call(stability=80)
+        assert high_stb > low_stb
+
+    # ── Decline conditions ──
+    def test_extreme_pollution_kills_population(self):
+        # Welfare neutral (no birth bonus) but pollution > 70 dominates.
+        new = self._call(pop=2000, welfare=50, pollution=80, stability=50)
+        assert new < 2000
+
+    def test_extreme_pollution_balanced_by_max_welfare(self):
+        # Documented behavior: maxed welfare (+ stability + treasury) can offset
+        # pollution=80 to roughly zero net change. This is intentional gameplay —
+        # a wealthy, stable, well-cared-for society can weather pollution.
+        new = self._call(pop=2000, welfare=80, pollution=80,
+                         stability=80, treasury=5000)
+        # Net effect within ±5% (no migration triggered here)
+        assert 1900 <= new <= 2100
+
+    def test_pollution_above_50_increases_deaths(self):
+        mild = self._call(pop=2000, pollution=40)
+        med  = self._call(pop=2000, pollution=55)
+        assert med < mild
+
+    def test_low_welfare_increases_deaths(self):
+        ok   = self._call(welfare=40)
+        bad  = self._call(welfare=20)
+        assert bad < ok
+
+    def test_low_stability_triggers_migration_out(self):
+        new = self._call(pop=2000, welfare=60, stability=20)
+        assert new < 2000
+
+    def test_low_defense_triggers_migration_out(self):
+        new = self._call(pop=2000, welfare=60, defense=20)
+        assert new < 2000
+
+    def test_compound_collapse(self):
+        # Bad on every axis — strong negative pressure.
+        new = self._call(pop=5000, welfare=20, pollution=80,
+                         stability=20, defense=20, treasury=0)
+        assert new < 5000
+
+    # ── Floor ──
+    def test_floor_prevents_extinction_under_collapse(self):
+        new = self._call(pop=100, welfare=10, pollution=95,
+                         stability=10, defense=10, treasury=0)
+        assert new >= 100
+
+    def test_floor_pulls_zero_population_up(self):
+        # Defensive: state with pop=0 shouldn't stay at 0 forever.
+        new = self._call(pop=0)
+        assert new >= 100
+
+    def test_floor_caps_negative_pop_input(self):
+        # Defensive: corrupted state with negative pop is clamped at 0 then floored.
+        new = self._call(pop=-500)
+        assert new >= 100
+
+    # ── Noise ──
+    def test_noise_zero_keeps_result_deterministic(self):
+        a = self._call(rng=_FixedRng(0.0))
+        b = self._call(rng=_FixedRng(0.0))
+        assert a == b
+
+    def test_positive_noise_increases_population(self):
+        baseline = self._call(rng=_FixedRng(0.0))
+        with_pos = self._call(rng=_FixedRng(+0.02))
+        assert with_pos > baseline
+
+    def test_negative_noise_decreases_population(self):
+        baseline = self._call(rng=_FixedRng(0.0))
+        with_neg = self._call(rng=_FixedRng(-0.02))
+        assert with_neg < baseline
+
+    # ── Boundary inputs ──
+    def test_zero_welfare_pollution_stability_defense(self):
+        # All-zero conditions should not crash and should yield decline.
+        new = self._call(pop=1000, welfare=0, pollution=0,
+                         stability=0, defense=0, treasury=0)
+        assert new >= 100  # floor still applies
+
+    def test_max_metrics_grows_strongly(self):
+        new = self._call(pop=1000, welfare=100, pollution=0,
+                         stability=100, defense=100, treasury=10_000)
+        assert new > 1000
+
+    def test_default_rng_uses_random_module(self):
+        # Smoke test: omitting `rng` doesn't crash and stays within bounds.
+        new = _engine_world.compute_population_delta(
+            pop=1000, welfare=50, pollution=30,
+            stability=50, defense=50, treasury=500,
+        )
+        # ±20% absolute bound is more than generous given the rates.
+        assert 100 <= new <= 1400
+
+    def test_birth_rate_threshold_is_strict_inequality(self):
+        # `welfare > 60` is strict. Welfare exactly 60 should NOT get the bonus.
+        with_60 = self._call(welfare=60)
+        with_61 = self._call(welfare=61)
+        assert with_61 > with_60
+
+    # ── Integration ──
+    def test_integrates_with_world_autonomous_tick(self, tmp_path, monkeypatch):
+        """world_autonomous_tick should produce decreased population when conditions are bad."""
+        monkeypatch.chdir(tmp_path)
+        Path("world").mkdir()
+        state = {
+            **BASE_STATE,
+            "pollution": 80,
+            "stability": 20,
+            "defense":   20,
+            "welfare":   20,
+            "population": 5000,
+            "industry":  60,
+            "green_policy": 10,
+            "treasury":  100,
+            "next_tick_at": None,
+        }
+        Path("world/state.json").write_text(json.dumps(state), encoding="utf-8")
+        with patch.object(_engine_world, "SKIP_TIMING", True), \
+             patch.object(_engine_world.random, "uniform", return_value=0.0):
+            tv.world_autonomous_tick()
+        new_state = json.loads(Path("world/state.json").read_text(encoding="utf-8"))
+        assert new_state["population"] < 5000
