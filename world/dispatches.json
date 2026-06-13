@@ -1,11 +1,5 @@
 [
   {
-    "tick": 8,
-    "date": "2026-06-11",
-    "narrative": "In an unprecedented cultural surge, the citizens of Gitizens have collectively embraced the art of drawing, igniting a creative renaissance across the Founding Era. As the population reaches 1,350, this artistic movement has not only elevated community morale, with a stability rating of 62/100, but also reflects a growing treasury of 245 GC. However, amidst this flourishing creativity, the pollution level remains a concern at 4/100, urging leaders to balance progress with environmental stewardship.",
-    "changes": "autonomous tick applied \u00b7 event: Everyone Suddenly Starts Painting"
-  },
-  {
     "tick": 9,
     "date": "2026-06-11",
     "narrative": "In a decisive advancement for the Gitizens, the population has surged to 1,400, reflecting a promising growth during the Founding Era. However, with a treasury of only 269 GC and stability at a precarious 61 out of 100, concerns about governance and resource management loom large. As pollution levels remain at 3 out of 100, the delicate balance of progress and preservation hangs in the balance.",
@@ -67,5 +61,12 @@
     "narrative": "In a significant progression for the Gitizens, the latest tick has brought the population to a robust 2,300, yet stability remains precariously low at 49 out of 100. With a treasury holding steady at 103 GC and no new proposals or achievements to report, the Founding Era teeters on the brink, raising concerns about the future sustainability of this burgeoning civilization.",
     "changes": "autonomous tick applied",
     "metrics": "population 2,300 \u00b7 treasury 103 GC \u00b7 stability 49/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 18,
+    "date": "2026-06-13",
+    "narrative": "In the aftermath of Tick #18, completed on June 13, 2026, Gitizens face a critical moment in their Founding Era, with a burgeoning population now at 2,450. The treasury, holding 111 GC, reflects a cautious optimism, yet stability remains precarious at 48 out of 100, urging leaders to address the burgeoning challenges of governance and resource management. As pollution levels remain at a hopeful 0, the path forward hinges on the community's collective efforts to secure a sustainable future.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 2,450 \u00b7 treasury 111 GC \u00b7 stability 48/100 \u00b7 pollution 0/100"
   }
 ]
