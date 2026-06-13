@@ -8,6 +8,7 @@ dist/
 build/
 .pytest_cache/
 .superpowers/
+docs/superpowers/
 *.log
 .DS_Store
 Thumbs.db
