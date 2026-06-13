@@ -388,7 +388,7 @@ def _ensure_labels():
     labels = [
         ("ai-proposal",    "0075ca", "AI-generated proposal"),
         ("applied",        "0e8a16", "Feedback or effect applied"),
-        ("citizen-voices", "d93f0b", "Weekly citizen diary"),
+        ("citizen-voices", "d93f0b", "Daily citizen diary"),
         ("dispatch",       "e4e669", "World Chronicle dispatch"),
         ("event",          "6f42c1", "Active world event"),
         ("feedback",       "fbca04", "Citizen feedback"),

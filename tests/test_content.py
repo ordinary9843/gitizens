@@ -441,7 +441,7 @@ class TestGenerateCitizenNarrator:
 
     def test_skipped_if_called_recently(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        recent_date = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
+        recent_date = (datetime.now(timezone.utc) - timedelta(hours=6)).isoformat()
         state = {**BASE_STATE, "last_narrator_date": recent_date}
         self._make_state_file(tmp_path, state)
         mock_client = MagicMock()
@@ -474,9 +474,9 @@ class TestGenerateCitizenNarrator:
             tv.generate_citizen_narrator()
         mock_client.chat.completions.create.assert_called_once()
 
-    def test_runs_when_last_narrator_over_7_days_ago(self, tmp_path, monkeypatch):
+    def test_runs_when_last_narrator_over_1_day_ago(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        old_date = (datetime.now(timezone.utc) - timedelta(days=8)).isoformat()
+        old_date = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat()
         state = {**BASE_STATE, "last_narrator_date": old_date}
         self._make_state_file(tmp_path, state)
         mock_client = MagicMock()
