@@ -5,7 +5,6 @@ from pathlib import Path
 from .constants import WORLD_GENERATION_RULES, THRESHOLD_TAGS
 from .gh import run, gh_json, REPO
 from .state import read_json, read_state, write_state, read_stats, write_stats
-from .svg import generate_dashboard_svg
 from .content import client, upsert_bot_comment
 
 
@@ -402,8 +401,7 @@ def collect_star_income():
     state["treasury"] = min(100_000, state.get("treasury", 0) + income)
     write_state(state)
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    generate_dashboard_svg(read_stats(), today)
-    run(["git", "add", "world/state.json", "world/stats.svg"])
+    run(["git", "add", "world/state.json"])
     run(["git", "commit", "-m",
          f"[WORLD] treasury: +{income} {currency} from {len(new_logins)} new star(s)"])
     print(f"  Star income: +{len(new_logins)} new stars -> +{income} {currency}")

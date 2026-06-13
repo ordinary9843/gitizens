@@ -31,8 +31,6 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 **Next tick:** 2026-06-13T04:00:00Z UTC
 <!-- STATE_END -->
 
-[![Gitizens Dashboard](world/stats.svg)](https://ordinary9843.github.io/gitizens/)
-
 ---
 
 ## Become a Citizen

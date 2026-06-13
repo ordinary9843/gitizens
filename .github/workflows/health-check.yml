@@ -1,0 +1,63 @@
+name: "[WORLD] Health Check"
+
+on:
+  schedule:
+    - cron: "30 */4 * * *"
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check world state freshness
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python - << 'EOF'
+          import json, sys, os
+          from datetime import datetime, timezone, timedelta
+          from pathlib import Path
+
+          state = json.loads(Path("world/state.json").read_text())
+          next_tick_raw = state.get("next_tick_at")
+          if not next_tick_raw:
+              print("No next_tick_at found — skipping check")
+              sys.exit(0)
+
+          next_tick = datetime.fromisoformat(next_tick_raw.replace("Z", "+00:00"))
+          now = datetime.now(timezone.utc)
+          overdue = now - next_tick
+
+          # Alert if the world is more than 6 hours past its scheduled tick
+          THRESHOLD = timedelta(hours=6)
+          if overdue > THRESHOLD:
+              hours = int(overdue.total_seconds() // 3600)
+              print(f"ALERT: World is {hours}h overdue (next_tick_at={next_tick_raw})")
+              import subprocess
+              title = f"[HEALTH] World tick overdue by {hours}h"
+              body = (
+                  f"The world has not ticked since `{next_tick_raw}` "
+                  f"({hours} hours overdue).\n\n"
+                  "Possible causes:\n"
+                  "- Tally workflow push blocked by branch protection\n"
+                  "- API permission error (check workflow run logs)\n"
+                  "- Workflow not running (check Actions schedule)\n\n"
+                  "Check the latest [Tally Votes run](../../actions/workflows/tally-votes.yml) "
+                  "for errors."
+              )
+              subprocess.run(
+                  ["gh", "issue", "create", "--title", title, "--body", body,
+                   "--label", "bug"],
+                  check=True,
+                  env={**os.environ},
+              )
+              sys.exit(1)
+          else:
+              print(f"World is healthy (next_tick_at={next_tick_raw}, overdue={overdue})")
+          EOF

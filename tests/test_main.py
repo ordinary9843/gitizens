@@ -65,10 +65,9 @@ class TestMainOrdering:
             read_state=MagicMock(side_effect=lambda: dict({**BASE_STATE, "laws_count": 0})),
             write_state=MagicMock(),
             read_stats=MagicMock(return_value={}),
-            generate_dashboard_svg=MagicMock(),
             generate_world_md=MagicMock(),
             update_readme=MagicMock(),
-            push_with_retry=MagicMock(return_value=False),
+            push_with_retry=MagicMock(return_value=True),
             publish_dispatch=MagicMock(),
         )
         base.update(overrides)
@@ -79,7 +78,9 @@ class TestMainOrdering:
         self._setup_world(tmp_path)
         patches = self._common_patches(push_with_retry=MagicMock(return_value=False))
         with patch.multiple(tv, **patches):
-            tv.main()
+            with pytest.raises(SystemExit) as exc_info:
+                tv.main()
+        assert exc_info.value.code == 1
         patches["publish_dispatch"].assert_not_called()
 
     def test_publish_called_when_push_succeeds(self, tmp_path, monkeypatch):

@@ -35,8 +35,6 @@ from engine import (
     # events
     fire_random_event, open_event_issue, close_event_issue,
     check_event_expiry, fire_chained_event, apply_crisis_multiplier,
-    # svg
-    svg_radar, generate_dashboard_svg,
     # content
     client, generate_narrative, update_world_summary, generate_world_md,
     generate_annals, generate_citizen_narrator, upsert_bot_comment, update_readme,
@@ -167,7 +165,6 @@ def main():
     dirty = run(["git", "status", "--porcelain", "world/"])
     if dirty:
         stats = read_stats()
-        generate_dashboard_svg(stats, today)
         state = read_state()
         generate_world_md(state, None, today)
         update_readme(state, stats, None, today)
@@ -184,6 +181,8 @@ def main():
 
     if push_with_retry():
         publish_dispatch()
+    else:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -18,7 +18,6 @@ from .events import (
     fire_random_event, open_event_issue, close_event_issue,
     check_event_expiry, fire_chained_event, apply_crisis_multiplier,
 )
-from .svg import svg_radar, generate_dashboard_svg
 from .content import (
     client, _LLM_EXCLUDE, _state_for_llm,
     generate_narrative, update_world_summary, generate_world_md,

@@ -106,8 +106,7 @@ class TestCollectStarIncome:
                 return stargazers_output
             calls.append(cmd)
             return ""
-        with patch.object(_engine_chronicle, "run", side_effect=fake_run), \
-             patch.object(_engine_chronicle, "generate_dashboard_svg"):
+        with patch.object(_engine_chronicle, "run", side_effect=fake_run):
             tv.collect_star_income()
         return calls
 
