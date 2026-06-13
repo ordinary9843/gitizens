@@ -582,3 +582,191 @@ class TestGenerateLeaderboard:
         content = (tmp_path / "world/LEADERBOARD.md").read_text(encoding="utf-8")
         assert "first_vote" in content
         assert "legislator" in content
+
+
+# ===========================================================================
+# append_history — happy path rows
+# ===========================================================================
+
+class TestAppendHistory:
+    def test_appends_passed_row_with_law_link(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "history").mkdir()
+        (tmp_path / "history/INDEX.md").write_text("| # | Law | Proposal | Votes | Date |\n")
+        tv.append_history(3, "Build a School", 42, 5, 1, True, "2026-06-13")
+        content = (tmp_path / "history/INDEX.md").read_text(encoding="utf-8")
+        assert "law-003" in content
+        assert "Build a School" in content
+        assert "#42" in content
+        assert "5+1" in content
+        assert "1-1" in content
+        assert "2026-06-13" in content
+
+    def test_appends_rejected_row_without_law_link(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "history").mkdir()
+        (tmp_path / "history/INDEX.md").write_text("| # | Law | Proposal | Votes | Date |\n")
+        tv.append_history(None, "Ban Fireworks", 99, 1, 4, False, "2026-06-13")
+        content = (tmp_path / "history/INDEX.md").read_text(encoding="utf-8")
+        assert "rejected" in content
+        assert "Ban Fireworks" in content
+        assert "#99" in content
+        assert "law-" not in content.split("rejected")[1]  # no law link after rejected
+
+    def test_appends_row_to_existing_content(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "history").mkdir()
+        header = "| # | Law | Proposal | Votes | Date |\n"
+        existing_row = "| 1 | [law-001](...) | [#10](...) First Law | 3+1 0-1 | 2026-01-01 |\n"
+        (tmp_path / "history/INDEX.md").write_text(header + existing_row)
+        tv.append_history(2, "Second Law", 20, 4, 0, True, "2026-06-13")
+        content = (tmp_path / "history/INDEX.md").read_text(encoding="utf-8")
+        assert "First Law" in content
+        assert "Second Law" in content
+        assert content.index("First Law") < content.index("Second Law")
+
+
+# ===========================================================================
+# update_laws_index — creates file, adds entries, caps at 20
+# ===========================================================================
+
+class TestUpdateLawsIndex:
+    def test_creates_file_when_missing(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        tv.update_laws_index(1, "First Law", 10, "http://example.com/10",
+                             "Founding Era", "2026-06-13")
+        data = json.loads((tmp_path / "world/laws_index.json").read_text())
+        assert len(data) == 1
+        entry = data[0]
+        assert entry["number"] == 1
+        assert entry["title"] == "First Law"
+        assert entry["issue_number"] == 10
+        assert entry["issue_url"] == "http://example.com/10"
+        assert entry["era"] == "Founding Era"
+        assert entry["enacted_date"] == "2026-06-13"
+
+    def test_appends_to_existing_entries(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        existing = [{"number": 1, "title": "Old Law", "issue_number": 5,
+                     "issue_url": "http://x", "enacted_date": "2026-01-01", "era": "Test"}]
+        (tmp_path / "world/laws_index.json").write_text(json.dumps(existing))
+        tv.update_laws_index(2, "New Law", 6, "http://y", "Founding Era", "2026-06-13")
+        data = json.loads((tmp_path / "world/laws_index.json").read_text())
+        assert len(data) == 2
+        assert data[-1]["title"] == "New Law"
+
+    def test_caps_at_20_entries(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        existing = [{"number": i, "title": f"Law {i}", "issue_number": i,
+                     "issue_url": "http://x", "enacted_date": "2026-01-01", "era": "Test"}
+                    for i in range(1, 21)]
+        (tmp_path / "world/laws_index.json").write_text(json.dumps(existing))
+        tv.update_laws_index(21, "Overflow Law", 100, "http://z",
+                             "Founding Era", "2026-06-13")
+        data = json.loads((tmp_path / "world/laws_index.json").read_text())
+        assert len(data) == 20
+        assert data[-1]["title"] == "Overflow Law"
+        assert data[0]["title"] == "Law 2"  # oldest entry dropped
+
+
+# ===========================================================================
+# generate_leaderboard — missing/corrupted citizens.json, sort order
+# ===========================================================================
+
+class TestGenerateLeaderboardEdgeCases:
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir()
+
+    def test_missing_citizens_json_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        # No citizens.json — should return without error and without creating LEADERBOARD.md
+        tv.generate_leaderboard()
+        assert not (tmp_path / "world/LEADERBOARD.md").exists()
+
+    def test_sorted_by_votes_descending(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        citizens = {
+            "charlie": {"total_votes": 1,  "total_proposals": 0, "achievements": []},
+            "alice":   {"total_votes": 10, "total_proposals": 2, "achievements": []},
+            "bob":     {"total_votes": 5,  "total_proposals": 0, "achievements": []},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.generate_leaderboard()
+        content = (tmp_path / "world/LEADERBOARD.md").read_text(encoding="utf-8")
+        alice_pos = content.index("@alice")
+        bob_pos = content.index("@bob")
+        charlie_pos = content.index("@charlie")
+        assert alice_pos < bob_pos < charlie_pos
+
+    def test_no_achievements_shows_dash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        citizens = {
+            "alice": {"total_votes": 1, "total_proposals": 0, "achievements": []},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.generate_leaderboard()
+        content = (tmp_path / "world/LEADERBOARD.md").read_text(encoding="utf-8")
+        assert "—" in content
+
+
+# ===========================================================================
+# post_world_dispatch — orchestrates sub-functions
+# ===========================================================================
+
+class TestPostWorldDispatch:
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir()
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world/entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        (tmp_path / "world/history.json").write_text(
+            json.dumps([{"tick": 1, "date": "2026-06-13T00:00:00Z"}])
+        )
+
+    def _mock_llm(self, monkeypatch):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = (
+            "Dispatch narrative."
+        )
+        monkeypatch.setattr(_engine_chronicle, "client", mock_client)
+        return mock_client
+
+    def test_writes_gap_dashboard_json(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        self._mock_llm(monkeypatch)
+        monkeypatch.setattr(_engine_chronicle, "publish_dispatch", lambda: None)
+        _engine_chronicle.post_world_dispatch({**BASE_STATE, "tags_applied": []},
+                                              False, 0, "", 0)
+        assert (tmp_path / "world/gap_dashboard.json").exists()
+
+    def test_saves_dispatch_entry(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        self._mock_llm(monkeypatch)
+        monkeypatch.setattr(_engine_chronicle, "publish_dispatch", lambda: None)
+        _engine_chronicle.post_world_dispatch({**BASE_STATE, "tags_applied": []},
+                                              True, 1, "Flood", 0)
+        dispatches = json.loads((tmp_path / "world/dispatches.json").read_text())
+        assert len(dispatches) == 1
+        assert dispatches[0]["changes"] == "autonomous tick applied · 1 law enacted · event: Flood"
+
+    def test_calls_publish_dispatch(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        self._mock_llm(monkeypatch)
+        published = []
+        monkeypatch.setattr(_engine_chronicle, "publish_dispatch",
+                            lambda: published.append(True))
+        _engine_chronicle.post_world_dispatch({**BASE_STATE, "tags_applied": []},
+                                              False, 0, "", 0)
+        assert published == [True]
