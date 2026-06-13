@@ -49,6 +49,7 @@ def validate_event(event: dict) -> bool:
             return False
         if not all(isinstance(v, (int, float)) for v in effects.values()):
             return False
+    # normalize duration_hours in place so callers receive the corrected value
     try:
         duration = float(event["duration_hours"])
         event["duration_hours"] = duration if duration >= 0 else 4.0
@@ -62,7 +63,7 @@ def apply_clamps(event: dict, current_state: dict) -> dict:
         effects = event.get(key, {})
         for metric, delta in list(effects.items()):
             delta = max(-50, min(50, int(round(delta))))
-            current = current_state.get(metric, 50)
+            current = current_state.get(metric, 50)  # unknown metrics default to midpoint
             if current + delta < 5:
                 delta = max(5 - current, -50)
             effects[metric] = delta
