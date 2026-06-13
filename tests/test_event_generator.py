@@ -340,10 +340,9 @@ class TestFallbackFromPool:
         assert result["id"] == VALID_EVENT["id"]
 
     def test_returns_none_on_missing_pool(self):
-        # _fallback_from_pool should return None or a dict gracefully when
-        # the real pool file may or may not exist in the test environment.
-        result = _gen._fallback_from_pool({"treasury": 50})
-        assert result is None or isinstance(result, dict)
+        with patch("pathlib.Path.read_text", side_effect=FileNotFoundError("no pool")):
+            result = _gen._fallback_from_pool({"treasury": 50})
+        assert result is None
 
     def test_empty_pool_returns_none(self, tmp_path):
         pool_file = tmp_path / "event_pool.json"
@@ -404,4 +403,5 @@ class TestGenerateEvent:
                 with patch("engine.event_generator._fallback_from_pool", return_value=None):
                     with patch("engine.state.read_history", return_value=[]):
                         result = _gen.generate_event(BASE_STATE)
-        assert result is None or isinstance(result, dict)
+        assert isinstance(result, dict)
+        assert result["id"] == "evt-llm-001"
