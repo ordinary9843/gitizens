@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-13T17:52:54.985242+00:00",
+  "updated_at": "2026-06-13T17:55:11.678496+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/militarized-state",
       "metric": "defense",
-      "current": 41,
+      "current": 47,
       "target": 50,
-      "gap": 9
+      "gap": 3
     },
     {
       "tag": "crisis/pollution-crisis",
