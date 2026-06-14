@@ -545,6 +545,21 @@ class TestValidateFunction:
             vp.validate()
         assert any("--add-label" in str(c) and "proposal" in str(c) for c in calls)
 
+    def test_treasury_notice_exception_handled(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_world(tmp_path, treasury=200)
+        vp = self._vp(tmp_path)
+        _llm_valid(vp)
+        vp.ISSUE_TITLE = "[PROPOSAL] Test"
+        vp.ISSUE_BODY = _POLICY_BODY
+
+        def fake_run(cmd, *args, **kwargs):
+            if "comment" in cmd:
+                raise RuntimeError("gh error")
+
+        with patch("subprocess.run", side_effect=fake_run):
+            vp.validate()
+
     def test_no_effect_block_passes_declaration_path(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         _make_world(tmp_path)

@@ -266,6 +266,27 @@ class TestMainBranches:
             tv.main()
         patches["process_ai_proposal"].assert_called_once_with(ai_proposal)
 
+    def test_ai_proposal_law_increments_count(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world(tmp_path)
+        laws_count = [0]
+
+        def fake_read_state():
+            return {**BASE_STATE, "laws_count": laws_count[0]}
+
+        def fake_process_ai(_proposal):
+            laws_count[0] += 1
+
+        ai_proposal = {"number": 10, "title": "[AI-PROPOSAL] Boost"}
+        patches = self._common_patches(
+            get_ai_proposals=MagicMock(return_value=[ai_proposal]),
+            process_ai_proposal=MagicMock(side_effect=fake_process_ai),
+            read_state=MagicMock(side_effect=fake_read_state),
+        )
+        with patch.multiple(tv, **patches):
+            tv.main()
+        patches["process_ai_proposal"].assert_called_once()
+
     def test_ai_proposal_exception_handled(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         self._setup_world(tmp_path)

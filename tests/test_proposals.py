@@ -68,6 +68,13 @@ class TestGetReactions:
         assert for_c == 2
         assert for_v == ["alice", "bob"]
 
+    def test_empty_line_in_output_skipped(self):
+        raw = '{"login": "alice", "content": "+1"}\n\n{"login": "bob", "content": "-1"}'
+        with patch.object(_engine_gh, "run", return_value=raw):
+            for_c, against_c, for_v, against_v = tv.get_reactions(1)
+        assert for_c == 1 and against_c == 1
+        assert for_v == ["alice"] and against_v == ["bob"]
+
 
 # ===========================================================================
 # format_signatories

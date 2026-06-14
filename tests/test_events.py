@@ -285,6 +285,22 @@ class TestCheckEventExpiry:
         result = tv.check_event_expiry(0)
         assert result is True
 
+    def test_naive_datetime_gets_utc_timezone(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        (tmp_path / "world/active_event.json").write_text("{}")
+        # naive ISO datetime (no +00:00 or Z suffix) → tzinfo is None → branch executed
+        from datetime import datetime as _dt
+        fired_at = (_dt.utcnow() - timedelta(hours=1)).isoformat()  # naive, no tz
+        evt = {"id": "x", "title": "T", "fired_at": fired_at,
+               "duration_hours": 4, "issue_number": 0,
+               "immediate_effects": {}, "default_consequence": {},
+               "response_consequence": {}}
+        (tmp_path / "world/active_event.json").write_text(json.dumps(evt))
+        result = tv.check_event_expiry(0)
+        assert result is False  # 1h ago < 4h duration → not yet expired
+
 
 # ===========================================================================
 # check_event_expiry — reaction-based voting (Feature A)

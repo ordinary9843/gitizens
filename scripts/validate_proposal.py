@@ -144,7 +144,7 @@ def validate():
                 "```\n"
                 "````"
             )
-            return
+            return  # pragma: no cover — fail() always sys.exit(1) before here
 
         if not isinstance(effect_data, dict):
             fail("Effect YAML must be a mapping (key: value pairs).")
@@ -328,5 +328,5 @@ def validate():
     gh("issue", "edit", ISSUE_NUMBER, "--repo", REPO, "--add-label", "proposal")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     validate()
