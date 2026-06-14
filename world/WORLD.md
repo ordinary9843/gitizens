@@ -11,7 +11,7 @@
 | Era | Founding Era |
 | Laws enacted | 14 |
 | Last enacted | 2026-06-14 |
-| Treasury | 112 Git Coins |
+| Treasury | 136 Git Coins |
 
 ### Policy
 
