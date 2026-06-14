@@ -714,6 +714,13 @@ class TestGenerateLeaderboardEdgeCases:
         content = (tmp_path / "world/LEADERBOARD.md").read_text(encoding="utf-8")
         assert "—" in content
 
+    def test_corrupted_citizens_json_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        (tmp_path / "world/citizens.json").write_text("{this is not valid json}")
+        tv.generate_leaderboard()
+        assert not (tmp_path / "world/LEADERBOARD.md").exists()
+
 
 # ===========================================================================
 # post_world_dispatch — orchestrates sub-functions
