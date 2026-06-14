@@ -777,3 +777,197 @@ class TestPostWorldDispatch:
         _engine_chronicle.post_world_dispatch({**BASE_STATE, "tags_applied": []},
                                               False, 0, "", 0)
         assert published == [True]
+
+
+# ===========================================================================
+# _load_entity_names — exception handler (lines 61-62)
+# ===========================================================================
+
+class TestLoadEntityNamesException:
+    def test_corrupt_entity_file_exception_handled(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        cat_path = tmp_path / "world/entities/buildings"
+        cat_path.mkdir(parents=True)
+        (cat_path / "_index.json").write_text(json.dumps({"entities": ["bld-001"]}))
+        (cat_path / "bld-001.json").write_text("INVALID JSON CONTENT")
+        names = tv._load_entity_names()
+        assert "WARN" in capsys.readouterr().out
+        assert isinstance(names, set)
+
+
+# ===========================================================================
+# _build_gap_dashboard — entity_names=None triggers _load_entity_names (line 69)
+# ===========================================================================
+
+class TestBuildGapDashboardEntityNamesNone:
+    def test_loads_entity_names_when_not_provided(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        state = {**BASE_STATE, "tags_applied": []}
+        result = tv._build_gap_dashboard(state)
+        assert "What Needs Your Vote" in result
+
+
+# ===========================================================================
+# _build_gap_dashboard — milestone "below" direction (line 107)
+# ===========================================================================
+
+class TestBuildGapDashboardBelowMilestone:
+    def test_below_direction_milestone_shown_when_gap_in_range(self):
+        state = {**BASE_STATE, "pollution": 25, "tags_applied": []}
+        result = tv._build_gap_dashboard(state, entity_names=set())
+        assert "recovery/air-cleaned" in result
+        assert "needs -5" in result
+
+
+# ===========================================================================
+# generate_leaderboard — corrupt representatives.json (lines 174-175)
+# ===========================================================================
+
+class TestGenerateLeaderboardCorruptReps:
+    def test_corrupt_reps_json_handled_gracefully(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {"alice": {"total_votes": 5, "total_proposals": 0, "achievements": []}}
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        (tmp_path / "world/representatives.json").write_text("INVALID JSON")
+        tv.generate_leaderboard()
+        content = (tmp_path / "world/LEADERBOARD.md").read_text(encoding="utf-8")
+        assert "@alice" in content
+
+
+# ===========================================================================
+# get_or_create_dispatch_issue (lines 201-225)
+# ===========================================================================
+
+class TestGetOrCreateDispatchIssue:
+    def test_returns_existing_issue_number(self, monkeypatch):
+        monkeypatch.setattr(_engine_chronicle, "gh_json", lambda cmd: [{"number": 42}])
+        result = tv.get_or_create_dispatch_issue()
+        assert result == 42
+
+    def test_creates_new_issue_when_none_exists(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "scripts").mkdir()
+        monkeypatch.setattr(_engine_chronicle, "gh_json", lambda cmd: [])
+        monkeypatch.setattr(_engine_chronicle, "run",
+                            lambda cmd: "https://github.com/test/repo/issues/99")
+        result = tv.get_or_create_dispatch_issue()
+        assert result == 99
+
+    def test_returns_zero_on_url_parse_failure(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "scripts").mkdir()
+        monkeypatch.setattr(_engine_chronicle, "gh_json", lambda cmd: [])
+        monkeypatch.setattr(_engine_chronicle, "run", lambda cmd: "not-a-url")
+        result = tv.get_or_create_dispatch_issue()
+        assert result == 0
+
+
+# ===========================================================================
+# _build_chronicle_body — missing dispatches / corrupt reps / gap dashboard
+# (lines 232-233, 261-262, 266-268)
+# ===========================================================================
+
+class TestBuildChronicleBodyEdgeCases:
+    def test_missing_dispatches_json_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        body = tv._build_chronicle_body()
+        assert "World Chronicle" in body
+
+    def test_corrupt_representatives_json_handled(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        (tmp_path / "world/representatives.json").write_text("CORRUPT JSON")
+        body = tv._build_chronicle_body()
+        assert "World Chronicle" in body
+
+    def test_gap_dashboard_included_when_state_readable(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        (tmp_path / "world/state.json").write_text(
+            json.dumps({**BASE_STATE, "tags_applied": []}))
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world/entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+        body = tv._build_chronicle_body()
+        assert "What Needs Your Vote" in body
+
+
+# ===========================================================================
+# save_dispatch — missing history / corrupt dispatches / plural / LLM error
+# (lines 288-289, 295-296, 314, 336-338)
+# ===========================================================================
+
+class TestSaveDispatchEdgeCases:
+    def _mock_llm(self, monkeypatch):
+        mc = MagicMock()
+        mc.chat.completions.create.return_value.choices[0].message.content = "Narrative."
+        monkeypatch.setattr(_engine_chronicle, "client", mc)
+        return mc
+
+    def test_missing_history_json_defaults_to_tick_1(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        self._mock_llm(monkeypatch)
+        tv.save_dispatch({**BASE_STATE}, False, 0, "", 0)
+        dispatches = json.loads((tmp_path / "world/dispatches.json").read_text())
+        assert dispatches[0]["tick"] == 1
+
+    def test_corrupt_dispatches_json_resets_gracefully(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("NOT JSON")
+        (tmp_path / "world/history.json").write_text(
+            json.dumps([{"tick": 5, "date": "2026-01-01"}]))
+        self._mock_llm(monkeypatch)
+        tv.save_dispatch({**BASE_STATE}, False, 0, "", 0)
+        dispatches = json.loads((tmp_path / "world/dispatches.json").read_text())
+        assert len(dispatches) == 1
+
+    def test_feedback_count_plural_label(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        (tmp_path / "world/history.json").write_text(
+            json.dumps([{"tick": 3, "date": "2026-01-01"}]))
+        self._mock_llm(monkeypatch)
+        tv.save_dispatch({**BASE_STATE}, False, 0, "", feedback_count=2)
+        dispatches = json.loads((tmp_path / "world/dispatches.json").read_text())
+        assert "feedbacks" in dispatches[0]["changes"]
+
+    def test_llm_exception_uses_fallback_narrative(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/dispatches.json").write_text("[]")
+        (tmp_path / "world/history.json").write_text(
+            json.dumps([{"tick": 7, "date": "2026-01-01"}]))
+        mc = MagicMock()
+        mc.chat.completions.create.side_effect = RuntimeError("LLM down")
+        monkeypatch.setattr(_engine_chronicle, "client", mc)
+        tv.save_dispatch({**BASE_STATE}, True, 0, "", 0)
+        dispatches = json.loads((tmp_path / "world/dispatches.json").read_text())
+        assert "Tick 8" in dispatches[0]["narrative"]
+
+
+# ===========================================================================
+# collect_star_income — treasury is None (line 373)
+# ===========================================================================
+
+class TestCollectStarIncomeTreasuryNone:
+    def test_returns_early_when_treasury_is_none(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        state = {k: v for k, v in BASE_STATE.items()}
+        state["treasury"] = None
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        run_calls = []
+        with patch.object(_engine_chronicle, "run",
+                          side_effect=lambda cmd: run_calls.append(cmd) or ""):
+            tv.collect_star_income()
+        assert len(run_calls) == 0

@@ -513,3 +513,159 @@ class TestFireRandomEvent:
                 from engine.events import fire_random_event
                 result = fire_random_event(BASE_STATE)
         assert result is None
+
+
+# ===========================================================================
+# parse_llm_output — code block with invalid JSON (lines 21-22)
+# ===========================================================================
+
+class TestParseLlmOutputCodeBlockInvalidJson:
+    def test_code_block_with_invalid_json_returns_none(self):
+        raw = "```json\n{this is: not valid json!!}\n```"
+        assert _gen.parse_llm_output(raw) is None
+
+
+# ===========================================================================
+# validate_event — non-dict input (line 40)
+# ===========================================================================
+
+class TestValidateEventNonDict:
+    def test_integer_input_returns_false(self):
+        assert _gen.validate_event(42) is False
+
+    def test_list_input_returns_false(self):
+        assert _gen.validate_event([VALID_EVENT]) is False
+
+    def test_string_input_returns_false(self):
+        assert _gen.validate_event("event") is False
+
+
+# ===========================================================================
+# _load_recent_laws — file missing / exception (lines 145, 149-150)
+# ===========================================================================
+
+class TestLoadRecentLaws:
+    def test_returns_empty_when_file_does_not_exist(self):
+        from pathlib import Path as _Path
+        original_exists = _Path.exists
+        def patched_exists(self):
+            if "laws_index.json" in str(self):
+                return False
+            return original_exists(self)
+        with patch.object(_Path, "exists", patched_exists):
+            result = _gen._load_recent_laws()
+        assert result == []
+
+    def test_returns_empty_on_read_exception(self):
+        from pathlib import Path as _Path
+        original_exists = _Path.exists
+        original_read = _Path.read_text
+        def patched_exists(self):
+            if "laws_index.json" in str(self):
+                return True
+            return original_exists(self)
+        def patched_read(self, *args, **kwargs):
+            if "laws_index.json" in str(self):
+                raise OSError("IO error")
+            return original_read(self, *args, **kwargs)
+        with patch.object(_Path, "exists", patched_exists), \
+             patch.object(_Path, "read_text", patched_read):
+            result = _gen._load_recent_laws()
+        assert result == []
+
+
+# ===========================================================================
+# _load_recent_event_history — success path (lines 159-167)
+# ===========================================================================
+
+class TestLoadRecentEventHistory:
+    def test_returns_event_titles_when_annals_exist(self):
+        from pathlib import Path as _Path
+        annals = [
+            {"type": "event", "title": "Earthquake"},
+            {"type": "tick"},
+            {"type": "event", "title": "Flood"},
+        ]
+        original_exists = _Path.exists
+        original_read = _Path.read_text
+        def patched_exists(self):
+            if "annals.json" in str(self):
+                return True
+            return original_exists(self)
+        def patched_read(self, *args, **kwargs):
+            if "annals.json" in str(self):
+                return json.dumps(annals)
+            return original_read(self, *args, **kwargs)
+        with patch.object(_Path, "exists", patched_exists), \
+             patch.object(_Path, "read_text", patched_read):
+            result = _gen._load_recent_event_history()
+        assert "Earthquake" in result
+        assert "Flood" in result
+        assert len(result) == 2
+
+
+# ===========================================================================
+# _fallback_from_pool — success path (lines 176-190)
+# ===========================================================================
+
+class TestFallbackFromPoolDirect:
+    def test_direct_call_selects_from_pool(self):
+        from pathlib import Path as _Path
+        pool = [dict(VALID_EVENT)]
+        original_read = _Path.read_text
+        def patched_read(self, *args, **kwargs):
+            if "event_pool.json" in str(self):
+                return json.dumps(pool)
+            return original_read(self, *args, **kwargs)
+        with patch.object(_Path, "read_text", patched_read):
+            result = _gen._fallback_from_pool(BASE_STATE)
+        assert result is not None
+        assert result["id"] == VALID_EVENT["id"]
+
+    def test_empty_pool_returns_none_direct(self):
+        from pathlib import Path as _Path
+        original_read = _Path.read_text
+        def patched_read(self, *args, **kwargs):
+            if "event_pool.json" in str(self):
+                return json.dumps([])
+            return original_read(self, *args, **kwargs)
+        with patch.object(_Path, "read_text", patched_read):
+            result = _gen._fallback_from_pool(BASE_STATE)
+        assert result is None
+
+    def test_low_direction_multiplier_applied(self):
+        from pathlib import Path as _Path
+        pool = [{**VALID_EVENT, "category": "natural"}]
+        low_green_state = {**BASE_STATE, "green_policy": 10}
+        original_read = _Path.read_text
+        def patched_read(self, *args, **kwargs):
+            if "event_pool.json" in str(self):
+                return json.dumps(pool)
+            return original_read(self, *args, **kwargs)
+        with patch.object(_Path, "read_text", patched_read):
+            result = _gen._fallback_from_pool(low_green_state)
+        assert result is not None
+        assert result["category"] == "natural"
+
+
+# ===========================================================================
+# _load_recent_event_history — exception path (lines 166-167)
+# ===========================================================================
+
+class TestLoadRecentEventHistoryException:
+    def test_exception_during_read_returns_empty(self):
+        from pathlib import Path as _Path
+        original_exists = _Path.exists
+        original_read = _Path.read_text
+        def patched_exists(self):
+            if "annals.json" in str(self):
+                return True
+            return original_exists(self)
+        def patched_read(self, *args, **kwargs):
+            if "annals.json" in str(self):
+                raise OSError("IO error reading annals")
+            return original_read(self, *args, **kwargs)
+        with patch.object(_Path, "exists", patched_exists), \
+             patch.object(_Path, "read_text", patched_read):
+            result = _gen._load_recent_event_history()
+        assert result == []

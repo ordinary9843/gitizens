@@ -646,3 +646,140 @@ class TestCitizenNarratorDailyCadence:
         content.generate_citizen_narrator()
         # Should fire (malformed = treat as no prior run)
         assert "last_narrator_date" in written
+
+
+# ===========================================================================
+# generate_world_md — extra state fields and missing entity index (lines 92, 98-99)
+# ===========================================================================
+
+class TestGenerateWorldMdEdgeCases:
+    def _setup_world_dirs(self, tmp_path):
+        (tmp_path / "world" / "annals").mkdir(parents=True)
+        (tmp_path / "world" / "archive").mkdir(parents=True)
+        for cat, _ in [("institutions", ""), ("districts", ""),
+                       ("buildings", ""), ("sectors", "")]:
+            (tmp_path / "world" / "entities" / cat).mkdir(parents=True)
+            (tmp_path / "world" / "entities" / cat / "_index.json").write_text(
+                '{"entities": []}', encoding="utf-8")
+
+    def test_extra_state_field_shown_in_metrics(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        state = {**BASE_STATE, "custom_extra_stat": 999}
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "Custom Extra Stat" in content
+        assert "999" in content
+
+    def test_missing_entity_index_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world" / "archive").mkdir(parents=True)
+        state = {**BASE_STATE}
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "## Entities" in content
+
+    def test_archive_oserror_handled(self, tmp_path, monkeypatch):
+        from pathlib import Path as _Path
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        state = {**BASE_STATE}
+        original_glob = _Path.glob
+        def patched_glob(self, pattern):
+            if "archive" in str(self) and pattern == "*.json":
+                raise OSError("Permission denied")
+            return original_glob(self, pattern)
+        monkeypatch.setattr(_Path, "glob", patched_glob)
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "## Archive" in content
+
+    def test_archived_entities_listed(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._setup_world_dirs(tmp_path)
+        archive_entity = {"name": "Old Mill", "demolished_law": 3, "auto_reason": "Outdated"}
+        (tmp_path / "world" / "archive" / "bld-001.json").write_text(
+            json.dumps(archive_entity))
+        state = {**BASE_STATE}
+        tv.generate_world_md(state, law_number=None, date="2026-06-13")
+        content = (tmp_path / "world" / "WORLD.md").read_text(encoding="utf-8")
+        assert "Old Mill" in content
+        assert "Outdated" in content
+
+
+# ===========================================================================
+# generate_annals — LLM exception returns early (lines 217-219)
+# ===========================================================================
+
+class TestGenerateAnnalsLlmException:
+    def test_llm_exception_no_chapter_written(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world/annals").mkdir(parents=True)
+        (tmp_path / "world/state.json").write_text(json.dumps(BASE_STATE))
+        history = [{"tick": i + 1, "laws_count": 0, "population": 1000,
+                    "treasury": 0, "era": "Founding Era"} for i in range(10)]
+        mc = MagicMock()
+        mc.chat.completions.create.side_effect = RuntimeError("LLM failed")
+        with patch.object(_engine_content, "client", mc):
+            tv.generate_annals(history)
+        assert not (tmp_path / "world/annals/chapter-001.md").exists()
+
+
+# ===========================================================================
+# upsert_bot_comment — result without issuecomment ID (line 267)
+# ===========================================================================
+
+class TestUpsertBotCommentNoCommentId:
+    def test_post_without_issuecomment_in_result(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        monkeypatch.setattr(_engine_content, "run", lambda cmd: "")
+        tv.upsert_bot_comment(10, "body text")
+        assert not (tmp_path / "world/pinned_comment_ids.json").exists()
+
+
+# ===========================================================================
+# _get_or_create_citizen_voices_issue (lines 271-295)
+# ===========================================================================
+
+class TestGetOrCreateCitizenVoicesIssue:
+    def test_returns_existing_issue_number(self, monkeypatch):
+        monkeypatch.setattr(_engine_content, "run", lambda cmd: "")
+        monkeypatch.setattr(_engine_content, "gh_json", lambda cmd: [{"number": 55}])
+        result = tv._get_or_create_citizen_voices_issue()
+        assert result == 55
+
+    def test_creates_new_issue_when_none_exist(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "scripts").mkdir()
+        run_calls = iter(["", "https://github.com/test/repo/issues/88"])
+        monkeypatch.setattr(_engine_content, "run", lambda cmd: next(run_calls))
+        monkeypatch.setattr(_engine_content, "gh_json", lambda cmd: [])
+        result = tv._get_or_create_citizen_voices_issue()
+        assert result == 88
+
+    def test_returns_zero_on_bad_url(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "scripts").mkdir()
+        run_calls = iter(["", "not-a-valid-url"])
+        monkeypatch.setattr(_engine_content, "run", lambda cmd: next(run_calls))
+        monkeypatch.setattr(_engine_content, "gh_json", lambda cmd: [])
+        result = tv._get_or_create_citizen_voices_issue()
+        assert result == 0
+
+
+# ===========================================================================
+# generate_citizen_narrator — naive datetime gets UTC timezone (line 305)
+# ===========================================================================
+
+class TestCitizenNarratorNaiveDatetime:
+    def test_naive_datetime_assigned_utc_and_skips_today(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        today_naive = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+        state = {**BASE_STATE, "last_narrator_date": today_naive}
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        mc = MagicMock()
+        with patch.object(_engine_content, "client", mc):
+            tv.generate_citizen_narrator()
+        mc.chat.completions.create.assert_not_called()

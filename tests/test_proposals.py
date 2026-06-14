@@ -1177,3 +1177,225 @@ class TestProcessIssueCooldownAndTreasury:
             _engine_proposals.SKIP_TIMING = False
         state = json.loads((tmp_path / "world/state.json").read_text())
         assert state["laws_count"] == BASE_STATE["laws_count"] + 1
+
+
+# ===========================================================================
+# process_issue — corrupt reps.json except (lines 73-74)
+# ===========================================================================
+
+class TestProcessIssueCorruptReps:
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "world/laws").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        (tmp_path / "world/stats.json").write_text(json.dumps({}))
+        (tmp_path / "world/citizens.json").write_text("{}")
+        (tmp_path / "world/active_event.json").write_text("{}")
+        (tmp_path / "world/history.json").write_text("[]")
+        (tmp_path / "world/laws_index.json").write_text("[]")
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world" / "entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+
+    def test_corrupt_representatives_json_ignored(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        (tmp_path / "world/representatives.json").write_text("INVALID JSON")
+        created = (datetime.now(timezone.utc) - timedelta(hours=48)).isoformat()
+        issue = {
+            "number": 1, "title": "[PROPOSAL] Test", "body": "",
+            "createdAt": created, "author": {"login": "bob"},
+        }
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(0, 0, [], [])), \
+             patch.object(_engine_proposals, "run", return_value=""):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_issue(issue)
+            _engine_proposals.SKIP_TIMING = False
+        stats = json.loads((tmp_path / "world/stats.json").read_text())
+        assert stats.get("proposals_silent", 0) >= 1
+
+
+# ===========================================================================
+# process_issue — OSError writing law file (lines 197-199)
+# ===========================================================================
+
+class TestProcessIssueOsError:
+    def _make_world_no_laws(self, tmp_path):
+        (tmp_path / "world").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        (tmp_path / "world/stats.json").write_text(json.dumps({}))
+        (tmp_path / "world/citizens.json").write_text("{}")
+        (tmp_path / "world/active_event.json").write_text("{}")
+        (tmp_path / "world/history.json").write_text("[]")
+        (tmp_path / "world/laws_index.json").write_text("[]")
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world" / "entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+
+    def test_oserror_law_file_write_aborts(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        self._make_world_no_laws(tmp_path)
+        created = (datetime.now(timezone.utc) - timedelta(hours=48)).isoformat()
+        issue = {
+            "number": 99, "title": "[PROPOSAL] Build Roads", "body": "",
+            "createdAt": created, "author": {"login": "alice"},
+        }
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(3, 1, ["a", "b", "c"], ["d"])), \
+             patch.object(_engine_proposals, "run", return_value=""), \
+             patch.object(_engine_proposals, "generate_narrative", return_value="Narrative."), \
+             patch.object(_engine_proposals, "generate_world_md", return_value=None), \
+             patch.object(_engine_proposals, "update_readme", return_value=None), \
+             patch.object(_engine_proposals, "append_history", return_value=None), \
+             patch.object(_engine_proposals, "update_laws_index", return_value=None), \
+             patch.object(_engine_proposals, "apply_tags", return_value=None), \
+             patch.object(_engine_proposals, "run_world_engine", return_value=[]), \
+             patch.object(_engine_proposals, "update_world_summary", return_value="Summary."):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_issue(issue)
+            _engine_proposals.SKIP_TIMING = False
+        assert "ERROR" in capsys.readouterr().out
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state.get("laws_count") == BASE_STATE["laws_count"]
+
+
+# ===========================================================================
+# process_ai_proposal — timing skip (lines 251-252) and OSError (lines 325-327)
+# ===========================================================================
+
+class TestProcessAiProposalEdgeCases:
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "world/laws").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        (tmp_path / "world/stats.json").write_text(json.dumps({}))
+        (tmp_path / "world/citizens.json").write_text("{}")
+        (tmp_path / "world/active_event.json").write_text("{}")
+        (tmp_path / "world/history.json").write_text("[]")
+        (tmp_path / "world/laws_index.json").write_text("[]")
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world" / "entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+
+    def test_timing_window_not_over_skips(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        created = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+        issue = {
+            "number": 55, "title": "[AI-PROPOSAL] Test", "body": "",
+            "createdAt": created,
+        }
+        reactions_called = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          side_effect=lambda n: reactions_called.append(n) or (0, 0, [], [])):
+            monkeypatch.setattr(_engine_proposals, "SKIP_TIMING", False)
+            _engine_proposals.process_ai_proposal(issue)
+        assert not reactions_called
+
+    def test_oserror_law_file_write_aborts(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        (tmp_path / "world/laws").rmdir()
+        created = (datetime.now(timezone.utc) - timedelta(hours=6)).isoformat()
+        issue = {
+            "number": 55, "title": "[AI-PROPOSAL] Expand Gardens", "body": "",
+            "createdAt": created,
+        }
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(0, 0, [], [])), \
+             patch.object(_engine_proposals, "run", return_value=""), \
+             patch.object(_engine_proposals, "generate_narrative", return_value="Narrative."), \
+             patch.object(_engine_proposals, "generate_world_md", return_value=None), \
+             patch.object(_engine_proposals, "update_readme", return_value=None), \
+             patch.object(_engine_proposals, "append_history", return_value=None), \
+             patch.object(_engine_proposals, "update_laws_index", return_value=None), \
+             patch.object(_engine_proposals, "apply_tags", return_value=None), \
+             patch.object(_engine_proposals, "run_world_engine", return_value=[]), \
+             patch.object(_engine_proposals, "update_world_summary", return_value="Summary."):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_ai_proposal(issue)
+            _engine_proposals.SKIP_TIMING = False
+        assert "ERROR" in capsys.readouterr().out
+
+
+# ===========================================================================
+# process_feedback — timing skip (lines 353-354) and stability metric (378-379)
+# ===========================================================================
+
+class TestProcessFeedbackEdgeCases:
+    def _make_world(self, tmp_path):
+        (tmp_path / "world").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+        (tmp_path / "world/citizens.json").write_text("{}")
+        (tmp_path / "world/active_event.json").write_text("{}")
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world" / "entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+
+    def test_timing_window_not_over_returns_false(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        created = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+        issue = {
+            "number": 77, "title": "[FEEDBACK] Test", "body": "",
+            "createdAt": created,
+        }
+        reactions_called = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          side_effect=lambda n: reactions_called.append(n) or (0, 0, [], [])):
+            monkeypatch.setattr(_engine_proposals, "SKIP_TIMING", False)
+            result = _engine_proposals.process_feedback(issue)
+        assert result is False
+        assert not reactions_called
+
+    def test_stability_metric_in_feedback_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        body = (
+            "## Effect\n\n```yaml\n"
+            "type: policy\n"
+            "changes:\n"
+            "  stability: 5\n"
+            "```\n"
+        )
+        created = (datetime.now(timezone.utc) - timedelta(hours=6)).isoformat()
+        issue = {
+            "number": 88, "title": "[FEEDBACK] Stability boost", "body": body,
+            "createdAt": created,
+        }
+        initial_stability = BASE_STATE["stability"]
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(1, 0, ["alice"], [])), \
+             patch.object(_engine_proposals, "run", return_value=""), \
+             patch.object(_engine_proposals, "run_world_engine", return_value=[]):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_feedback(issue)
+            _engine_proposals.SKIP_TIMING = False
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["stability"] == min(100, initial_stability + 5)
+
+
+# ===========================================================================
+# _ensure_labels (lines 401-412)
+# ===========================================================================
+
+class TestEnsureLabels:
+    def test_creates_all_required_labels(self):
+        calls = []
+        with patch.object(_engine_proposals, "run",
+                          side_effect=lambda cmd: calls.append(cmd) or ""):
+            _engine_proposals._ensure_labels()
+        label_names = [c[3] for c in calls if len(c) > 3]
+        assert "ai-proposal" in label_names
+        assert "passed" in label_names
+        assert "rejected" in label_names
+        assert len(calls) == 8
