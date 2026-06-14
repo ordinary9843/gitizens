@@ -1163,7 +1163,7 @@ function drawMoon(ctx) {
   // Moon arc: rises at dusk, sets at dawn
   const nt = h < 6 ? (h + 6) / 12 : h >= 18 ? (h - 18) / 12 : -1;
   if (nt < 0) return;
-  const mx = W * (0.08 + nt * 0.84);
+  const mx = W * (0.12 + nt * 0.76);
   const my = GY * (0.42 - Math.sin(nt * Math.PI) * 0.34);
   // Moon phase (day of month → phase angle)
   const phaseOffset = (now.getUTCDate() % 29.5) / 29.5;
