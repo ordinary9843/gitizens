@@ -167,9 +167,9 @@
     }
     #city-container {
       width: 100%; position: relative; overflow: hidden;
-      flex-shrink: 0; height: 360px;
+      flex-shrink: 0; height: 420px;
     }
-    #city-bg, #city-fg { width: 100%; height: 360px; display: block; }
+    #city-bg, #city-fg { width: 100%; height: 420px; display: block; }
     #city-fg { position: absolute; top: 0; left: 0; pointer-events: none; }
     #loading {
       position: absolute; inset: 0; display: flex;
@@ -822,6 +822,23 @@ function hexAlpha(hex, a) {
 
 function wHash(a, b) { return ((a*17 + b*31) % 97); }
 
+function glowWindow(ctx, wx, wy, ww, wh, color, lit) {
+  if (lit) {
+    const cx = wx + ww * 0.5, cy = wy + wh * 0.5;
+    const rg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(ww, wh) * 2.4);
+    rg.addColorStop(0, hexAlpha(color, 0.55));
+    rg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalAlpha = 0.65;
+    ctx.fillStyle = rg;
+    ctx.fillRect(wx - ww * 0.8, wy - wh * 0.8, ww * 2.6, wh * 2.6);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = color;
+  } else {
+    ctx.fillStyle = '#07111e';
+  }
+  ctx.fillRect(wx, wy, ww, wh);
+}
+
 // ── Chart.js global theme ─────────────────────────────────────────────────────
 
 if (typeof Chart !== 'undefined') {
@@ -834,7 +851,7 @@ let _radarChart = null, _histChart = null;
 
 // ── Canvas city state ─────────────────────────────────────────────────────────
 
-let _bgCtx = null, _fgCtx = null, _cityW = 900, _cityH = 320, _cityGY = 240;
+let _bgCtx = null, _fgCtx = null, _cityW = 900, _cityH = 380, _cityGY = 290;
 let _S = {};
 let _animFrame = null;
 let _animTime = 0;
@@ -1018,6 +1035,19 @@ const BUILDINGS = {
         ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.6; ctx.strokeRect(x+wx, gy-40, 10, 13);
       });
       ctx.fillStyle = '#0d1e0d'; ctx.fillRect(x+34, gy-22, 14, 22);
+      // AC unit on roof
+      ctx.fillStyle = '#183a18'; ctx.fillRect(x+6, gy-62, 22, 8);
+      ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.5; ctx.strokeRect(x+6, gy-62, 22, 8);
+      ctx.fillStyle = '#102a10'; ctx.fillRect(x+9, gy-64, 4, 3);
+      ctx.fillRect(x+15, gy-64, 4, 3); ctx.fillRect(x+21, gy-64, 4, 3);
+      // Antenna
+      ctx.strokeStyle = '#7a987a'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x+66, gy-54); ctx.lineTo(x+66, gy-73); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x+61, gy-69); ctx.lineTo(x+71, gy-69); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x+63, gy-65); ctx.lineTo(x+69, gy-65); ctx.stroke();
+      ctx.fillStyle = '#10d870'; ctx.globalAlpha = 0.7;
+      ctx.beginPath(); ctx.arc(x+66, gy-73, 2, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
     }},
 
   'Social Housing District': { w:114, order:3,
@@ -1028,13 +1058,19 @@ const BUILDINGS = {
         for (let row = 0; row < ~~(bh/17); row++) {
           [4,13,22].forEach(col => {
             const lit = wHash(bx+col, row) < wel;
-            ctx.fillStyle = lit ? '#c8a830' : '#0d1117';
-            ctx.globalAlpha = 0.85;
-            ctx.fillRect(x+bx+col, gy-bh+7+row*17, 7, 9);
+            ctx.globalAlpha = 0.88;
+            glowWindow(ctx, x+bx+col, gy-bh+7+row*17, 7, 9, '#c8a830', lit);
             ctx.globalAlpha = 1;
           });
         }
       });
+      // Water tower on tallest block (bx=38, bh=92)
+      const twx = x + 53, twy = gy - 92;
+      ctx.fillStyle = '#253225'; ctx.fillRect(twx-3, twy-14, 6, 14);
+      ctx.fillStyle = '#1a2e1a';
+      ctx.beginPath(); ctx.ellipse(twx, twy-14, 9, 5, 0, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.ellipse(twx, twy-14, 9, 5, 0, 0, Math.PI*2); ctx.stroke();
     }},
 
   'Public School': { w:72, order:4,
@@ -1065,8 +1101,7 @@ const BUILDINGS = {
       for (let i = 0; i < 5; i++) {
         [15,32,49].forEach((jx, j) => {
           const lit = wHash(i*3+j, 7) < edu;
-          ctx.fillStyle = lit ? '#0d2a50' : '#07141f';
-          ctx.fillRect(x+jx, gy-91+i*18, 11, 13);
+          glowWindow(ctx, x+jx, gy-91+i*18, 11, 13, '#00b8e0', lit);
           ctx.strokeStyle = '#00b8e0'; ctx.lineWidth = 0.5; ctx.strokeRect(x+jx, gy-91+i*18, 11, 13);
         });
       }
@@ -1234,7 +1269,7 @@ const BUILDINGS = {
 function initCityCanvas() {
   const container = document.getElementById('city-container');
   const W = Math.max(container.clientWidth || 900, 400);
-  const H = 360;
+  const H = 420;
   const dpr = window.devicePixelRatio || 1;
   ['city-bg', 'city-fg'].forEach(id => {
     const c = document.getElementById(id);
@@ -1358,6 +1393,30 @@ function renderCityBg(state) {
   fogGrd.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = fogGrd; ctx.fillRect(0, GY, W, 44);
 
+  // Distant city silhouette (depth layer)
+  const _silH = [55,80,44,96,60,72,50,88,40,68,76,54,90,48,64,82,58,70,46,84,62,78,52,86,66];
+  const _slotW = W / _silH.length;
+  ctx.globalAlpha = 0.07 + (1 - pt) * 0.07;
+  ctx.fillStyle = lerpColor('#0c1a2e', '#120c06', pt);
+  _silH.forEach((h, i) => {
+    const bx = i * _slotW + _slotW * 0.12;
+    const bw = _slotW * 0.6;
+    const bh = h * 0.52;
+    ctx.fillRect(bx, GY - bh, bw, bh);
+    if (h > 64) {
+      ctx.globalAlpha = 0.05 + (1 - pt) * 0.05;
+      ctx.fillStyle = '#c8a830';
+      for (let row = 0; row < 3; row++) {
+        [bw * 0.18, bw * 0.52].forEach(wx => {
+          ctx.fillRect(bx + wx, GY - bh + 8 + row * 10, 3, 5);
+        });
+      }
+      ctx.globalAlpha = 0.07 + (1 - pt) * 0.07;
+      ctx.fillStyle = lerpColor('#0c1a2e', '#120c06', pt);
+    }
+  });
+  ctx.globalAlpha = 1;
+
   // Buildings
   _chimneys = [];
   _buildingHits = [];
@@ -1378,6 +1437,18 @@ function renderCityBg(state) {
       ctx.save();
       b.draw(ctx, cx, GY, state);
       ctx.restore();
+      // Right-edge depth shadow (building 3D feel)
+      const _sdG = ctx.createLinearGradient(cx + b.w - 12, 0, cx + b.w + 1, 0);
+      _sdG.addColorStop(0, 'rgba(0,0,0,0)');
+      _sdG.addColorStop(1, 'rgba(0,0,0,0.38)');
+      ctx.fillStyle = _sdG;
+      ctx.fillRect(cx + b.w - 12, GY - 195, 13, 195);
+      // Left-edge highlight
+      const _hlG = ctx.createLinearGradient(cx, 0, cx + 5, 0);
+      _hlG.addColorStop(0, 'rgba(255,255,255,0.05)');
+      _hlG.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = _hlG;
+      ctx.fillRect(cx, GY - 195, 5, 195);
       const mm = METRIC_META[m];
       if (mm) {
         const glowGrd = ctx.createLinearGradient(cx, GY, cx, GY+38);
