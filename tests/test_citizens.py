@@ -195,3 +195,90 @@ class TestStreakPenalty:
     def test_monotonically_increasing(self):
         penalties = [self._penalty(s) for s in range(1, 8)]
         assert penalties == sorted(penalties)
+
+
+# ===========================================================================
+# Higher-tier achievements — active_citizen, veteran_legislator
+# ===========================================================================
+
+class TestHigherTierAchievements:
+
+    def test_active_citizen_awarded_at_25_votes(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "alice": {
+                "total_votes": 24,
+                "total_proposals": 0,
+                "last_active": "2026-06-01T00:00:00+00:00",
+                "achievements": ["first_vote", "civic_duty"],
+            }
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.track_citizen_activity(["alice"], [])
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "active_citizen" in data["alice"]["achievements"]
+
+    def test_active_citizen_not_awarded_at_24_votes(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "alice": {
+                "total_votes": 23,
+                "total_proposals": 0,
+                "last_active": "2026-06-01T00:00:00+00:00",
+                "achievements": ["first_vote", "civic_duty"],
+            }
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.track_citizen_activity(["alice"], [])
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "active_citizen" not in data["alice"]["achievements"]
+
+    def test_veteran_legislator_awarded_at_5_proposals(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "bob": {
+                "total_votes": 0,
+                "total_proposals": 4,
+                "last_active": "2026-06-01T00:00:00+00:00",
+                "achievements": ["legislator"],
+            }
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.track_citizen_proposal("bob")
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "veteran_legislator" in data["bob"]["achievements"]
+
+    def test_veteran_legislator_not_awarded_at_4_proposals(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "bob": {
+                "total_votes": 0,
+                "total_proposals": 3,
+                "last_active": "2026-06-01T00:00:00+00:00",
+                "achievements": ["legislator"],
+            }
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.track_citizen_proposal("bob")
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert "veteran_legislator" not in data["bob"]["achievements"]
+
+    def test_no_duplicate_active_citizen(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "alice": {
+                "total_votes": 25,
+                "total_proposals": 0,
+                "last_active": "2026-06-01T00:00:00+00:00",
+                "achievements": ["first_vote", "civic_duty", "active_citizen"],
+            }
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        tv.track_citizen_activity(["alice"], [])
+        data = json.loads((tmp_path / "world/citizens.json").read_text())
+        assert data["alice"]["achievements"].count("active_citizen") == 1
