@@ -1,5 +1,8 @@
 <div align="center">
   <img src="docs/logo.png" alt="Gitizens" width="160" />
+
+  [![Tests](https://github.com/ordinary9843/gitizens/actions/workflows/test.yml/badge.svg)](https://github.com/ordinary9843/gitizens/actions/workflows/test.yml)
+  ![Coverage](docs/coverage-badge.svg)
 </div>
 
 ---

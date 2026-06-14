@@ -5,6 +5,9 @@ on:
     branches: [master]
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,10 +20,28 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt "genbadge[coverage]"
 
       - name: Run tests
         env:
           GITHUB_TOKEN: placeholder
           GITHUB_REPOSITORY: ordinary9843/gitizens
-        run: python -m pytest tests/ -v
+        run: python -m pytest tests/ -v --cov=scripts --cov-report=xml
+
+      - name: Generate coverage badge
+        run: genbadge coverage -i coverage.xml -o docs/coverage-badge.svg
+
+      - name: Commit badge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          git config user.name "gitizens-bot"
+          git config user.email "bot@gitizens"
+          git add docs/coverage-badge.svg
+          git diff --staged --quiet || git commit -m "[CI] update coverage badge"
+          git push
+
+  lint-workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: rhysd/actionlint@v1
