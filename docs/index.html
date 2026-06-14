@@ -1728,14 +1728,15 @@ function drawLensFlare(ctx, sx, sy, brightness, color) {
     ctx.beginPath(); ctx.moveTo(sx - dx*len, sy - dy*len);
     ctx.lineTo(sx + dx*len, sy + dy*len); ctx.stroke();
   });
-  // Ghost orbs along flare axis
-  const orbs = [0.4, 0.65, 1.1, 1.4];
+  // Ghost orbs along flare axis (use logical coords, keep orbs near the light source)
+  const orbs = [0.25, 0.45, 0.65];
   orbs.forEach((t, i) => {
-    const ox = sx * (1 - t) + ctx.canvas.width * 0.5 * t;
-    const oy = sy * (1 - t) + ctx.canvas.height * 0.5 * t;
-    const r = (8 - i * 1.5) * brightness;
+    const ox = sx * (1 - t) + _cityW * 0.5 * t;
+    const oy = sy * (1 - t) + _cityGY * 0.5 * t;
+    if (oy < _cityGY * 0.5) return;
+    const r = (6 - i * 1.5) * brightness;
     const oG = ctx.createRadialGradient(ox, oy, 0, ox, oy, r * 2);
-    oG.addColorStop(0, color.replace('1)', `${a * 0.5})`));
+    oG.addColorStop(0, color.replace('1)', `${a * 0.4})`));
     oG.addColorStop(1, color.replace('1)', '0)'));
     ctx.fillStyle = oG; ctx.fillRect(ox - r*2, oy - r*2, r*4, r*4);
   });
@@ -2315,21 +2316,6 @@ function renderCityBg(state) {
   });
   ctx.globalAlpha = 1;
 
-  // Moon
-  if (pol < 70) {
-    const mOp = Math.max(0, (70-pol)/70 * 0.9);
-    const mx = ~~(W * 0.88); const my = 42;
-    const haloGrd = ctx.createRadialGradient(mx, my, 18, mx, my, 52);
-    haloGrd.addColorStop(0, 'rgba(220,215,185,' + (mOp * 0.14) + ')');
-    haloGrd.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = haloGrd; ctx.fillRect(mx-55, my-55, 110, 110);
-    ctx.globalAlpha = mOp * 0.95; ctx.fillStyle = '#e8e0c4';
-    ctx.beginPath(); ctx.arc(mx, my, 20, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha = mOp; ctx.fillStyle = skyTop;
-    ctx.beginPath(); ctx.arc(mx+10, my-2, 19, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
-  }
-
   if (_weatherType === 'drought') {
     ctx.globalAlpha = 0.22;
     ctx.fillStyle = '#f07830';
@@ -2415,18 +2401,6 @@ function renderCityBg(state) {
       ctx.save();
       b.draw(ctx, cx, GY, state);
       ctx.restore();
-      // Right-edge depth shadow (building 3D feel)
-      const _sdG = ctx.createLinearGradient(cx + b.w - 12, 0, cx + b.w + 1, 0);
-      _sdG.addColorStop(0, 'rgba(0,0,0,0)');
-      _sdG.addColorStop(1, 'rgba(0,0,0,0.38)');
-      ctx.fillStyle = _sdG;
-      ctx.fillRect(cx + b.w - 12, GY - 195, 13, 195);
-      // Left-edge highlight
-      const _hlG = ctx.createLinearGradient(cx, 0, cx + 5, 0);
-      _hlG.addColorStop(0, 'rgba(255,255,255,0.05)');
-      _hlG.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = _hlG;
-      ctx.fillRect(cx, GY - 195, 5, 195);
       const mm = METRIC_META[m];
       if (mm) {
         const glowGrd = ctx.createLinearGradient(cx, GY, cx, GY+38);
