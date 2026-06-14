@@ -163,3 +163,35 @@ class TestAchievements:
             tv.select_weekly_representatives()
         data = json.loads((tmp_path / "world/citizens.json").read_text())
         assert "representative" in data["alice"]["achievements"]
+
+
+# ===========================================================================
+# _streak_penalty — direct unit tests
+# ===========================================================================
+
+class TestStreakPenalty:
+    def _penalty(self, streak):
+        import scripts.engine.citizens as _cit
+        return _cit._streak_penalty(streak)
+
+    def test_streak_0_returns_zero(self):
+        assert self._penalty(0) == 0
+
+    def test_streak_1_returns_zero(self):
+        assert self._penalty(1) == 0
+
+    def test_streak_2_returns_base(self):
+        assert self._penalty(2) == 100
+
+    def test_streak_3_doubles(self):
+        assert self._penalty(3) == 200
+
+    def test_streak_4_doubles_again(self):
+        assert self._penalty(4) == 400
+
+    def test_streak_5_doubles_again(self):
+        assert self._penalty(5) == 800
+
+    def test_monotonically_increasing(self):
+        penalties = [self._penalty(s) for s in range(1, 8)]
+        assert penalties == sorted(penalties)
