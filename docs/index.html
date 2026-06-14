@@ -875,6 +875,8 @@ let _buildingHits = [];
 let _winSpots = [];
 let _streetlights = [];
 let _treeBranches = [];
+let _neonSigns = [];
+let _searchlights = [];
 
 let _entranceDone = true;
 let _entranceStart = 0;
@@ -1565,6 +1567,12 @@ const BUILDINGS = {
       ctx.beginPath(); ctx.moveTo(x+51, gy-118); ctx.lineTo(x+51, gy-136); ctx.stroke();
       ctx.fillStyle = '#f07830';
       ctx.beginPath(); ctx.moveTo(x+43, gy-136); ctx.lineTo(x+51, gy-152); ctx.lineTo(x+59, gy-136); ctx.closePath(); ctx.fill();
+      // Searchlight base (corner turrets)
+      [[x+4, gy-72], [x+90, gy-72]].forEach(([sx, sy]) => {
+        ctx.fillStyle = '#3a1e08';
+        ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI * 2); ctx.fill();
+        _searchlights.push({x: sx, y: sy, phase: sx * 0.03});
+      });
     }},
 
   'Manufacturing District': { w:98, order:9,
@@ -1583,6 +1591,7 @@ const BUILDINGS = {
         ctx.fillStyle = '#2a1a30'; ctx.fillRect(x+cx-5, gy-ch-62, 10, ch);
         _chimneys.push({x: x+cx, y: gy-ch-62, intensity});
       });
+      _neonSigns.push({x: x+49, y: gy-68, label: 'FACTORY', color: '#b058f8', phase: x * 0.01});
     }},
 
   'Industrial Complex': { w:122, order:10,
@@ -1608,6 +1617,7 @@ const BUILDINGS = {
           ctx.strokeStyle = '#b058f8'; ctx.lineWidth = 0.4; ctx.strokeRect(x+jx, gy-74+i*19, 16, 13);
         });
       }
+      _neonSigns.push({x: x+61, y: gy-92, label: 'COMPLEX', color: '#c070ff', phase: x * 0.013 + 1.2});
     }},
 
   'Heavy Industry Zone': { w:142, order:11,
@@ -1629,6 +1639,7 @@ const BUILDINGS = {
         glowWindow(ctx, x+105, gy-88+i*22, 32, 16, '#b058f8', litR);
         ctx.strokeRect(x+105, gy-88+i*22, 32, 16);
       }
+      _neonSigns.push({x: x+71, y: gy-106, label: 'INDUSTRY', color: '#d080ff', phase: x * 0.009 + 2.4});
     }},
 
   'Eco-Research Center': { w:80, order:12,
@@ -1650,6 +1661,21 @@ const BUILDINGS = {
       ctx.beginPath(); ctx.moveTo(x+40, gy-109); ctx.lineTo(x+40, gy-126); ctx.stroke();
       ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.arc(x+40, gy-128, 5, 0, Math.PI*2); ctx.stroke();
+      // Solar panel array on flat roof
+      const panelRows = [[gy-88, 3], [gy-93, 3]];
+      panelRows.forEach(([py, count]) => {
+        for (let pi = 0; pi < count; pi++) {
+          const px = x + 14 + pi * 17;
+          ctx.fillStyle = '#0a3060'; ctx.fillRect(px, py, 14, 7);
+          ctx.strokeStyle = '#1a6090'; ctx.lineWidth = 0.6; ctx.strokeRect(px, py, 14, 7);
+          ctx.strokeStyle = 'rgba(30,120,180,0.5)'; ctx.lineWidth = 0.4;
+          ctx.beginPath(); ctx.moveTo(px+7, py); ctx.lineTo(px+7, py+7); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(px, py+3.5); ctx.lineTo(px+14, py+3.5); ctx.stroke();
+          // Glint
+          ctx.fillStyle = 'rgba(100,200,255,0.18)';
+          ctx.fillRect(px+1, py+1, 4, 2);
+        }
+      });
     }},
 
   'Smog Zone': { w:112, order:13,
@@ -1687,7 +1713,7 @@ function initCityCanvas() {
 
 function renderCityBg(state) {
   _S = state;
-  _winSpots = []; _streetlights = []; _treeBranches = [];
+  _winSpots = []; _streetlights = []; _treeBranches = []; _neonSigns = []; _searchlights = [];
   const ctx = _bgCtx;
   if (!ctx) return;
   const W = _cityW, H = _cityH, GY = _cityGY;
@@ -2003,6 +2029,47 @@ function animLoop() {
     ag.addColorStop(0, `rgba(248,224,80,${0.10 * pulse})`);
     ag.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = ag; ctx.fillRect(sl.x - 44, sl.y - 44, 88, 88);
+  });
+
+  // Searchlight beams (Defense Ministry)
+  _searchlights.forEach(sl => {
+    const angle = Math.sin(_animTime * 0.011 + sl.phase) * 0.72 - Math.PI * 0.5;
+    const len = 110;
+    const ex = sl.x + Math.cos(angle) * len;
+    const ey = sl.y + Math.sin(angle) * len;
+    const beam = ctx.createLinearGradient(sl.x, sl.y, ex, ey);
+    beam.addColorStop(0, 'rgba(255,245,190,0.28)');
+    beam.addColorStop(1, 'rgba(255,245,190,0)');
+    ctx.save();
+    ctx.fillStyle = beam;
+    ctx.beginPath();
+    ctx.moveTo(sl.x, sl.y);
+    ctx.lineTo(sl.x + Math.cos(angle - 0.09) * len, sl.y + Math.sin(angle - 0.09) * len);
+    ctx.lineTo(sl.x + Math.cos(angle + 0.09) * len, sl.y + Math.sin(angle + 0.09) * len);
+    ctx.closePath();
+    ctx.fill();
+    // Core bright line
+    ctx.globalAlpha = 0.18;
+    ctx.strokeStyle = 'rgba(255,255,220,1)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(sl.x, sl.y); ctx.lineTo(ex, ey); ctx.stroke();
+    ctx.restore();
+  });
+
+  // Neon signs (industrial buildings)
+  _neonSigns.forEach(ns => {
+    const t = _animTime * 0.17 + ns.phase;
+    const flicker = Math.sin(t) > -0.88 ? 1 : (Math.random() > 0.55 ? 0.15 : 1);
+    ctx.save();
+    ctx.globalAlpha = flicker * 0.92;
+    ctx.font = 'bold 7px monospace';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = ns.color; ctx.shadowBlur = 10;
+    ctx.fillStyle = ns.color;
+    ctx.fillText(ns.label, ns.x, ns.y);
+    ctx.shadowBlur = 4;
+    ctx.fillText(ns.label, ns.x, ns.y);
+    ctx.shadowBlur = 0;
+    ctx.restore();
   });
 
   // Tree canopy sway
