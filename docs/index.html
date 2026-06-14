@@ -1145,7 +1145,7 @@ function drawDayNight(ctx) {
   if (dayBright > 0.5) {
     const sunArc = Math.max(0, Math.min(1, (h - 6) / 12));
     const sunX = W * (0.18 + sunArc * 0.64);
-    const sunY = GY * (0.13 - Math.sin(sunArc * Math.PI) * 0.09);
+    const sunY = GY * (0.30 - Math.sin(sunArc * Math.PI) * 0.14);
     const discA = dayBright * 0.42;
     const dG = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 28);
     dG.addColorStop(0,    `rgba(255,252,200,${discA})`);
@@ -1164,7 +1164,7 @@ function drawMoon(ctx) {
   const nt = h < 6 ? (h + 6) / 12 : h >= 18 ? (h - 18) / 12 : -1;
   if (nt < 0) return;
   const mx = W * (0.18 + nt * 0.64);
-  const my = GY * (0.42 - Math.sin(nt * Math.PI) * 0.34);
+  const my = GY * (0.45 - Math.sin(nt * Math.PI) * 0.26);
   // Moon phase (day of month → phase angle)
   const phaseOffset = (now.getUTCDate() % 29.5) / 29.5;
   // Glow halo
