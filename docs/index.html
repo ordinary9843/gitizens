@@ -1337,6 +1337,72 @@ function updatePuddles(ctx) {
   }
 }
 
+// ── Lightning system ──────────────────────────────────────────────────────────
+
+let _lightning = null;
+let _lightningTimer = 0;
+
+function drawLightning(ctx) {
+  if (_weatherType !== 'crisis') { _lightning = null; return; }
+  if (++_lightningTimer > 90 + ~~(Math.random() * 180) && !_lightning) {
+    _lightningTimer = 0;
+    const sx = 20 + Math.random() * (_cityW - 40);
+    const segments = [];
+    let cx = sx, cy = _cityGY * 0.15;
+    while (cy < _cityGY - 20) {
+      const nx = cx + (Math.random() - 0.5) * 28;
+      const ny = cy + 14 + Math.random() * 16;
+      segments.push([cx, cy, nx, ny]);
+      cx = nx; cy = ny;
+    }
+    _lightning = {segments, life: 1, decay: 0.09 + Math.random() * 0.06};
+  }
+  if (!_lightning) return;
+  const {segments, life} = _lightning;
+  ctx.save();
+  ctx.globalAlpha = life * 0.85;
+  // Flash fill
+  ctx.fillStyle = `rgba(220,230,255,${life * 0.07})`;
+  ctx.fillRect(0, 0, _cityW, _cityH);
+  // Main bolt
+  ctx.strokeStyle = `rgba(200,220,255,${life})`; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+  ctx.beginPath();
+  segments.forEach(([x1, y1, x2, y2], i) => { i === 0 ? ctx.moveTo(x1, y1) : null; ctx.lineTo(x2, y2); });
+  ctx.stroke();
+  // Bright core
+  ctx.strokeStyle = `rgba(255,255,255,${life * 0.9})`; ctx.lineWidth = 0.9;
+  ctx.beginPath();
+  segments.forEach(([x1, y1, x2, y2], i) => { i === 0 ? ctx.moveTo(x1, y1) : null; ctx.lineTo(x2, y2); });
+  ctx.stroke();
+  ctx.restore();
+  _lightning.life -= _lightning.decay;
+  if (_lightning.life <= 0) _lightning = null;
+}
+
+// ── Heat shimmer ──────────────────────────────────────────────────────────────
+
+function drawHeatShimmer(ctx) {
+  if (!_chimneys.length) return;
+  const ind = _S.industry || 0;
+  if (ind < 30) return;
+  const strength = (ind - 30) / 70;
+  _chimneys.forEach(ch => {
+    const h = 28 + strength * 24;
+    for (let i = 0; i < 4; i++) {
+      const py = ch.y - i * 8 - 4;
+      const wave = Math.sin(_animTime * 0.048 + ch.x * 0.07 + i * 0.8) * 3.5 * strength;
+      ctx.save();
+      ctx.globalAlpha = 0.055 * strength * (1 - i * 0.22);
+      ctx.strokeStyle = 'rgba(255,140,40,1)'; ctx.lineWidth = 5 - i * 0.7;
+      ctx.beginPath();
+      ctx.moveTo(ch.x + wave, py);
+      ctx.quadraticCurveTo(ch.x + wave + Math.sin(_animTime * 0.03 + i) * 4, py - 5, ch.x + wave * 0.5, py - 10);
+      ctx.stroke();
+      ctx.restore();
+    }
+  });
+}
+
 // ── Buildings ─────────────────────────────────────────────────────────────────
 
 const BUILDINGS = {
@@ -2006,6 +2072,8 @@ function animLoop() {
   spawnLeaves();
   drawLeaves(ctx);
 
+  drawHeatShimmer(ctx);
+
   spawnSmoke();
   drawSmoke(ctx);
 
@@ -2113,6 +2181,7 @@ function animLoop() {
     ctx.fillStyle = '#f03040';
     ctx.fillRect(0, 0, _cityW, _cityH);
     ctx.globalAlpha = 1;
+    drawLightning(ctx);
   }
 
   if (!_entranceDone) {
