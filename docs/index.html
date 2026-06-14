@@ -167,9 +167,9 @@
     }
     #city-container {
       width: 100%; position: relative; overflow: hidden;
-      flex-shrink: 0; height: 360px;
+      flex-shrink: 0; height: 310px;
     }
-    #city-bg, #city-fg { width: 100%; height: 360px; display: block; }
+    #city-bg, #city-fg { width: 100%; height: 310px; display: block; }
     #city-fg { position: absolute; top: 0; left: 0; pointer-events: none; }
     #loading {
       position: absolute; inset: 0; display: flex;
@@ -2212,7 +2212,7 @@ const BUILDINGS = {
 function initCityCanvas() {
   const container = document.getElementById('city-container');
   const W = Math.max(container.clientWidth || 900, 400);
-  const H = 360;
+  const H = 310;
   const dpr = window.devicePixelRatio || 1;
   ['city-bg', 'city-fg'].forEach(id => {
     const c = document.getElementById(id);
@@ -2403,16 +2403,9 @@ function renderCityBg(state) {
       ctx.restore();
       const mm = METRIC_META[m];
       if (mm) {
-        const glowGrd = ctx.createLinearGradient(cx, GY, cx, GY+38);
-        glowGrd.addColorStop(0, mm.color + '28');
-        glowGrd.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = glowGrd; ctx.fillRect(cx, GY, b.w, 38);
         ctx.globalAlpha = 0.7; ctx.fillStyle = mm.color;
         ctx.fillRect(cx, GY, b.w, 2);
-        ctx.globalAlpha = 0.75; ctx.fillStyle = mm.color;
-        ctx.font = '8px "Share Tech Mono", monospace'; ctx.textAlign = 'center';
-        ctx.fillText(mm.abbr, cx + b.w/2, GY+16);
-        ctx.globalAlpha = 1; ctx.textAlign = 'left';
+        ctx.globalAlpha = 1;
       }
       _buildingHits.push({x: cx, w: b.w, name, metric: m, value: state[m]||0});
       if (!_seenBuildingNames.has(name)) {
