@@ -1667,6 +1667,179 @@ function drawFilmGrain(ctx) {
   ctx.putImageData(imgData, 0, 0);
 }
 
+// ── Confetti (Golden Age) ─────────────────────────────────────────────────────
+
+const _confetti = [];
+const CONFETTI_COLS = ['#f8e060','#f07030','#50d8a0','#5090e8','#d060d8','#f04060'];
+
+function spawnConfetti() {
+  const era = (_S && _S.era) || '';
+  if (!era.includes('Golden')) return;
+  if (_confetti.length > 120) return;
+  if (Math.random() > 0.08) return;
+  _confetti.push({
+    x: Math.random() * _cityW,
+    y: -8,
+    vx: (Math.random() - 0.5) * 1.6,
+    vy: 0.5 + Math.random() * 0.7,
+    rot: Math.random() * Math.PI * 2,
+    rotV: (Math.random() - 0.5) * 0.14,
+    w: 5 + Math.random() * 5,
+    h: 3 + Math.random() * 3,
+    color: CONFETTI_COLS[~~(Math.random() * CONFETTI_COLS.length)],
+    life: 1,
+  });
+}
+
+function drawConfetti(ctx) {
+  spawnConfetti();
+  for (let i = _confetti.length - 1; i >= 0; i--) {
+    const c = _confetti[i];
+    c.x += c.vx + Math.sin(_animTime * 0.02 + i * 0.3) * 0.4;
+    c.y += c.vy;
+    c.rot += c.rotV;
+    c.life -= 0.0035;
+    if (c.life <= 0 || c.y > _cityGY + 4) { _confetti.splice(i, 1); continue; }
+    ctx.save();
+    ctx.globalAlpha = Math.min(c.life, 0.85);
+    ctx.translate(c.x, c.y); ctx.rotate(c.rot);
+    ctx.fillStyle = c.color;
+    ctx.fillRect(-c.w * 0.5, -c.h * 0.5, c.w, c.h);
+    ctx.restore();
+  }
+}
+
+// ── Crisis fire & embers ───────────────────────────────────────────────────────
+
+const _embers = [];
+let _fireSpots = [];
+
+function updateFireSpots() {
+  if (_weatherType !== 'crisis') { _fireSpots = []; return; }
+  if (_fireSpots.length) return;
+  for (let i = 0; i < 4; i++) {
+    _fireSpots.push({x: 40 + Math.random() * (_cityW - 80), y: _cityGY});
+  }
+}
+
+function drawFire(ctx) {
+  updateFireSpots();
+  if (!_fireSpots.length) { for (let i = _embers.length-1; i>=0; i--) _embers.splice(i,1); return; }
+  // Spawn embers
+  _fireSpots.forEach(fs => {
+    if (_embers.length < 80 && Math.random() < 0.35) {
+      _embers.push({
+        x: fs.x + (Math.random()-0.5)*8,
+        y: fs.y,
+        vx: (Math.random()-0.5)*0.9,
+        vy: -(1.2 + Math.random()*1.4),
+        r: 1.2 + Math.random()*1.4,
+        life: 1,
+        col: Math.random() < 0.5 ? '#ff6010' : '#ffb820',
+      });
+    }
+    // Draw flame core
+    for (let f = 0; f < 3; f++) {
+      const fh = 18 + f * 8;
+      const fw = 8 - f * 2;
+      const fG = ctx.createRadialGradient(fs.x, fs.y, 0, fs.x, fs.y - fh * 0.5, fh);
+      fG.addColorStop(0, `rgba(255,200,60,0.7)`);
+      fG.addColorStop(0.4, `rgba(255,80,10,0.4)`);
+      fG.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.save();
+      ctx.globalAlpha = 0.65 - f * 0.15;
+      ctx.fillStyle = fG;
+      const wave = Math.sin(_animTime * 0.12 + fs.x * 0.05 + f) * fw;
+      ctx.translate(wave, 0);
+      ctx.fillRect(fs.x - fw - 6, fs.y - fh, (fw + 6) * 2, fh);
+      ctx.restore();
+    }
+  });
+  // Draw embers
+  for (let i = _embers.length - 1; i >= 0; i--) {
+    const e = _embers[i];
+    e.x += e.vx; e.y += e.vy; e.vy *= 0.97; e.vx += Math.sin(_animTime*0.08+i*0.5)*0.04;
+    e.life -= 0.018;
+    if (e.life <= 0 || e.y < _cityGY - 80) { _embers.splice(i, 1); continue; }
+    ctx.save();
+    ctx.globalAlpha = e.life * 0.8;
+    ctx.fillStyle = e.col;
+    ctx.beginPath(); ctx.arc(e.x, e.y, e.r * e.life, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+}
+
+// ── Building demolition ────────────────────────────────────────────────────────
+
+let _demolitions = [];
+let _prevActiveNames = new Set();
+
+function checkDemolitions(active) {
+  const cur = new Set(active.map(a => a.name));
+  _prevActiveNames.forEach(name => {
+    if (!cur.has(name) && _seenBuildingNames.has(name)) {
+      const hit = _buildingHits.find(h => h.name === name);
+      if (hit) {
+        const chunks = [];
+        for (let ci = 0; ci < 18; ci++) {
+          chunks.push({
+            x: hit.x + Math.random() * hit.w,
+            y: _cityGY - Math.random() * 120,
+            vx: (Math.random() - 0.5) * 3.5,
+            vy: -2 - Math.random() * 2,
+            w: 6 + Math.random() * 10,
+            h: 4 + Math.random() * 8,
+            rot: Math.random() * Math.PI,
+            rotV: (Math.random() - 0.5) * 0.18,
+            life: 1,
+            col: ['#2a3848','#3a4858','#1e2c38'][~~(Math.random()*3)],
+          });
+        }
+        _demolitions.push({chunks, done: false});
+        _seenBuildingNames.delete(name);
+      }
+    }
+  });
+  _prevActiveNames = cur;
+}
+
+function drawDemolitions(ctx) {
+  for (let di = _demolitions.length - 1; di >= 0; di--) {
+    const dem = _demolitions[di];
+    let allDone = true;
+    dem.chunks.forEach(c => {
+      if (c.life <= 0) return;
+      allDone = false;
+      c.x += c.vx; c.y += c.vy; c.vy += 0.18; c.rot += c.rotV; c.life -= 0.012;
+      ctx.save();
+      ctx.globalAlpha = c.life * 0.9;
+      ctx.translate(c.x, c.y); ctx.rotate(c.rot);
+      ctx.fillStyle = c.col;
+      ctx.fillRect(-c.w*0.5, -c.h*0.5, c.w, c.h);
+      ctx.restore();
+    });
+    if (allDone) _demolitions.splice(di, 1);
+  }
+}
+
+// ── Puddle building reflections ────────────────────────────────────────────────
+
+function drawPuddleReflections(ctx) {
+  if (_weatherType !== 'rain' || !_buildingHits.length) return;
+  const GY = _cityGY;
+  _buildingHits.forEach(bh => {
+    const bx = bh.x + bh.w * 0.5;
+    // Mirror slice from building base (GY down to GY+18)
+    const srcY = GY - 22;
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    ctx.translate(bx, GY + 4);
+    ctx.scale(1, -0.28); // squish + flip
+    ctx.drawImage(_bgCtx.canvas, bh.x, srcY, bh.w, 22, -bh.w*0.5, 0, bh.w, 22);
+    ctx.restore();
+  });
+}
+
 // ── Lightning system ──────────────────────────────────────────────────────────
 
 let _lightning = null;
@@ -2306,6 +2479,7 @@ function renderCityBg(state) {
     .map(s => ({...s, b: BUILDINGS[s.name]}))
     .filter(s => s.b)
     .sort((a, b) => a.b.order - b.b.order);
+  checkDemolitions(active);
 
   if (active.length === 0) {
     ctx.fillStyle = '#2a3e58'; ctx.font = '11px "Share Tech Mono", monospace'; ctx.textAlign = 'center';
@@ -2729,6 +2903,18 @@ function animLoop() {
   // Rainbow (after rain clears)
   updateRainbow();
   drawRainbow(ctx);
+
+  // Puddle reflections (during rain)
+  drawPuddleReflections(ctx);
+
+  // Fire & embers (crisis)
+  if (_weatherType === 'crisis') drawFire(ctx);
+
+  // Golden Age confetti
+  drawConfetti(ctx);
+
+  // Building demolition chunks
+  drawDemolitions(ctx);
 
   // Ground fog
   drawGroundFog(ctx);
