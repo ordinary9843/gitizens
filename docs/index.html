@@ -879,6 +879,7 @@ let _neonSigns = [];
 let _searchlights = [];
 let _buildingRises = [];
 let _seenBuildingNames = new Set();
+let _nightFactor = 1; // 0 = full day, 1 = full night
 
 let _entranceDone = true;
 let _entranceStart = 0;
@@ -1092,6 +1093,105 @@ function updateShootingStar(ctx) {
   ss.x += ss.vx; ss.y += ss.vy;
   ss.life -= ss.decay;
   if (ss.life <= 0 || ss.y > _cityGY * 0.45) _shootingStar = null;
+}
+
+// ── Day / Night cycle ─────────────────────────────────────────────────────────
+
+function updateNightFactor() {
+  const now = new Date();
+  const h = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+  const DAWN = 6, DUSK = 18, TRANS = 1.5;
+  let bright = 0;
+  if      (h >= DAWN - TRANS && h < DAWN) bright = (h - (DAWN - TRANS)) / TRANS;
+  else if (h >= DAWN && h < DUSK)         bright = 1;
+  else if (h >= DUSK && h < DUSK + TRANS) bright = 1 - (h - DUSK) / TRANS;
+  _nightFactor = 1 - Math.max(0, Math.min(1, bright));
+}
+
+function drawDayNight(ctx) {
+  const W = _cityW, GY = _cityGY;
+  const now = new Date();
+  const h = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+
+  // Day-time sky overlay (only when it's bright)
+  const dayBright = 1 - _nightFactor;
+  if (dayBright > 0.01) {
+    const skyG = ctx.createLinearGradient(0, 0, 0, GY - 200);
+    skyG.addColorStop(0,   `rgba(28,88,195,${dayBright * 0.88})`);
+    skyG.addColorStop(0.55,`rgba(55,125,215,${dayBright * 0.72})`);
+    skyG.addColorStop(1,   `rgba(80,155,228,${dayBright * 0.5})`);
+    ctx.fillStyle = skyG;
+    ctx.fillRect(0, 0, W, GY - 200);
+    // Fade edge — blend into buildings area
+    const fadeG = ctx.createLinearGradient(0, GY - 200, 0, GY - 100);
+    fadeG.addColorStop(0, `rgba(80,155,228,${dayBright * 0.45})`);
+    fadeG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = fadeG;
+    ctx.fillRect(0, GY - 200, W, 100);
+  }
+
+  // Golden hour / dawn / dusk warm horizon
+  const isGolden = (h > 4.5 && h < 8.5) || (h > 16 && h < 21);
+  if (isGolden) {
+    const gt = h < 12
+      ? Math.min(1, (h - 4.5) / 2) * Math.min(1, (8.5 - h) / 2)
+      : Math.min(1, (h - 16) / 2) * Math.min(1, (21 - h) / 2);
+    const goldenA = gt * 0.55;
+    const hG = ctx.createLinearGradient(0, GY - 130, 0, GY - 10);
+    hG.addColorStop(0, 'rgba(0,0,0,0)');
+    hG.addColorStop(0.45, `rgba(215,100,20,${goldenA})`);
+    hG.addColorStop(1,    `rgba(255,145,30,${goldenA * 1.4})`);
+    ctx.fillStyle = hG; ctx.fillRect(0, GY - 130, W, 130);
+    // Radial sun glow at horizon
+    const sunX = W * (h < 12 ? 0.18 : 0.82);
+    const sG = ctx.createRadialGradient(sunX, GY - 10, 0, sunX, GY - 10, 90);
+    sG.addColorStop(0, `rgba(255,200,60,${goldenA * 0.8})`);
+    sG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = sG; ctx.fillRect(sunX - 90, GY - 100, 180, 100);
+  }
+
+  // Sun disc (mid-day)
+  if (dayBright > 0.25) {
+    const sunArc = (h - 6) / 12; // 0 at 6am, 1 at 6pm
+    const sunX = W * (0.12 + Math.min(sunArc, 1) * 0.76);
+    const sunY = GY * (0.14 - Math.sin(Math.min(sunArc, 1) * Math.PI) * 0.10);
+    const discA = dayBright * 0.55;
+    const dG = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 32);
+    dG.addColorStop(0,   `rgba(255,252,200,${discA})`);
+    dG.addColorStop(0.35,`rgba(255,240,100,${discA * 0.7})`);
+    dG.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = dG; ctx.fillRect(sunX - 32, sunY - 32, 64, 64);
+  }
+}
+
+function drawMoon(ctx) {
+  const now = new Date();
+  const h = now.getUTCHours() + now.getUTCMinutes() / 60;
+  if (_nightFactor < 0.1) return;
+  const W = _cityW, GY = _cityGY;
+  // Moon arc: rises at dusk, sets at dawn
+  const nt = h < 6 ? (h + 6) / 12 : h >= 18 ? (h - 18) / 12 : -1;
+  if (nt < 0) return;
+  const mx = W * (0.08 + nt * 0.84);
+  const my = GY * (0.42 - Math.sin(nt * Math.PI) * 0.34);
+  // Moon phase (day of month → phase angle)
+  const phaseOffset = (now.getUTCDate() % 29.5) / 29.5;
+  // Glow halo
+  const moonA = _nightFactor * 0.9;
+  const haloG = ctx.createRadialGradient(mx, my, 6, mx, my, 30);
+  haloG.addColorStop(0, `rgba(200,215,255,${moonA * 0.18})`);
+  haloG.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = haloG; ctx.fillRect(mx - 30, my - 30, 60, 60);
+  // Moon disc
+  ctx.save();
+  ctx.fillStyle = `rgba(210,225,255,${moonA * 0.92})`;
+  ctx.beginPath(); ctx.arc(mx, my, 8, 0, Math.PI * 2); ctx.fill();
+  // Crescent shadow
+  const shadowOffset = Math.cos(phaseOffset * Math.PI * 2) * 9;
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = `rgba(0,0,0,${0.82})`;
+  ctx.beginPath(); ctx.arc(mx + shadowOffset, my, 7.5, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
 
 // ── Aurora Borealis ───────────────────────────────────────────────────────────
@@ -2050,10 +2150,14 @@ function animLoop() {
   _animTime++;
   ctx.clearRect(0, 0, _cityW, _cityH);
 
-  if (_stars.length && _cityGY > 0) {
+  // Day / night cycle (first pass — sky underneath everything)
+  updateNightFactor();
+  drawDayNight(ctx);
+
+  if (_stars.length && _cityGY > 0 && _nightFactor > 0.05) {
     ctx.fillStyle = 'white';
     _stars.forEach(s => {
-      const alpha = s.baseAlpha * (0.5 + Math.sin(_animTime * 0.04 + s.phase) * 0.5);
+      const alpha = s.baseAlpha * _nightFactor * (0.5 + Math.sin(_animTime * 0.04 + s.phase) * 0.5);
       if (alpha <= 0.02) return;
       ctx.globalAlpha = Math.min(alpha, 1);
       const r = s.r * (0.85 + Math.sin(_animTime * 0.025 + s.phase + 1) * 0.15);
@@ -2061,6 +2165,9 @@ function animLoop() {
     });
     ctx.globalAlpha = 1;
   }
+
+  // Moon
+  drawMoon(ctx);
 
   // Aurora borealis (lowest sky layer, only when clean & stable)
   drawAurora(ctx);
@@ -2096,14 +2203,16 @@ function animLoop() {
     ctx.fillRect(ws.x - ws.w * 1.2, ws.y - ws.h * 1.2, ws.w * 3.4, ws.h * 3.4);
   });
 
-  // Streetlight pulse
-  _streetlights.forEach(sl => {
-    const pulse = 0.88 + Math.sin(_animTime * 0.038 + sl.x * 0.009) * 0.12;
-    const ag = ctx.createRadialGradient(sl.x, sl.y, 0, sl.x, sl.y, 44 * pulse);
-    ag.addColorStop(0, `rgba(248,224,80,${0.10 * pulse})`);
-    ag.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = ag; ctx.fillRect(sl.x - 44, sl.y - 44, 88, 88);
-  });
+  // Streetlight pulse (brighter at night)
+  if (_nightFactor > 0.05) {
+    _streetlights.forEach(sl => {
+      const pulse = (0.88 + Math.sin(_animTime * 0.038 + sl.x * 0.009) * 0.12) * _nightFactor;
+      const ag = ctx.createRadialGradient(sl.x, sl.y, 0, sl.x, sl.y, 44 * pulse);
+      ag.addColorStop(0, `rgba(248,224,80,${0.18 * pulse})`);
+      ag.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = ag; ctx.fillRect(sl.x - 44, sl.y - 44, 88, 88);
+    });
+  }
 
   // Searchlight beams (Defense Ministry)
   _searchlights.forEach(sl => {
