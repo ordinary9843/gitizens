@@ -1141,8 +1141,8 @@ function drawDayNight(ctx) {
     ctx.fillStyle = sG; ctx.fillRect(sunX - 80, GY - 88, 160, 88);
   }
 
-  // Sun disc — subtle glow only, no sky wash
-  if (dayBright > 0.2) {
+  // Sun disc — only show when clearly daytime (avoid overlapping with moon at dawn/dusk)
+  if (dayBright > 0.5) {
     const sunArc = Math.max(0, Math.min(1, (h - 6) / 12));
     const sunX = W * (0.12 + sunArc * 0.76);
     const sunY = GY * (0.13 - Math.sin(sunArc * Math.PI) * 0.09);
@@ -1158,7 +1158,7 @@ function drawDayNight(ctx) {
 function drawMoon(ctx) {
   const now = new Date();
   const h = now.getUTCHours() + now.getUTCMinutes() / 60;
-  if (_nightFactor < 0.1) return;
+  if (_nightFactor < 0.5) return;
   const W = _cityW, GY = _cityGY;
   // Moon arc: rises at dusk, sets at dawn
   const nt = h < 6 ? (h + 6) / 12 : h >= 18 ? (h - 18) / 12 : -1;
