@@ -282,3 +282,48 @@ class TestHigherTierAchievements:
         tv.track_citizen_activity(["alice"], [])
         data = json.loads((tmp_path / "world/citizens.json").read_text())
         assert data["alice"]["achievements"].count("active_citizen") == 1
+
+
+# ===========================================================================
+# select_weekly_representatives — edge cases
+# ===========================================================================
+
+class TestSelectRepresentativesEdgeCases:
+    def test_corrupted_citizens_json_no_crash(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/citizens.json").write_text("{not valid json")
+        original_reps = json.dumps({"selected_at": None, "representatives": ["old"]})
+        (tmp_path / "world/representatives.json").write_text(original_reps)
+        tv.select_weekly_representatives()
+        reps = json.loads((tmp_path / "world/representatives.json").read_text())
+        assert reps["representatives"] == ["old"]
+
+    def test_malformed_selected_at_proceeds_with_selection(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "alice": {"total_votes": 10, "total_proposals": 0, "last_active": "", "achievements": []},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"selected_at": "not-a-date", "representatives": []}))
+        with patch.object(tv, "get_or_create_dispatch_issue", return_value=13), \
+             patch.object(tv, "run", return_value=""):
+            tv.select_weekly_representatives()
+        reps = json.loads((tmp_path / "world/representatives.json").read_text())
+        assert "alice" in reps["representatives"]
+
+    def test_no_reps_file_creates_it(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "alice": {"total_votes": 5, "total_proposals": 0, "last_active": "", "achievements": []},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        with patch.object(tv, "get_or_create_dispatch_issue", return_value=13), \
+             patch.object(tv, "run", return_value=""):
+            tv.select_weekly_representatives()
+        assert (tmp_path / "world/representatives.json").exists()
+        reps = json.loads((tmp_path / "world/representatives.json").read_text())
+        assert "alice" in reps["representatives"]
