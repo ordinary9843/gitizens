@@ -226,7 +226,7 @@ def select_weekly_representatives():
     try:
         for username in representatives:
             entry = citizens.get(username)
-            if entry is None:
+            if entry is None:  # pragma: no cover — reps are always from citizens dict
                 continue
             entry.setdefault("achievements", [])
             entry["was_representative"] = True

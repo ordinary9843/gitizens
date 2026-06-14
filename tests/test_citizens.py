@@ -327,3 +327,70 @@ class TestSelectRepresentativesEdgeCases:
         assert (tmp_path / "world/representatives.json").exists()
         reps = json.loads((tmp_path / "world/representatives.json").read_text())
         assert "alice" in reps["representatives"]
+
+
+# ===========================================================================
+# update_proposal_cooldown — edge cases
+# ===========================================================================
+
+class TestUpdateProposalCooldownEdgeCases:
+    def test_bad_last_date_resets_streak_to_one(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        cooldowns = {"education": {"last_date": "NOT-A-DATE", "streak": 3}}
+        (tmp_path / "world/proposal_cooldowns.json").write_text(json.dumps(cooldowns))
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        effect_data = {"type": "policy", "changes": {"education": 10}}
+        tv.update_proposal_cooldown(effect_data, today)
+        data = json.loads((tmp_path / "world/proposal_cooldowns.json").read_text())
+        assert data["education"]["streak"] == 1
+
+    def test_missing_last_date_resets_to_one(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        cooldowns = {"education": {"last_date": None, "streak": 2}}
+        (tmp_path / "world/proposal_cooldowns.json").write_text(json.dumps(cooldowns))
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        effect_data = {"type": "policy", "changes": {"education": 10}}
+        tv.update_proposal_cooldown(effect_data, today)
+        data = json.loads((tmp_path / "world/proposal_cooldowns.json").read_text())
+        assert data["education"]["streak"] == 1
+
+
+# ===========================================================================
+# select_weekly_representatives — more edge cases
+# ===========================================================================
+
+class TestSelectRepresentativesMoreEdges:
+    def test_no_citizens_file_returns_early(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"selected_at": None, "representatives": ["old"]}))
+        tv.select_weekly_representatives()
+        reps = json.loads((tmp_path / "world/representatives.json").read_text())
+        assert reps["representatives"] == ["old"]
+
+    def test_empty_citizens_returns_early(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/citizens.json").write_text("{}")
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"selected_at": None, "representatives": ["old"]}))
+        tv.select_weekly_representatives()
+        reps = json.loads((tmp_path / "world/representatives.json").read_text())
+        assert reps["representatives"] == ["old"]
+
+    def test_award_achievement_exception_handled(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        citizens = {
+            "alice": {"total_votes": 10, "total_proposals": 0, "last_active": "",
+                      "achievements": []},
+        }
+        (tmp_path / "world/citizens.json").write_text(json.dumps(citizens))
+        (tmp_path / "world/representatives.json").write_text(
+            json.dumps({"selected_at": None}))
+        with patch.object(tv, "get_or_create_dispatch_issue", return_value=1),              patch.object(tv, "run", return_value=""),              patch("engine.citizens._award_achievements",
+                   side_effect=RuntimeError("boom")):
+            tv.select_weekly_representatives()
