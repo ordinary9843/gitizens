@@ -1799,10 +1799,12 @@ function startTickCountdown(nextTickAt) {
   function tick() {
     const rem = target - Date.now();
     if (rem <= 0) {
-      el.textContent = 'ticking now…';
+      const overdueMs = Math.max(0, -rem);
+      const overdueMin = Math.floor(overdueMs / 60000);
+      el.textContent = overdueMin >= 1 ? `waiting for tick (${overdueMin}m)` : 'tick due…';
       clearInterval(_tickTimer);
       _tickTimer = null;
-      _startTickPoll(nextTickAt, -rem);
+      _startTickPoll(nextTickAt, overdueMs);
       return;
     }
     const h = Math.floor(rem / 3600000);
