@@ -1124,7 +1124,7 @@ function drawDayNight(ctx) {
 
   // Golden hour / dawn / dusk warm horizon glow (no heavy overlay — just colour)
   const isGolden = (h > 4.5 && h < 8.5) || (h > 16 && h < 21);
-  if (isGolden && dayBright > 0.05) {
+  if (isGolden && dayBright > 0.5) {
     const gt = h < 12
       ? Math.min(1, (h - 4.5) / 2) * Math.min(1, (8.5 - h) / 2)
       : Math.min(1, (h - 16) / 2) * Math.min(1, (21 - h) / 2);
