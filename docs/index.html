@@ -1090,6 +1090,52 @@ function updateShootingStar(ctx) {
   if (ss.life <= 0 || ss.y > _cityGY * 0.45) _shootingStar = null;
 }
 
+// ── Aurora Borealis ───────────────────────────────────────────────────────────
+
+function drawAurora(ctx) {
+  const pol = _S.pollution || 0;
+  const stab = _S.stability || 0;
+  if (pol > 24 || stab < 66) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  const t = _animTime * 0.008;
+  const intensity = Math.max(0, (1 - pol / 25) * ((stab - 65) / 35));
+  const bands = [
+    { baseY: H * 0.08, amp: 18, color: [0, 220, 130] },
+    { baseY: H * 0.13, amp: 14, color: [60, 100, 255] },
+    { baseY: H * 0.18, amp: 10, color: [160, 50, 240] },
+  ];
+  ctx.save();
+  for (let bi = 0; bi < bands.length; bi++) {
+    const b = bands[bi];
+    const [r, g, bl] = b.color;
+    const grad = ctx.createLinearGradient(0, b.baseY - b.amp - 12, 0, b.baseY + b.amp + 12);
+    grad.addColorStop(0, `rgba(${r},${g},${bl},0)`);
+    grad.addColorStop(0.4, `rgba(${r},${g},${bl},${(0.18 + bi * 0.04) * intensity})`);
+    grad.addColorStop(0.6, `rgba(${r},${g},${bl},${(0.22 + bi * 0.04) * intensity})`);
+    grad.addColorStop(1, `rgba(${r},${g},${bl},0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(0, b.baseY);
+    const steps = 40;
+    for (let i = 0; i <= steps; i++) {
+      const px = (i / steps) * W;
+      const py = b.baseY + Math.sin(i * 0.38 + t + bi * 1.4) * b.amp
+                         + Math.sin(i * 0.19 + t * 0.6 + bi * 2.2) * b.amp * 0.45;
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    for (let i = steps; i >= 0; i--) {
+      const px = (i / steps) * W;
+      const py = b.baseY + Math.sin(i * 0.38 + t + bi * 1.4) * b.amp
+                         + Math.sin(i * 0.19 + t * 0.6 + bi * 2.2) * b.amp * 0.45
+                         + b.amp * 1.6;
+      ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 // ── Walker system ─────────────────────────────────────────────────────────────
 
 const _walkers = [];
@@ -1519,6 +1565,12 @@ function renderCityBg(state) {
   const stb = state.stability || 79;
   const pt  = Math.min(pol / 100, 1);
 
+  const era = state.era || '';
+  // Era-based sky bias (layered on top of pollution shift)
+  const eraGolden    = era.includes('Golden');
+  const eraIndustrial= era.includes('Industrial');
+  const eraModern    = era.includes('Modern');
+
   const skyTop  = lerpColor('#040d1e', '#1e0a02', pt);
   const skyMid  = lerpColor('#071428', '#160a04', pt);
   const skyBot  = lerpColor('#0a1830', '#1a0a06', pt);
@@ -1536,6 +1588,29 @@ function renderCityBg(state) {
   horizGrd.addColorStop(0, 'rgba(0,0,0,0)');
   horizGrd.addColorStop(1, horizonGlowCol);
   ctx.fillStyle = horizGrd; ctx.fillRect(0, GY - 90, W, 90);
+
+  // Era-specific sky tint overlays
+  if (eraGolden) {
+    const gg = ctx.createLinearGradient(0, GY - 130, 0, GY);
+    gg.addColorStop(0, 'rgba(0,0,0,0)');
+    gg.addColorStop(0.55, 'rgba(200,130,20,0.07)');
+    gg.addColorStop(1, 'rgba(240,170,40,0.16)');
+    ctx.fillStyle = gg; ctx.fillRect(0, GY - 130, W, 130);
+    // Top golden fringe
+    ctx.globalAlpha = 0.05; ctx.fillStyle = '#ffd060';
+    ctx.fillRect(0, 0, W, GY * 0.18); ctx.globalAlpha = 1;
+  } else if (eraIndustrial) {
+    ctx.globalAlpha = 0.07; ctx.fillStyle = '#b05818';
+    ctx.fillRect(0, 0, W, GY * 0.55); ctx.globalAlpha = 1;
+    // Extra smoggy horizon amber
+    const ig = ctx.createLinearGradient(0, GY - 80, 0, GY);
+    ig.addColorStop(0, 'rgba(0,0,0,0)');
+    ig.addColorStop(1, 'rgba(180,80,20,0.10)');
+    ctx.fillStyle = ig; ctx.fillRect(0, GY - 80, W, 80);
+  } else if (eraModern) {
+    ctx.globalAlpha = 0.06; ctx.fillStyle = '#0030c0';
+    ctx.fillRect(0, 0, W, GY * 0.28); ctx.globalAlpha = 1;
+  }
 
   // Stars
   const starOp = Math.max(0, (50 - pol) / 50 * 0.85);
@@ -1756,6 +1831,9 @@ function animLoop() {
     });
     ctx.globalAlpha = 1;
   }
+
+  // Aurora borealis (lowest sky layer, only when clean & stable)
+  drawAurora(ctx);
 
   // Clouds (sky layer, behind buildings via low y)
   drawClouds(ctx);
