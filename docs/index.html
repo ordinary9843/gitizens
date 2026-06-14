@@ -1318,56 +1318,164 @@ function drawWalker(ctx, w) {
 const _vehicles = [];
 const VEHICLE_COLS = ['#c0392b','#e67e22','#f1c40f','#ecf0f1','#3498db','#95a5a6','#2c3e50','#27ae60'];
 
+function _eraVehicleType() {
+  const era = (_S && _S.era) || '';
+  if (era.includes('Golden')) return Math.random() < 0.25 ? 'hover' : 'sleek';
+  if (era.includes('Industrial')) return Math.random() < 0.3 ? 'steam' : 'cart';
+  if (era.includes('Modern')) return Math.random() < 0.2 ? 'truck' : 'car';
+  // Founding Era
+  return Math.random() < 0.55 ? 'cart' : 'car';
+}
+
 function initVehicles(pop) {
   const target = Math.min(~~(pop / 380), 7);
   while (_vehicles.length > target) _vehicles.pop();
   while (_vehicles.length < target) {
-    const isTruck = Math.random() < 0.2;
+    const type = _eraVehicleType();
+    const wMap = {cart: 34, steam: 36, car: 28 + ~~(Math.random()*8), truck: 40, sleek: 32, hover: 30};
     _vehicles.push({
       x: Math.random() * _cityW,
       dir: Math.random() > 0.5 ? 1 : -1,
-      speed: 0.65 + Math.random() * 0.95,
+      speed: (type === 'cart' ? 0.28 : type === 'hover' ? 1.1 : 0.65) + Math.random() * 0.55,
       color: VEHICLE_COLS[~~(Math.random() * VEHICLE_COLS.length)],
       roofColor: VEHICLE_COLS[~~(Math.random() * VEHICLE_COLS.length)],
-      w: isTruck ? 38 : 26 + ~~(Math.random() * 10),
-      type: isTruck ? 'truck' : 'car',
+      w: wMap[type] || 28,
+      type,
+      hoverPhase: Math.random() * Math.PI * 2,
     });
   }
 }
 
 function drawVehicle(ctx, v) {
   const GY = _cityGY;
-  const w = v.w, h = v.type === 'truck' ? 12 : 10;
+  const w = v.w;
   ctx.save();
   if (v.dir < 0) { ctx.translate(v.x + w, 0); ctx.scale(-1, 1); } else { ctx.translate(v.x, 0); }
 
-  ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
-  ctx.beginPath(); ctx.ellipse(w * 0.5, GY, w * 0.52, 2.2, 0, 0, Math.PI * 2); ctx.fill();
-  ctx.globalAlpha = 1;
-
-  ctx.fillStyle = v.color;
-  ctx.beginPath(); ctx.roundRect(0, GY - h, w, h, 2); ctx.fill();
-
-  if (v.type === 'car') {
+  if (v.type === 'cart') {
+    // Horse-drawn cart
+    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.5, 2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
+    // Cart body
+    ctx.fillStyle = '#8B5E2A';
+    ctx.beginPath(); ctx.roundRect(w*0.35, GY-10, w*0.55, 10, 1); ctx.fill();
+    ctx.fillStyle = '#6B3E0A'; ctx.fillRect(w*0.35, GY-13, w*0.55, 4);
+    // Wheels
+    [[w*0.42, GY],[w*0.82, GY]].forEach(([wx, wy]) => {
+      ctx.strokeStyle = '#4a3010'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(wx, wy, 5, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(wx-5,wy); ctx.lineTo(wx+5,wy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(wx,wy-5); ctx.lineTo(wx,wy+5); ctx.stroke();
+    });
+    // Horse body
+    ctx.fillStyle = '#6e4520';
+    ctx.beginPath(); ctx.ellipse(w*0.14, GY-7, 10, 5, -0.15, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(w*0.08, GY-13, 4, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#8a5a2a'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(w*0.04,GY-3); ctx.lineTo(w*0.02,GY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(w*0.14,GY-3); ctx.lineTo(w*0.12,GY); ctx.stroke();
+    // Harness line
+    ctx.strokeStyle = '#3a2808'; ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(w*0.24,GY-7); ctx.lineTo(w*0.35,GY-8); ctx.stroke();
+  } else if (v.type === 'steam') {
+    // Steam-era car (boxy, tall)
+    ctx.globalAlpha = 0.15; ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.5, 2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.fillStyle = v.color;
+    ctx.beginPath(); ctx.roundRect(0, GY-13, w, 13, 2); ctx.fill();
     ctx.fillStyle = v.roofColor;
-    ctx.beginPath(); ctx.roundRect(w * 0.22, GY - h - 7, w * 0.55, 7, [2, 2, 0, 0]); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(w*0.1, GY-22, w*0.8, 10, [3,3,0,0]); ctx.fill();
+    ctx.fillStyle = 'rgba(120,180,220,0.6)';
+    ctx.fillRect(w*0.15, GY-20, w*0.28, 6); ctx.fillRect(w*0.57, GY-20, w*0.28, 6);
+    // Steam pipe
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(w*0.82, GY-22); ctx.lineTo(w*0.82, GY-30); ctx.stroke();
+    ctx.fillStyle = '#555';
+    ctx.beginPath(); ctx.ellipse(w*0.82, GY-30, 3, 1.5, 0, 0, Math.PI*2); ctx.fill();
+    // Wheels
+    [w*0.18, w*0.78].forEach(wx => {
+      ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(wx, GY, 5, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#666'; ctx.beginPath(); ctx.arc(wx, GY, 2.5, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.fillStyle = '#fffac8'; ctx.fillRect(w-2.5, GY-11, 2.5, 2.5);
+    ctx.fillStyle = '#ff4040'; ctx.fillRect(0, GY-11, 2.5, 2.5);
+  } else if (v.type === 'hover') {
+    // Golden Age hover car
+    const hov = Math.sin(_animTime * 0.08 + v.hoverPhase) * 2.5;
+    const h = 9;
+    ctx.globalAlpha = 0.12 + Math.abs(hov) * 0.02; ctx.fillStyle = '#80c8ff';
+    ctx.beginPath(); ctx.ellipse(w*0.5, GY+1, w*0.44, 2.2, 0, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+    // Repulsor glow
+    const repG = ctx.createRadialGradient(w*0.5, GY-2+hov, 0, w*0.5, GY-2+hov, w*0.52);
+    repG.addColorStop(0, 'rgba(60,180,255,0.14)'); repG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = repG; ctx.fillRect(0, GY-10+hov, w, 12);
+    // Sleek body (no wheels)
+    ctx.fillStyle = v.color;
+    ctx.beginPath(); ctx.roundRect(0, GY-h+hov, w, h, [4,4,2,2]); ctx.fill();
+    // Canopy
+    ctx.fillStyle = v.roofColor;
+    ctx.beginPath(); ctx.roundRect(w*0.18, GY-h-6+hov, w*0.64, 7, [4,4,0,0]); ctx.fill();
+    ctx.fillStyle = 'rgba(120,220,255,0.8)';
+    ctx.fillRect(w*0.22, GY-h-4.5+hov, w*0.55, 4);
+    // Accent light strip
+    ctx.fillStyle = '#00e4ff'; ctx.globalAlpha = 0.6;
+    ctx.fillRect(0, GY-h+1+hov, w, 1.5);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#fffac8'; ctx.fillRect(w-2, GY-h+3+hov, 2, 2);
+  } else if (v.type === 'sleek') {
+    // Modern sleek car (Golden Age contemporary)
+    const h = 10;
+    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.52, 2.2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.fillStyle = v.color;
+    ctx.beginPath(); ctx.roundRect(0, GY-h, w, h, [0,0,2,2]); ctx.fill();
+    ctx.fillStyle = v.roofColor;
+    ctx.beginPath(); ctx.roundRect(w*0.2, GY-h-8, w*0.6, 9, [3,3,0,0]); ctx.fill();
+    ctx.fillStyle = 'rgba(140,230,255,0.75)';
+    ctx.fillRect(w*0.24, GY-h-6.5, w*0.52, 5);
+    ctx.fillStyle = '#ffee80'; ctx.fillRect(w-2.5, GY-h+3.5, 2.5, 2.5);
+    ctx.fillStyle = '#ff3030'; ctx.fillRect(0, GY-h+3.5, 2.5, 2.5);
+    [w*0.18, w*0.78].forEach(wx => {
+      ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(wx, GY, 3.8, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#666';    ctx.beginPath(); ctx.arc(wx, GY, 1.8, 0, Math.PI*2); ctx.fill();
+    });
+  } else if (v.type === 'truck') {
+    // Standard truck
+    const h = 12;
+    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.52, 2.2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.fillStyle = v.color;
+    ctx.beginPath(); ctx.roundRect(0, GY-h, w, h, 2); ctx.fill();
+    ctx.fillStyle = v.roofColor;
+    ctx.beginPath(); ctx.roundRect(w*0.62, GY-h-9, w*0.36, 9, [2,2,0,0]); ctx.fill();
     ctx.fillStyle = 'rgba(140,220,255,0.72)';
-    ctx.fillRect(w * 0.26, GY - h - 5.5, w * 0.20, 4.5);
-    ctx.fillRect(w * 0.52, GY - h - 5.5, w * 0.20, 4.5);
+    ctx.fillRect(w*0.65, GY-h-7.5, w*0.28, 5.5);
+    ctx.fillStyle = '#fffac8'; ctx.fillRect(w-2.5, GY-h+3.5, 2.5, 2.5);
+    ctx.fillStyle = '#ff4040'; ctx.fillRect(0, GY-h+3.5, 2.5, 2.5);
+    [w*0.12, w*0.82].forEach(wx => {
+      ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(wx, GY, 4, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#555';    ctx.beginPath(); ctx.arc(wx, GY, 2, 0, Math.PI*2); ctx.fill();
+    });
   } else {
+    // Standard car
+    const h = 10;
+    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.52, 2.2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.fillStyle = v.color;
+    ctx.beginPath(); ctx.roundRect(0, GY-h, w, h, 2); ctx.fill();
     ctx.fillStyle = v.roofColor;
-    ctx.beginPath(); ctx.roundRect(w * 0.62, GY - h - 9, w * 0.36, 9, [2, 2, 0, 0]); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(w*0.22, GY-h-7, w*0.55, 7, [2,2,0,0]); ctx.fill();
     ctx.fillStyle = 'rgba(140,220,255,0.72)';
-    ctx.fillRect(w * 0.65, GY - h - 7.5, w * 0.28, 5.5);
+    ctx.fillRect(w*0.26, GY-h-5.5, w*0.20, 4.5);
+    ctx.fillRect(w*0.52, GY-h-5.5, w*0.20, 4.5);
+    ctx.fillStyle = '#fffac8'; ctx.fillRect(w-2.5, GY-h+3.5, 2.5, 2.5);
+    ctx.fillStyle = '#ff4040'; ctx.fillRect(0, GY-h+3.5, 2.5, 2.5);
+    [w*0.17, w*0.76].forEach(wx => {
+      ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(wx, GY, 3.6, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#555';    ctx.beginPath(); ctx.arc(wx, GY, 1.9, 0, Math.PI*2); ctx.fill();
+    });
   }
-
-  ctx.fillStyle = '#fffac8'; ctx.fillRect(w - 2.5, GY - h + 3.5, 2.5, 2.5);
-  ctx.fillStyle = '#ff4040'; ctx.fillRect(0, GY - h + 3.5, 2.5, 2.5);
-
-  [w * 0.17, w * 0.76].forEach(wx => {
-    ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(wx, GY, 3.6, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#555';    ctx.beginPath(); ctx.arc(wx, GY, 1.9, 0, Math.PI * 2); ctx.fill();
-  });
 
   ctx.restore();
 }
@@ -2397,7 +2505,7 @@ function animLoop() {
     ctx.fillRect(ws.x - ws.w * 1.2, ws.y - ws.h * 1.2, ws.w * 3.4, ws.h * 3.4);
   });
 
-  // Streetlight pulse (brighter at night)
+  // Streetlight pulse + ground cone (brighter at night)
   if (_nightFactor > 0.05) {
     _streetlights.forEach(sl => {
       const pulse = (0.88 + Math.sin(_animTime * 0.038 + sl.x * 0.009) * 0.12) * _nightFactor;
@@ -2405,6 +2513,25 @@ function animLoop() {
       ag.addColorStop(0, `rgba(248,224,80,${0.18 * pulse})`);
       ag.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = ag; ctx.fillRect(sl.x - 44, sl.y - 44, 88, 88);
+      // Ground cone of light
+      const coneA = _nightFactor * 0.12 * pulse;
+      const coneG = ctx.createLinearGradient(sl.x, sl.y, sl.x, _cityGY + 10);
+      coneG.addColorStop(0, `rgba(248,224,80,${coneA})`);
+      coneG.addColorStop(1, 'rgba(248,224,80,0)');
+      ctx.save();
+      ctx.fillStyle = coneG;
+      ctx.beginPath();
+      ctx.moveTo(sl.x, sl.y);
+      ctx.lineTo(sl.x - 26, _cityGY + 10);
+      ctx.lineTo(sl.x + 26, _cityGY + 10);
+      ctx.closePath();
+      ctx.fill();
+      // Ground ellipse
+      const gG = ctx.createRadialGradient(sl.x, _cityGY, 0, sl.x, _cityGY, 28);
+      gG.addColorStop(0, `rgba(248,224,80,${coneA * 1.4})`);
+      gG.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = gG; ctx.fillRect(sl.x-28, _cityGY-6, 56, 16);
+      ctx.restore();
     });
   }
 
