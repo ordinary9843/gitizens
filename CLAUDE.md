@@ -13,3 +13,4 @@ GitHub-native civilization simulator. Issues are proposals, reactions are votes,
 
 - master branch protection must NOT have `required_status_checks` — the tally bot pushes directly and cannot satisfy a status check requirement without creating a deadlock
 - `tally-votes.yml` permissions must include `models: read` for GitHub Models API (narrator) and `contents: write` for pushing world state
+- `test.yml` intentionally hardcodes `GITHUB_REPOSITORY: ordinary9843/gitizens` for CI test isolation — do NOT change it to `${{ github.repository }}`
