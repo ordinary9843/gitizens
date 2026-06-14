@@ -1,7 +1,7 @@
 {
   "era": "Founding Era",
-  "laws_count": 12,
-  "last_enacted": "2026-06-11",
+  "laws_count": 13,
+  "last_enacted": "2026-06-13",
   "founded_date": "2026-06-10",
   "world_summary": "In the Founding Era, Gitizens thrive with strong welfare (77), education (71), and a pollution-free environment, supported by a stable treasury of 138 Git Coins.",
   "treasury": 0,
@@ -11,7 +11,7 @@
   "industry": 45,
   "welfare": 77,
   "green_policy": 67,
-  "defense": 59,
+  "defense": 53,
   "population": 3025,
   "pollution": 0,
   "stability": 44,
