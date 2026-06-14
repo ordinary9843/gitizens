@@ -119,7 +119,7 @@ def run_tally():
     return result.returncode == 0
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     print("=== Gitizens World Seed ===")
     issue_numbers = []
 

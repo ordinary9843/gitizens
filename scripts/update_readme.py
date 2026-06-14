@@ -41,5 +41,5 @@ def main():
     print(f"README badges updated: era={era} pop={pop} treasury={trs}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
