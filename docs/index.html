@@ -1144,7 +1144,7 @@ function drawDayNight(ctx) {
   // Sun disc — only show when clearly daytime (avoid overlapping with moon at dawn/dusk)
   if (dayBright > 0.5) {
     const sunArc = Math.max(0, Math.min(1, (h - 6) / 12));
-    const sunX = W * (0.12 + sunArc * 0.76);
+    const sunX = W * (0.18 + sunArc * 0.64);
     const sunY = GY * (0.13 - Math.sin(sunArc * Math.PI) * 0.09);
     const discA = dayBright * 0.42;
     const dG = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 28);
@@ -1163,7 +1163,7 @@ function drawMoon(ctx) {
   // Moon arc: rises at dusk, sets at dawn
   const nt = h < 6 ? (h + 6) / 12 : h >= 18 ? (h - 18) / 12 : -1;
   if (nt < 0) return;
-  const mx = W * (0.12 + nt * 0.76);
+  const mx = W * (0.18 + nt * 0.64);
   const my = GY * (0.42 - Math.sin(nt * Math.PI) * 0.34);
   // Moon phase (day of month → phase angle)
   const phaseOffset = (now.getUTCDate() % 29.5) / 29.5;
@@ -2330,11 +2330,11 @@ function renderCityBg(state) {
   }
 
   const stabClr = stb >= 70 ? '#10d870' : stb >= 40 ? '#e8a020' : '#f03040';
-  const stabOp  = 0.08 + stb / 100 * 0.18;
-  const stabGrd = ctx.createLinearGradient(0, GY-44, 0, GY);
+  const stabOp  = 0.03 + stb / 100 * 0.05;
+  const stabGrd = ctx.createLinearGradient(0, GY-18, 0, GY);
   stabGrd.addColorStop(0, hexAlpha(stabClr, stabOp));
   stabGrd.addColorStop(1, hexAlpha(stabClr, 0));
-  ctx.fillStyle = stabGrd; ctx.fillRect(0, GY-44, W, 44);
+  ctx.fillStyle = stabGrd; ctx.fillRect(0, GY-18, W, 18);
 
   ctx.fillStyle = gndCol; ctx.fillRect(0, GY, W, H-GY);
 
