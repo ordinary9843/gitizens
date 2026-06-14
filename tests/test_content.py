@@ -441,7 +441,9 @@ class TestGenerateCitizenNarrator:
 
     def test_skipped_if_called_recently(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        recent_date = (datetime.now(timezone.utc) - timedelta(hours=6)).isoformat()
+        # Use a timestamp earlier today (UTC) to confirm same-day cadence skips the run
+        today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        recent_date = f"{today_str}T00:01:00+00:00"
         state = {**BASE_STATE, "last_narrator_date": recent_date}
         self._make_state_file(tmp_path, state)
         mock_client = MagicMock()
@@ -548,3 +550,99 @@ class TestGenerateCitizenNarrator:
             tv.generate_citizen_narrator()
         updated = json.loads((tmp_path / "world" / "state.json").read_text())
         assert "last_narrator_date" in updated
+
+
+# ===========================================================================
+# generate_citizen_narrator — UTC calendar date cadence
+# ===========================================================================
+
+class TestCitizenNarratorDailyCadence:
+
+    def _fake_client(self, response_text="diary content"):
+        """Build a minimal LLM client stub that returns response_text."""
+        class FakeMsg:
+            content = response_text
+        class FakeChoice:
+            message = FakeMsg()
+        class FakeCompletion:
+            choices = [FakeChoice()]
+        class FakeCompletions:
+            def create(self, *a, **kw):
+                return FakeCompletion()
+        class FakeChat:
+            completions = FakeCompletions()
+        class FakeClient:
+            chat = FakeChat()
+        return FakeClient()
+
+    def test_skips_when_already_ran_today(self, monkeypatch):
+        """No LLM call when last_narrator_date is today (UTC)."""
+        import scripts.engine.content as content
+        from datetime import datetime, timezone
+
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        state = {"last_narrator_date": f"{today}T06:00:00+00:00"}
+
+        called = []
+        class FakeCompletions:
+            def create(self, *a, **kw):
+                called.append(True)
+                raise AssertionError("LLM must not be called when narrator already ran today")
+        class FakeChat:
+            completions = FakeCompletions()
+        class FakeClient:
+            chat = FakeChat()
+
+        monkeypatch.setattr(content, "read_state", lambda: dict(state))
+        monkeypatch.setattr(content, "client", FakeClient())
+        content.generate_citizen_narrator()
+        assert not called
+
+    def test_fires_on_different_utc_date(self, monkeypatch):
+        """LLM is called when last_narrator_date is a previous UTC date."""
+        import scripts.engine.content as content
+        from datetime import datetime, timezone, timedelta
+
+        yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+        state_store = {"last_narrator_date": f"{yesterday}T23:59:00+00:00"}
+        written = {}
+
+        monkeypatch.setattr(content, "read_state", lambda: dict(state_store))
+        monkeypatch.setattr(content, "write_state", lambda s: written.update(s))
+        monkeypatch.setattr(content, "_get_or_create_citizen_voices_issue", lambda: 0)
+        monkeypatch.setattr(content, "upsert_bot_comment", lambda n, b: None)
+        monkeypatch.setattr(content, "client", self._fake_client())
+
+        content.generate_citizen_narrator()
+        assert "last_narrator_date" in written, "last_narrator_date must be updated after narration"
+
+    def test_fires_when_no_previous_date(self, monkeypatch):
+        """Fires on first run when last_narrator_date is absent."""
+        import scripts.engine.content as content
+
+        state_store = {}
+        written = {}
+        monkeypatch.setattr(content, "read_state", lambda: dict(state_store))
+        monkeypatch.setattr(content, "write_state", lambda s: written.update(s))
+        monkeypatch.setattr(content, "_get_or_create_citizen_voices_issue", lambda: 0)
+        monkeypatch.setattr(content, "upsert_bot_comment", lambda n, b: None)
+        monkeypatch.setattr(content, "client", self._fake_client())
+
+        content.generate_citizen_narrator()
+        assert "last_narrator_date" in written
+
+    def test_skips_with_malformed_date_gracefully(self, monkeypatch):
+        """Malformed last_narrator_date is treated as absent -- narrator fires."""
+        import scripts.engine.content as content
+
+        state_store = {"last_narrator_date": "not-a-date"}
+        written = {}
+        monkeypatch.setattr(content, "read_state", lambda: dict(state_store))
+        monkeypatch.setattr(content, "write_state", lambda s: written.update(s))
+        monkeypatch.setattr(content, "_get_or_create_citizen_voices_issue", lambda: 0)
+        monkeypatch.setattr(content, "upsert_bot_comment", lambda n, b: None)
+        monkeypatch.setattr(content, "client", self._fake_client())
+
+        content.generate_citizen_narrator()
+        # Should fire (malformed = treat as no prior run)
+        assert "last_narrator_date" in written

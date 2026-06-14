@@ -299,11 +299,14 @@ def generate_citizen_narrator():
     state = read_state()
     last_narrator = state.get("last_narrator_date")
     if last_narrator:
-        last_dt = datetime.fromisoformat(last_narrator.replace("Z", "+00:00"))
-        if last_dt.tzinfo is None:
-            last_dt = last_dt.replace(tzinfo=timezone.utc)
-        if (datetime.now(timezone.utc) - last_dt).days < 1:
-            return
+        try:
+            last_dt = datetime.fromisoformat(last_narrator.replace("Z", "+00:00"))
+            if last_dt.tzinfo is None:
+                last_dt = last_dt.replace(tzinfo=timezone.utc)
+            if datetime.now(timezone.utc).date() == last_dt.date():
+                return
+        except ValueError:
+            pass
     today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     try:
         response = client.chat.completions.create(
