@@ -881,9 +881,7 @@ class TestProcessAiProposal:
              patch.object(_engine_proposals, "append_history", return_value=None), \
              patch.object(_engine_proposals, "update_laws_index", return_value=None), \
              patch.object(_engine_proposals, "apply_tags", return_value=None), \
-             patch.object(_engine_proposals, "run_world_engine", return_value=[]), \
-             patch.object(_engine_proposals, "generate_dashboard_svg", return_value=None,
-                          create=True):
+             patch.object(_engine_proposals, "run_world_engine", return_value=[]):
             _engine_proposals.SKIP_TIMING = True
             _engine_proposals.process_ai_proposal(issue)
             _engine_proposals.SKIP_TIMING = False
@@ -1004,3 +1002,74 @@ class TestProcessFeedbackBasic:
             _engine_proposals.SKIP_TIMING = False
         state = json.loads((tmp_path / "world/state.json").read_text())
         assert state["welfare"] == min(100, initial_welfare + 5)
+
+
+# ===========================================================================
+# process_ai_proposal — atomic close before post-processing (tick-reliability fix)
+# ===========================================================================
+
+class TestAiProposalAtomicClose:
+
+    def test_no_generate_dashboard_svg_call(self):
+        """generate_dashboard_svg must not appear anywhere in proposals module source."""
+        import scripts.engine.proposals as p
+        src = open(p.__file__, encoding="utf-8").read()
+        assert "generate_dashboard_svg" not in src
+
+    def test_issue_closed_before_generate_world_md(self, tmp_path, monkeypatch):
+        """Issue close/relabel must happen before generate_world_md is called."""
+        import scripts.engine.proposals as proposals
+        call_order = []
+
+        def fake_run(cmd, **kw):
+            joined = " ".join(str(c) for c in cmd)
+            if "issue" in joined and "edit" in joined and "passed" in joined:
+                call_order.append("close")
+            elif "issue" in joined and "close" in joined:
+                call_order.append("close")
+            return ""
+
+        def fake_world_md(*a, **kw):
+            call_order.append("world_md")
+
+        monkeypatch.setattr(proposals, "run", fake_run)
+        monkeypatch.setattr(proposals, "gh_json", lambda *a, **kw: [])
+        monkeypatch.setattr(proposals, "get_reactions", lambda n: (0, 0, [], []))
+        monkeypatch.setattr(proposals, "generate_narrative", lambda *a, **kw: "narrative")
+        monkeypatch.setattr(proposals, "generate_world_md", fake_world_md)
+        monkeypatch.setattr(proposals, "update_readme", lambda *a, **kw: None)
+        monkeypatch.setattr(proposals, "update_laws_index", lambda *a, **kw: None)
+        monkeypatch.setattr(proposals, "update_proposal_cooldown", lambda *a, **kw: None)
+        monkeypatch.setattr(proposals, "apply_effect", lambda *a, **kw: None)
+        monkeypatch.setattr(proposals, "run_world_engine", lambda *a, **kw: [])
+        monkeypatch.setattr(proposals, "check_proposal_cooldown", lambda *a, **kw: (True, "", 0))
+        monkeypatch.setattr(proposals, "load_active_event", lambda: None)
+        monkeypatch.setattr(proposals, "apply_crisis_multiplier", lambda e, ev: e)
+        monkeypatch.setattr(proposals, "update_world_summary", lambda s: "")
+        monkeypatch.setattr(proposals, "check_threshold_tags", lambda a, b: [])
+        monkeypatch.setattr(proposals, "determine_era", lambda s: "Founding Era")
+        monkeypatch.setattr(proposals, "read_state", lambda: {
+            "laws_count": 12, "treasury": 1000, "currency": "GC", "era": "Founding Era",
+        })
+        monkeypatch.setattr(proposals, "write_state", lambda s: None)
+        monkeypatch.setattr(proposals, "read_stats", lambda: {})
+        monkeypatch.setattr(proposals, "write_stats", lambda s: None)
+        monkeypatch.setattr(proposals, "SKIP_TIMING", True)
+
+        law_dir = tmp_path / "world" / "laws"
+        law_dir.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        issue = {
+            "number": 99,
+            "title": "[AI-PROPOSAL] Test",
+            "body": "## Effect\n```yaml\ntype: policy\nchanges:\n  defense: +6\n```",
+            "createdAt": "2020-01-01T00:00:00Z",
+        }
+        proposals.process_ai_proposal(issue)
+
+        assert "close" in call_order, "Issue must be closed during processing"
+        assert "world_md" in call_order, "generate_world_md must be called"
+        close_idx = min(i for i, v in enumerate(call_order) if v == "close")
+        wmd_idx = call_order.index("world_md")
+        assert close_idx < wmd_idx, f"close (idx {close_idx}) must come before world_md (idx {wmd_idx})"

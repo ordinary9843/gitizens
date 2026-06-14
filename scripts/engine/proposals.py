@@ -304,11 +304,10 @@ def process_ai_proposal(issue: dict):
     stats["proposals_passed"] = stats.get("proposals_passed", 0) + 1
     write_stats(stats)
 
-    generate_dashboard_svg(stats, today)
-    generate_world_md(state, law_number, today)
-    update_readme(state, stats, law_number, today)
-    update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
-    update_proposal_cooldown(effect_data, today)
+    # Close and relabel FIRST so a mid-processing error cannot cause re-processing.
+    run(["gh", "issue", "edit", str(number), "--repo", REPO,
+         "--add-label", "passed", "--remove-label", "ai-proposal"])
+    run(["gh", "issue", "close", str(number), "--repo", REPO])
 
     try:
         Path(f"world/laws/law-{law_number:03d}.md").write_text(
@@ -327,6 +326,10 @@ def process_ai_proposal(issue: dict):
         print(f"  [ERROR] Failed to write law file for AI-proposal #{number}: {e} — aborting")
         return
     write_state(state)
+    generate_world_md(state, law_number, today)
+    update_readme(state, stats, law_number, today)
+    update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
+    update_proposal_cooldown(effect_data, today)
     append_history(law_number, clean_title, number, 0, 0, True, today)
     run(["git", "add", "-A"])
     run(["git", "commit", "-m", f"[LAW] law-{law_number:03d}: {clean_title} (AI, #{number})"])
@@ -337,9 +340,6 @@ def process_ai_proposal(issue: dict):
          "--body",
          f"**Law {law_number:03d} enacted** (AI proposal — no veto received).\n\n"
          f"{narrative}{world_note}"])
-    run(["gh", "issue", "edit", str(number), "--repo", REPO,
-         "--add-label", "passed", "--remove-label", "ai-proposal"])
-    run(["gh", "issue", "close", str(number), "--repo", REPO])
 
 
 def process_feedback(issue: dict) -> bool:
