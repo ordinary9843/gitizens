@@ -192,7 +192,7 @@ def world_autonomous_tick() -> bool:
                 tick_str.replace("Z", "+00:00")
             )).total_seconds() / 3600
             print(f"  Catchup: {n_ticks} ticks ({overdue_h:.1f}h overdue)")
-        else:
+        else:  # pragma: no cover — n_ticks > 1 requires next_tick_at to be set
             print(f"  Catchup: {n_ticks} ticks")
 
     any_changed = False

@@ -1219,3 +1219,110 @@ class TestMultiTickCatchup:
         # So no state changes — result must be False
         assert result is False
         assert write_calls == [], f"No writes expected for no-change ticks, got {len(write_calls)}"
+
+
+# ===========================================================================
+# apply_effect — declaration, population/treasury/string patch branches
+# ===========================================================================
+
+class TestApplyEffectBranches:
+    def _state(self, tmp_path):
+        (tmp_path / "world").mkdir(exist_ok=True)
+        (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
+
+    def test_declaration_type_is_no_op(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._state(tmp_path)
+        effect = {"type": "declaration"}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == BASE_STATE["treasury"]
+
+    def test_population_valid_patch_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._state(tmp_path)
+        effect = {"type": "state_patch", "patch": {"population": 3000}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["population"] == 3000
+
+    def test_population_invalid_value_skipped(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        self._state(tmp_path)
+        original_pop = BASE_STATE["population"]
+        effect = {"type": "state_patch", "patch": {"population": "bad"}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["population"] == original_pop
+        assert "BLOCKED" in capsys.readouterr().out
+
+    def test_treasury_invalid_value_skipped(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        self._state(tmp_path)
+        original = BASE_STATE["treasury"]
+        effect = {"type": "state_patch", "patch": {"treasury": "bad"}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["treasury"] == original
+        assert "BLOCKED" in capsys.readouterr().out
+
+    def test_string_key_currency_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._state(tmp_path)
+        effect = {"type": "state_patch", "patch": {"currency": "Gold Coins"}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["currency"] == "Gold Coins"
+
+    def test_string_key_founded_date_applied(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._state(tmp_path)
+        effect = {"type": "state_patch", "patch": {"founded_date": "2026-01-01"}}
+        tv.apply_effect(effect, None)
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["founded_date"] == "2026-01-01"
+
+
+# ===========================================================================
+# apply_event_effects — all_random field
+# ===========================================================================
+
+class TestApplyEventEffectsAllRandom:
+    def test_all_random_modifies_all_metrics(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        state = {**BASE_STATE, "education": 50, "stability": 50}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        event = {"immediate_effects": {"all_random": True}}
+        import random
+        monkeypatch.setattr(random, "randint", lambda a, b: 5)
+        tv.apply_event_effects(event, "immediate_effects")
+        new_state = json.loads((tmp_path / "world/state.json").read_text())
+        assert new_state["education"] == min(100, max(0, state["education"] + 5))
+
+
+# ===========================================================================
+# world_autonomous_tick — welfare > 80 stability bonus
+# ===========================================================================
+
+class TestAutonomousTickWelfareStabilityBonus:
+    def test_welfare_over_80_boosts_stability(self, monkeypatch):
+        from scripts.engine import world as _w
+        state = {
+            "industry": 0, "green_policy": 0, "welfare": 90,
+            "defense": 50, "pollution": 0, "population": 1000,
+            "stability": 50, "treasury": 100, "era": "Founding Era",
+            "next_tick_at": (datetime.now(timezone.utc) - timedelta(hours=3)
+                             ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        written = []
+        import random as _random
+        monkeypatch.setattr(_w, "SKIP_TIMING", False)
+        monkeypatch.setattr(_w, "read_state", lambda: dict(state))
+        monkeypatch.setattr(_w, "write_state", lambda s: written.append(dict(s)))
+        monkeypatch.setattr(_w, "determine_era", lambda s: "Founding Era")
+        monkeypatch.setattr(_random, "uniform", lambda a, b: 0.0)
+        _w.world_autonomous_tick()
+        assert written
+        new_stb = written[-1]["stability"]
+        assert new_stb > state["stability"]
