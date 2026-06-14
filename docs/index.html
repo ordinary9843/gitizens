@@ -880,6 +880,8 @@ let _searchlights = [];
 let _buildingRises = [];
 let _seenBuildingNames = new Set();
 let _nightFactor = 1; // 0 = full day, 1 = full night
+let _antennaBlinks = [];
+let _manholes = [];
 
 let _entranceDone = true;
 let _entranceStart = 0;
@@ -1796,6 +1798,11 @@ const BUILDINGS = {
       ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x+26, gy-156); ctx.lineTo(x+50, gy-156); ctx.stroke();
       ctx.globalAlpha = 1;
+      // AC units
+      ctx.globalAlpha = 0.4; ctx.fillStyle = '#c8d8e8';
+      [14,26,48].forEach(ax => ctx.fillRect(x+ax, gy-117, 8, 4));
+      ctx.globalAlpha = 1;
+      _antennaBlinks.push({x: x+38, y: gy-163, phase: x * 0.06 + 1.5});
     }},
 
   'Military Barracks': { w:88, order:7,
@@ -1874,6 +1881,19 @@ const BUILDINGS = {
         _chimneys.push({x: x+cx, y: gy-ch-62, intensity});
       });
       _neonSigns.push({x: x+49, y: gy-68, label: 'FACTORY', color: '#b058f8', phase: x * 0.01});
+      // Water tower
+      ctx.fillStyle = '#281830'; ctx.fillRect(x+80, gy-75, 10, 14);
+      ctx.fillStyle = '#3a2240';
+      ctx.beginPath(); ctx.ellipse(x+85, gy-75, 9, 5, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x+85, gy-61, 9, 5, 0, 0, Math.PI*2); ctx.fill();
+      // AC units
+      ctx.globalAlpha = 0.5; ctx.fillStyle = '#e0e8f0';
+      [6,20,34].forEach(ax => ctx.fillRect(x+ax, gy-63, 8, 5));
+      ctx.globalAlpha = 1;
+      // Rooftop antenna with blink light
+      ctx.strokeStyle = '#5a6a7a'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(x+8, gy-62); ctx.lineTo(x+8, gy-80); ctx.stroke();
+      _antennaBlinks.push({x: x+8, y: gy-81, phase: x * 0.05});
     }},
 
   'Industrial Complex': { w:122, order:10,
@@ -1900,6 +1920,11 @@ const BUILDINGS = {
         });
       }
       _neonSigns.push({x: x+61, y: gy-92, label: 'COMPLEX', color: '#c070ff', phase: x * 0.013 + 1.2});
+      // AC units on tower roof
+      ctx.globalAlpha = 0.45; ctx.fillStyle = '#d0dce8';
+      [68,82,96].forEach(ax => ctx.fillRect(x+ax, gy-90, 7, 4));
+      ctx.globalAlpha = 1;
+      _antennaBlinks.push({x: x+88, y: gy-128, phase: x * 0.04 + 0.8});
     }},
 
   'Heavy Industry Zone': { w:142, order:11,
@@ -1996,6 +2021,7 @@ function initCityCanvas() {
 function renderCityBg(state) {
   _S = state;
   _winSpots = []; _streetlights = []; _treeBranches = []; _neonSigns = []; _searchlights = [];
+  _antennaBlinks = []; _manholes = [];
   const ctx = _bgCtx;
   if (!ctx) return;
   const W = _cityW, H = _cityH, GY = _cityGY;
@@ -2248,6 +2274,37 @@ function renderCityBg(state) {
       ctx.beginPath(); ctx.moveTo(0, GY+gy2); ctx.lineTo(W, GY+gy2); ctx.stroke();
     }
     ctx.globalAlpha = 1;
+
+    // Road center dashed line
+    ctx.globalAlpha = 0.12; ctx.strokeStyle = '#f0e060'; ctx.lineWidth = 1.2;
+    ctx.setLineDash([18, 14]);
+    ctx.beginPath(); ctx.moveTo(0, GY + 22); ctx.lineTo(W, GY + 22); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Zebra crosswalks in building gaps
+    if (active.length > 1) {
+      let zbx = Math.max(20, (W - totW) / 2);
+      active.forEach(({b}, ai) => {
+        zbx += b.w;
+        if (ai < active.length - 1) {
+          const cx2 = zbx + GAP * 0.5;
+          ctx.globalAlpha = 0.095; ctx.fillStyle = '#d0d8e8';
+          for (let zi = 0; zi < 5; zi++) {
+            ctx.fillRect(cx2 - 6, GY + 4 + zi * 5, 12, 3);
+          }
+          // Manhole in gap
+          const mhx = cx2, mhy = GY + 30;
+          ctx.globalAlpha = 0.18; ctx.fillStyle = '#1a2838';
+          ctx.beginPath(); ctx.ellipse(mhx, mhy, 5.5, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#2a3848'; ctx.lineWidth = 0.8;
+          ctx.beginPath(); ctx.ellipse(mhx, mhy, 5.5, 2.5, 0, 0, Math.PI * 2); ctx.stroke();
+          _manholes.push({x: mhx, y: mhy});
+        }
+        zbx += GAP;
+      });
+    }
+
+    ctx.globalAlpha = 1;
   }
 
   document.getElementById('loading').style.display = 'none';
@@ -2351,6 +2408,38 @@ function animLoop() {
     ctx.beginPath(); ctx.moveTo(sl.x, sl.y); ctx.lineTo(ex, ey); ctx.stroke();
     ctx.restore();
   });
+
+  // Antenna blink lights
+  _antennaBlinks.forEach(ab => {
+    const on = Math.sin(_animTime * 0.06 + ab.phase) > 0.6;
+    if (!on) return;
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = '#ff2020';
+    ctx.beginPath(); ctx.arc(ab.x, ab.y, 1.8, 0, Math.PI * 2); ctx.fill();
+    const rg = ctx.createRadialGradient(ab.x, ab.y, 0, ab.x, ab.y, 8);
+    rg.addColorStop(0, 'rgba(255,30,30,0.35)');
+    rg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rg; ctx.fillRect(ab.x - 8, ab.y - 8, 16, 16);
+    ctx.restore();
+  });
+
+  // Manhole steam vents
+  _manholes.forEach(mh => {
+    if (Math.random() > 0.015) return;
+    // Spawn a puff — just draw inline for simplicity
+  });
+  if ((_animTime & 7) === 0) {
+    _manholes.forEach(mh => {
+      const steamA = 0.08 + Math.sin(_animTime * 0.05 + mh.x) * 0.04;
+      ctx.save();
+      ctx.globalAlpha = steamA;
+      ctx.fillStyle = 'rgba(200,210,230,1)';
+      const sy = mh.y - 12 - (_animTime % 40) * 0.4;
+      ctx.beginPath(); ctx.ellipse(mh.x, sy, 4, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    });
+  }
 
   // Neon signs (industrial buildings)
   _neonSigns.forEach(ns => {
