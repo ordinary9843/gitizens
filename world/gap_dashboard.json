@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-06-14T02:36:04.098636+00:00",
+  "updated_at": "2026-06-14T04:43:05.948084+00:00",
   "pending": [
+    {
+      "name": "Industrial Complex",
+      "metric": "industry",
+      "current": 51,
+      "target": 55,
+      "gap": 4
+    },
     {
       "name": "Academy of Sciences",
       "metric": "education",
       "current": 71,
       "target": 80,
       "gap": 9
-    },
-    {
-      "name": "Industrial Complex",
-      "metric": "industry",
-      "current": 45,
-      "target": 55,
-      "gap": 10
     },
     {
       "name": "Defense Ministry",
@@ -26,13 +26,6 @@
   "at_risk": [],
   "milestones_pending": [
     {
-      "tag": "milestone/industrial-age",
-      "metric": "industry",
-      "current": 45,
-      "target": 50,
-      "gap": 5
-    },
-    {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
       "current": 0,
@@ -43,6 +36,7 @@
   "milestones_achieved": [
     "era/founding-era",
     "milestone/educated-society",
-    "milestone/welfare-state"
+    "milestone/welfare-state",
+    "milestone/industrial-age"
   ]
 }
