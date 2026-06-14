@@ -1287,7 +1287,7 @@ class TestProcessAiProposalEdgeCases:
     def test_timing_window_not_over_skips(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         self._make_world(tmp_path)
-        created = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+        created = (datetime.now(timezone.utc) - timedelta(minutes=30)).isoformat()
         issue = {
             "number": 55, "title": "[AI-PROPOSAL] Test", "body": "",
             "createdAt": created,
@@ -1344,7 +1344,7 @@ class TestProcessFeedbackEdgeCases:
     def test_timing_window_not_over_returns_false(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         self._make_world(tmp_path)
-        created = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+        created = (datetime.now(timezone.utc) - timedelta(minutes=30)).isoformat()
         issue = {
             "number": 77, "title": "[FEEDBACK] Test", "body": "",
             "createdAt": created,

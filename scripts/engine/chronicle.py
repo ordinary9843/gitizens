@@ -206,7 +206,7 @@ def get_or_create_dispatch_issue() -> int:
         return issues[0]["number"]
     body = (
         "World news dispatch for **Gitizens**.\n\n"
-        "Every 2 hours, the world narrator updates this post with the latest "
+        "Every hour, the world narrator updates this post with the latest "
         "tick summary — laws passed, events fired, population changes, and more.\n\n"
         "*React with 👍 to follow the chronicle.*"
     )

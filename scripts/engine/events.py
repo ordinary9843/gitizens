@@ -40,7 +40,7 @@ def open_event_issue(event: dict) -> int:
         f"**Category:** {event.get('category', '?').title()}  ·  "
         f"**Rarity:** {event.get('rarity', '?').title()}\n\n"
         f"**Immediate effects (already applied):** {imm_str}\n\n"
-        f"**Response window:** 2 hours\n\n"
+        f"**Response window:** 1 hour\n\n"
         f"**👍 React to mobilise** — response: {fmt_effects(event.get('response_consequence', {}))}\n\n"
         f"**👎 React to stand down** — default: {fmt_effects(event.get('default_consequence', {}))}\n\n"
         f"> Hint: {event.get('response_hint', 'React 👍 to trigger the response consequence.')}\n"

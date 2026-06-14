@@ -313,7 +313,7 @@ class TestAutonomousTickTimingGuard:
 
     def test_runs_when_past_next_tick_at(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        self._state_with_next_tick(tmp_path, delta_seconds=-3600)  # 1 hour ago
+        self._state_with_next_tick(tmp_path, delta_seconds=-60)  # 1 minute ago
         with patch.object(_engine_world, "SKIP_TIMING", False), \
              patch.object(_engine_world, "write_state") as ws, \
              patch.object(_engine_world, "run", return_value=""):
@@ -811,43 +811,42 @@ class TestApplyTags:
 # ===========================================================================
 
 class TestComputeNextTickAt:
-    def test_advances_by_two_hours_at_top_of_hour(self):
+    def test_advances_by_one_hour_at_top_of_hour(self):
         now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-06-14T20:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-06-14T19:00:00Z"
 
     def test_snaps_to_top_of_hour_when_now_is_mid_hour(self):
         now = datetime(2026, 6, 14, 18, 37, 42, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-06-14T20:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-06-14T19:00:00Z"
 
-    def test_consecutive_calls_two_hours_apart_produce_different_values(self):
-        # Regression: the old 4-hour boundary calculation made consecutive 2h
-        # cron runs collide on the same timestamp. Two adjacent runs must now
-        # always differ.
+    def test_consecutive_calls_one_hour_apart_produce_different_values(self):
+        # Regression: the old 4-hour boundary calculation made consecutive cron
+        # runs collide on the same timestamp. Adjacent runs must always differ.
         first  = tv.compute_next_tick_at(datetime(2026, 6, 14, 18, 0, tzinfo=timezone.utc))
-        second = tv.compute_next_tick_at(datetime(2026, 6, 14, 20, 0, tzinfo=timezone.utc))
-        third  = tv.compute_next_tick_at(datetime(2026, 6, 14, 22, 0, tzinfo=timezone.utc))
+        second = tv.compute_next_tick_at(datetime(2026, 6, 14, 19, 0, tzinfo=timezone.utc))
+        third  = tv.compute_next_tick_at(datetime(2026, 6, 14, 20, 0, tzinfo=timezone.utc))
         assert first != second != third
-        assert first == "2026-06-14T20:00:00Z"
-        assert second == "2026-06-14T22:00:00Z"
-        assert third == "2026-06-15T00:00:00Z"
+        assert first == "2026-06-14T19:00:00Z"
+        assert second == "2026-06-14T20:00:00Z"
+        assert third == "2026-06-14T21:00:00Z"
 
     def test_crosses_day_boundary(self):
         now = datetime(2026, 6, 14, 23, 0, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-06-15T01:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-06-15T00:00:00Z"
 
     def test_crosses_month_boundary(self):
         now = datetime(2026, 6, 30, 23, 30, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-07-01T01:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-07-01T00:00:00Z"
 
     def test_crosses_year_boundary(self):
         now = datetime(2026, 12, 31, 23, 30, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2027-01-01T01:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2027-01-01T00:00:00Z"
 
     def test_naive_datetime_treated_as_utc(self):
         # Defensive: if a caller passes a naive datetime, treat it as UTC
         # rather than crashing or producing a localized timestamp.
         naive = datetime(2026, 6, 14, 18, 0, 0)
-        assert tv.compute_next_tick_at(naive) == "2026-06-14T20:00:00Z"
+        assert tv.compute_next_tick_at(naive) == "2026-06-14T19:00:00Z"
 
     def test_aware_non_utc_input(self):
         # Caller passes a tz-aware datetime in a non-UTC zone — the snap
@@ -855,14 +854,14 @@ class TestComputeNextTickAt:
         from datetime import timezone as _tz
         plus_eight = _tz(timedelta(hours=8))
         now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=plus_eight)
-        # 18:00+08 + 2h = 20:00+08; format() writes the local-clock string
+        # 18:00+08 + 1h = 19:00+08; format() writes the local-clock string
         # with a literal "Z" suffix. We accept this as documented behavior.
         result = tv.compute_next_tick_at(now)
-        assert result.startswith("2026-06-14T20:00:00")
+        assert result.startswith("2026-06-14T19:00:00")
 
     def test_midnight_input(self):
         now = datetime(2026, 6, 14, 0, 0, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-06-14T02:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-06-14T01:00:00Z"
 
     def test_format_is_iso_with_z_suffix(self):
         now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=timezone.utc)
@@ -1062,7 +1061,7 @@ class TestCountMissedTicks:
 
     def test_two_intervals_overdue_returns_two(self):
         from datetime import datetime, timezone, timedelta
-        past = (datetime.now(timezone.utc) - timedelta(hours=2, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        past = (datetime.now(timezone.utc) - timedelta(hours=1, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
         orig = _world_mod.SKIP_TIMING
         try:
             _world_mod.SKIP_TIMING = False
@@ -1121,7 +1120,7 @@ class TestMultiTickCatchup:
 
     def test_catchup_applies_two_ticks(self, monkeypatch):
         from datetime import datetime, timezone, timedelta
-        past = (datetime.now(timezone.utc) - timedelta(hours=2, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        past = (datetime.now(timezone.utc) - timedelta(hours=1, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
         base = self._base_state(past)
 
         states = [dict(base)]

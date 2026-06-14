@@ -9,7 +9,7 @@
 [![Tests](https://github.com/ordinary9843/gitizens/actions/workflows/test.yml/badge.svg)](https://github.com/ordinary9843/gitizens/actions/workflows/test.yml)
 ![Coverage](docs/coverage-badge.svg)
 
-GitHub Issues are laws. Reactions are votes. Every 2 hours, the world ticks forward on its own.
+GitHub Issues are laws. Reactions are votes. Every hour, the world ticks forward on its own.
 
 Buildings emerge when policy metrics cross thresholds. Random events strike. Eras rise and fall.  
 No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote.
@@ -49,7 +49,7 @@ No signup. No account. Just a GitHub account and an opinion.
 ## How to Play
 
 ### 1. Watch the world
-Open the [live city dashboard](https://ordinary9843.github.io/gitizens/). Every building reflects a real policy metric. The world ticks every 2 hours — even when no one is online.
+Open the [live city dashboard](https://ordinary9843.github.io/gitizens/). Every building reflects a real policy metric. The world ticks every hour — even when no one is online.
 
 ### 2. Vote on proposals
 Open any [Issue labeled `proposal`](../../issues?q=label%3Aproposal+is%3Aopen). React with 👍 to vote for, 👎 to vote against. Voting closes in 24 hours.
@@ -67,7 +67,7 @@ Open the [live dashboard](https://ordinary9843.github.io/gitizens/) and scroll t
 | Mechanic | How it works |
 |----------|-------------|
 | **Policy laws** | Change education / industry / welfare / green_policy / defense (costs 100 Git Coins) |
-| **Idle growth** | World ticks every 2h regardless of votes — population grows, pollution drifts, stability shifts |
+| **Idle growth** | World ticks every hour regardless of votes — population grows, pollution drifts, stability shifts |
 | **Random events** | 15% chance per tick — drought, stock crash, alien signal, pandemic, and 47 more |
 | **Era progression** | Founding → Industrial → Modern → Golden Age (or Crisis Age if things go wrong) |
 | **Treasury** | Earned from GitHub stars (×10 GC) + industrial output + population tax |

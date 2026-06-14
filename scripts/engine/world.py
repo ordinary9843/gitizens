@@ -11,7 +11,7 @@ from .state import read_json, write_json, read_state, write_state
 from .gh import run, SKIP_TIMING
 
 
-TICK_INTERVAL_HOURS = 2
+TICK_INTERVAL_HOURS = 1
 
 # Population dynamics — fractional per-tick rates. New population is
 # pop + births - deaths + migration + noise, floored at POPULATION_FLOOR.
@@ -72,7 +72,7 @@ def compute_next_tick_at(now: datetime) -> str:
     """Return ISO timestamp for the next bot tick.
 
     Advances `now` by `TICK_INTERVAL_HOURS` and snaps to the top of that hour.
-    Cron runs every 2 hours; this guarantees every consecutive run produces a
+    Cron runs every hour; this guarantees every consecutive run produces a
     different timestamp, so `world/state.json` always becomes dirty on tick.
     """
     if now.tzinfo is None:

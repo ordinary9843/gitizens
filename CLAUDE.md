@@ -1,6 +1,6 @@
 # Gitizens
 
-GitHub-native civilization simulator. Issues are proposals, reactions are votes, a cron workflow tallies votes every 2 hours and updates world state.
+GitHub-native civilization simulator. Issues are proposals, reactions are votes, a cron workflow tallies votes every hour and updates world state.
 
 ## Core constraints
 
