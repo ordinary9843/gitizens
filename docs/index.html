@@ -882,6 +882,10 @@ let _seenBuildingNames = new Set();
 let _nightFactor = 1; // 0 = full day, 1 = full night
 let _antennaBlinks = [];
 let _manholes = [];
+let _flags = [];
+let _elevators = [];
+let _gondolas = [];
+let _laundryLines = [];
 
 let _entranceDone = true;
 let _entranceStart = 0;
@@ -1803,6 +1807,10 @@ const BUILDINGS = {
       [14,26,48].forEach(ax => ctx.fillRect(x+ax, gy-117, 8, 4));
       ctx.globalAlpha = 1;
       _antennaBlinks.push({x: x+38, y: gy-163, phase: x * 0.06 + 1.5});
+      // Elevator shaft indicator
+      _elevators.push({x: x+31, top: gy-112, bot: gy-10, color: '#00b8e0'});
+      // Window cleaning gondola
+      _gondolas.push({x: x+22, roofY: gy-115, w: 28, color: '#00b8e0'});
     }},
 
   'Military Barracks': { w:88, order:7,
@@ -1832,9 +1840,8 @@ const BUILDINGS = {
       // Flagpole on left merlon
       ctx.strokeStyle = '#8a7040'; ctx.lineWidth = 1.2;
       ctx.beginPath(); ctx.moveTo(x+6, gy-75); ctx.lineTo(x+6, gy-92); ctx.stroke();
-      ctx.fillStyle = '#f07830'; ctx.globalAlpha = 0.8;
-      ctx.beginPath(); ctx.moveTo(x+6, gy-92); ctx.lineTo(x+16, gy-87); ctx.lineTo(x+6, gy-82); ctx.closePath(); ctx.fill();
       ctx.globalAlpha = 1;
+      _flags.push({px: x+6, py: gy-92, len: 18, h: 11, color: '#f07830', phase: x*0.04+0.5});
     }},
 
   'Defense Ministry': { w:102, order:8,
@@ -1855,7 +1862,8 @@ const BUILDINGS = {
       ctx.strokeStyle = '#f07830'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x+51, gy-118); ctx.lineTo(x+51, gy-136); ctx.stroke();
       ctx.fillStyle = '#f07830';
-      ctx.beginPath(); ctx.moveTo(x+43, gy-136); ctx.lineTo(x+51, gy-152); ctx.lineTo(x+59, gy-136); ctx.closePath(); ctx.fill();
+      // Flag (animated wave registered separately)
+      _flags.push({px: x+51, py: gy-136, len: 22, h: 14, color: '#f07830', phase: x*0.03});
       // Searchlight base (corner turrets)
       [[x+4, gy-72], [x+90, gy-72]].forEach(([sx, sy]) => {
         ctx.fillStyle = '#3a1e08';
@@ -2022,6 +2030,7 @@ function renderCityBg(state) {
   _S = state;
   _winSpots = []; _streetlights = []; _treeBranches = []; _neonSigns = []; _searchlights = [];
   _antennaBlinks = []; _manholes = [];
+  _flags = []; _elevators = []; _gondolas = []; _laundryLines = [];
   const ctx = _bgCtx;
   if (!ctx) return;
   const W = _cityW, H = _cityH, GY = _cityGY;
@@ -2260,6 +2269,20 @@ function renderCityBg(state) {
           lg.addColorStop(0, 'rgba(248,224,80,0.16)'); lg.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = lg; ctx.fillRect(lx-30, GY-74, 74, 74);
           _streetlights.push({x: lx+8, y: GY-36});
+          // Laundry line between building edges (every other gap)
+          if (ai % 2 === 0 && GAP >= 14) {
+            const la = slx - b.w, lb = slx + GAP;
+            const laH = GY - 38 - (wHash(ai, 77) % 18);
+            const lbH = GY - 34 - (wHash(ai, 89) % 14);
+            _laundryLines.push({x1: la, y1: laH, x2: lb, y2: lbH,
+              items: [
+                {t: 0.18, col: '#c04040', w: 7, h: 9},
+                {t: 0.40, col: '#e8d090', w: 8, h: 10},
+                {t: 0.62, col: '#4090d0', w: 6, h: 11},
+                {t: 0.82, col: '#60c060', w: 9, h: 8},
+              ]
+            });
+          }
           slx += GAP;
         }
       });
@@ -2455,6 +2478,76 @@ function animLoop() {
     ctx.shadowBlur = 4;
     ctx.fillText(ns.label, ns.x, ns.y);
     ctx.shadowBlur = 0;
+    ctx.restore();
+  });
+
+  // Waving flags
+  _flags.forEach(fl => {
+    const t = _animTime * 0.055 + fl.phase;
+    ctx.save();
+    ctx.strokeStyle = fl.color; ctx.lineWidth = 1;
+    ctx.fillStyle = fl.color; ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.moveTo(fl.px, fl.py);
+    for (let s = 0; s <= 8; s++) {
+      const sx = fl.px + (s / 8) * fl.len;
+      const sy = fl.py + Math.sin(t - s * 0.55) * (s / 8) * (fl.h * 0.45)
+                       + (s / 8) * (fl.h * 0.35);
+      s === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+    }
+    for (let s = 8; s >= 0; s--) {
+      const sx = fl.px + (s / 8) * fl.len;
+      const sy = fl.py + Math.sin(t - s * 0.55) * (s / 8) * (fl.h * 0.45)
+                       + (s / 8) * (fl.h * 0.35) + fl.h;
+      ctx.lineTo(sx, sy);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  });
+
+  // Elevator lights
+  _elevators.forEach(el => {
+    const period = 280;
+    const pos = (_animTime % period) / period;
+    const ey = el.top + (el.bot - el.top) * (pos < 0.5 ? pos * 2 : (1 - pos) * 2);
+    ctx.save();
+    ctx.globalAlpha = 0.45;
+    ctx.fillStyle = el.color;
+    ctx.fillRect(el.x, ey - 2, 4, 5);
+    ctx.restore();
+  });
+
+  // Window cleaning gondolas
+  _gondolas.forEach(g => {
+    const period = 420;
+    const pos = (_animTime % period) / period;
+    const gy2 = g.roofY + pos * (Math.abs(g.roofY) + 80);
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = g.color; ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(g.x, g.roofY); ctx.lineTo(g.x, gy2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(g.x + g.w, g.roofY); ctx.lineTo(g.x + g.w, gy2); ctx.stroke();
+    ctx.fillStyle = 'rgba(200,220,240,0.6)';
+    ctx.fillRect(g.x - 2, gy2, g.w + 4, 6);
+    ctx.restore();
+  });
+
+  // Laundry lines
+  _laundryLines.forEach(ll => {
+    const sway = Math.sin(_animTime * 0.018 + ll.x1 * 0.01) * 1.5;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(180,180,190,0.28)'; ctx.lineWidth = 0.7;
+    ctx.beginPath(); ctx.moveTo(ll.x1, ll.y1 + sway); ctx.lineTo(ll.x2, ll.y2 + sway); ctx.stroke();
+    ll.items.forEach(item => {
+      const ix = ll.x1 + (ll.x2 - ll.x1) * item.t;
+      const iy = ll.y1 + (ll.y2 - ll.y1) * item.t + sway;
+      const swayI = Math.sin(_animTime * 0.025 + item.t * 8) * 1.8;
+      ctx.fillStyle = item.col; ctx.globalAlpha = 0.7;
+      ctx.fillRect(ix - item.w * 0.5 + swayI * 0.3, iy, item.w, item.h);
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 0.4;
+      ctx.strokeRect(ix - item.w * 0.5 + swayI * 0.3, iy, item.w, item.h);
+    });
+    ctx.globalAlpha = 1;
     ctx.restore();
   });
 
