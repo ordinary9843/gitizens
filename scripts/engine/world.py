@@ -160,65 +160,88 @@ def auto_remove_entity(category: str, entity_id: str, law_number: int, reason: s
 
 # ── Autonomous world tick ────────────────────────────────────────────────────
 
+def _count_missed_ticks(state: dict) -> int:
+    """Return how many 2-h ticks are overdue (at least 1, capped at 6). Returns 0 if not yet due."""
+    if SKIP_TIMING:
+        return 1
+    tick_str = state.get("next_tick_at", "")
+    if not tick_str:
+        return 1
+    try:
+        next_dt = datetime.fromisoformat(tick_str.replace("Z", "+00:00"))
+        now = datetime.now(timezone.utc)
+        if now < next_dt:
+            return 0
+        overdue_secs = (now - next_dt).total_seconds()
+        return 1 + min(5, int(overdue_secs // (TICK_INTERVAL_HOURS * 3600)))
+    except ValueError:
+        return 1
+
+
 def world_autonomous_tick() -> bool:
     state = read_state()
 
-    if not SKIP_TIMING:
-        next_tick_at = state.get("next_tick_at")
-        if next_tick_at:
-            try:
-                next_dt = datetime.fromisoformat(next_tick_at.replace("Z", "+00:00"))
-                if datetime.now(timezone.utc) < next_dt:
-                    print(f"  Tick skipped — next tick at {next_tick_at}")
-                    return False
-            except ValueError:
-                pass
-
-    ind = state.get("industry", 0)
-    grn = state.get("green_policy", 0)
-    wel = state.get("welfare", 0)
-    dfn = state.get("defense", 0)
-    pol = state.get("pollution", 0)
-    pop = state.get("population", 1000)
-    stb = state.get("stability", 80)
-    treasury = state.get("treasury", 0)
-
-    pol_delta = +1 if ind - grn >= 20 else (-1 if grn - ind >= 20 else 0)
-    new_pol = max(0, min(100, pol + pol_delta))
-
-    new_pop = compute_population_delta(
-        pop=pop, welfare=wel, pollution=new_pol,
-        stability=stb, defense=dfn, treasury=treasury,
-    )
-
-    target_stb = max(0, min(100, 30 + wel // 5 + dfn // 10 - new_pol // 10))
-    new_stb = stb + (1 if stb < target_stb else (-1 if stb > target_stb else 0))
-    if wel > 80:
-        new_stb = min(100, new_stb + 1)
-
-    industry_income = ind // 10
-    pop_income      = new_pop // 500
-    new_treasury = min(100_000, treasury + industry_income + pop_income)
-
-    state.update({
-        "pollution":  new_pol,
-        "population": new_pop,
-        "stability":  new_stb,
-        "treasury":   new_treasury,
-    })
-    new_era = determine_era(state)
-    era_changed = new_era != state.get("era", "Founding Era")
-    state["era"] = new_era
-
-    changed = (new_pol != pol or new_pop != pop or new_stb != stb or
-               new_treasury != treasury or era_changed)
-    if not changed:
+    n_ticks = _count_missed_ticks(state)
+    if n_ticks == 0:
+        print(f"  Tick skipped — next tick at {state.get('next_tick_at')}")
         return False
+    if n_ticks > 1:
+        overdue_h = (datetime.now(timezone.utc) - datetime.fromisoformat(
+            state["next_tick_at"].replace("Z", "+00:00")
+        )).total_seconds() / 3600
+        print(f"  Catchup: {n_ticks} ticks ({overdue_h:.1f}h overdue)")
 
-    write_state(state)
-    print(f"  Tick: pol={new_pol} pop={new_pop} stb={new_stb} "
-          f"treasury={new_treasury}(+{industry_income+pop_income}) era={new_era}")
-    return True
+    any_changed = False
+    for tick_i in range(n_ticks):
+        if tick_i > 0:
+            state = read_state()
+
+        ind = state.get("industry", 0)
+        grn = state.get("green_policy", 0)
+        wel = state.get("welfare", 0)
+        dfn = state.get("defense", 0)
+        pol = state.get("pollution", 0)
+        pop = state.get("population", 1000)
+        stb = state.get("stability", 80)
+        treasury = state.get("treasury", 0)
+
+        pol_delta = +1 if ind - grn >= 20 else (-1 if grn - ind >= 20 else 0)
+        new_pol = max(0, min(100, pol + pol_delta))
+
+        new_pop = compute_population_delta(
+            pop=pop, welfare=wel, pollution=new_pol,
+            stability=stb, defense=dfn, treasury=treasury,
+        )
+
+        target_stb = max(0, min(100, 30 + wel // 5 + dfn // 10 - new_pol // 10))
+        new_stb = stb + (1 if stb < target_stb else (-1 if stb > target_stb else 0))
+        if wel > 80:
+            new_stb = min(100, new_stb + 1)
+
+        industry_income = ind // 10
+        pop_income      = new_pop // 500
+        new_treasury = min(100_000, treasury + industry_income + pop_income)
+
+        state.update({
+            "pollution":  new_pol,
+            "population": new_pop,
+            "stability":  new_stb,
+            "treasury":   new_treasury,
+        })
+        new_era = determine_era(state)
+        era_changed = new_era != state.get("era", "Founding Era")
+        state["era"] = new_era
+
+        changed = (new_pol != pol or new_pop != pop or new_stb != stb or
+                   new_treasury != treasury or era_changed)
+        if changed:
+            any_changed = True
+            write_state(state)
+            suffix = f" [{tick_i+1}/{n_ticks}]" if n_ticks > 1 else ""
+            print(f"  Tick{suffix}: pol={new_pol} pop={new_pop} stb={new_stb} "
+                  f"treasury={new_treasury}(+{industry_income+pop_income}) era={new_era}")
+
+    return any_changed
 
 
 # ── World engine ─────────────────────────────────────────────────────────────

@@ -14,6 +14,8 @@ from tests.helpers import (
     _make_category,
 )
 
+import scripts.engine.world as _world_mod
+
 
 # ===========================================================================
 # determine_era
@@ -1030,3 +1032,154 @@ class TestComputePopulationDelta:
             tv.world_autonomous_tick()
         new_state = json.loads(Path("world/state.json").read_text(encoding="utf-8"))
         assert new_state["population"] < 5000
+
+
+# ===========================================================================
+# _count_missed_ticks
+# ===========================================================================
+
+class TestCountMissedTicks:
+
+    def test_not_yet_due_returns_zero(self):
+        from datetime import datetime, timezone, timedelta
+        future = (datetime.now(timezone.utc) + timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        orig = _world_mod.SKIP_TIMING
+        try:
+            _world_mod.SKIP_TIMING = False
+            assert _world_mod._count_missed_ticks({"next_tick_at": future}) == 0
+        finally:
+            _world_mod.SKIP_TIMING = orig
+
+    def test_just_overdue_returns_one(self):
+        from datetime import datetime, timezone, timedelta
+        past = (datetime.now(timezone.utc) - timedelta(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        orig = _world_mod.SKIP_TIMING
+        try:
+            _world_mod.SKIP_TIMING = False
+            assert _world_mod._count_missed_ticks({"next_tick_at": past}) == 1
+        finally:
+            _world_mod.SKIP_TIMING = orig
+
+    def test_two_intervals_overdue_returns_two(self):
+        from datetime import datetime, timezone, timedelta
+        past = (datetime.now(timezone.utc) - timedelta(hours=2, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        orig = _world_mod.SKIP_TIMING
+        try:
+            _world_mod.SKIP_TIMING = False
+            assert _world_mod._count_missed_ticks({"next_tick_at": past}) == 2
+        finally:
+            _world_mod.SKIP_TIMING = orig
+
+    def test_caps_at_six(self):
+        from datetime import datetime, timezone, timedelta
+        past = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        orig = _world_mod.SKIP_TIMING
+        try:
+            _world_mod.SKIP_TIMING = False
+            assert _world_mod._count_missed_ticks({"next_tick_at": past}) == 6
+        finally:
+            _world_mod.SKIP_TIMING = orig
+
+    def test_skip_timing_returns_one_regardless(self):
+        orig = _world_mod.SKIP_TIMING
+        try:
+            _world_mod.SKIP_TIMING = True
+            assert _world_mod._count_missed_ticks({"next_tick_at": "2020-01-01T00:00:00Z"}) == 1
+        finally:
+            _world_mod.SKIP_TIMING = orig
+
+    def test_missing_next_tick_at_returns_one(self):
+        orig = _world_mod.SKIP_TIMING
+        try:
+            _world_mod.SKIP_TIMING = False
+            assert _world_mod._count_missed_ticks({}) == 1
+        finally:
+            _world_mod.SKIP_TIMING = orig
+
+    def test_malformed_timestamp_returns_one(self):
+        orig = _world_mod.SKIP_TIMING
+        try:
+            _world_mod.SKIP_TIMING = False
+            assert _world_mod._count_missed_ticks({"next_tick_at": "not-a-date"}) == 1
+        finally:
+            _world_mod.SKIP_TIMING = orig
+
+
+# ===========================================================================
+# world_autonomous_tick — multi-tick catchup
+# ===========================================================================
+
+class TestMultiTickCatchup:
+
+    def _base_state(self, next_tick_at):
+        return {
+            "industry": 20, "green_policy": 0, "welfare": 50,
+            "defense": 50, "pollution": 10, "population": 1000,
+            "stability": 60, "treasury": 0, "era": "Founding Era",
+            "next_tick_at": next_tick_at,
+        }
+
+    def test_catchup_applies_two_ticks(self, monkeypatch):
+        from datetime import datetime, timezone, timedelta
+        past = (datetime.now(timezone.utc) - timedelta(hours=2, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        base = self._base_state(past)
+
+        write_calls = []
+        monkeypatch.setattr(_world_mod, "SKIP_TIMING", False)
+        monkeypatch.setattr(_world_mod, "read_state", lambda: {**base})
+        monkeypatch.setattr(_world_mod, "write_state", lambda s: write_calls.append(dict(s)))
+        monkeypatch.setattr(_world_mod, "determine_era", lambda s: "Founding Era")
+
+        result = _world_mod.world_autonomous_tick()
+        assert result is True
+        assert len(write_calls) >= 2, f"Expected >=2 write_state calls for 2-tick catchup, got {len(write_calls)}"
+
+    def test_single_tick_when_barely_overdue(self, monkeypatch):
+        from datetime import datetime, timezone, timedelta
+        past = (datetime.now(timezone.utc) - timedelta(minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        base = self._base_state(past)
+
+        write_calls = []
+        monkeypatch.setattr(_world_mod, "SKIP_TIMING", False)
+        monkeypatch.setattr(_world_mod, "read_state", lambda: {**base})
+        monkeypatch.setattr(_world_mod, "write_state", lambda s: write_calls.append(dict(s)))
+        monkeypatch.setattr(_world_mod, "determine_era", lambda s: "Founding Era")
+
+        result = _world_mod.world_autonomous_tick()
+        assert result is True
+        assert len(write_calls) == 1
+
+    def test_population_larger_after_three_ticks(self, monkeypatch):
+        from datetime import datetime, timezone, timedelta
+
+        past_1 = (datetime.now(timezone.utc) - timedelta(minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        past_3 = (datetime.now(timezone.utc) - timedelta(hours=4, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        def run_ticks(past_ts):
+            base = {
+                "industry": 0, "green_policy": 0, "welfare": 80,
+                "defense": 50, "pollution": 10, "population": 1000,
+                "stability": 60, "treasury": 2000, "era": "Founding Era",
+                "next_tick_at": past_ts,
+            }
+            states = [base]
+            written = []
+            monkeypatch.setattr(_world_mod, "SKIP_TIMING", False)
+            monkeypatch.setattr(_world_mod, "read_state", lambda: dict(states[-1]))
+            def fake_write(s):
+                written.append(dict(s))
+                states.append(dict(s))
+            monkeypatch.setattr(_world_mod, "write_state", fake_write)
+            monkeypatch.setattr(_world_mod, "determine_era", lambda s: "Founding Era")
+            _world_mod.world_autonomous_tick()
+            return written[-1]["population"] if written else 1000
+
+        # Use seeded random to make test deterministic
+        import random
+        orig_uniform = random.uniform
+        monkeypatch.setattr(random, "uniform", lambda a, b: 0.0)
+        pop_1 = run_ticks(past_1)
+        pop_3 = run_ticks(past_3)
+        monkeypatch.setattr(random, "uniform", orig_uniform)
+
+        assert pop_3 >= pop_1, f"3-tick population {pop_3} should be >= 1-tick population {pop_1}"
