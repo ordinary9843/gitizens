@@ -13,3 +13,7 @@ docs/superpowers/
 .DS_Store
 Thumbs.db
 scripts/_event_body.txt
+.coverage
+coverage.json
+coverage.xml
+.claude/settings.local.json

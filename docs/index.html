@@ -176,6 +176,9 @@
       align-items: center; justify-content: center;
       color: var(--muted); font-size: 11px; letter-spacing: 3px;
       font-family: 'Share Tech Mono', monospace;
+      background: #04080e;
+      z-index: 10;
+      transition: opacity 0.65s ease;
     }
     /* teal glow at base of city */
     #city-container::after {
@@ -879,6 +882,7 @@ let _neonSigns = [];
 let _searchlights = [];
 let _buildingRises = [];
 let _seenBuildingNames = new Set();
+let _cityInitialized = false;
 let _nightFactor = 1; // 0 = full day, 1 = full night
 let _antennaBlinks = [];
 let _manholes = [];
@@ -886,9 +890,6 @@ let _flags = [];
 let _elevators = [];
 let _gondolas = [];
 let _laundryLines = [];
-
-let _entranceDone = true;
-let _entranceStart = 0;
 
 let _eventExpiry = null;
 let _eventCountdownTimer = null;
@@ -1119,55 +1120,38 @@ function drawDayNight(ctx) {
   const W = _cityW, GY = _cityGY;
   const now = new Date();
   const h = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
-
-  // Day-time sky overlay (only when it's bright)
   const dayBright = 1 - _nightFactor;
-  if (dayBright > 0.01) {
-    const skyG = ctx.createLinearGradient(0, 0, 0, GY - 200);
-    skyG.addColorStop(0,   `rgba(28,88,195,${dayBright * 0.88})`);
-    skyG.addColorStop(0.55,`rgba(55,125,215,${dayBright * 0.72})`);
-    skyG.addColorStop(1,   `rgba(80,155,228,${dayBright * 0.5})`);
-    ctx.fillStyle = skyG;
-    ctx.fillRect(0, 0, W, GY - 200);
-    // Fade edge — blend into buildings area
-    const fadeG = ctx.createLinearGradient(0, GY - 200, 0, GY - 100);
-    fadeG.addColorStop(0, `rgba(80,155,228,${dayBright * 0.45})`);
-    fadeG.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = fadeG;
-    ctx.fillRect(0, GY - 200, W, 100);
-  }
 
-  // Golden hour / dawn / dusk warm horizon
+  // Golden hour / dawn / dusk warm horizon glow (no heavy overlay — just colour)
   const isGolden = (h > 4.5 && h < 8.5) || (h > 16 && h < 21);
-  if (isGolden) {
+  if (isGolden && dayBright > 0.05) {
     const gt = h < 12
       ? Math.min(1, (h - 4.5) / 2) * Math.min(1, (8.5 - h) / 2)
       : Math.min(1, (h - 16) / 2) * Math.min(1, (21 - h) / 2);
-    const goldenA = gt * 0.55;
-    const hG = ctx.createLinearGradient(0, GY - 130, 0, GY - 10);
+    const goldenA = gt * 0.38;
+    const hG = ctx.createLinearGradient(0, GY - 110, 0, GY - 5);
     hG.addColorStop(0, 'rgba(0,0,0,0)');
-    hG.addColorStop(0.45, `rgba(215,100,20,${goldenA})`);
-    hG.addColorStop(1,    `rgba(255,145,30,${goldenA * 1.4})`);
-    ctx.fillStyle = hG; ctx.fillRect(0, GY - 130, W, 130);
-    // Radial sun glow at horizon
-    const sunX = W * (h < 12 ? 0.18 : 0.82);
-    const sG = ctx.createRadialGradient(sunX, GY - 10, 0, sunX, GY - 10, 90);
-    sG.addColorStop(0, `rgba(255,200,60,${goldenA * 0.8})`);
+    hG.addColorStop(0.5, `rgba(210,95,18,${goldenA})`);
+    hG.addColorStop(1,   `rgba(250,140,25,${goldenA * 1.2})`);
+    ctx.fillStyle = hG; ctx.fillRect(0, GY - 110, W, 110);
+    const sunX = W * (h < 12 ? 0.15 : 0.85);
+    const sG = ctx.createRadialGradient(sunX, GY - 8, 0, sunX, GY - 8, 80);
+    sG.addColorStop(0, `rgba(255,195,55,${goldenA * 0.7})`);
     sG.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = sG; ctx.fillRect(sunX - 90, GY - 100, 180, 100);
+    ctx.fillStyle = sG; ctx.fillRect(sunX - 80, GY - 88, 160, 88);
   }
 
-  // Sun disc (mid-day)
-  if (dayBright > 0.25) {
-    const sunArc = (h - 6) / 12; // 0 at 6am, 1 at 6pm
-    const sunX = W * (0.12 + Math.min(sunArc, 1) * 0.76);
-    const sunY = GY * (0.14 - Math.sin(Math.min(sunArc, 1) * Math.PI) * 0.10);
-    const discA = dayBright * 0.55;
-    const dG = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 32);
-    dG.addColorStop(0,   `rgba(255,252,200,${discA})`);
-    dG.addColorStop(0.35,`rgba(255,240,100,${discA * 0.7})`);
-    dG.addColorStop(1,   'rgba(0,0,0,0)');
-    ctx.fillStyle = dG; ctx.fillRect(sunX - 32, sunY - 32, 64, 64);
+  // Sun disc — subtle glow only, no sky wash
+  if (dayBright > 0.2) {
+    const sunArc = Math.max(0, Math.min(1, (h - 6) / 12));
+    const sunX = W * (0.12 + sunArc * 0.76);
+    const sunY = GY * (0.13 - Math.sin(sunArc * Math.PI) * 0.09);
+    const discA = dayBright * 0.42;
+    const dG = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 28);
+    dG.addColorStop(0,    `rgba(255,252,200,${discA})`);
+    dG.addColorStop(0.4,  `rgba(255,235,90,${discA * 0.6})`);
+    dG.addColorStop(1,    'rgba(0,0,0,0)');
+    ctx.fillStyle = dG; ctx.fillRect(sunX - 28, sunY - 28, 56, 56);
   }
 }
 
@@ -2417,7 +2401,7 @@ function renderCityBg(state) {
     .map(s => ({...s, b: BUILDINGS[s.name]}))
     .filter(s => s.b)
     .sort((a, b) => a.b.order - b.b.order);
-  checkDemolitions(active);
+  if (_cityInitialized) checkDemolitions(active);
 
   if (active.length === 0) {
     ctx.fillStyle = '#2a3e58'; ctx.font = '11px "Share Tech Mono", monospace'; ctx.textAlign = 'center';
@@ -2459,7 +2443,9 @@ function renderCityBg(state) {
       _buildingHits.push({x: cx, w: b.w, name, metric: m, value: state[m]||0});
       if (!_seenBuildingNames.has(name)) {
         _seenBuildingNames.add(name);
-        _buildingRises.push({x: cx, w: b.w, startFrame: _animTime});
+        if (_cityInitialized) {
+          _buildingRises.push({x: cx, w: b.w, startFrame: _animTime});
+        }
       }
       cx += b.w + GAP;
     });
@@ -2550,10 +2536,15 @@ function renderCityBg(state) {
     ctx.globalAlpha = 1;
   }
 
-  document.getElementById('loading').style.display = 'none';
+  // After first render, mark initialized so subsequent state updates can trigger rise/demolition
+  if (!_cityInitialized) {
+    _prevActiveNames = new Set(active.map(a => a.name));
+    _cityInitialized = true;
+  }
 
-  _entranceDone = false;
-  _entranceStart = performance.now();
+  // Clear loading text — actual fade-out is handled by animLoop after first render
+  const _loadEl = document.getElementById('loading');
+  if (_loadEl) _loadEl.textContent = '';
 }
 
 // ── Animation loop ────────────────────────────────────────────────────────────
@@ -2854,6 +2845,15 @@ function animLoop() {
   // Building demolition chunks
   drawDemolitions(ctx);
 
+  // Fade out loading overlay after first few frames (city is fully rendered by then)
+  if (_animTime === 3) {
+    const loadEl = document.getElementById('loading');
+    if (loadEl && loadEl.style.display !== 'none') {
+      loadEl.style.opacity = '0';
+      setTimeout(() => { loadEl.style.display = 'none'; }, 700);
+    }
+  }
+
   // Building rise animation (new buildings slide up from ground)
   for (let i = _buildingRises.length - 1; i >= 0; i--) {
     const rise = _buildingRises[i];
@@ -2871,18 +2871,6 @@ function animLoop() {
     ctx.fillStyle = edgeG;
     ctx.fillRect(rise.x, _cityGY - coverH - 6, rise.w + 1, 6);
     ctx.restore();
-  }
-
-  if (!_entranceDone) {
-    const elapsed = performance.now() - _entranceStart;
-    if (elapsed < 700) {
-      const t = elapsed / 700;
-      const alpha = (1 - t) * (1 - t) * 0.97;
-      ctx.fillStyle = `rgba(4,8,16,${alpha})`;
-      ctx.fillRect(0, 0, _cityW, _cityH);
-    } else {
-      _entranceDone = true;
-    }
   }
 
   // Lens flares on streetlights (night only)
