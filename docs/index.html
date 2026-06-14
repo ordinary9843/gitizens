@@ -167,9 +167,9 @@
     }
     #city-container {
       width: 100%; position: relative; overflow: hidden;
-      flex-shrink: 0; height: 420px;
+      flex-shrink: 0; height: 360px;
     }
-    #city-bg, #city-fg { width: 100%; height: 420px; display: block; }
+    #city-bg, #city-fg { width: 100%; height: 360px; display: block; }
     #city-fg { position: absolute; top: 0; left: 0; pointer-events: none; }
     #loading {
       position: absolute; inset: 0; display: flex;
@@ -2212,7 +2212,7 @@ const BUILDINGS = {
 function initCityCanvas() {
   const container = document.getElementById('city-container');
   const W = Math.max(container.clientWidth || 900, 400);
-  const H = 420;
+  const H = 360;
   const dpr = window.devicePixelRatio || 1;
   ['city-bg', 'city-fg'].forEach(id => {
     const c = document.getElementById(id);
