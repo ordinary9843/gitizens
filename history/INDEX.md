@@ -22,3 +22,4 @@
 | 10 | [law-010](../world/laws/law-010.md) | [#15](https://github.com/ordinary9843/gitizens/issues/15) Public Arts Grant Program | 1+1 0-1 | 2026-06-11 |
 | 11 | [law-011](../world/laws/law-011.md) | [#10](https://github.com/ordinary9843/gitizens/issues/10) Industrial Innovation Initiative | 0+1 0-1 | 2026-06-11 |
 | 12 | [law-012](../world/laws/law-012.md) | [#16](https://github.com/ordinary9843/gitizens/issues/16) Fortification Initiative | 0+1 0-1 | 2026-06-11 |
+| 14 | [law-014](../world/laws/law-014.md) | [#60](https://github.com/ordinary9843/gitizens/issues/60) Industrial Renaissance Act | 0+1 0-1 | 2026-06-14 |

@@ -1,6 +1,18 @@
 {
-  "welfare": "2026-06-11",
-  "education": "2026-06-11",
-  "industry": "2026-06-11",
-  "defense": "2026-06-11"
+  "welfare": {
+    "last_date": "2026-06-11",
+    "streak": 1
+  },
+  "education": {
+    "last_date": "2026-06-11",
+    "streak": 1
+  },
+  "industry": {
+    "last_date": "2026-06-14",
+    "streak": 2
+  },
+  "defense": {
+    "last_date": "2026-06-11",
+    "streak": 1
+  }
 }
