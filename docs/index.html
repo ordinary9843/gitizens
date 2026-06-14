@@ -1771,20 +1771,21 @@ async function _pollFreshState(staleNextTickAt) {
   return false;
 }
 
-function _startTickPoll(staleNextTickAt) {
+function _startTickPoll(staleNextTickAt, initialOverdueMs = 0) {
   if (_tickPollTimer) return;
-  _tickStuckSince = _tickStuckSince || Date.now();
-  _pollFreshState(staleNextTickAt);
-  _tickPollTimer = setInterval(() => {
+  _tickStuckSince = Date.now() - initialOverdueMs;
+  const el = document.getElementById('tick-countdown');
+  function checkAndUpdate() {
     _pollFreshState(staleNextTickAt).then(updated => {
       if (updated) return;
       const stuckMin = Math.floor((Date.now() - _tickStuckSince) / 60000);
-      if (stuckMin >= 5) {
-        const el = document.getElementById('tick-countdown');
-        if (el) el.textContent = `waiting for tick (${stuckMin}m)`;
+      if (stuckMin >= 1 && el) {
+        el.textContent = `waiting for tick (${stuckMin}m)`;
       }
     });
-  }, 30 * 1000);
+  }
+  checkAndUpdate();
+  _tickPollTimer = setInterval(checkAndUpdate, 30 * 1000);
 }
 
 function startTickCountdown(nextTickAt) {
@@ -1801,7 +1802,7 @@ function startTickCountdown(nextTickAt) {
       el.textContent = 'ticking now…';
       clearInterval(_tickTimer);
       _tickTimer = null;
-      _startTickPoll(nextTickAt);
+      _startTickPoll(nextTickAt, -rem);
       return;
     }
     const h = Math.floor(rem / 3600000);
