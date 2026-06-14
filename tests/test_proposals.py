@@ -1073,3 +1073,100 @@ class TestAiProposalAtomicClose:
         close_idx = min(i for i, v in enumerate(call_order) if v == "close")
         wmd_idx = call_order.index("world_md")
         assert close_idx < wmd_idx, f"close (idx {close_idx}) must come before world_md (idx {wmd_idx})"
+
+
+# ===========================================================================
+# process_issue — cooldown block and treasury block paths
+# ===========================================================================
+
+class TestProcessIssueCooldownAndTreasury:
+    def _make_world(self, tmp_path, treasury=200):
+        (tmp_path / "world").mkdir(parents=True, exist_ok=True)
+        (tmp_path / "world/laws").mkdir(parents=True, exist_ok=True)
+        state = {**BASE_STATE, "treasury": treasury}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        (tmp_path / "world/stats.json").write_text(json.dumps({}))
+        (tmp_path / "world/citizens.json").write_text("{}")
+        (tmp_path / "world/active_event.json").write_text("{}")
+        (tmp_path / "world/history.json").write_text("[]")
+        (tmp_path / "world/laws_index.json").write_text("[]")
+        for cat in ("buildings", "districts", "institutions", "sectors"):
+            cat_path = tmp_path / "world" / "entities" / cat
+            cat_path.mkdir(parents=True)
+            (cat_path / "_index.json").write_text(
+                json.dumps({"next_seq": 1, "count": 0, "entities": []}))
+
+    def _policy_issue(self, age_hours=48):
+        created = (datetime.now(timezone.utc) - timedelta(hours=age_hours)).isoformat()
+        body = (
+            "## Effect\n\n```yaml\n"
+            "type: policy\n"
+            "changes:\n"
+            "  education: 5\n"
+            "```\n"
+        )
+        return {
+            "number": 77,
+            "title": "[PROPOSAL] Improve Education",
+            "body": body,
+            "createdAt": created,
+            "author": {"login": "alice"},
+        }
+
+    def test_policy_proposal_blocked_by_cooldown(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": {"last_date": today, "streak": 1}}))
+        issue = self._policy_issue()
+        run_calls = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(3, 1, ["a", "b", "c"], ["d"])), \
+             patch.object(_engine_proposals, "run",
+                          side_effect=lambda cmd, **kw: run_calls.append(cmd) or ""):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_issue(issue)
+            _engine_proposals.SKIP_TIMING = False
+        closed = any("close" in cmd for cmd in run_calls)
+        assert closed, "Cooldown-blocked proposal must be closed"
+        stats = json.loads((tmp_path / "world/stats.json").read_text())
+        assert stats.get("proposals_rejected", 0) >= 1
+
+    def test_policy_proposal_blocked_by_insufficient_treasury(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path, treasury=0)
+        issue = self._policy_issue()
+        run_calls = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(3, 1, ["a", "b", "c"], ["d"])), \
+             patch.object(_engine_proposals, "run",
+                          side_effect=lambda cmd, **kw: run_calls.append(cmd) or ""):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_issue(issue)
+            _engine_proposals.SKIP_TIMING = False
+        closed = any("close" in cmd for cmd in run_calls)
+        assert closed, "Treasury-blocked proposal must be closed"
+        stats = json.loads((tmp_path / "world/stats.json").read_text())
+        assert stats.get("proposals_rejected", 0) >= 1
+
+    def test_policy_proposal_passes_with_sufficient_treasury(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path, treasury=500)
+        issue = self._policy_issue()
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(3, 1, ["a", "b", "c"], ["d"])), \
+             patch.object(_engine_proposals, "run", return_value=""), \
+             patch.object(_engine_proposals, "generate_narrative", return_value="Narrative."), \
+             patch.object(_engine_proposals, "generate_world_md", return_value=None), \
+             patch.object(_engine_proposals, "update_readme", return_value=None), \
+             patch.object(_engine_proposals, "append_history", return_value=None), \
+             patch.object(_engine_proposals, "update_laws_index", return_value=None), \
+             patch.object(_engine_proposals, "apply_tags", return_value=None), \
+             patch.object(_engine_proposals, "run_world_engine", return_value=[]), \
+             patch.object(_engine_proposals, "update_world_summary", return_value="summary"):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_issue(issue)
+            _engine_proposals.SKIP_TIMING = False
+        state = json.loads((tmp_path / "world/state.json").read_text())
+        assert state["laws_count"] == BASE_STATE["laws_count"] + 1
