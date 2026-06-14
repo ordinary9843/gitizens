@@ -1124,15 +1124,25 @@ class TestMultiTickCatchup:
         past = (datetime.now(timezone.utc) - timedelta(hours=2, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
         base = self._base_state(past)
 
+        states = [dict(base)]
         write_calls = []
+
+        def fake_write(s):
+            write_calls.append(dict(s))
+            states.append(dict(s))
+
         monkeypatch.setattr(_world_mod, "SKIP_TIMING", False)
-        monkeypatch.setattr(_world_mod, "read_state", lambda: {**base})
-        monkeypatch.setattr(_world_mod, "write_state", lambda s: write_calls.append(dict(s)))
+        monkeypatch.setattr(_world_mod, "read_state", lambda: dict(states[-1]))
+        monkeypatch.setattr(_world_mod, "write_state", fake_write)
         monkeypatch.setattr(_world_mod, "determine_era", lambda s: "Founding Era")
 
         result = _world_mod.world_autonomous_tick()
         assert result is True
-        assert len(write_calls) >= 2, f"Expected >=2 write_state calls for 2-tick catchup, got {len(write_calls)}"
+        assert len(write_calls) == 2, f"Expected exactly 2 write_state calls for 2-tick catchup, got {len(write_calls)}"
+        # Tick 2 should have seen updated state from tick 1
+        assert states[2]["population"] != base["population"] or states[1]["population"] != base["population"], (
+            "At least one tick must change population"
+        )
 
     def test_single_tick_when_barely_overdue(self, monkeypatch):
         from datetime import datetime, timezone, timedelta
@@ -1183,3 +1193,29 @@ class TestMultiTickCatchup:
         monkeypatch.setattr(random, "uniform", orig_uniform)
 
         assert pop_3 >= pop_1, f"3-tick population {pop_3} should be >= 1-tick population {pop_1}"
+
+    def test_returns_false_when_no_changes_across_all_ticks(self, monkeypatch):
+        """Returns False when all N catchup ticks produce identical output (boundary state)."""
+        from datetime import datetime, timezone, timedelta
+        # State where all values are pinned at 0 — no change possible
+        past = (datetime.now(timezone.utc) - timedelta(hours=2, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        frozen_state = {
+            "industry": 0, "green_policy": 0, "welfare": 0,
+            "defense": 0, "pollution": 0, "population": 100,
+            "stability": 30, "treasury": 0, "era": "Founding Era",
+            "next_tick_at": past,
+        }
+        import random
+        write_calls = []
+        monkeypatch.setattr(_world_mod, "SKIP_TIMING", False)
+        monkeypatch.setattr(_world_mod, "read_state", lambda: dict(frozen_state))
+        monkeypatch.setattr(_world_mod, "write_state", lambda s: write_calls.append(s))
+        monkeypatch.setattr(_world_mod, "determine_era", lambda s: "Founding Era")
+        monkeypatch.setattr(random, "uniform", lambda a, b: 0.0)
+
+        result = _world_mod.world_autonomous_tick()
+        # With all zeros and noise=0, population delta = max(100, 100+0-0+0+0) = 100
+        # treasury = min(100000, 0+0+0) = 0; pollution/stability same; era unchanged
+        # So no state changes — result must be False
+        assert result is False
+        assert write_calls == [], f"No writes expected for no-change ticks, got {len(write_calls)}"

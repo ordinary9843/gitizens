@@ -186,10 +186,14 @@ def world_autonomous_tick() -> bool:
         print(f"  Tick skipped — next tick at {state.get('next_tick_at')}")
         return False
     if n_ticks > 1:
-        overdue_h = (datetime.now(timezone.utc) - datetime.fromisoformat(
-            state["next_tick_at"].replace("Z", "+00:00")
-        )).total_seconds() / 3600
-        print(f"  Catchup: {n_ticks} ticks ({overdue_h:.1f}h overdue)")
+        tick_str = state.get("next_tick_at", "")
+        if tick_str:
+            overdue_h = (datetime.now(timezone.utc) - datetime.fromisoformat(
+                tick_str.replace("Z", "+00:00")
+            )).total_seconds() / 3600
+            print(f"  Catchup: {n_ticks} ticks ({overdue_h:.1f}h overdue)")
+        else:
+            print(f"  Catchup: {n_ticks} ticks")
 
     any_changed = False
     for tick_i in range(n_ticks):
