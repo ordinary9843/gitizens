@@ -1780,7 +1780,7 @@ function _startTickPoll(staleNextTickAt, initialOverdueMs = 0) {
       if (updated) return;
       const stuckMin = Math.floor((Date.now() - _tickStuckSince) / 60000);
       if (stuckMin >= 1 && el) {
-        el.textContent = `waiting for tick (${stuckMin}m)`;
+        el.textContent = 'world processing…';
       }
     });
   }
@@ -1801,7 +1801,7 @@ function startTickCountdown(nextTickAt) {
     if (rem <= 0) {
       const overdueMs = Math.max(0, -rem);
       const overdueMin = Math.floor(overdueMs / 60000);
-      el.textContent = overdueMin >= 1 ? `waiting for tick (${overdueMin}m)` : 'tick due…';
+      el.textContent = overdueMin >= 1 ? 'world processing…' : 'tick due…';
       clearInterval(_tickTimer);
       _tickTimer = null;
       _startTickPoll(nextTickAt, overdueMs);
