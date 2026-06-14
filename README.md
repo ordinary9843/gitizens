@@ -4,10 +4,10 @@
 
 ---
 
+## What is Gitizens?
+
 [![Tests](https://github.com/ordinary9843/gitizens/actions/workflows/test.yml/badge.svg)](https://github.com/ordinary9843/gitizens/actions/workflows/test.yml)
 ![Coverage](docs/coverage-badge.svg)
-
-## What is Gitizens?
 
 GitHub Issues are laws. Reactions are votes. Every 2 hours, the world ticks forward on its own.
 
