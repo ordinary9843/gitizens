@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-14T18:13:35.562176+00:00",
+  "updated_at": "2026-06-14T20:17:26.439437+00:00",
   "pending": [
     {
       "name": "Industrial Complex",
@@ -11,9 +11,9 @@
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 69,
+      "current": 71,
       "target": 80,
-      "gap": 11
+      "gap": 9
     },
     {
       "name": "Defense Ministry",
