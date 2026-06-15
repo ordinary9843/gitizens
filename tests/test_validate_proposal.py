@@ -122,14 +122,14 @@ class TestValidateCooldownVP:
     def test_expired_cooldown_dict_format_passes(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        # Use a date exactly COOLDOWN_DAYS days ago (boundary: cooldown has just expired)
         from datetime import timedelta
-        expired_date = (datetime.now(timezone.utc) - timedelta(days=3)).strftime("%Y-%m-%d")
+        from scripts.engine.constants import COOLDOWN_DAYS
+        expired_date = (datetime.now(timezone.utc) - timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": {"last_date": expired_date, "streak": 2}}))
         ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
-        assert ok  # cooldown has just expired, proposal should be allowed
+        assert ok  # COOLDOWN_DAYS days ago is exactly expired
 
     def test_cooldown_expired_after_one_day_is_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
