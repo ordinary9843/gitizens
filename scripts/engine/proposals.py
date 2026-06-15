@@ -278,6 +278,10 @@ def process_ai_proposal(issue: dict):
         ok, reason, extra_cost = check_proposal_cooldown(effect_data)
         if not ok:
             print(f"  AI-proposal #{number}: COOLDOWN BLOCKED — {reason}")
+            stats = read_stats()
+            stats["proposals_total"]    = stats.get("proposals_total", 0) + 1
+            stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
+            write_stats(stats)
             run(["gh", "issue", "comment", str(number), "--repo", REPO,
                  "--body", f"**AI proposal blocked: metric on cooldown.**\n\n{reason}"])
             run(["gh", "issue", "edit", str(number), "--repo", REPO,

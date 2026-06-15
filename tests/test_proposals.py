@@ -934,8 +934,10 @@ class TestProcessAiProposal:
             _engine_proposals.SKIP_TIMING = True
             _engine_proposals.process_ai_proposal(issue)
             _engine_proposals.SKIP_TIMING = False
-        closed = any("close" in cmd for cmd in run_calls)
-        assert closed, "Cooldown-blocked AI proposal should be closed"
+        assert any("close" in str(c) for c in run_calls), "Cooldown-blocked AI proposal should be closed"
+        stats = json.loads((tmp_path / "world/stats.json").read_text())
+        assert stats.get("proposals_total", 0) >= 1
+        assert stats.get("proposals_rejected", 0) >= 1
 
     def test_blocked_by_insufficient_treasury(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
