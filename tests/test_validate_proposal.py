@@ -142,6 +142,16 @@ class TestValidateCooldownVP:
             {"type": "policy", "changes": {"education": 5}})
         assert ok  # COOLDOWN_DAYS=1 → 1 day ago is expired
 
+    def test_cooldown_unexpected_type_skipped(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        # integer value — neither dict nor str — should be skipped (else: continue at line 85)
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": 42}))
+        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 5}})
+        assert ok
+
 
 # ===========================================================================
 # load_world_context

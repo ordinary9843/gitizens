@@ -285,6 +285,31 @@ def process_ai_proposal(issue: dict):
             run(["gh", "issue", "close", str(number), "--repo", REPO])
             return
 
+        treasury = state_before.get("treasury", 0)
+        currency = state_before.get("currency", "Git Coins")
+        total_cost = POLICY_COST + extra_cost
+        if treasury < total_cost:
+            print(f"  AI-proposal #{number}: TREASURY BLOCKED — needs {total_cost}, has {treasury}")
+            stats = read_stats()
+            stats["proposals_total"]    = stats.get("proposals_total", 0) + 1
+            stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
+            write_stats(stats)
+            penalty_note = (
+                f" (base **{POLICY_COST}** + repeat-touch surcharge **{extra_cost}**)"
+                if extra_cost > 0 else ""
+            )
+            run(["gh", "issue", "comment", str(number), "--repo", REPO,
+                 "--body",
+                 f"**AI proposal blocked: insufficient treasury.**\n\n"
+                 f"Enacting this policy costs **{total_cost} {currency}**{penalty_note}.\n"
+                 f"Current treasury: **{treasury} {currency}**.\n\n"
+                 f"A treasury replenishment proposal is needed:\n"
+                 f"```yaml\ntype: state_patch\npatch:\n  treasury: {treasury + total_cost + 200}\n```"])
+            run(["gh", "issue", "edit", str(number), "--repo", REPO,
+                 "--add-label", "rejected", "--remove-label", "ai-proposal"])
+            run(["gh", "issue", "close", str(number), "--repo", REPO])
+            return
+
     print(f"  AI-proposal #{number}: PASSED (no veto) -> law-{law_number:03d}")
     narrative = generate_narrative(clean_title, 0, 0, state_before)
     active_event_now = load_active_event()

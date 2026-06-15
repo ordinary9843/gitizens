@@ -937,6 +937,66 @@ class TestProcessAiProposal:
         closed = any("close" in cmd for cmd in run_calls)
         assert closed, "Cooldown-blocked AI proposal should be closed"
 
+    def test_blocked_by_insufficient_treasury(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        # Treasury too low (50 < POLICY_COST=100)
+        state = {**BASE_STATE, "treasury": 50}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        body = (
+            "## Effect\n\n```yaml\n"
+            "type: policy\n"
+            "changes:\n"
+            "  education: 5\n"
+            "```\n"
+        )
+        issue = self._ai_issue(against_votes=0, body=body)
+        run_calls = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(0, 0, [], [])), \
+             patch.object(_engine_proposals, "run",
+                          side_effect=lambda cmd, **kw: run_calls.append(cmd) or ""):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_ai_proposal(issue)
+            _engine_proposals.SKIP_TIMING = False
+        # Should be closed
+        assert any("close" in str(c) for c in run_calls), "Treasury-blocked AI proposal should be closed"
+        # Should add rejected label
+        assert any("rejected" in str(c) for c in run_calls), "Should add rejected label"
+        # Should not pass (laws_count unchanged)
+        state_after = json.loads((tmp_path / "world/state.json").read_text())
+        assert state_after["laws_count"] == BASE_STATE["laws_count"], "Law should not be enacted"
+
+    def test_blocked_by_insufficient_treasury_with_surcharge(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        self._make_world(tmp_path)
+        # streak=2 -> _streak_penalty(2+1)=200 surcharge, total=300; treasury=150 is not enough
+        # Use a date 3 days ago: past COOLDOWN_DAYS=1 but within COOLDOWN_PENALTY_DECAY_DAYS=7
+        last_date = (datetime.now(timezone.utc) - timedelta(days=3)).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": {"last_date": last_date, "streak": 2}}))
+        state = {**BASE_STATE, "treasury": 150}
+        (tmp_path / "world/state.json").write_text(json.dumps(state))
+        body = (
+            "## Effect\n\n```yaml\n"
+            "type: policy\n"
+            "changes:\n"
+            "  education: 5\n"
+            "```\n"
+        )
+        issue = self._ai_issue(against_votes=0, body=body)
+        run_calls = []
+        with patch.object(_engine_proposals, "get_reactions",
+                          return_value=(0, 0, [], [])), \
+             patch.object(_engine_proposals, "run",
+                          side_effect=lambda cmd, **kw: run_calls.append(cmd) or ""):
+            _engine_proposals.SKIP_TIMING = True
+            _engine_proposals.process_ai_proposal(issue)
+            _engine_proposals.SKIP_TIMING = False
+        assert any("close" in str(c) for c in run_calls)
+        state_after = json.loads((tmp_path / "world/state.json").read_text())
+        assert state_after["laws_count"] == BASE_STATE["laws_count"]
+
 
 # ===========================================================================
 # process_feedback — pass, reject, no-effect path
