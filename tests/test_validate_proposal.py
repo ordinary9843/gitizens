@@ -131,6 +131,17 @@ class TestValidateCooldownVP:
             {"type": "policy", "changes": {"education": 5}})
         assert ok  # cooldown has just expired, proposal should be allowed
 
+    def test_cooldown_expired_after_one_day_is_ok(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        from datetime import timedelta
+        yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": {"last_date": yesterday, "streak": 1}}))
+        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 5}})
+        assert ok  # COOLDOWN_DAYS=1 → 1 day ago is expired
+
 
 # ===========================================================================
 # load_world_context

@@ -22,6 +22,7 @@ CATEGORY_COLORS = {
 }
 
 POLICY_METRICS = {"education", "industry", "welfare", "green_policy", "defense"}
+VALID_TYPES = {"declaration", "policy", "evolve", "state_patch"}
 POLICY_COST = 100
 
 BASE_STATE_FIELDS = {

@@ -13,15 +13,18 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from openai import OpenAI
 
+# Resolve engine package from the same directory as this script
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from engine.constants import (
+    COOLDOWN_DAYS, POLICY_COST, POLICY_METRICS,
+    VALID_TYPES, _EVOLVE_BLOCKED,
+)
+
 ISSUE_NUMBER = os.environ["ISSUE_NUMBER"]
 ISSUE_TITLE  = os.environ["ISSUE_TITLE"]
 ISSUE_BODY   = os.environ.get("ISSUE_BODY", "")
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 REPO         = os.environ["GITHUB_REPOSITORY"]
-
-VALID_TYPES    = {"declaration", "policy", "evolve", "state_patch"}
-POLICY_METRICS = {"education", "industry", "welfare", "green_policy", "defense"}
-POLICY_COST    = 100
 
 REQUIRED_FIELDS = {
     "policy":      ["changes"],
@@ -30,21 +33,14 @@ REQUIRED_FIELDS = {
     "declaration": [],
 }
 
-COOLDOWN_DAYS = 3
-
 # state_patch allowlist — any key outside this set is rejected
 _PATCH_ALLOWED = {
     "treasury", "currency", "founded_date",
     "education", "industry", "welfare", "green_policy", "defense",
     "pollution", "stability", "population",
 }
-_PATCH_0_100 = {"education", "industry", "welfare", "green_policy", "defense", "pollution", "stability"}
-
-# evolve.changes must not touch these system-managed fields
-_EVOLVE_BLOCKED = {
-    "id", "built_law", "built_at", "auto_trigger",
-    "demolished_law", "demolished_at", "demolished_reason", "last_evolved_law",
-}
+_PATCH_0_100 = {"education", "industry", "welfare", "green_policy",
+                "defense", "pollution", "stability"}
 
 
 def gh(*args):
