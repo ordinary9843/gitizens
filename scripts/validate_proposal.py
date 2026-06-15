@@ -51,14 +51,14 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def fail(reason: str):
+def fail(reason: str, label: str = "invalid"):
     print(f"INVALID: {reason}", file=sys.stderr)
     gh("issue", "comment", ISSUE_NUMBER, "--repo", REPO, "--body",
        f"This proposal was automatically closed.\n\n**Reason:** {reason}\n\n"
        "Open the [dashboard](https://ordinary9843.github.io/gitizens/) "
        "and use the **PROPOSE A LAW** form to submit a valid proposal.")
     gh("issue", "close", ISSUE_NUMBER, "--repo", REPO)
-    gh("issue", "edit", ISSUE_NUMBER, "--repo", REPO, "--add-label", "invalid")
+    gh("issue", "edit", ISSUE_NUMBER, "--repo", REPO, "--add-label", label)
     sys.exit(0)
 
 
@@ -308,7 +308,7 @@ def validate():
     if effect_data and effect_data.get("type") == "policy":
         ok, reason = check_cooldown_for_proposal(effect_data)
         if not ok:
-            fail(f"Proposal cooldown active: {reason}")
+            fail(f"Proposal cooldown active: {reason}", label="rejected")
 
     # Treasury notice for policy proposals
     if effect_data and effect_data.get("type") == "policy":

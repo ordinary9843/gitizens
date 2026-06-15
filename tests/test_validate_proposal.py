@@ -605,3 +605,36 @@ class TestValidateFunction:
         with patch("subprocess.run", side_effect=lambda *a, **k: calls.append(a[0])):
             vp.validate()
         assert any("proposal" in str(c) for c in calls)
+
+    def test_cooldown_block_uses_rejected_label(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_world(tmp_path)
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": {"last_date": today, "streak": 1}}))
+        vp = self._vp(tmp_path)
+        _llm_valid(vp)
+        vp.ISSUE_TITLE = "[PROPOSAL] Test"
+        vp.ISSUE_BODY = _POLICY_BODY
+        calls = []
+        with patch("subprocess.run", side_effect=lambda *a, **k: calls.append(a[0])), \
+             pytest.raises(SystemExit):
+            vp.validate()
+        label_calls = [c for c in calls if "--add-label" in str(c)]
+        assert any("rejected" in str(c) for c in label_calls), \
+            f"Expected 'rejected' label, got: {label_calls}"
+        assert not any("invalid" in str(c) for c in label_calls), \
+            "Should not add 'invalid' label for cooldown block"
+
+    def test_format_failure_uses_invalid_label(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        _make_world(tmp_path)
+        vp = self._vp(tmp_path)
+        vp.ISSUE_TITLE = "Wrong Title"
+        vp.ISSUE_BODY = ""
+        calls = []
+        with patch("subprocess.run", side_effect=lambda *a, **k: calls.append(a[0])), \
+             pytest.raises(SystemExit):
+            vp.validate()
+        label_calls = [c for c in calls if "--add-label" in str(c)]
+        assert any("invalid" in str(c) for c in label_calls)
