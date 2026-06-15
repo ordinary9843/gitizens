@@ -80,8 +80,15 @@ def check_cooldown_for_proposal(effect_data: dict) -> tuple[bool, str]:
     for metric in effect_data.get("changes", {}):
         if metric not in cooldowns:
             continue
+        entry = cooldowns[metric]
+        if isinstance(entry, dict):
+            date_str = entry.get("last_date", "")
+        elif isinstance(entry, str):
+            date_str = entry
+        else:
+            continue
         try:
-            last_date = datetime.fromisoformat(cooldowns[metric]).date()
+            last_date = datetime.fromisoformat(date_str).date()
         except (ValueError, TypeError):
             continue
         if (today - last_date).days < COOLDOWN_DAYS:

@@ -108,6 +108,28 @@ class TestValidateCooldownVP:
             {"type": "policy", "changes": {"education": 5}})
         assert ok
 
+    def test_active_cooldown_dict_format_blocks(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": {"last_date": today, "streak": 1}}))
+        ok, reason = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 5}})
+        assert not ok
+        assert "education" in reason
+
+    def test_active_cooldown_dict_format_streak_blocks(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        (tmp_path / "world/proposal_cooldowns.json").write_text(
+            json.dumps({"education": {"last_date": today, "streak": 3}}))
+        ok, reason = self._vp(tmp_path).check_cooldown_for_proposal(
+            {"type": "policy", "changes": {"education": 5}})
+        assert not ok
+        assert "education" in reason
+
 
 # ===========================================================================
 # load_world_context
