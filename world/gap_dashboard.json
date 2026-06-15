@@ -1,13 +1,6 @@
 {
-  "updated_at": "2026-06-15T00:09:09.987699+00:00",
+  "updated_at": "2026-06-15T06:23:54.443258+00:00",
   "pending": [
-    {
-      "name": "Industrial Complex",
-      "metric": "industry",
-      "current": 51,
-      "target": 55,
-      "gap": 4
-    },
     {
       "name": "Academy of Sciences",
       "metric": "education",
@@ -21,6 +14,13 @@
       "current": 53,
       "target": 65,
       "gap": 12
+    },
+    {
+      "name": "Eco-Research Center",
+      "metric": "green_policy",
+      "current": 69,
+      "target": 85,
+      "gap": 16
     }
   ],
   "at_risk": [],
