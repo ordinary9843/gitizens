@@ -1,12 +1,5 @@
 [
   {
-    "tick": 31,
-    "date": "2026-06-14",
-    "narrative": "In a pivotal moment for the Gitizens civilization, the latest tick has concluded with a population of 3,169, reflecting a delicate stability score of 46 out of 100. While the treasury stands at a modest 33 GC, citizens have engaged in critical discourse, leading to the application of two significant feedback proposals. As the Founding Era unfolds, the mysterious event dubbed \"The Unseen Artist\" looms, promising to shape the cultural landscape of this burgeoning society.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: The Unseen Artist",
-    "metrics": "population 3,169 \u00b7 treasury 33 GC \u00b7 stability 46/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 32,
     "date": "2026-06-14",
     "narrative": "In the wake of Tick #32, the Gitizens civilization stands at a pivotal moment, boasting a population of 3,392 and a treasury of 66 GC. With stability currently at 51 out of 100, the recent event dubbed \"The Unseen Artist\" has sparked conversations among citizens, reflecting their desire for cultural enrichment in this Founding Era, even as pollution remains at a commendable zero.",
@@ -68,5 +61,12 @@
     "narrative": "In a remarkable turn of events during Tick #40, the Gitizens civilization has experienced a surge of creativity with the emergence of \"The Unseen Artist,\" although no specific proposals have been made to harness this newfound inspiration. With a population of 5,037 and a treasury of 191 GC, the society's stability stands at a precarious 53 out of 100, leaving its leaders to ponder the implications of this artistic awakening amidst a pollution-free environment. As the Founding Era continues, the potential for innovation hangs in the balance, demanding careful stewardship from its citizens.",
     "changes": "autonomous tick applied \u00b7 event: The Unseen Artist",
     "metrics": "population 5,037 \u00b7 treasury 191 GC \u00b7 stability 53/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 41,
+    "date": "2026-06-15",
+    "narrative": "In a significant development for the Gitizens, the population has surged to 5,199 as the Founding Era progresses, bolstered by the recent autonomous tick. Despite the treasury standing at a modest 221 GC and stability at a precarious 51 out of 100, citizens have actively contributed feedback, reflecting their engagement in the community. Meanwhile, the intriguing event titled \"The Unseen Artist\" has captured the imagination of many, leaving the realm abuzz with speculation and creativity.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: The Unseen Artist",
+    "metrics": "population 5,199 \u00b7 treasury 221 GC \u00b7 stability 51/100 \u00b7 pollution 0/100"
   }
 ]
