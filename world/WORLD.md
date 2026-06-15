@@ -11,7 +11,7 @@
 | Era | Founding Era |
 | Laws enacted | 15 |
 | Last enacted | 2026-06-15 |
-| Treasury | 78 Git Coins |
+| Treasury | 148 Git Coins |
 
 ### Policy
 
@@ -20,7 +20,7 @@
 | Education | 71/100 |
 | Industry | 57/100 |
 | Welfare | 86/100 |
-| Green Policy | 69/100 |
+| Green Policy | 71/100 |
 | Defense | 53/100 |
 | Pollution *(derived)* | 0/100 |
 

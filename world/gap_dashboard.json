@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-15T13:14:06.913290+00:00",
+  "updated_at": "2026-06-15T18:26:14.164570+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -18,9 +18,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 69,
+      "current": 71,
       "target": 85,
-      "gap": 16
+      "gap": 14
     }
   ],
   "at_risk": [],
