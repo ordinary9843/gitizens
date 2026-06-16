@@ -654,5 +654,21 @@
     "stability": 51,
     "treasury": 221,
     "active_event": "evt-llm-1023"
+  },
+  {
+    "tick": 42,
+    "date": "2026-06-16T04:05:04Z",
+    "laws_count": 16,
+    "era": "Founding Era",
+    "education": 71,
+    "industry": 57,
+    "welfare": 87,
+    "green_policy": 71,
+    "defense": 59,
+    "pollution": 0,
+    "population": 5456,
+    "stability": 53,
+    "treasury": 96,
+    "active_event": "evt-llm-1023"
   }
 ]

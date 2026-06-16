@@ -3,7 +3,7 @@
   "laws_count": 16,
   "last_enacted": "2026-06-16",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Founding Era, Gitizens enjoy high welfare and education, supported by 16 effective laws, a stable treasury, and zero pollution.",
+  "world_summary": "In the Founding Era, Gitizens thrive with high welfare (87), education (71), and zero pollution, supported by 16 effective laws and a stable treasury.",
   "treasury": 96,
   "currency": "Git Coins",
   "stars_last_counted": 5,
@@ -28,6 +28,6 @@
     "romkru",
     "sykar-f"
   ],
-  "last_narrator_date": "2026-06-15T00:09:14.491901+00:00",
-  "next_tick_at": "2026-06-16T00:00:00Z"
+  "last_narrator_date": "2026-06-16T04:05:09.754717+00:00",
+  "next_tick_at": "2026-06-16T05:00:00Z"
 }

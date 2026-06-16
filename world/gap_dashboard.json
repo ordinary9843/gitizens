@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-06-15T23:45:37.619019+00:00",
+  "updated_at": "2026-06-16T04:05:04.709278+00:00",
   "pending": [
+    {
+      "name": "Defense Ministry",
+      "metric": "defense",
+      "current": 59,
+      "target": 65,
+      "gap": 6
+    },
     {
       "name": "Academy of Sciences",
       "metric": "education",
       "current": 71,
       "target": 80,
       "gap": 9
-    },
-    {
-      "name": "Defense Ministry",
-      "metric": "defense",
-      "current": 53,
-      "target": 65,
-      "gap": 12
     },
     {
       "name": "Eco-Research Center",
