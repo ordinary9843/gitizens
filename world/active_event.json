@@ -1,23 +1,24 @@
 {
-  "id": "evt-llm-1023",
-  "category": "social",
+  "id": "evt-llm-4821",
+  "category": "economic",
   "rarity": "uncommon",
-  "title": "The Unseen Artist",
-  "description": "A mysterious figure known only as 'The Unseen Artist' begins creating public murals overnight, infusing the city with vibrant colors and unexpected themes. The murals provoke a wave of artistic expression and community pride, but also simmering debates about the boundaries of public art.",
-  "flavor": "Each morning, Gitizens awaken to new surprises adorning their streets.",
+  "title": "The Artisan Boom",
+  "description": "In the wake of increased instability due to 'The Unseen Artist', a surge in local artisan markets emerges, with citizens seeking new sources of income and expression. This fresh influx of creativity draws attention from both domestic buyers and foreign investors, revitalizing sectors of the economy that were stagnant.",
+  "flavor": "The towns are abuzz with the sounds of hammers, brushes, and laughter as citizens turn their hobbies into thriving businesses.",
   "immediate_effects": {
-    "education": 5,
-    "welfare": 3
+    "treasury": 15
   },
   "response_consequence": {
-    "stability": -5
+    "stability": 3,
+    "defense": 1
   },
   "default_consequence": {
-    "stability": 2
+    "stability": 2,
+    "defense": 1
   },
-  "response_hint": "Implementing regulations on public art could help maintain order, but it risks stifling creativity.",
+  "response_hint": "Passing laws to support local artisans can further enhance economic stability and draw more investors.",
   "duration_hours": 72.0,
-  "chained_from": null,
-  "fired_at": "2026-06-13T09:24:10.781012+00:00",
-  "issue_number": 45
+  "chained_from": "evt-llm-1023",
+  "fired_at": "2026-06-16T10:07:04.779847+00:00",
+  "issue_number": 94
 }
