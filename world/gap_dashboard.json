@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-16T19:36:15.767844+00:00",
+  "updated_at": "2026-06-16T22:11:58.998298+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -18,9 +18,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 71,
+      "current": 73,
       "target": 85,
-      "gap": 14
+      "gap": 12
     }
   ],
   "at_risk": [],
