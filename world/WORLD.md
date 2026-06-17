@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-17*
+*Last updated: 2026-06-17 — [Law 018](laws/law-018.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Industrial Era |
-| Laws enacted | 17 |
+| Laws enacted | 18 |
 | Last enacted | 2026-06-17 |
-| Treasury | 255 Git Coins |
+| Treasury | 20 Git Coins |
 
 ### Policy
 
@@ -21,7 +21,7 @@
 | Industry | 63/100 |
 | Welfare | 93/100 |
 | Green Policy | 74/100 |
-| Defense | 59/100 |
+| Defense | 66/100 |
 | Pollution *(derived)* | 0/100 |
 
 ---
@@ -33,6 +33,7 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `ins-001` | National University | [Law 005](laws/law-005.md) | education >= 55 |
+| `ins-002` | Defense Ministry | [Law 018](laws/law-018.md) | defense >= 65 |
 
 ### Districts
 
