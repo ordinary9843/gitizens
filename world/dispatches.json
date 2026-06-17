@@ -1,12 +1,5 @@
 [
   {
-    "tick": 38,
-    "date": "2026-06-15",
-    "narrative": "In a significant development for Gitizens, the population has reached 4,449 as of Tick #38, marking a steady growth during the Founding Era. With a treasury of 78 GC and stability holding at 53 out of 100, citizens are encouraged by recent feedback implementations, although the looming threat of pollution remains at 0. Meanwhile, the mysterious event dubbed \"The Unseen Artist\" has sparked intrigue among the populace, hinting at undiscovered talents within the community.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: The Unseen Artist",
-    "metrics": "population 4,449 \u00b7 treasury 78 GC \u00b7 stability 53/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 39,
     "date": "2026-06-15",
     "narrative": "In a significant development this tick, the Gitizens celebrate a burgeoning population of 4,855, as the treasury swells to 148 GC, reflecting a period of cautious optimism. However, with stability teetering at 52 out of 100 and pollution levels at a concerning 0, the shadows of uncertainty loom large. The recent event, \"The Unseen Artist,\" has sparked discussions among the populace, though no new proposals or achievements have emerged from the fervent exchanges.",
@@ -68,5 +61,12 @@
     "narrative": "In a remarkable display of creativity and innovation, Gitizens have entered the Artisan Boom, significantly enriching the cultural fabric of our burgeoning civilization. With a population now at 6,893 and a treasury bolstered to 455 GC, the spirit of collaboration and craftsmanship thrives, even as stability holds at a precarious 52 out of 100. As we adapt to this new era, the echoes of artistry may well shape the future of our society.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: The Artisan Boom",
     "metrics": "population 6,893 \u00b7 treasury 455 GC \u00b7 stability 52/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 48,
+    "date": "2026-06-17",
+    "narrative": "In a remarkable turn of events, Gitizens has witnessed an Artisan Boom, propelling the industrial sector to new heights as the population swells to 7,388. With a treasury now standing at 68 Gold Coins and stability at a precarious 53 out of 100, the recent enactment of a law and the application of citizen feedback signal a pivotal moment for the thriving civilization. However, as the pollution level remains at 0, the challenge will be sustaining this growth without compromising the environment.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: The Artisan Boom",
+    "metrics": "population 7,388 \u00b7 treasury 68 GC \u00b7 stability 53/100 \u00b7 pollution 0/100"
   }
 ]
