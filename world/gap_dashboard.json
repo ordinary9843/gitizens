@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-16T22:11:58.998298+00:00",
+  "updated_at": "2026-06-17T00:16:51.313920+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -11,9 +11,9 @@
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 71,
+      "current": 72,
       "target": 80,
-      "gap": 9
+      "gap": 8
     },
     {
       "name": "Eco-Research Center",
