@@ -25,3 +25,4 @@
 | 14 | [law-014](../world/laws/law-014.md) | [#60](https://github.com/ordinary9843/gitizens/issues/60) Industrial Renaissance Act | 0+1 0-1 | 2026-06-14 |
 | 15 | [law-015](../world/laws/law-015.md) | [#82](https://github.com/ordinary9843/gitizens/issues/82) Industrial Innovation Grant Program | 0+1 0-1 | 2026-06-15 |
 | 16 | [law-016](../world/laws/law-016.md) | [#91](https://github.com/ordinary9843/gitizens/issues/91) Defensive Renaissance Act | 0+1 0-1 | 2026-06-16 |
+| 17 | [law-017](../world/laws/law-017.md) | [#107](https://github.com/ordinary9843/gitizens/issues/107) Crafting the Future Initiative | 0+1 0-1 | 2026-06-17 |
