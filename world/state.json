@@ -3,18 +3,18 @@
   "laws_count": 18,
   "last_enacted": "2026-06-17",
   "founded_date": "2026-06-10",
-  "world_summary": "In the thriving Industrial Era, Gitizens enjoy high welfare (94), solid education (73), and a pollution-free environment, supported by a stable treasury of 558 Git Coins.",
-  "treasury": 558,
+  "world_summary": "In the Industrial Era, Gitizens thrive with high welfare (96), solid education (73), and zero pollution, supported by a stable treasury of 639 Git Coins.",
+  "treasury": 639,
   "currency": "Git Coins",
   "stars_last_counted": 5,
   "education": 73,
   "industry": 63,
-  "welfare": 94,
+  "welfare": 96,
   "green_policy": 76,
   "defense": 66,
-  "population": 10921,
+  "population": 10933,
   "pollution": 0,
-  "stability": 55,
+  "stability": 54,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -29,5 +29,5 @@
     "sykar-f"
   ],
   "last_narrator_date": "2026-06-18T03:57:02.600486+00:00",
-  "next_tick_at": "2026-06-18T17:00:00Z"
+  "next_tick_at": "2026-06-18T20:00:00Z"
 }
