@@ -2,6 +2,12 @@
   "ordinary9843": {
     "total_votes": 1,
     "total_proposals": 1,
-    "last_active": "2026-06-11T12:38:22.276476+00:00"
+    "last_active": "2026-06-11T12:38:22.276476+00:00",
+    "achievements": [
+      "first_vote",
+      "legislator",
+      "representative"
+    ],
+    "was_representative": true
   }
 }
