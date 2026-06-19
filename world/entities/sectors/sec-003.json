@@ -1,0 +1,7 @@
+{
+  "id": "sec-003",
+  "name": "Heavy Industry Zone",
+  "built_law": null,
+  "built_at": "2026-06-19T15:16:05.790578+00:00",
+  "auto_trigger": "industry >= 80"
+}

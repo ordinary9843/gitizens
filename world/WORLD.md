@@ -11,14 +11,14 @@
 | Era | Modern Era |
 | Laws enacted | 19 |
 | Last enacted | 2026-06-19 |
-| Treasury | 261 Git Coins |
+| Treasury | 400 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 73/100 |
-| Industry | 85/100 |
+| Industry | 87/100 |
 | Welfare | 98/100 |
 | Green Policy | 77/100 |
 | Defense | 67/100 |
@@ -57,6 +57,7 @@
 |----|------|----------|---------|
 | `sec-001` | Manufacturing District | [Law 007](laws/law-007.md) | industry >= 25 |
 | `sec-002` | Industrial Complex | [Law 015](laws/law-015.md) | industry >= 55 |
+| `sec-003` | Heavy Industry Zone | — | industry >= 80 |
 
 ---
 
