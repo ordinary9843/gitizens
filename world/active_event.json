@@ -1,24 +1,25 @@
 {
-  "id": "evt-llm-4821",
+  "id": "evt-llm-9273",
   "category": "economic",
   "rarity": "uncommon",
-  "title": "The Artisan Boom",
-  "description": "In the wake of increased instability due to 'The Unseen Artist', a surge in local artisan markets emerges, with citizens seeking new sources of income and expression. This fresh influx of creativity draws attention from both domestic buyers and foreign investors, revitalizing sectors of the economy that were stagnant.",
-  "flavor": "The towns are abuzz with the sounds of hammers, brushes, and laughter as citizens turn their hobbies into thriving businesses.",
+  "title": "Unexpected Trade Deal with Emerging Nation",
+  "description": "A sudden trade agreement has been struck with an emerging nation, allowing Gitizens to access rare raw materials at unprecedented prices. This influx is anticipated to invigorate local industries and boost treasury funds significantly.",
+  "flavor": "The excitement in the markets is palpable as industry leaders discuss the potential of this newfound partnership.",
   "immediate_effects": {
-    "treasury": 15
+    "industry": 15,
+    "treasury": 50
   },
   "response_consequence": {
-    "stability": 3,
-    "defense": 1
+    "industry": 10,
+    "treasury": 50
   },
   "default_consequence": {
-    "stability": 2,
-    "defense": 1
+    "industry": 5,
+    "treasury": 25
   },
-  "response_hint": "Passing laws to support local artisans can further enhance economic stability and draw more investors.",
-  "duration_hours": 72.0,
-  "chained_from": "evt-llm-1023",
-  "fired_at": "2026-06-16T10:07:04.779847+00:00",
-  "issue_number": 94
+  "response_hint": "Enacting a trade facilitation law could amplify the benefits of this agreement.",
+  "duration_hours": 48.0,
+  "chained_from": null,
+  "fired_at": "2026-06-19T11:22:56.661516+00:00",
+  "issue_number": 139
 }
