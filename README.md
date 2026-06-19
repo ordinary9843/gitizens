@@ -22,16 +22,16 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 
 <!-- WORLD-STATE-START -->
 ![Era](https://img.shields.io/badge/Era-Modern_Era-e3b341?style=flat-square&logo=github)
-![Population](https://img.shields.io/badge/Population-13836-3fb950?style=flat-square)
-![Treasury](https://img.shields.io/badge/Treasury-400_GC-388bfd?style=flat-square)
-![Stability](https://img.shields.io/badge/Stability-57%2F100-bc8cff?style=flat-square)
+![Population](https://img.shields.io/badge/Population-14123-3fb950?style=flat-square)
+![Treasury](https://img.shields.io/badge/Treasury-471_GC-388bfd?style=flat-square)
+![Stability](https://img.shields.io/badge/Stability-56%2F100-bc8cff?style=flat-square)
 ![Pollution](https://img.shields.io/badge/Pollution-0%2F100-f85149?style=flat-square)
 ![Laws](https://img.shields.io/badge/Laws-19_enacted-8b949e?style=flat-square)
 <!-- WORLD-STATE-END -->
 
 <!-- STATE_START -->
 **Era:** Modern Era | **Laws enacted:** 19 | [World state](world/WORLD.md)  
-**Next tick:** 2026-06-19T16:00:00Z UTC
+**Next tick:** 2026-06-19T18:00:00Z UTC
 <!-- STATE_END -->
 
 ---

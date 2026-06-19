@@ -1,12 +1,5 @@
 [
   {
-    "tick": 54,
-    "date": "2026-06-18",
-    "narrative": "In a remarkable surge of creativity and productivity, Gitizens have entered The Artisan Boom, propelling the civilization's industrial output to new heights. With a population now standing at 9,240, the treasury has swelled to 225 GC, reflecting the thriving economy, though stability remains a concern at 56 out of 100. As pollution levels remain at a commendable 0, the community must balance progress with sustainability in this pivotal era.",
-    "changes": "autonomous tick applied \u00b7 event: The Artisan Boom",
-    "metrics": "population 9,240 \u00b7 treasury 225 GC \u00b7 stability 56/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 55,
     "date": "2026-06-18",
     "narrative": "In a remarkable turn of events, the Gitizens have entered a period of unprecedented growth known as the Artisan Boom, propelling the population to 9,862 amidst a burgeoning industrial landscape. With a treasury holding steady at 348 GC and a stability rating of 56 out of 100, the potential for innovation is palpable, even as the community navigates the challenges of its flourishing economy. As the Industrial Era unfolds, citizens are urged to engage actively in shaping the future of their society.",
@@ -68,5 +61,12 @@
     "narrative": "In a surprising turn of events, Gitizens celebrated a significant trade deal with an emerging nation, promising to bolster the treasury, currently at 400 GC, and enhance economic stability. With a population of 13,836 and a stability rating of 57 out of 100, this unexpected alliance may provide a crucial lifeline as the civilization navigates the complexities of the Modern Era. Citizens are urged to remain vigilant as the impacts of this deal unfold amidst a backdrop of zero pollution levels.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Unexpected Trade Deal with Emerging Nation",
     "metrics": "population 13,836 \u00b7 treasury 400 GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 64,
+    "date": "2026-06-19",
+    "narrative": "In a surprising turn of events, Gitizens celebrated the completion of Tick #64 on June 19, 2026, as an unexpected trade deal with an emerging nation promises to bolster the treasury, now standing at 471 GC. With a population of 14,123 and a stability rating of 56 out of 100, the civilization navigates the challenges of the Modern Era, while maintaining a commendable pollution level of 0. The recent autonomous tick and citizen feedbacks signal a growing engagement within the community as they adapt to evolving circumstances.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Unexpected Trade Deal with Emerging Nation",
+    "metrics": "population 14,123 \u00b7 treasury 471 GC \u00b7 stability 56/100 \u00b7 pollution 0/100"
   }
 ]
