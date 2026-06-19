@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-19*
+*Last updated: 2026-06-19 — [Law 020](laws/law-020.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Modern Era |
-| Laws enacted | 19 |
+| Laws enacted | 20 |
 | Last enacted | 2026-06-19 |
-| Treasury | 471 Git Coins |
+| Treasury | 43 Git Coins |
 
 ### Policy
 
@@ -21,7 +21,7 @@
 | Industry | 87/100 |
 | Welfare | 98/100 |
 | Green Policy | 77/100 |
-| Defense | 67/100 |
+| Defense | 74/100 |
 | Pollution *(derived)* | 0/100 |
 
 ---
