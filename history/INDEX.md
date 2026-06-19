@@ -29,3 +29,4 @@
 | 18 | [law-018](../world/laws/law-018.md) | [#114](https://github.com/ordinary9843/gitizens/issues/114) Fortification and Training Enhancement Act | 0+1 0-1 | 2026-06-17 |
 | 19 | [law-019](../world/laws/law-019.md) | [#135](https://github.com/ordinary9843/gitizens/issues/135) Industrial Innovation Acceleration Act | 0+1 0-1 | 2026-06-19 |
 | 20 | [law-020](../world/laws/law-020.md) | [#146](https://github.com/ordinary9843/gitizens/issues/146) Fortified Foundations Act | 0+1 0-1 | 2026-06-19 |
+| 21 | [law-021](../world/laws/law-021.md) | [#149](https://github.com/ordinary9843/gitizens/issues/149) Academia Advancement Initiative | 0+1 0-1 | 2026-06-19 |

@@ -1,13 +1,5 @@
 [
   {
-    "number": 1,
-    "title": "Declare Open Source the Founding Principle",
-    "issue_number": 1,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1",
-    "enacted_date": "2026-06-10",
-    "era": "Founding Era"
-  },
-  {
     "number": 2,
     "title": "Fund the National Education Initiative",
     "issue_number": 2,
@@ -156,6 +148,14 @@
     "title": "Fortified Foundations Act",
     "issue_number": 146,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/146",
+    "enacted_date": "2026-06-19",
+    "era": "Modern Era"
+  },
+  {
+    "number": 21,
+    "title": "Academia Advancement Initiative",
+    "issue_number": 149,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/149",
     "enacted_date": "2026-06-19",
     "era": "Modern Era"
   }

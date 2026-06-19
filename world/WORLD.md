@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-19*
+*Last updated: 2026-06-19 — [Law 021](laws/law-021.md)*
 
 ---
 
@@ -9,15 +9,15 @@
 | Field | Value |
 |-------|-------|
 | Era | Modern Era |
-| Laws enacted | 20 |
+| Laws enacted | 21 |
 | Last enacted | 2026-06-19 |
-| Treasury | 43 Git Coins |
+| Treasury | 16 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 74/100 |
+| Education | 81/100 |
 | Industry | 87/100 |
 | Welfare | 98/100 |
 | Green Policy | 79/100 |
@@ -34,6 +34,7 @@
 |----|------|----------|---------|
 | `ins-001` | National University | [Law 005](laws/law-005.md) | education >= 55 |
 | `ins-002` | Defense Ministry | [Law 018](laws/law-018.md) | defense >= 65 |
+| `ins-003` | Academy of Sciences | [Law 021](laws/law-021.md) | education >= 80 |
 
 ### Districts
 
