@@ -1038,5 +1038,21 @@
     "stability": 55,
     "treasury": 43,
     "active_event": "evt-llm-9273"
+  },
+  {
+    "tick": 66,
+    "date": "2026-06-19T21:11:49Z",
+    "laws_count": 21,
+    "era": "Modern Era",
+    "education": 81,
+    "industry": 87,
+    "welfare": 98,
+    "green_policy": 79,
+    "defense": 74,
+    "pollution": 0,
+    "population": 14569,
+    "stability": 57,
+    "treasury": 16,
+    "active_event": "evt-llm-9273"
   }
 ]
