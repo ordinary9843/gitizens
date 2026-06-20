@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-06-20T14:03:01.448262+00:00",
+  "updated_at": "2026-06-20T16:18:20.014734+00:00",
   "pending": [
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 79,
+      "current": 80,
       "target": 85,
-      "gap": 6
+      "gap": 5
     }
   ],
   "at_risk": [],
