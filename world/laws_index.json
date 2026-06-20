@@ -1,13 +1,5 @@
 [
   {
-    "number": 2,
-    "title": "Fund the National Education Initiative",
-    "issue_number": 2,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/2",
-    "enacted_date": "2026-06-10",
-    "era": "Founding Era"
-  },
-  {
     "number": 3,
     "title": "Launch the Social Welfare Program",
     "issue_number": 3,
@@ -157,6 +149,14 @@
     "issue_number": 149,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/149",
     "enacted_date": "2026-06-19",
+    "era": "Modern Era"
+  },
+  {
+    "number": 22,
+    "title": "Strengthening the Shield Initiative",
+    "issue_number": 170,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/170",
+    "enacted_date": "2026-06-20",
     "era": "Modern Era"
   }
 ]
