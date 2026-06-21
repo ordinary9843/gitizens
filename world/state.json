@@ -3,18 +3,18 @@
   "laws_count": 23,
   "last_enacted": "2026-06-21",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Modern Era, Gitizens thrives with perfect welfare, high education and industry ratings, zero pollution, and a stable population governed by 23 laws.",
-  "treasury": 1115,
+  "world_summary": "In the thriving Modern Era, Gitizens boasts high welfare, education, and industry ratings, governed by 23 laws, with zero pollution and stable population growth.",
+  "treasury": 1239,
   "currency": "Git Coins",
   "stars_last_counted": 5,
   "education": 84,
   "industry": 92,
-  "welfare": 100,
-  "green_policy": 89,
+  "welfare": 98,
+  "green_policy": 90,
   "defense": 80,
-  "population": 26134,
+  "population": 26875,
   "pollution": 0,
-  "stability": 52,
+  "stability": 56,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -29,5 +29,5 @@
     "sykar-f"
   ],
   "last_narrator_date": "2026-06-21T00:06:04.778572+00:00",
-  "next_tick_at": "2026-06-21T20:00:00Z"
+  "next_tick_at": "2026-06-21T22:00:00Z"
 }
