@@ -1,12 +1,5 @@
 [
   {
-    "tick": 68,
-    "date": "2026-06-20",
-    "narrative": "In a surprising turn of events, the Gitizens of the Modern Era have secured an unexpected trade deal with an emerging nation, injecting new vitality into their treasury, which now stands at 128 GC. With a population of 15,194, the civilization's stability remains precarious at 55 out of 100, prompting leaders to address citizen feedback as they navigate the complexities of this new alliance. Meanwhile, pollution levels remain at a clean 0, reflecting the community's commitment to sustainability amidst rapid development.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Unexpected Trade Deal with Emerging Nation",
-    "metrics": "population 15,194 \u00b7 treasury 128 GC \u00b7 stability 55/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 69,
     "date": "2026-06-20",
     "narrative": "In a surprising turn of events, the Gitizens celebrated an unexpected trade deal with an emerging nation, a move poised to invigorate the economy as the population reaches 15,825. Despite a treasury of 323 GC and a stability rating of 56 out of 100, the recent developments have sparked hope for enhanced prosperity and growth. However, the citizens remain vigilant as they navigate the complexities of this new alliance amidst a backdrop of zero pollution.",
@@ -68,5 +61,12 @@
     "narrative": "In a surprising turn of events, Gitizens has secured an unexpected trade deal with an emerging nation, potentially boosting its economy as the treasury now stands at 131 GC. With a population of 19,301 and stability holding at 59 out of 100, the effects of this deal could be pivotal for the Modern Era's growth, especially as pollution remains at a commendable zero. As autonomous governance continues to evolve, the recent enactment of a new law may further shape the future of this thriving civilization.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Unexpected Trade Deal with Emerging Nation",
     "metrics": "population 19,301 \u00b7 treasury 131 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 78,
+    "date": "2026-06-21",
+    "narrative": "In a surprising turn of events, the Gitizens have successfully negotiated an unexpected trade deal with an emerging nation, a move that could bolster the treasury, currently at 416 GC, and enhance stability, which stands at a precarious 57 out of 100. With a population of 20,687, the realm continues to navigate the complexities of the Modern Era while maintaining a pollution level of 0, showcasing an ongoing commitment to sustainability amidst economic growth.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Unexpected Trade Deal with Emerging Nation",
+    "metrics": "population 20,687 \u00b7 treasury 416 GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
   }
 ]
