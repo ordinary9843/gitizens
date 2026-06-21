@@ -1,0 +1,7 @@
+{
+  "id": "bld-004",
+  "name": "Eco-Research Center",
+  "built_law": 23,
+  "built_at": "2026-06-21T00:05:50.117290+00:00",
+  "auto_trigger": "green_policy >= 85"
+}

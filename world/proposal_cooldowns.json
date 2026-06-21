@@ -14,5 +14,9 @@
   "defense": {
     "last_date": "2026-06-20",
     "streak": 5
+  },
+  "green_policy": {
+    "last_date": "2026-06-21",
+    "streak": 1
   }
 }
