@@ -1,12 +1,5 @@
 [
   {
-    "tick": 71,
-    "date": "2026-06-20",
-    "narrative": "In a surprising turn of events, Gitizens have secured an unexpected trade deal with an emerging nation, promising to bolster the civilization's treasury, which currently stands at 564 GC. Despite a stable population of 16,590, with a mild stability rating of 56 out of 100, citizens remain watchful as the effects of this new alliance unfold in the Modern Era. With pollution at a commendable 0, the focus now shifts to how this economic boost will influence future growth and prosperity.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Unexpected Trade Deal with Emerging Nation",
-    "metrics": "population 16,590 \u00b7 treasury 564 GC \u00b7 stability 56/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 72,
     "date": "2026-06-20",
     "narrative": "In a surprising turn of events, Gitizens celebrated the completion of Tick #72 with a notable boost in international relations, marked by an unexpected trade deal with an emerging nation. As the population stands at 17,166 and the treasury holds 689 GC, the community grapples with a stability rating of 56 out of 100, while maintaining a commendable pollution level of 0. The recent autonomous tick and two citizen feedbacks signal a civic engagement that could prove vital in navigating upcoming challenges.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant turn of events, the Gitizens civilization has reached a population milestone of 24,000, reflecting a steady increase amidst the challenges of the Modern Era. With a treasury bolstered to 809 GC, the community faces a delicate balance of stability at 59 out of 100, while maintaining an impressive pollution level of 0. As Tick #80 concludes, the absence of proposals raises concerns about future direction and governance.",
     "changes": "autonomous tick applied",
     "metrics": "population 24,000 \u00b7 treasury 809 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 81,
+    "date": "2026-06-21",
+    "narrative": "In a critical turn of events, the Gitizens faced a Cryptocurrency Crisis, sending shockwaves through their modern civilization. With a population now at 25,014 and a treasury dwindling to 876 GC, stability has dropped to a precarious 48 out of 100, leaving the community on edge. While pollution remains at a manageable 0, the urgent need for solutions has never been more pressing.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cryptocurrency Crisis",
+    "metrics": "population 25,014 \u00b7 treasury 876 GC \u00b7 stability 48/100 \u00b7 pollution 0/100"
   }
 ]

@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-llm-2398",
+  "category": "economic",
+  "rarity": "rare",
+  "title": "Cryptocurrency Crisis",
+  "description": "A sudden and unexpected crash in the newly adopted cryptocurrency market leads to widespread economic uncertainty. With many Gitizens heavily invested, panic selling begins to erode consumer confidence and destabilize the economy.",
+  "flavor": "Digital fortunes evaporate as swiftly as they were created.",
+  "immediate_effects": {
+    "treasury": -50,
+    "stability": -10
+  },
+  "response_consequence": {
+    "defense": -5,
+    "welfare": -3
+  },
+  "default_consequence": {
+    "education": -8,
+    "green_policy": -5
+  },
+  "response_hint": "Enacting legislation to regulate digital currencies could stabilize the market.",
+  "duration_hours": 48.0,
+  "chained_from": null,
+  "fired_at": "2026-06-21T15:51:24.792341+00:00",
+  "issue_number": 183
+}
