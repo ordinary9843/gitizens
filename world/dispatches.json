@@ -1,12 +1,5 @@
 [
   {
-    "tick": 80,
-    "date": "2026-06-21",
-    "narrative": "In a significant turn of events, the Gitizens civilization has reached a population milestone of 24,000, reflecting a steady increase amidst the challenges of the Modern Era. With a treasury bolstered to 809 GC, the community faces a delicate balance of stability at 59 out of 100, while maintaining an impressive pollution level of 0. As Tick #80 concludes, the absence of proposals raises concerns about future direction and governance.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 24,000 \u00b7 treasury 809 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 81,
     "date": "2026-06-21",
     "narrative": "In a critical turn of events, the Gitizens faced a Cryptocurrency Crisis, sending shockwaves through their modern civilization. With a population now at 25,014 and a treasury dwindling to 876 GC, stability has dropped to a precarious 48 out of 100, leaving the community on edge. While pollution remains at a manageable 0, the urgent need for solutions has never been more pressing.",
@@ -68,5 +61,12 @@
     "narrative": "In a startling turn of events, the Gitizens of the Modern Era face a severe Cryptocurrency Crisis, shaking the foundations of their digital economy. With a population of 34,997 and a treasury dwindling to 908 GC, stability has plummeted to a precarious 59 out of 100. As pollution remains at a controlled 0, the community now grapples with the looming threat of financial instability amidst an otherwise thriving civilization.",
     "changes": "autonomous tick applied \u00b7 event: Cryptocurrency Crisis",
     "metrics": "population 34,997 \u00b7 treasury 908 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 90,
+    "date": "2026-06-22",
+    "narrative": "In the wake of the recent Cryptocurrency Crisis, Gitizens find themselves grappling with the repercussions as the treasury stands at a precarious 1,147 GC. With a population of 35,814 and stability now at a concerning 57 out of 100, citizens are urged to remain vigilant as the implications of this economic turmoil unfold. The effects of pollution remain nonexistent, but the urgency to address the crisis looms large in the Modern Era.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cryptocurrency Crisis",
+    "metrics": "population 35,814 \u00b7 treasury 1147 GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
   }
 ]
