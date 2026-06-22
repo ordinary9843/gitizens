@@ -33,3 +33,4 @@
 | 22 | [law-022](../world/laws/law-022.md) | [#170](https://github.com/ordinary9843/gitizens/issues/170) Strengthening the Shield Initiative | 0+1 0-1 | 2026-06-20 |
 | 23 | [law-023](../world/laws/law-023.md) | [#173](https://github.com/ordinary9843/gitizens/issues/173) Green Innovation Incentive Act | 0+1 0-1 | 2026-06-21 |
 | 24 | [law-024](../world/laws/law-024.md) | [#196](https://github.com/ordinary9843/gitizens/issues/196) Fortification Frontier Act | 0+1 0-1 | 2026-06-22 |
+| 25 | [law-025](../world/laws/law-025.md) | [#199](https://github.com/ordinary9843/gitizens/issues/199) Knowledge for All Initiative | 0+1 0-1 | 2026-06-22 |

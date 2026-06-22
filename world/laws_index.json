@@ -1,13 +1,5 @@
 [
   {
-    "number": 5,
-    "title": "Build the Grand Archive \u2014 Permanent Record of All Laws",
-    "issue_number": 4,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/4",
-    "enacted_date": "2026-06-10",
-    "era": "Founding Era"
-  },
-  {
     "number": 6,
     "title": "Invest in Green Technology \u2014 Carbon-Free by 2040",
     "issue_number": 5,
@@ -156,6 +148,14 @@
     "title": "Fortification Frontier Act",
     "issue_number": 196,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/196",
+    "enacted_date": "2026-06-22",
+    "era": "Modern Era"
+  },
+  {
+    "number": 25,
+    "title": "Knowledge for All Initiative",
+    "issue_number": 199,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/199",
     "enacted_date": "2026-06-22",
     "era": "Modern Era"
   }
