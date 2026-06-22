@@ -1,13 +1,5 @@
 [
   {
-    "number": 4,
-    "title": "Launch the Social Welfare Program",
-    "issue_number": 3,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/3",
-    "enacted_date": "2026-06-10",
-    "era": "Founding Era"
-  },
-  {
     "number": 5,
     "title": "Build the Grand Archive \u2014 Permanent Record of All Laws",
     "issue_number": 4,
@@ -157,6 +149,14 @@
     "issue_number": 173,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/173",
     "enacted_date": "2026-06-21",
+    "era": "Modern Era"
+  },
+  {
+    "number": 24,
+    "title": "Fortification Frontier Act",
+    "issue_number": 196,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/196",
+    "enacted_date": "2026-06-22",
     "era": "Modern Era"
   }
 ]
