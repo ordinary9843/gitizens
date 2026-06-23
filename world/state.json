@@ -3,8 +3,8 @@
   "laws_count": 25,
   "last_enacted": "2026-06-22",
   "founded_date": "2026-06-10",
-  "world_summary": "In the thriving Gitizens' Modern Era, welfare and education score 100 and 89 respectively, supported by robust industry and strong green policies, with zero pollution.",
-  "treasury": 1750,
+  "world_summary": "In the Modern Era, Gitizens boasts a thriving economy with perfect welfare, strong education, and robust green policies, all while maintaining zero pollution.",
+  "treasury": 2037,
   "currency": "Git Coins",
   "stars_last_counted": 5,
   "education": 89,
@@ -12,7 +12,7 @@
   "welfare": 100,
   "green_policy": 92,
   "defense": 87,
-  "population": 41149,
+  "population": 44542,
   "pollution": 0,
   "stability": 57,
   "tags_applied": [
@@ -29,5 +29,5 @@
     "sykar-f"
   ],
   "last_narrator_date": "2026-06-23T00:06:12.840917+00:00",
-  "next_tick_at": "2026-06-23T06:00:00Z"
+  "next_tick_at": "2026-06-23T09:00:00Z"
 }
