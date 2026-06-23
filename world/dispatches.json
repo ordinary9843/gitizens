@@ -1,12 +1,5 @@
 [
   {
-    "tick": 88,
-    "date": "2026-06-22",
-    "narrative": "In a startling turn of events, Gitizens are grappling with the ramifications of a Cryptocurrency Crisis, as their treasury now stands at a precarious 599 GC amidst a population of 34,290. With stability slipping to 56 out of 100, citizens are voicing their concerns, prompting a wave of feedback that has been swiftly addressed in the latest autonomous tick. As pollution remains at a manageable 0, the stakes have never been higher for this burgeoning digital civilization.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cryptocurrency Crisis",
-    "metrics": "population 34,290 \u00b7 treasury 599 GC \u00b7 stability 56/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 89,
     "date": "2026-06-22",
     "narrative": "In a startling turn of events, the Gitizens of the Modern Era face a severe Cryptocurrency Crisis, shaking the foundations of their digital economy. With a population of 34,997 and a treasury dwindling to 908 GC, stability has plummeted to a precarious 59 out of 100. As pollution remains at a controlled 0, the community now grapples with the looming threat of financial instability amidst an otherwise thriving civilization.",
@@ -68,5 +61,12 @@
     "narrative": "In the latest tick of Gitizens, citizens celebrated a significant milestone with the enactment of a new law amidst a burgeoning population of 53,661. The treasury stands at 3,047 GC, reflecting a modest stability rating of 59 out of 100, while the recent Mutual Aid Movement event has sparked discussions on community support and cooperation. With pollution levels remaining at a pristine 0, the focus now turns to maintaining environmental integrity as the civilization navigates the complexities of modern governance.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Mutual Aid Movement",
     "metrics": "population 53,661 \u00b7 treasury 3047 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 98,
+    "date": "2026-06-23",
+    "narrative": "In the latest tick of the Gitizens' saga, the population has surged to 54,730, while the treasury stands at 3,283 GC. The stability of the civilization remains a cautious 57 out of 100, as the newly initiated Mutual Aid Movement seeks to bolster community support amid these trying times. With pollution levels at a commendable 0, the Gitizens continue to thrive in the Modern Era, though challenges lie ahead.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Mutual Aid Movement",
+    "metrics": "population 54,730 \u00b7 treasury 3283 GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
   }
 ]
