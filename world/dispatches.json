@@ -1,12 +1,5 @@
 [
   {
-    "tick": 81,
-    "date": "2026-06-21",
-    "narrative": "In a critical turn of events, the Gitizens faced a Cryptocurrency Crisis, sending shockwaves through their modern civilization. With a population now at 25,014 and a treasury dwindling to 876 GC, stability has dropped to a precarious 48 out of 100, leaving the community on edge. While pollution remains at a manageable 0, the urgent need for solutions has never been more pressing.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cryptocurrency Crisis",
-    "metrics": "population 25,014 \u00b7 treasury 876 GC \u00b7 stability 48/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 82,
     "date": "2026-06-21",
     "narrative": "In a staggering turn of events, the citizens of Gitizens face a Cryptocurrency Crisis that threatens their economic stability, as treasury funds dwindle to a precarious 994 GC amidst a population of 25,330. With overall stability resting at a concerning 50 out of 100, the community's resilience is put to the test, leaving many to wonder how long they can weather this financial storm. As pollution levels remain at zero, the focus now shifts to restoring fiscal health and ensuring a sustainable future for all.",
@@ -68,5 +61,12 @@
     "narrative": "In the wake of the recent Cryptocurrency Crisis, Gitizens find themselves grappling with the repercussions as the treasury stands at a precarious 1,147 GC. With a population of 35,814 and stability now at a concerning 57 out of 100, citizens are urged to remain vigilant as the implications of this economic turmoil unfold. The effects of pollution remain nonexistent, but the urgency to address the crisis looms large in the Modern Era.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cryptocurrency Crisis",
     "metrics": "population 35,814 \u00b7 treasury 1147 GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 91,
+    "date": "2026-06-23",
+    "narrative": "In a startling turn of events, the Gitizens faced a Cryptocurrency Crisis that has sent shockwaves through the economy, with the treasury now at a precarious 1,311 GC amidst a population of 37,284. As stability dips to 58 out of 100, citizens are urged to remain vigilant and engaged, as feedback from the community plays a crucial role in navigating these turbulent times. With pollution levels at a crucial zero, the focus now shifts to restoring fiscal confidence before the situation worsens.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cryptocurrency Crisis",
+    "metrics": "population 37,284 \u00b7 treasury 1311 GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
   }
 ]

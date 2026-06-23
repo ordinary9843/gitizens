@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-22*
+*Last updated: 2026-06-23*
 
 ---
 
@@ -11,7 +11,7 @@
 | Era | Modern Era |
 | Laws enacted | 25 |
 | Last enacted | 2026-06-22 |
-| Treasury | 1,147 Git Coins |
+| Treasury | 1,311 Git Coins |
 
 ### Policy
 
