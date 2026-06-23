@@ -1,13 +1,5 @@
 [
   {
-    "number": 6,
-    "title": "Invest in Green Technology \u2014 Carbon-Free by 2040",
-    "issue_number": 5,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/5",
-    "enacted_date": "2026-06-10",
-    "era": "Founding Era"
-  },
-  {
     "number": 7,
     "title": "Jumpstart Industrial Development \u2014 Factory District Initiative",
     "issue_number": 6,
@@ -157,6 +149,14 @@
     "issue_number": 199,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/199",
     "enacted_date": "2026-06-22",
+    "era": "Modern Era"
+  },
+  {
+    "number": 26,
+    "title": "Scholars for Tomorrow Initiative",
+    "issue_number": 227,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/227",
+    "enacted_date": "2026-06-23",
     "era": "Modern Era"
   }
 ]
