@@ -35,3 +35,4 @@
 | 24 | [law-024](../world/laws/law-024.md) | [#196](https://github.com/ordinary9843/gitizens/issues/196) Fortification Frontier Act | 0+1 0-1 | 2026-06-22 |
 | 25 | [law-025](../world/laws/law-025.md) | [#199](https://github.com/ordinary9843/gitizens/issues/199) Knowledge for All Initiative | 0+1 0-1 | 2026-06-22 |
 | 26 | [law-026](../world/laws/law-026.md) | [#227](https://github.com/ordinary9843/gitizens/issues/227) Scholars for Tomorrow Initiative | 0+1 0-1 | 2026-06-23 |
+| 27 | [law-027](../world/laws/law-027.md) | [#233](https://github.com/ordinary9843/gitizens/issues/233) Fortified Futures Initiative | 0+1 0-1 | 2026-06-23 |

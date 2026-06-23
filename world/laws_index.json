@@ -1,13 +1,5 @@
 [
   {
-    "number": 7,
-    "title": "Jumpstart Industrial Development \u2014 Factory District Initiative",
-    "issue_number": 6,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/6",
-    "enacted_date": "2026-06-10",
-    "era": "Founding Era"
-  },
-  {
     "number": 8,
     "title": "Establish the National Defense Corps",
     "issue_number": 7,
@@ -156,6 +148,14 @@
     "title": "Scholars for Tomorrow Initiative",
     "issue_number": 227,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/227",
+    "enacted_date": "2026-06-23",
+    "era": "Modern Era"
+  },
+  {
+    "number": 27,
+    "title": "Fortified Futures Initiative",
+    "issue_number": 233,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/233",
     "enacted_date": "2026-06-23",
     "era": "Modern Era"
   }
