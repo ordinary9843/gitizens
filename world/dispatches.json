@@ -1,12 +1,5 @@
 [
   {
-    "tick": 91,
-    "date": "2026-06-23",
-    "narrative": "In a startling turn of events, the Gitizens faced a Cryptocurrency Crisis that has sent shockwaves through the economy, with the treasury now at a precarious 1,311 GC amidst a population of 37,284. As stability dips to 58 out of 100, citizens are urged to remain vigilant and engaged, as feedback from the community plays a crucial role in navigating these turbulent times. With pollution levels at a crucial zero, the focus now shifts to restoring fiscal confidence before the situation worsens.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cryptocurrency Crisis",
-    "metrics": "population 37,284 \u00b7 treasury 1311 GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 92,
     "date": "2026-06-23",
     "narrative": "In a startling turn of events, the Gitizens faced a Cryptocurrency Crisis that has left the treasury precariously low at 1,750 GC, despite a robust population of 41,149. With stability now teetering at 57 out of 100 and pollution levels remaining at a commendable zero, the citizens are left to ponder their next move in these uncertain times. As autonomous governance takes hold, the community eagerly awaits the outcomes of two citizen feedback initiatives that may shape their future.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant development within the Gitizens civilization, Tick #100 concluded on June 24, 2026, revealing a stable population of 59,430 and a treasury totaling 106 GC. The recent implementation of an autonomous tick has led to the enactment of one new law and the incorporation of two citizen feedbacks, coinciding with the emergence of the Mutual Aid Movement, which promises to reshape community dynamics amidst a stability rating of 59 out of 100. As pollution remains at a commendable 0%, the citizens look toward a future filled with potential and responsibility.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Mutual Aid Movement",
     "metrics": "population 59,430 \u00b7 treasury 106 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 101,
+    "date": "2026-06-24",
+    "narrative": "In a pivotal development for the Gitizens of GitHub, Tick #101 has concluded with the enactment of a new law aimed at bolstering community support, coinciding with the rise of the Mutual Aid Movement. As the population swells to 61,923, the treasury stands at 427 GC, but stability remains precariously low at 59 out of 100. Citizens express mixed sentiments, urging greater action to address the challenges of modern governance amidst a pollution-free environment.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Mutual Aid Movement",
+    "metrics": "population 61,923 \u00b7 treasury 427 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
   }
 ]
