@@ -1,13 +1,5 @@
 [
   {
-    "number": 8,
-    "title": "Establish the National Defense Corps",
-    "issue_number": 7,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/7",
-    "enacted_date": "2026-06-10",
-    "era": "Founding Era"
-  },
-  {
     "number": 9,
     "title": "Enforce the Green Standard \u2014 Industrial Emission Limits",
     "issue_number": 9,
@@ -157,6 +149,14 @@
     "issue_number": 233,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/233",
     "enacted_date": "2026-06-23",
+    "era": "Modern Era"
+  },
+  {
+    "number": 28,
+    "title": "Innovative Learning Initiative",
+    "issue_number": 236,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/236",
+    "enacted_date": "2026-06-24",
     "era": "Modern Era"
   }
 ]
