@@ -1,13 +1,5 @@
 [
   {
-    "number": 10,
-    "title": "Public Arts Grant Program",
-    "issue_number": 15,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/15",
-    "enacted_date": "2026-06-11",
-    "era": "Founding Era"
-  },
-  {
     "number": 11,
     "title": "Industrial Innovation Initiative",
     "issue_number": 10,
@@ -156,6 +148,14 @@
     "title": "Sustainable Urban Growth Act",
     "issue_number": 239,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/239",
+    "enacted_date": "2026-06-24",
+    "era": "Modern Era"
+  },
+  {
+    "number": 30,
+    "title": "Industrial Renaissance Act",
+    "issue_number": 246,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/246",
     "enacted_date": "2026-06-24",
     "era": "Modern Era"
   }
