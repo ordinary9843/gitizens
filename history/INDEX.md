@@ -37,3 +37,4 @@
 | 26 | [law-026](../world/laws/law-026.md) | [#227](https://github.com/ordinary9843/gitizens/issues/227) Scholars for Tomorrow Initiative | 0+1 0-1 | 2026-06-23 |
 | 27 | [law-027](../world/laws/law-027.md) | [#233](https://github.com/ordinary9843/gitizens/issues/233) Fortified Futures Initiative | 0+1 0-1 | 2026-06-23 |
 | 28 | [law-028](../world/laws/law-028.md) | [#236](https://github.com/ordinary9843/gitizens/issues/236) Innovative Learning Initiative | 0+1 0-1 | 2026-06-24 |
+| 29 | [law-029](../world/laws/law-029.md) | [#239](https://github.com/ordinary9843/gitizens/issues/239) Sustainable Urban Growth Act | 0+1 0-1 | 2026-06-24 |

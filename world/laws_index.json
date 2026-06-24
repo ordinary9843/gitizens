@@ -1,13 +1,5 @@
 [
   {
-    "number": 9,
-    "title": "Enforce the Green Standard \u2014 Industrial Emission Limits",
-    "issue_number": 9,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/9",
-    "enacted_date": "2026-06-11",
-    "era": "Founding Era"
-  },
-  {
     "number": 10,
     "title": "Public Arts Grant Program",
     "issue_number": 15,
@@ -156,6 +148,14 @@
     "title": "Innovative Learning Initiative",
     "issue_number": 236,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/236",
+    "enacted_date": "2026-06-24",
+    "era": "Modern Era"
+  },
+  {
+    "number": 29,
+    "title": "Sustainable Urban Growth Act",
+    "issue_number": 239,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/239",
     "enacted_date": "2026-06-24",
     "era": "Modern Era"
   }
