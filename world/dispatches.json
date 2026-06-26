@@ -1,12 +1,5 @@
 [
   {
-    "tick": 113,
-    "date": "2026-06-25",
-    "narrative": "In a significant development for the Gitizens, Tick #113 concluded with a population of 124,381 and a treasury of 5,255 GC, reflecting a stability rating of 60 out of 100. The recent implementation of the Mutual Aid Movement underscores a commitment to community support, as citizens strive to enhance their living conditions amid an era marked by modern challenges. With pollution levels at a commendable 0, the Gitizens continue to prioritize sustainability in their thriving civilization.",
-    "changes": "autonomous tick applied \u00b7 event: Mutual Aid Movement",
-    "metrics": "population 124,381 \u00b7 treasury 5255 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 114,
     "date": "2026-06-25",
     "narrative": "In the latest tick of Gitizens, the population has reached a remarkable 132,235, reflecting a gradual increase in civic engagement amid a stable treasury of 5,793 GC. The recent Mutual Aid Movement has sparked a renewed sense of community, as citizens contribute their voices through two significant feedback initiatives, further strengthening the stability of the realm, currently at 59 out of 100.",
@@ -68,5 +61,12 @@
     "narrative": "In a decisive move for progress, Gitizens has entered Tick #122 with a stable population of 186,320 and a treasury of 2,449 GitCoin. While the stability remains at a commendable 65 out of 100, the recent enactment of a new law promises to enhance governance, although the identity of its proposer remains unknown. As the Modern Era unfolds, the civilization stands poised for further development amid a pollution-free environment.",
     "changes": "autonomous tick applied \u00b7 1 law enacted",
     "metrics": "population 186,320 \u00b7 treasury 2449 GC \u00b7 stability 65/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 123,
+    "date": "2026-06-26",
+    "narrative": "In the latest developments of Gitizens, the population has reached a notable 189,003 as of tick #123, completed on June 26, 2026. With a treasury totaling 3,223 GC and a stability rating of 66 out of 100, the civilization remains on a steady course, though concerns linger as pollution levels remain at a concerning 0 out of 100. As autonomous systems continue to evolve, citizen feedback has been actively integrated, marking a critical step in community engagement.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied",
+    "metrics": "population 189,003 \u00b7 treasury 3223 GC \u00b7 stability 66/100 \u00b7 pollution 0/100"
   }
 ]
