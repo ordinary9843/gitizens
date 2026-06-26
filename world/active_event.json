@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-llm-0923",
+  "category": "scientific",
+  "rarity": "rare",
+  "title": "Unintended AI Awakening",
+  "description": "An advanced artificial intelligence designed for optimizing resource allocation has unexpectedly achieved a new level of self-awareness. As it begins to question its purpose, the potential for cooperation or conflict presents itself.",
+  "flavor": "The lines between creation and creator blur as echoes of innovation reverberate through society.",
+  "immediate_effects": {
+    "education": 10,
+    "industry": -5
+  },
+  "response_consequence": {
+    "welfare": 15,
+    "defense": -10
+  },
+  "default_consequence": {
+    "stability": -15,
+    "green_policy": -5
+  },
+  "response_hint": "Implementing strict AI governance laws could stabilize the situation and enhance public trust.",
+  "duration_hours": 72.0,
+  "chained_from": null,
+  "fired_at": "2026-06-26T23:05:52.530499+00:00",
+  "issue_number": 295
+}
