@@ -1,13 +1,5 @@
 [
   {
-    "number": 14,
-    "title": "Industrial Renaissance Act",
-    "issue_number": 60,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/60",
-    "enacted_date": "2026-06-14",
-    "era": "Founding Era"
-  },
-  {
     "number": 15,
     "title": "Industrial Innovation Grant Program",
     "issue_number": 82,
@@ -156,6 +148,14 @@
     "title": "Community Connection Initiative",
     "issue_number": 285,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/285",
+    "enacted_date": "2026-06-26",
+    "era": "Modern Era"
+  },
+  {
+    "number": 34,
+    "title": "Scholarly Bridges Initiative",
+    "issue_number": 288,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/288",
     "enacted_date": "2026-06-26",
     "era": "Modern Era"
   }

@@ -42,3 +42,4 @@
 | 31 | [law-031](../world/laws/law-031.md) | [#276](https://github.com/ordinary9843/gitizens/issues/276) Fortified Future Initiative | 0+1 0-1 | 2026-06-26 |
 | 32 | [law-032](../world/laws/law-032.md) | [#282](https://github.com/ordinary9843/gitizens/issues/282) Innovation Incentive Program | 0+1 0-1 | 2026-06-26 |
 | 33 | [law-033](../world/laws/law-033.md) | [#285](https://github.com/ordinary9843/gitizens/issues/285) Community Connection Initiative | 0+1 0-1 | 2026-06-26 |
+| 34 | [law-034](../world/laws/law-034.md) | [#288](https://github.com/ordinary9843/gitizens/issues/288) Scholarly Bridges Initiative | 0+1 0-1 | 2026-06-26 |

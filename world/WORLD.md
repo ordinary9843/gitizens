@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-06-26 — [Law 034](laws/law-034.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Modern Era |
-| Laws enacted | 33 |
+| Laws enacted | 34 |
 | Last enacted | 2026-06-26 |
-| Treasury | 2,585 Git Coins |
+| Treasury | 2,449 Git Coins |
 
 ### Policy
 
