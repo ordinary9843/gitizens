@@ -1,12 +1,5 @@
 [
   {
-    "tick": 108,
-    "date": "2026-06-25",
-    "narrative": "In a significant development for Gitizens, the completion of Tick #108 on June 25, 2026, has seen the population rise to 85,230 with a treasury now standing at 1,366 GC. Despite a concerning stability rating of 59 out of 100, the recent Mutual Aid Movement may offer a glimmer of hope, as citizens actively engage in feedback initiatives aimed at improving communal welfare and addressing pressing societal needs.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Mutual Aid Movement",
-    "metrics": "population 85,230 \u00b7 treasury 1366 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 109,
     "date": "2026-06-25",
     "narrative": "In a significant development for the Gitizens of the Modern Era, tick #109 concluded on June 25, 2026, revealing a population of 92,266 and a treasury bolstered to 2,302 GC. Amidst a backdrop of 59% stability and zero pollution, the recently initiated Mutual Aid Movement promises to reshape community dynamics, though no proposals were put forth this cycle. As citizens engage with two feedback mechanisms, the future remains uncertain yet hopeful in this evolving digital civilization.",
@@ -68,5 +61,12 @@
     "narrative": "In the latest tick of Gitizens, the Mutual Aid Movement has taken root, fostering a spirit of collaboration among the 146,272 inhabitants of this burgeoning civilization. With a treasury of 1,877 GC and a stability rating of 61 out of 100, the citizens stand united, navigating the challenges of the Modern Era while keeping pollution at a commendable 0. As the movement gains momentum, the implications for community resilience and innovation are poised to reshape the future of Gitizens.",
     "changes": "autonomous tick applied \u00b7 event: Mutual Aid Movement",
     "metrics": "population 146,272 \u00b7 treasury 1877 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 118,
+    "date": "2026-06-26",
+    "narrative": "In a pivotal moment for Gitizens, the Mutual Aid Movement has gained traction, reflecting a community unified in support and collaboration. With a population now reaching 160,864 and a treasury of 3,156 GC, citizens reported a stability rating of 60 out of 100, indicating a resilient yet cautious environment as they navigate the complexities of modern governance. The absence of new proposals highlights a potential lull in innovation amidst the growing momentum for mutual support.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Mutual Aid Movement",
+    "metrics": "population 160,864 \u00b7 treasury 3156 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
