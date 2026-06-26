@@ -39,3 +39,4 @@
 | 28 | [law-028](../world/laws/law-028.md) | [#236](https://github.com/ordinary9843/gitizens/issues/236) Innovative Learning Initiative | 0+1 0-1 | 2026-06-24 |
 | 29 | [law-029](../world/laws/law-029.md) | [#239](https://github.com/ordinary9843/gitizens/issues/239) Sustainable Urban Growth Act | 0+1 0-1 | 2026-06-24 |
 | 30 | [law-030](../world/laws/law-030.md) | [#246](https://github.com/ordinary9843/gitizens/issues/246) Industrial Renaissance Act | 0+1 0-1 | 2026-06-24 |
+| 31 | [law-031](../world/laws/law-031.md) | [#276](https://github.com/ordinary9843/gitizens/issues/276) Fortified Future Initiative | 0+1 0-1 | 2026-06-26 |
