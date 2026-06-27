@@ -1,10 +1,10 @@
 {
   "era": "Modern Era",
-  "laws_count": 35,
+  "laws_count": 36,
   "last_enacted": "2026-06-27",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Modern Era, Gitizens thrive with perfect scores in education, welfare, industry, and green policies, ensuring a pollution-free environment and stability.",
-  "treasury": 408,
+  "world_summary": "In the thriving Modern Era, Gitizens achieve perfect scores in education, industry, welfare, and green policies, ensuring a pollution-free environment and moderate stability.",
+  "treasury": 44,
   "currency": "Git Coins",
   "stars_last_counted": 5,
   "education": 100,
@@ -12,7 +12,7 @@
   "welfare": 100,
   "green_policy": 100,
   "defense": 100,
-  "population": 210645,
+  "population": 222214,
   "pollution": 0,
   "stability": 63,
   "tags_applied": [

@@ -1,13 +1,5 @@
 [
   {
-    "number": 16,
-    "title": "Defensive Renaissance Act",
-    "issue_number": 91,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/91",
-    "enacted_date": "2026-06-16",
-    "era": "Founding Era"
-  },
-  {
     "number": 17,
     "title": "Crafting the Future Initiative",
     "issue_number": 107,
@@ -156,6 +148,14 @@
     "title": "Industrial Renaissance Act",
     "issue_number": 299,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/299",
+    "enacted_date": "2026-06-27",
+    "era": "Modern Era"
+  },
+  {
+    "number": 36,
+    "title": "Knowledge Nexus Expansion Act",
+    "issue_number": 302,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/302",
     "enacted_date": "2026-06-27",
     "era": "Modern Era"
   }
