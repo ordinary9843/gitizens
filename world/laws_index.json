@@ -1,13 +1,5 @@
 [
   {
-    "number": 15,
-    "title": "Industrial Innovation Grant Program",
-    "issue_number": 82,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/82",
-    "enacted_date": "2026-06-15",
-    "era": "Founding Era"
-  },
-  {
     "number": 16,
     "title": "Defensive Renaissance Act",
     "issue_number": 91,
@@ -157,6 +149,14 @@
     "issue_number": 288,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/288",
     "enacted_date": "2026-06-26",
+    "era": "Modern Era"
+  },
+  {
+    "number": 35,
+    "title": "Industrial Renaissance Act",
+    "issue_number": 299,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/299",
+    "enacted_date": "2026-06-27",
     "era": "Modern Era"
   }
 ]

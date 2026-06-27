@@ -43,3 +43,4 @@
 | 32 | [law-032](../world/laws/law-032.md) | [#282](https://github.com/ordinary9843/gitizens/issues/282) Innovation Incentive Program | 0+1 0-1 | 2026-06-26 |
 | 33 | [law-033](../world/laws/law-033.md) | [#285](https://github.com/ordinary9843/gitizens/issues/285) Community Connection Initiative | 0+1 0-1 | 2026-06-26 |
 | 34 | [law-034](../world/laws/law-034.md) | [#288](https://github.com/ordinary9843/gitizens/issues/288) Scholarly Bridges Initiative | 0+1 0-1 | 2026-06-26 |
+| 35 | [law-035](../world/laws/law-035.md) | [#299](https://github.com/ordinary9843/gitizens/issues/299) Industrial Renaissance Act | 0+1 0-1 | 2026-06-27 |
