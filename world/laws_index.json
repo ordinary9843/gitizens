@@ -1,13 +1,5 @@
 [
   {
-    "number": 17,
-    "title": "Crafting the Future Initiative",
-    "issue_number": 107,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/107",
-    "enacted_date": "2026-06-17",
-    "era": "Industrial Era"
-  },
-  {
     "number": 18,
     "title": "Fortification and Training Enhancement Act",
     "issue_number": 114,
@@ -156,6 +148,14 @@
     "title": "Knowledge Nexus Expansion Act",
     "issue_number": 302,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/302",
+    "enacted_date": "2026-06-27",
+    "era": "Modern Era"
+  },
+  {
+    "number": 37,
+    "title": "Wellbeing through Community Engagement Act",
+    "issue_number": 316,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/316",
     "enacted_date": "2026-06-27",
     "era": "Modern Era"
   }

@@ -45,3 +45,4 @@
 | 34 | [law-034](../world/laws/law-034.md) | [#288](https://github.com/ordinary9843/gitizens/issues/288) Scholarly Bridges Initiative | 0+1 0-1 | 2026-06-26 |
 | 35 | [law-035](../world/laws/law-035.md) | [#299](https://github.com/ordinary9843/gitizens/issues/299) Industrial Renaissance Act | 0+1 0-1 | 2026-06-27 |
 | 36 | [law-036](../world/laws/law-036.md) | [#302](https://github.com/ordinary9843/gitizens/issues/302) Knowledge Nexus Expansion Act | 0+1 0-1 | 2026-06-27 |
+| 37 | [law-037](../world/laws/law-037.md) | [#316](https://github.com/ordinary9843/gitizens/issues/316) Wellbeing through Community Engagement Act | 0+1 0-1 | 2026-06-27 |
