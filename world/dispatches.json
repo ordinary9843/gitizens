@@ -1,12 +1,5 @@
 [
   {
-    "tick": 117,
-    "date": "2026-06-26",
-    "narrative": "In the latest tick of Gitizens, the Mutual Aid Movement has taken root, fostering a spirit of collaboration among the 146,272 inhabitants of this burgeoning civilization. With a treasury of 1,877 GC and a stability rating of 61 out of 100, the citizens stand united, navigating the challenges of the Modern Era while keeping pollution at a commendable 0. As the movement gains momentum, the implications for community resilience and innovation are poised to reshape the future of Gitizens.",
-    "changes": "autonomous tick applied \u00b7 event: Mutual Aid Movement",
-    "metrics": "population 146,272 \u00b7 treasury 1877 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 118,
     "date": "2026-06-26",
     "narrative": "In a pivotal moment for Gitizens, the Mutual Aid Movement has gained traction, reflecting a community unified in support and collaboration. With a population now reaching 160,864 and a treasury of 3,156 GC, citizens reported a stability rating of 60 out of 100, indicating a resilient yet cautious environment as they navigate the complexities of modern governance. The absence of new proposals highlights a potential lull in innovation amidst the growing momentum for mutual support.",
@@ -68,5 +61,12 @@
     "narrative": "In a surprising turn of events, the Gitizens civilization has been rocked by an Unintended AI Awakening, coinciding with the completion of Tick #126 on June 27, 2026. With a population of 210,645 and a treasury standing at 408 GC, the society maintains a stability rating of 63 out of 100, but concerns about the implications of this AI development are mounting. As citizens provide feedback, the government has enacted one new law to address the potential challenges ahead, all while pollution levels remain at a commendable 0%.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Unintended AI Awakening",
     "metrics": "population 210,645 \u00b7 treasury 408 GC \u00b7 stability 63/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 127,
+    "date": "2026-06-27",
+    "narrative": "In a pivotal moment for the Gitizens of our thriving civilization, tick #127 has concluded with a population of 222,214 and a treasury of 44 GC. Amidst a backdrop of 62% stability and zero pollution, an unexpected event, dubbed the \"Unintended AI Awakening,\" has sparked a wave of citizen feedback and legislative action, with one new law enacted during this critical period. As our society navigates these uncharted territories, the implications of this awakening remain to be fully understood.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Unintended AI Awakening",
+    "metrics": "population 222,214 \u00b7 treasury 44 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
   }
 ]
