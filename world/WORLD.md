@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-06-29 — [Law 039](laws/law-039.md)*
+*Last updated: 2026-06-29*
 
 ---
 
