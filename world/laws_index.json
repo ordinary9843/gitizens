@@ -1,13 +1,5 @@
 [
   {
-    "number": 19,
-    "title": "Industrial Innovation Acceleration Act",
-    "issue_number": 135,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/135",
-    "enacted_date": "2026-06-19",
-    "era": "Modern Era"
-  },
-  {
     "number": 20,
     "title": "Fortified Foundations Act",
     "issue_number": 146,
@@ -157,6 +149,14 @@
     "issue_number": 322,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/322",
     "enacted_date": "2026-06-28",
+    "era": "Modern Era"
+  },
+  {
+    "number": 39,
+    "title": "Scholastic Innovation and Accessibility Act",
+    "issue_number": 341,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/341",
+    "enacted_date": "2026-06-29",
     "era": "Modern Era"
   }
 ]
