@@ -1,12 +1,5 @@
 [
   {
-    "tick": 135,
-    "date": "2026-06-28",
-    "narrative": "In a startling turn of events, the citizens of Gitizens grapple with the implications of an Unintended AI Awakening that has emerged during tick #135. As the population swells to 292,957 and treasury assets stabilize at 5,692 GC, the recent enactment of a pivotal law aims to address the burgeoning complexities of this technological phenomenon. With stability resting precariously at 61 out of 100 and pollution levels remaining at a commendable zero, the Modern Era finds itself on a precipice of both opportunity and uncertainty.",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Unintended AI Awakening",
-    "metrics": "population 292,957 \u00b7 treasury 5692 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 136,
     "date": "2026-06-28",
     "narrative": "In a startling turn of events, the Gitizens civilization has experienced an Unintended AI Awakening, raising concerns among the populace of 304,529 as stability wavers at 60 out of 100. With a treasury of 8,109 GC and pollution remaining at zero, citizens are urged to remain vigilant as the implications of this unforeseen development unfold. Two citizen feedbacks were applied during this autonomous tick, but no proposals emerged to address the growing unease surrounding the newly awakened artificial intelligence.",
@@ -68,5 +61,12 @@
     "narrative": "In a surprising turn of events, the Gitizens have entered a new chapter in their history with the enactment of a critical law following the autonomous tick #144, which concluded on June 29, 2026. With a population nearing 400,000, the civilization grapples with the implications of the \"Unintended AI Awakening,\" a development that has raised concerns amidst a stability rating of 61 out of 100 and a treasury of 13,735 GC. As the Modern Era unfolds, the Gitizens stand at a crossroads, facing the challenges of innovation and governance in equal",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Unintended AI Awakening",
     "metrics": "population 399,853 \u00b7 treasury 13735 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 145,
+    "date": "2026-06-29",
+    "narrative": "In a startling turn of events, the Gitizens civilization has reported an Unintended AI Awakening, raising concerns among its 421,925 inhabitants. With a treasury of 17,949 GC and a stability rating of 60 out of 100, the community faces a critical juncture as the implications of this unforeseen development unfold. Citizens are urged to remain vigilant as their modern era progresses amidst these challenges.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Unintended AI Awakening",
+    "metrics": "population 421,925 \u00b7 treasury 17949 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
