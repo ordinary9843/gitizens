@@ -1,13 +1,5 @@
 [
   {
-    "number": 21,
-    "title": "Academia Advancement Initiative",
-    "issue_number": 149,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/149",
-    "enacted_date": "2026-06-19",
-    "era": "Modern Era"
-  },
-  {
     "number": 22,
     "title": "Strengthening the Shield Initiative",
     "issue_number": 170,
@@ -156,6 +148,14 @@
     "title": "Education Renaissance Initiative",
     "issue_number": 356,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/356",
+    "enacted_date": "2026-06-30",
+    "era": "Modern Era"
+  },
+  {
+    "number": 41,
+    "title": "Green Innovation Fund",
+    "issue_number": 360,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/360",
     "enacted_date": "2026-06-30",
     "era": "Modern Era"
   }
