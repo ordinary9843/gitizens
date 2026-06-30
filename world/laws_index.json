@@ -1,13 +1,5 @@
 [
   {
-    "number": 20,
-    "title": "Fortified Foundations Act",
-    "issue_number": 146,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/146",
-    "enacted_date": "2026-06-19",
-    "era": "Modern Era"
-  },
-  {
     "number": 21,
     "title": "Academia Advancement Initiative",
     "issue_number": 149,
@@ -157,6 +149,14 @@
     "issue_number": 341,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/341",
     "enacted_date": "2026-06-29",
+    "era": "Modern Era"
+  },
+  {
+    "number": 40,
+    "title": "Education Renaissance Initiative",
+    "issue_number": 356,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/356",
+    "enacted_date": "2026-06-30",
     "era": "Modern Era"
   }
 ]

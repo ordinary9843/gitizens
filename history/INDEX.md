@@ -48,3 +48,4 @@
 | 37 | [law-037](../world/laws/law-037.md) | [#316](https://github.com/ordinary9843/gitizens/issues/316) Wellbeing through Community Engagement Act | 0+1 0-1 | 2026-06-27 |
 | 38 | [law-038](../world/laws/law-038.md) | [#322](https://github.com/ordinary9843/gitizens/issues/322) Elevate Our Scholars Initiative | 0+1 0-1 | 2026-06-28 |
 | 39 | [law-039](../world/laws/law-039.md) | [#341](https://github.com/ordinary9843/gitizens/issues/341) Scholastic Innovation and Accessibility Act | 0+1 0-1 | 2026-06-29 |
+| 40 | [law-040](../world/laws/law-040.md) | [#356](https://github.com/ordinary9843/gitizens/issues/356) Education Renaissance Initiative | 0+1 0-1 | 2026-06-30 |
