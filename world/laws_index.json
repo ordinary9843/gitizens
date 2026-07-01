@@ -1,13 +1,5 @@
 [
   {
-    "number": 22,
-    "title": "Strengthening the Shield Initiative",
-    "issue_number": 170,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/170",
-    "enacted_date": "2026-06-20",
-    "era": "Modern Era"
-  },
-  {
     "number": 23,
     "title": "Green Innovation Incentive Act",
     "issue_number": 173,
@@ -157,6 +149,14 @@
     "issue_number": 360,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/360",
     "enacted_date": "2026-06-30",
+    "era": "Modern Era"
+  },
+  {
+    "number": 42,
+    "title": "Digital Learning Revolution Act",
+    "issue_number": 378,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/378",
+    "enacted_date": "2026-07-01",
     "era": "Modern Era"
   }
 ]
