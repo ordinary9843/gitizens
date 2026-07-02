@@ -51,3 +51,4 @@
 | 40 | [law-040](../world/laws/law-040.md) | [#356](https://github.com/ordinary9843/gitizens/issues/356) Education Renaissance Initiative | 0+1 0-1 | 2026-06-30 |
 | 41 | [law-041](../world/laws/law-041.md) | [#360](https://github.com/ordinary9843/gitizens/issues/360) Green Innovation Fund | 0+1 0-1 | 2026-06-30 |
 | 42 | [law-042](../world/laws/law-042.md) | [#378](https://github.com/ordinary9843/gitizens/issues/378) Digital Learning Revolution Act | 0+1 0-1 | 2026-07-01 |
+| 43 | [law-043](../world/laws/law-043.md) | [#399](https://github.com/ordinary9843/gitizens/issues/399) Wellness for All Initiative | 0+1 0-1 | 2026-07-02 |

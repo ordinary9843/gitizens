@@ -1,13 +1,5 @@
 [
   {
-    "number": 23,
-    "title": "Green Innovation Incentive Act",
-    "issue_number": 173,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/173",
-    "enacted_date": "2026-06-21",
-    "era": "Modern Era"
-  },
-  {
     "number": 24,
     "title": "Fortification Frontier Act",
     "issue_number": 196,
@@ -157,6 +149,14 @@
     "issue_number": 378,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/378",
     "enacted_date": "2026-07-01",
+    "era": "Modern Era"
+  },
+  {
+    "number": 43,
+    "title": "Wellness for All Initiative",
+    "issue_number": 399,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/399",
+    "enacted_date": "2026-07-02",
     "era": "Modern Era"
   }
 ]
