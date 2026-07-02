@@ -1,12 +1,5 @@
 [
   {
-    "tick": 159,
-    "date": "2026-06-30",
-    "narrative": "In a significant development for Gitizens, the latest tick, #159, has ushered in the Rise of the Digital Philosophers, a movement poised to reshape the intellectual landscape of our civilization. With a stable population of 698,824 and a treasury bolstered to 49,536 GC, the era of modernity progresses amidst a commendable stability rate of 61/100. As pollution remains at a pristine 0/100, citizens are invited to reflect on the transformative ideas that these new thinkers may bring to our digital society.",
-    "changes": "autonomous tick applied \u00b7 event: Rise of the Digital Philosophers",
-    "metrics": "population 698,824 \u00b7 treasury 49536 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 160,
     "date": "2026-06-30",
     "narrative": "In a significant development for the Gitizens civilization, the recent tick has witnessed a surge in philosophical discourse, marked by the event dubbed the \"Rise of the Digital Philosophers.\" With a population now reaching 699,024 and a treasury balance of 52,348 GC, citizens are increasingly voicing their opinions, as evidenced by the application of two citizen feedbacks. Despite these advancements, the stability remains a precarious 60 out of 100, prompting leaders to address the growing concerns of their populace.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant development for the Gitizens civilization, the rise of the Digital Philosophers has sparked lively discussions among the population of 1,044,492. With stability holding at 61 out of 100 and treasury reserves at 68,037 GC, citizens are urged to reflect on their digital existence as the era of modernity continues to unfold. Meanwhile, pollution remains at a commendable 0, suggesting a commitment to sustainable growth amidst these philosophical advancements.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of the Digital Philosophers",
     "metrics": "population 1,044,492 \u00b7 treasury 68037 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 169,
+    "date": "2026-07-02",
+    "narrative": "In the wake of Tick #169, the Gitizens civilization has entered a pivotal moment marked by the Rise of the Digital Philosophers, fostering a new era of intellectual discourse among its 1,120,254 inhabitants. With a treasury of 76,520 GC and a stability rating of 59 out of 100, the society navigates this transformative period under the shadow of autonomous governance, reflecting on two key citizen feedbacks and the enactment of a significant new law. As pollution remains at a commendable zero, the future of Gitizens hangs in the balance, poised between progress and the",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of the Digital Philosophers",
+    "metrics": "population 1,120,254 \u00b7 treasury 76520 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
   }
 ]
