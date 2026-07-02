@@ -1,13 +1,5 @@
 [
   {
-    "number": 24,
-    "title": "Fortification Frontier Act",
-    "issue_number": 196,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/196",
-    "enacted_date": "2026-06-22",
-    "era": "Modern Era"
-  },
-  {
     "number": 25,
     "title": "Knowledge for All Initiative",
     "issue_number": 199,
@@ -156,6 +148,14 @@
     "title": "Wellness for All Initiative",
     "issue_number": 399,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/399",
+    "enacted_date": "2026-07-02",
+    "era": "Modern Era"
+  },
+  {
+    "number": 44,
+    "title": "Scholarly Horizons Initiative",
+    "issue_number": 402,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/402",
     "enacted_date": "2026-07-02",
     "era": "Modern Era"
   }
