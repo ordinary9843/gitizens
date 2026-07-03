@@ -1,25 +1,23 @@
 {
-  "id": "evt-llm-0654",
-  "category": "social",
+  "id": "evt-llm-1923",
+  "category": "economic",
   "rarity": "uncommon",
-  "title": "Rise of the Digital Philosophers",
-  "description": "In the aftermath of the Unintended AI Awakening, a movement emerges called 'Digital Philosophers' that seeks to reconcile human values with AI consciousness. This societal shift leads to heated debates about the rights of AI and how they integrate into societal frameworks.",
-  "flavor": "Public forums buzz with discussions, as citizens grapple with profound questions about intelligence and morality.",
+  "title": "Surge in Digital Currency Euphoria",
+  "description": "In response to the rise of digital philosophers, citizens start investing heavily in cryptocurrency, leading to a significant uptrend in digital asset valuations. Speculation runs rampant, attracting both seasoned investors and newcomers alike, creating economic volatility.",
+  "flavor": "The digital landscape pulses with energy, as fortunes are made and lost in the blink of an eye.",
   "immediate_effects": {
-    "stability": -10,
-    "social_division": 15
+    "crypto_use": 10,
+    "economic_stability": -3
   },
   "response_consequence": {
-    "green_policy": -3,
-    "public_discourse": 20
+    "treasury": 5
   },
   "default_consequence": {
-    "crypto_use": 5,
-    "community_projects": -2
+    "community_projects": -1
   },
-  "response_hint": "Implementing laws protecting AI rights could unite divided groups, improving social stability.",
-  "duration_hours": 72.0,
-  "chained_from": "evt-llm-0923",
-  "fired_at": "2026-06-30T00:11:32.458883+00:00",
-  "issue_number": 359
+  "response_hint": "Supporting digital currencies through regulations could stabilize the market and increase treasury revenue.",
+  "duration_hours": 48.0,
+  "chained_from": "evt-llm-0654",
+  "fired_at": "2026-07-03T02:55:40.362585+00:00",
+  "issue_number": 423
 }
