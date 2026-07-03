@@ -11,7 +11,7 @@
 | Era | Modern Era |
 | Laws enacted | 45 |
 | Last enacted | 2026-07-03 |
-| Treasury | 91,604 Git Coins |
+| Treasury | 100,000 Git Coins |
 
 ### Policy
 
