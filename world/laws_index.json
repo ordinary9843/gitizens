@@ -1,13 +1,5 @@
 [
   {
-    "number": 26,
-    "title": "Scholars for Tomorrow Initiative",
-    "issue_number": 227,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/227",
-    "enacted_date": "2026-06-23",
-    "era": "Modern Era"
-  },
-  {
     "number": 27,
     "title": "Fortified Futures Initiative",
     "issue_number": 233,
@@ -157,6 +149,14 @@
     "issue_number": 420,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/420",
     "enacted_date": "2026-07-03",
+    "era": "Modern Era"
+  },
+  {
+    "number": 46,
+    "title": "Welfare Enhancement Initiative",
+    "issue_number": 445,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/445",
+    "enacted_date": "2026-07-04",
     "era": "Modern Era"
   }
 ]
