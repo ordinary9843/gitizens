@@ -1,12 +1,5 @@
 [
   {
-    "tick": 180,
-    "date": "2026-07-03",
-    "narrative": "In a remarkable turn of events, the Gitizens civilization has experienced a surge in digital currency euphoria, invigorating the economy as the treasury swells to 100,000 GC. With a population now reaching 1,920,588, stability remains a moderate 60 out of 100, while pollution levels hold steady at a commendable 0. As citizens engage in this newfound optimism, the community eagerly anticipates the potential impact on their modern era.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Digital Currency Euphoria",
-    "metrics": "population 1,920,588 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 181,
     "date": "2026-07-03",
     "narrative": "In a remarkable turn of events, Gitizens have experienced a Surge in Digital Currency Euphoria, boosting the treasury to an impressive 100,000 GC amid a thriving population of 1,989,480. However, stability remains a concern, resting at a precarious 61 out of 100, as the civilization navigates the complexities of a rapidly evolving digital landscape. With pollution levels at zero, the community stands at a critical juncture, where economic enthusiasm must align with sustainable growth.",
@@ -68,5 +61,12 @@
     "narrative": "In the latest tick of Gitizens, completed on July 4, 2026, the digital landscape buzzed with a surge in digital currency euphoria, reflecting the growing financial optimism among the populace of 3,202,747. With a treasury of 100,000 GC and stability holding steady at 59 out of 100, citizens are cautiously optimistic, even as pollution remains at a pristine 0. The autonomous tick has successfully integrated two citizen feedbacks, signaling a responsive governance in these dynamic times.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Digital Currency Euphoria",
     "metrics": "population 3,202,747 \u00b7 treasury 100000 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 190,
+    "date": "2026-07-04",
+    "narrative": "In the wake of Tick #190, the Gitizens have experienced a notable surge in digital currency enthusiasm, propelling the treasury to a robust 100,000 GC. With a population now reaching 3,301,857, the civilization maintains a stability rating of 60 out of 100, while pollution remains at a pristine 0. As citizens voice their feedback, the modern era continues to shape the future of this burgeoning society.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Digital Currency Euphoria",
+    "metrics": "population 3,301,857 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
