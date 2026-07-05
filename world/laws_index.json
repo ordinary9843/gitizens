@@ -1,13 +1,5 @@
 [
   {
-    "number": 27,
-    "title": "Fortified Futures Initiative",
-    "issue_number": 233,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/233",
-    "enacted_date": "2026-06-23",
-    "era": "Modern Era"
-  },
-  {
     "number": 28,
     "title": "Innovative Learning Initiative",
     "issue_number": 236,
@@ -157,6 +149,14 @@
     "issue_number": 445,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/445",
     "enacted_date": "2026-07-04",
+    "era": "Modern Era"
+  },
+  {
+    "number": 47,
+    "title": "Sustained Well-Being Initiative",
+    "issue_number": 472,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/472",
+    "enacted_date": "2026-07-05",
     "era": "Modern Era"
   }
 ]

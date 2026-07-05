@@ -55,3 +55,4 @@
 | 44 | [law-044](../world/laws/law-044.md) | [#402](https://github.com/ordinary9843/gitizens/issues/402) Scholarly Horizons Initiative | 0+1 0-1 | 2026-07-02 |
 | 45 | [law-045](../world/laws/law-045.md) | [#420](https://github.com/ordinary9843/gitizens/issues/420) The Community Enrichment Act | 0+1 0-1 | 2026-07-03 |
 | 46 | [law-046](../world/laws/law-046.md) | [#445](https://github.com/ordinary9843/gitizens/issues/445) Welfare Enhancement Initiative | 0+1 0-1 | 2026-07-04 |
+| 47 | [law-047](../world/laws/law-047.md) | [#472](https://github.com/ordinary9843/gitizens/issues/472) Sustained Well-Being Initiative | 0+1 0-1 | 2026-07-05 |
