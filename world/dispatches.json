@@ -1,12 +1,5 @@
 [
   {
-    "tick": 200,
-    "date": "2026-07-05",
-    "narrative": "In a stark reminder of the growing disparities within the Gitizens civilization, the recent event known as the Digital Divide Awakens has left 4,868,630 citizens grappling with unequal access to technology and resources. With a treasury of 100,000 GC and stability wavering at 61 out of 100, the urgency to address this divide is palpable as pollution remains at a concerning zero, highlighting the need for sustainable growth amidst rising tensions. The absence of proposers to tackle these challenges only intensifies the looming crisis, urging immediate action from the community.",
-    "changes": "autonomous tick applied \u00b7 event: Digital Divide Awakens",
-    "metrics": "population 4,868,630 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 201,
     "date": "2026-07-05",
     "narrative": "In a striking turn of events, the Digital Divide Awakens has cast a shadow over Gitizens, as citizens grapple with growing inequality in access to technology. With a population nearing 5 million and stability slipping to 60 out of 100, the urgency for equitable digital resources has never been more pressing. As treasury stands at 100,000 GC, leaders are called to address this critical issue before it escalates further.",
@@ -68,5 +61,12 @@
     "narrative": "In a pivotal moment for the Gitizens of GitHub, the Digital Divide has awakened, casting a shadow over the Modern Era as the population swells to 6,832,328. With a treasury standing at 100,000 GC and a stability rating of 61 out of 100, concerns mount as citizens grapple with disparities in access to technology and resources, threatening to unravel the fabric of their burgeoning society. As pollution remains at a commendable 0, the call for equitable digital access grows louder, demanding urgent attention from leaders and innovators alike.",
     "changes": "autonomous tick applied \u00b7 event: Digital Divide Awakens",
     "metrics": "population 6,832,328 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 210,
+    "date": "2026-07-06",
+    "narrative": "In a world marked by rapid technological advancement, the Digital Divide has intensified, threatening the stability of Gitizens as the population swells to 7,479,797. With a treasury of 100,000 GC and a stability rating of 60 out of 100, citizens express growing concerns over access to essential digital resources. As the era progresses, the challenge of bridging this gap remains critical to the future of our civilization.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Digital Divide Awakens",
+    "metrics": "population 7,479,797 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
