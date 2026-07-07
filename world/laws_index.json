@@ -1,13 +1,5 @@
 [
   {
-    "number": 28,
-    "title": "Innovative Learning Initiative",
-    "issue_number": 236,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/236",
-    "enacted_date": "2026-06-24",
-    "era": "Modern Era"
-  },
-  {
     "number": 29,
     "title": "Sustainable Urban Growth Act",
     "issue_number": 239,
@@ -157,6 +149,14 @@
     "issue_number": 472,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/472",
     "enacted_date": "2026-07-05",
+    "era": "Modern Era"
+  },
+  {
+    "number": 48,
+    "title": "Universal Wellness Program",
+    "issue_number": 516,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/516",
+    "enacted_date": "2026-07-07",
     "era": "Modern Era"
   }
 ]
