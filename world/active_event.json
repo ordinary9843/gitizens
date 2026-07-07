@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-llm-2048",
+  "category": "cosmic",
+  "rarity": "legendary",
+  "title": "Celestial Phenomenon Awakens",
+  "description": "A massive cosmic event, widely referred to as the 'Starlit Accord', has unexpectedly illuminated the skies worldwide, causing unprecedented changes in social dynamics. Citizens experience heightened creativity and spiritual awakening, compelling them to reevaluate their industry and green initiatives.",
+  "flavor": "The night sky glows like never before, inspiring awe and introspection among the Gitizens.",
+  "immediate_effects": {
+    "education": 10,
+    "welfare": 15,
+    "green_policy": 5
+  },
+  "response_consequence": {
+    "stability": -20
+  },
+  "default_consequence": {
+    "industry": -10,
+    "defense": -5
+  },
+  "response_hint": "Passing a law promoting artistic expression and cultural development could help stabilize social unrest.",
+  "duration_hours": 72.0,
+  "chained_from": null,
+  "fired_at": "2026-07-07T13:20:58.214840+00:00",
+  "issue_number": 517
+}

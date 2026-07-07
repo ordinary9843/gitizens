@@ -1,12 +1,5 @@
 [
   {
-    "tick": 208,
-    "date": "2026-07-06",
-    "narrative": "In a pivotal moment for Gitizens, the Digital Divide has awakened, highlighting the stark disparities in access to technology among the population of 6,459,206. With a treasury of 100,000 GC and stability at a precarious 61 out of 100, the community grapples with the implications of this growing divide as it seeks to bridge the gap and foster unity. As autonomous decisions reshape the landscape, citizens are urged to voice their concerns in the wake of recent feedback initiatives.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Digital Divide Awakens",
-    "metrics": "population 6,459,206 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 209,
     "date": "2026-07-06",
     "narrative": "In a pivotal moment for the Gitizens of GitHub, the Digital Divide has awakened, casting a shadow over the Modern Era as the population swells to 6,832,328. With a treasury standing at 100,000 GC and a stability rating of 61 out of 100, concerns mount as citizens grapple with disparities in access to technology and resources, threatening to unravel the fabric of their burgeoning society. As pollution remains at a commendable 0, the call for equitable digital access grows louder, demanding urgent attention from leaders and innovators alike.",
@@ -68,5 +61,12 @@
     "narrative": "In the latest development of the Gitizens civilization, the population has surged to 11,087,908, reflecting a growing community amidst the challenges of the Modern Era. With a treasury boasting 100,000 GC and stability holding steady at 62 out of 100, citizens have actively engaged in governance, contributing two feedbacks this tick. However, the absence of new proposals raises questions about future initiatives in our ever-evolving society.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied",
     "metrics": "population 11,087,908 \u00b7 treasury 100000 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 218,
+    "date": "2026-07-07",
+    "narrative": "In a momentous turn of events, the Gitizens have embraced a new law following Tick #218, which was completed on July 7, 2026. As the population reaches 11,530,622, the treasury stands at 96,700 GC, signaling a moment of both prosperity and challenge, with stability at a precarious 62 out of 100. Meanwhile, the rare Celestial Phenomenon Awakens, casting an awe-inspiring glow over the land, prompting both hope and trepidation among the citizens.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Celestial Phenomenon Awakens",
+    "metrics": "population 11,530,622 \u00b7 treasury 96700 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
   }
 ]
