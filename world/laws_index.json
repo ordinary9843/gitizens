@@ -1,13 +1,5 @@
 [
   {
-    "number": 29,
-    "title": "Sustainable Urban Growth Act",
-    "issue_number": 239,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/239",
-    "enacted_date": "2026-06-24",
-    "era": "Modern Era"
-  },
-  {
     "number": 30,
     "title": "Industrial Renaissance Act",
     "issue_number": 246,
@@ -157,6 +149,14 @@
     "issue_number": 516,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/516",
     "enacted_date": "2026-07-07",
+    "era": "Modern Era"
+  },
+  {
+    "number": 49,
+    "title": "Holistic Health Promotion Act",
+    "issue_number": 533,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/533",
+    "enacted_date": "2026-07-08",
     "era": "Modern Era"
   }
 ]
