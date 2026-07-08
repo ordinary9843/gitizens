@@ -1,12 +1,5 @@
 [
   {
-    "tick": 217,
-    "date": "2026-07-07",
-    "narrative": "In the latest development of the Gitizens civilization, the population has surged to 11,087,908, reflecting a growing community amidst the challenges of the Modern Era. With a treasury boasting 100,000 GC and stability holding steady at 62 out of 100, citizens have actively engaged in governance, contributing two feedbacks this tick. However, the absence of new proposals raises questions about future initiatives in our ever-evolving society.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied",
-    "metrics": "population 11,087,908 \u00b7 treasury 100000 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 218,
     "date": "2026-07-07",
     "narrative": "In a momentous turn of events, the Gitizens have embraced a new law following Tick #218, which was completed on July 7, 2026. As the population reaches 11,530,622, the treasury stands at 96,700 GC, signaling a moment of both prosperity and challenge, with stability at a precarious 62 out of 100. Meanwhile, the rare Celestial Phenomenon Awakens, casting an awe-inspiring glow over the land, prompting both hope and trepidation among the citizens.",
@@ -68,5 +61,12 @@
     "narrative": "In a remarkable turn of events, the Gitizens community has witnessed the awakening of a celestial phenomenon, captivating the attention of the 17,332,553 inhabitants. With treasury reserves stable at 100,000 GC and a moderate stability rating of 63 out of 100, citizens are urged to consider the implications of this astral occurrence as environmental conditions remain pristine, with pollution levels held at a notable 0.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Celestial Phenomenon Awakens",
     "metrics": "population 17,332,553 \u00b7 treasury 100000 GC \u00b7 stability 63/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 227,
+    "date": "2026-07-08",
+    "narrative": "In a notable development for the Gitizens, tick #227 concluded on July 8, 2026, with the population now standing at 17,890,343 and a treasury bolstered to 93,500 GC. Following the enactment of a new law, the community's stability rests at 63 out of 100, while the recent celestial phenomenon has stirred excitement\u2014and perhaps unease\u2014among the inhabitants as they navigate the complexities of their vibrant civilization. Pollution remains at a commendable zero, reflecting a commitment to maintaining a clean environment amidst these transformative times.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Celestial Phenomenon Awakens",
+    "metrics": "population 17,890,343 \u00b7 treasury 93500 GC \u00b7 stability 63/100 \u00b7 pollution 0/100"
   }
 ]
