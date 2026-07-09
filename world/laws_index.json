@@ -1,13 +1,5 @@
 [
   {
-    "number": 30,
-    "title": "Industrial Renaissance Act",
-    "issue_number": 246,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/246",
-    "enacted_date": "2026-06-24",
-    "era": "Modern Era"
-  },
-  {
     "number": 31,
     "title": "Fortified Future Initiative",
     "issue_number": 276,
@@ -157,6 +149,14 @@
     "issue_number": 533,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/533",
     "enacted_date": "2026-07-08",
+    "era": "Modern Era"
+  },
+  {
+    "number": 50,
+    "title": "Knowledge Renaissance Act",
+    "issue_number": 546,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/546",
+    "enacted_date": "2026-07-09",
     "era": "Modern Era"
   }
 ]
