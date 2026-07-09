@@ -3,7 +3,7 @@
   "laws_count": 50,
   "last_enacted": "2026-07-09",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Modern Era, Gitizens thrive with a population of 27.6 million, achieving perfect scores in education, industry, welfare, green policy, and defense.",
+  "world_summary": "In the Modern Era, Gitizens boast a thriving population of 27.6 million, excelling in education, industry, and welfare with zero pollution and strong stability.",
   "treasury": 100000,
   "currency": "Git Coins",
   "stars_last_counted": 6,
@@ -12,9 +12,9 @@
   "welfare": 100,
   "green_policy": 100,
   "defense": 100,
-  "population": 27631807,
+  "population": 28667294,
   "pollution": 0,
-  "stability": 59,
+  "stability": 60,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -30,5 +30,5 @@
     "sykar-f"
   ],
   "last_narrator_date": "2026-07-09T00:09:09.325569+00:00",
-  "next_tick_at": "2026-07-09T18:00:00Z"
+  "next_tick_at": "2026-07-09T20:00:00Z"
 }
