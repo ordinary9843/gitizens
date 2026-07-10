@@ -59,3 +59,4 @@
 | 48 | [law-048](../world/laws/law-048.md) | [#516](https://github.com/ordinary9843/gitizens/issues/516) Universal Wellness Program | 0+1 0-1 | 2026-07-07 |
 | 49 | [law-049](../world/laws/law-049.md) | [#533](https://github.com/ordinary9843/gitizens/issues/533) Holistic Health Promotion Act | 0+1 0-1 | 2026-07-08 |
 | 50 | [law-050](../world/laws/law-050.md) | [#546](https://github.com/ordinary9843/gitizens/issues/546) Knowledge Renaissance Act | 0+1 0-1 | 2026-07-09 |
+| 51 | [law-051](../world/laws/law-051.md) | [#565](https://github.com/ordinary9843/gitizens/issues/565) Scholarship Empowerment Initiative | 0+1 0-1 | 2026-07-10 |

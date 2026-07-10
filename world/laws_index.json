@@ -1,13 +1,5 @@
 [
   {
-    "number": 31,
-    "title": "Fortified Future Initiative",
-    "issue_number": 276,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/276",
-    "enacted_date": "2026-06-26",
-    "era": "Modern Era"
-  },
-  {
     "number": 32,
     "title": "Innovation Incentive Program",
     "issue_number": 282,
@@ -157,6 +149,14 @@
     "issue_number": 546,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/546",
     "enacted_date": "2026-07-09",
+    "era": "Modern Era"
+  },
+  {
+    "number": 51,
+    "title": "Scholarship Empowerment Initiative",
+    "issue_number": 565,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/565",
+    "enacted_date": "2026-07-10",
     "era": "Modern Era"
   }
 ]
