@@ -1,25 +1,25 @@
 {
-  "id": "evt-llm-2048",
-  "category": "cosmic",
-  "rarity": "legendary",
-  "title": "Celestial Phenomenon Awakens",
-  "description": "A massive cosmic event, widely referred to as the 'Starlit Accord', has unexpectedly illuminated the skies worldwide, causing unprecedented changes in social dynamics. Citizens experience heightened creativity and spiritual awakening, compelling them to reevaluate their industry and green initiatives.",
-  "flavor": "The night sky glows like never before, inspiring awe and introspection among the Gitizens.",
+  "id": "evt-llm-2049",
+  "category": "economic",
+  "rarity": "uncommon",
+  "title": "Market Collapse Sparks Panic",
+  "description": "In the wake of the Celestial Phenomenon Awakens, industry production has plummeted, leading to an unexpected market collapse. Citizens, fearing for their livelihoods, have begun hoarding resources, further destabilizing the economy.",
+  "flavor": "Stock markets falter as panic spreads through the trading floors.",
   "immediate_effects": {
-    "education": 10,
-    "welfare": 15,
-    "green_policy": 5
+    "industry": -15,
+    "economy": -20
   },
   "response_consequence": {
-    "stability": -20
+    "economy": -10,
+    "social_stability": -5
   },
   "default_consequence": {
-    "industry": -10,
-    "defense": -5
+    "industry": -5,
+    "economy": -5
   },
-  "response_hint": "Passing a law promoting artistic expression and cultural development could help stabilize social unrest.",
-  "duration_hours": 72.0,
-  "chained_from": null,
-  "fired_at": "2026-07-07T13:20:58.214840+00:00",
-  "issue_number": 517
+  "response_hint": "Implementing fiscal reforms or stabilizing measures could mitigate economic decline.",
+  "duration_hours": 48.0,
+  "chained_from": "evt-llm-2048",
+  "fired_at": "2026-07-10T16:24:35.054234+00:00",
+  "issue_number": 574
 }
