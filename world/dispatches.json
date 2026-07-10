@@ -1,12 +1,5 @@
 [
   {
-    "tick": 229,
-    "date": "2026-07-08",
-    "narrative": "In a historic turn of events, the Gitizens celebrated the completion of tick #229 on July 8, 2026, amidst a backdrop of celestial phenomena that has captivated the populace of 19,411,596. With a treasury now holding 100,000 GC and a stability rating of 61 out of 100, citizens are both intrigued and anxious about the implications of these cosmic occurrences, as they reflect on the balance of their modern era. Meanwhile, pollution levels remain at a commendable zero, fostering a sense of hope for the future.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Celestial Phenomenon Awakens",
-    "metrics": "population 19,411,596 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 230,
     "date": "2026-07-08",
     "narrative": "In a remarkable turn of events, the citizens of Gitizens witnessed the awe-inspiring Celestial Phenomenon Awakening, captivating the population of 20,451,014 and stirring both wonder and speculation across the realm. With a treasury standing at 100,000 GC and stability holding at a precarious 63 out of 100, the impact of this cosmic event could prove pivotal for the future of our civilization. As we navigate this new chapter, the anticipation of what lies ahead looms large in the hearts of all Gitizens.",
@@ -68,5 +61,12 @@
     "narrative": "In a remarkable turn of events, the citizens of Gitizens have reported a significant celestial phenomenon, captivating the attention of the 30,871,323 inhabitants as they navigate the complexities of the Modern Era. With a treasury balance of 100,000 GC and stability at a precarious 60 out of 100, the nation stands at a crossroads, challenged by the whispers of cosmic wonder amidst the backdrop of its ongoing struggles. As pollution remains at a commendable 0, the populace is urged to consider the implications of this awakening on their future.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Celestial Phenomenon Awakens",
     "metrics": "population 30,871,323 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 239,
+    "date": "2026-07-10",
+    "narrative": "In a significant turn of events during tick #239, the Gitizens of the thriving civilization have witnessed the enactment of a pivotal law as their population swells to 31,758,646. With a treasury standing at 99,800 GC and stability measured at a precarious 60 out of 100, the autonomous tick has brought forth a wave of citizen feedback, while a rare celestial phenomenon has ignited both wonder and concern among the populace. As pollution remains at a commendable 0, the eyes of the Gitizens now turn skyward, contemplating the implications of this cosmic awakening",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Celestial Phenomenon Awakens",
+    "metrics": "population 31,758,646 \u00b7 treasury 99800 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]

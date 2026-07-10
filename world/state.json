@@ -3,7 +3,7 @@
   "laws_count": 51,
   "last_enacted": "2026-07-10",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Modern Era, Gitizens enjoy a stable, thriving society with perfect scores in education, industry, welfare, and green policies, supported by a robust treasury.",
+  "world_summary": "In the Modern Era, Gitizens thrive with perfect scores in education, industry, welfare, and green policies, supported by a robust treasury of 99,800 Git Coins.",
   "treasury": 99800,
   "currency": "Git Coins",
   "stars_last_counted": 6,
@@ -14,7 +14,7 @@
   "defense": 100,
   "population": 31758646,
   "pollution": 0,
-  "stability": 61,
+  "stability": 60,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -29,6 +29,6 @@
     "romkru",
     "sykar-f"
   ],
-  "last_narrator_date": "2026-07-09T00:09:09.325569+00:00",
-  "next_tick_at": "2026-07-10T00:00:00Z"
+  "last_narrator_date": "2026-07-10T02:59:07.519400+00:00",
+  "next_tick_at": "2026-07-10T03:00:00Z"
 }
