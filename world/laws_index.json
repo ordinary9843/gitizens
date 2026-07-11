@@ -1,13 +1,5 @@
 [
   {
-    "number": 33,
-    "title": "Community Connection Initiative",
-    "issue_number": 285,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/285",
-    "enacted_date": "2026-06-26",
-    "era": "Modern Era"
-  },
-  {
     "number": 34,
     "title": "Scholarly Bridges Initiative",
     "issue_number": 288,
@@ -157,6 +149,14 @@
     "issue_number": 575,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/575",
     "enacted_date": "2026-07-10",
+    "era": "Modern Era"
+  },
+  {
+    "number": 53,
+    "title": "Industry Innovation Incentive",
+    "issue_number": 587,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/587",
+    "enacted_date": "2026-07-11",
     "era": "Modern Era"
   }
 ]
