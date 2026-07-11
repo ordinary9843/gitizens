@@ -1,12 +1,5 @@
 [
   {
-    "tick": 239,
-    "date": "2026-07-10",
-    "narrative": "In a significant turn of events during tick #239, the Gitizens of the thriving civilization have witnessed the enactment of a pivotal law as their population swells to 31,758,646. With a treasury standing at 99,800 GC and stability measured at a precarious 60 out of 100, the autonomous tick has brought forth a wave of citizen feedback, while a rare celestial phenomenon has ignited both wonder and concern among the populace. As pollution remains at a commendable 0, the eyes of the Gitizens now turn skyward, contemplating the implications of this cosmic awakening",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Celestial Phenomenon Awakens",
-    "metrics": "population 31,758,646 \u00b7 treasury 99800 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 240,
     "date": "2026-07-10",
     "narrative": "In a striking development, the Gitizens have reached a population of 33,729,054 amidst a stable treasury of 100,000 GC, reflecting a community in growth yet facing challenges with a stability rating of 61 out of 100. As the Modern Era progresses, an autonomous tick has just concluded, revealing the occurrence of a Celestial Phenomenon that has awakened within the realm, hinting at potential shifts in the landscape of this GitHub-based civilization. As pollution remains at a commendable 0, the Gitizens stand at a pivotal moment, balancing prosperity with the mysteries of",
@@ -68,5 +61,12 @@
     "narrative": "In the wake of the recent Market Collapse that has sent shockwaves through the Gitizens community, stability has plummeted to 58 out of 100, leaving the population of 46,911,678 on edge. With the treasury dwindling to 99,800 GC and pollution remaining at a concerning 0, citizens are rallying for immediate action following the enactment of a new law and the implementation of two feedback suggestions. As panic grips the populace, leaders must navigate these turbulent waters to restore confidence and stability.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Market Collapse Sparks Panic",
     "metrics": "population 46,911,678 \u00b7 treasury 99800 GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 249,
+    "date": "2026-07-11",
+    "narrative": "In a shocking turn of events, the Modern Era of Gitizens has been rocked by a Market Collapse that has sent tremors through the economy, leaving the population of 51,026,532 in a state of panic. With treasury reserves dwindling to 100,000 GC and stability dipping to 62 out of 100, citizens are bracing for uncertainty as the fallout from this crisis unfolds. Despite the challenges, autonomous governance has responded swiftly, incorporating two citizen feedbacks to address the growing concerns of the populace.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Market Collapse Sparks Panic",
+    "metrics": "population 51,026,532 \u00b7 treasury 100000 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
   }
 ]
