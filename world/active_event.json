@@ -1,25 +1,25 @@
 {
-  "id": "evt-llm-2049",
-  "category": "economic",
+  "id": "evt-llm-2050",
+  "category": "social",
   "rarity": "uncommon",
-  "title": "Market Collapse Sparks Panic",
-  "description": "In the wake of the Celestial Phenomenon Awakens, industry production has plummeted, leading to an unexpected market collapse. Citizens, fearing for their livelihoods, have begun hoarding resources, further destabilizing the economy.",
-  "flavor": "Stock markets falter as panic spreads through the trading floors.",
+  "title": "Rise of Community Barter Systems",
+  "description": "In the wake of the market collapse, citizens begin to abandon traditional commerce in favor of community-led barter systems. This shift fosters stronger local ties but may also lead to inequalities in resource access.",
+  "flavor": "As neighborhoods come together, the spirit of cooperation reignites, yet shadows of disparity loom.",
   "immediate_effects": {
-    "industry": -15,
-    "economy": -20
+    "social_stability": 10,
+    "local_resources": 5
   },
   "response_consequence": {
-    "economy": -10,
-    "social_stability": -5
+    "trade_opportunities": -5,
+    "industry": -3
   },
   "default_consequence": {
-    "industry": -5,
-    "economy": -5
+    "economy": -2,
+    "consumer_trust": -7
   },
-  "response_hint": "Implementing fiscal reforms or stabilizing measures could mitigate economic decline.",
-  "duration_hours": 48.0,
-  "chained_from": "evt-llm-2048",
-  "fired_at": "2026-07-10T16:24:35.054234+00:00",
-  "issue_number": 574
+  "response_hint": "Enacting trade regulations could stabilize commerce but might challenge the emerging local systems.",
+  "duration_hours": 72.0,
+  "chained_from": "evt-llm-2049",
+  "fired_at": "2026-07-12T17:11:36.382837+00:00",
+  "issue_number": 642
 }
