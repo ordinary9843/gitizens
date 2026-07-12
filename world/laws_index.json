@@ -1,13 +1,5 @@
 [
   {
-    "number": 34,
-    "title": "Scholarly Bridges Initiative",
-    "issue_number": 288,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/288",
-    "enacted_date": "2026-06-26",
-    "era": "Modern Era"
-  },
-  {
     "number": 35,
     "title": "Industrial Renaissance Act",
     "issue_number": 299,
@@ -157,6 +149,14 @@
     "issue_number": 587,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/587",
     "enacted_date": "2026-07-11",
+    "era": "Modern Era"
+  },
+  {
+    "number": 54,
+    "title": "Industrial Renaissance Act",
+    "issue_number": 624,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/624",
+    "enacted_date": "2026-07-12",
     "era": "Modern Era"
   }
 ]
