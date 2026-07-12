@@ -1,12 +1,5 @@
 [
   {
-    "tick": 258,
-    "date": "2026-07-11",
-    "narrative": "In a shocking turn of events, the Modern Era of Gitizens faces turmoil as the Market Collapse Sparks Panic, sending tremors through the population of 71,374,530. With stability dipping to 59 out of 100 and treasury resources dwindling at 100,000 GC, citizens are left grappling with uncertainty in the wake of the autonomous tick applied on July 11, 2026. The fallout from this crisis raises pressing concerns over economic resilience as the community seeks to navigate these turbulent waters.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Market Collapse Sparks Panic",
-    "metrics": "population 71,374,530 \u00b7 treasury 100000 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 259,
     "date": "2026-07-11",
     "narrative": "In a startling turn of events, the Gitizens' economy has been rocked by a sudden market collapse, sending tremors through the population of 72,649,143. With stability plummeting to 59 out of 100 and the treasury holding a precarious 100,000 GC, citizens are left grappling with uncertainty as panic spreads across the realm. The autonomous tick has brought no relief, as feedback from the populace struggles to address the growing crisis.",
@@ -68,5 +61,12 @@
     "narrative": "In a shocking turn of events, the recent Market Collapse has sent ripples of panic through the Gitizens community, as the economy struggles to maintain stability with a current treasury of 100,000 GC and a precarious stability rating of just 62 out of 100. With a population of 88,317,739 grappling with the fallout, citizens are voicing their concerns through feedback mechanisms, underscoring the urgent need for decisive action to restore confidence in the marketplace. As pollution remains at a manageable level of 0, the focus now shifts to addressing the turmoil that threatens the very",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Market Collapse Sparks Panic",
     "metrics": "population 88,317,739 \u00b7 treasury 100000 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 268,
+    "date": "2026-07-12",
+    "narrative": "In a shocking turn of events, the recent Market Collapse has sent ripples of panic throughout the Gitizens' economy, as the stability rating plummets to 60 out of 100 amidst a bustling population of 90,817,355. With a treasury standing at 100,000 GC and pollution levels at a commendable 0, the citizens now face an urgent call for action to restore confidence and prevent further decline. In the wake of this crisis, leaders remain silent, leaving many to wonder what measures will be taken to navigate this perilous moment in our Modern Era.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Market Collapse Sparks Panic",
+    "metrics": "population 90,817,355 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
