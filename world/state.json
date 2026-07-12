@@ -3,7 +3,7 @@
   "laws_count": 54,
   "last_enacted": "2026-07-12",
   "founded_date": "2026-06-10",
-  "world_summary": "In the thriving Gitizens civilization, education, welfare, and green policies reach perfect levels, supporting a stable population of 98.6 million with zero pollution.",
+  "world_summary": "In the Modern Era, Gitizens thrives with perfect education, welfare, and green policies, supporting a stable population of 101 million and zero pollution.",
   "treasury": 100000,
   "currency": "Git Coins",
   "stars_last_counted": 6,
@@ -12,9 +12,9 @@
   "welfare": 100,
   "green_policy": 100,
   "defense": 95,
-  "population": 98622292,
+  "population": 101032990,
   "pollution": 0,
-  "stability": 58,
+  "stability": 61,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -30,5 +30,5 @@
     "sykar-f"
   ],
   "last_narrator_date": "2026-07-12T02:42:25.322104+00:00",
-  "next_tick_at": "2026-07-12T18:00:00Z"
+  "next_tick_at": "2026-07-12T20:00:00Z"
 }
