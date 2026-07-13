@@ -3,7 +3,7 @@
   "laws_count": 56,
   "last_enacted": "2026-07-13",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Modern Era, Gitizens enjoys perfect education and welfare, a stable population of 124 million, and a treasury of 99,500 Git Coins.",
+  "world_summary": "In the Modern Era, Gitizens boasts perfect education and welfare, a stable population of 124 million, and strong industry and defense policies.",
   "treasury": 99900,
   "currency": "Git Coins",
   "stars_last_counted": 1,
@@ -31,5 +31,5 @@
     "{\"message\":\"You do not have permission to view the stargazers of this repository\",\"documentation_url\":\"https://docs.github.com/rest/activity/starring#list-stargazers\",\"status\":\"403\"}"
   ],
   "last_narrator_date": "2026-07-13T02:43:44.284220+00:00",
-  "next_tick_at": "2026-07-13T07:00:00Z"
+  "next_tick_at": "2026-07-13T11:00:00Z"
 }

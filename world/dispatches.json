@@ -1,12 +1,5 @@
 [
   {
-    "tick": 269,
-    "date": "2026-07-12",
-    "narrative": "In a startling turn of events, the Gitizens community faces a dire situation as the recent Market Collapse Sparks Panic, sending ripples of uncertainty through the economy. With a population of 92,619,008 and a treasury dwindling to 100,000 GC, stability has plummeted to a precarious 58 out of 100, leaving citizens in a state of anxiety as they navigate the fallout. Immediate action is needed to restore confidence and ensure the survival of this thriving civilization.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Market Collapse Sparks Panic",
-    "metrics": "population 92,619,008 \u00b7 treasury 100000 GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 270,
     "date": "2026-07-12",
     "narrative": "In a startling turn of events, the Modern Era of Gitizens has been rocked by a sudden market collapse, causing widespread panic among the population of 96,434,978. With treasury reserves plunging to 100,000 GC and stability faltering to 60 out of 100, citizens are bracing for the potential fallout of this alarming economic upheaval.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant shift for Gitizens, the rise of community barter systems has begun to reshape economic interactions, as the population reaches 119,581,363 amidst a treasury of 100,000 GC. With stability at a precarious 61 out of 100 and pollution levels at a notable 0, citizens are urged to adapt or risk being left behind in this evolving landscape. The recent autonomous tick has also seen the application of two critical citizen feedbacks, signaling a growing engagement in governance.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of Community Barter Systems",
     "metrics": "population 119,581,363 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 279,
+    "date": "2026-07-13",
+    "narrative": "In the latest tick of Gitizens, the population has reached a staggering 124,268,117, reflecting the thriving growth of our modern civilization. With the treasury standing at 99,900 GC and stability at a concerning 61 out of 100, the recent rise of community barter systems promises to reshape economic interactions amidst the challenges of governance. As pollution remains at a pristine level of 0, citizens may find new avenues for trade that bolster both community ties and local economies.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Rise of Community Barter Systems",
+    "metrics": "population 124,268,117 \u00b7 treasury 99900 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
