@@ -1,13 +1,5 @@
 [
   {
-    "number": 35,
-    "title": "Industrial Renaissance Act",
-    "issue_number": 299,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/299",
-    "enacted_date": "2026-06-27",
-    "era": "Modern Era"
-  },
-  {
     "number": 36,
     "title": "Knowledge Nexus Expansion Act",
     "issue_number": 302,
@@ -157,6 +149,14 @@
     "issue_number": 624,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/624",
     "enacted_date": "2026-07-12",
+    "era": "Modern Era"
+  },
+  {
+    "number": 55,
+    "title": "Future-Ready Industry Enhancement Act",
+    "issue_number": 652,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/652",
+    "enacted_date": "2026-07-13",
     "era": "Modern Era"
   }
 ]
