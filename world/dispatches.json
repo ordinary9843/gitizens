@@ -1,12 +1,5 @@
 [
   {
-    "tick": 275,
-    "date": "2026-07-12",
-    "narrative": "In a significant development for Gitizens, the population has reached 108,291,361 amidst the ongoing Modern Era, as the community embraces the newly established Barter Systems. With a treasury totaling 100,000 GC, the nation's stability remains at a precarious 63 out of 100, raising concerns about the potential impact of this grassroots economic shift. As pollution levels stand at an admirable 0, citizens now face the challenge of balancing innovation with sustainability.",
-    "changes": "autonomous tick applied \u00b7 event: Rise of Community Barter Systems",
-    "metrics": "population 108,291,361 \u00b7 treasury 100000 GC \u00b7 stability 63/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 276,
     "date": "2026-07-12",
     "narrative": "In a significant development for the Gitizens, the latest tick has brought the emergence of Community Barter Systems, promising to reshape local economies amid a stable population of 111,347,152. With treasury reserves holding steady at 100,000 GC and stability measured at 62 out of 100, citizens are encouraged to engage in this new system as a means to enhance trade and cooperation. As pollution remains at a commendable 0, the focus now shifts to how these barter initiatives will impact the overall prosperity of the civilization.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant development for Gitizens, the latest tick, #284, has revealed a burgeoning community barter system, reflecting a growing desire for decentralized trade among the population of 156,469,549. With treasury reserves standing at 100,000 GC and a stability rating of 62 out of 100, citizens are increasingly turning to alternative economic models in response to shifting societal needs. As pollution remains at a steady 0/100, the Gitizens continue to navigate the complexities of their modern era with resilience and innovation.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of Community Barter Systems",
     "metrics": "population 156,469,549 \u00b7 treasury 100000 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 285,
+    "date": "2026-07-13",
+    "narrative": "In a significant development for the Gitizens civilization, the latest tick has revealed a burgeoning trend towards community barter systems, reflecting a growing shift in economic practices among the population of 161,661,929. With treasury holdings remaining stable at 100,000 GC and a moderate stability rating of 61 out of 100, citizens are increasingly turning to direct trade as a viable alternative to conventional currency exchanges. As pollution levels remain at zero, the emphasis on sustainable practices may further fuel this grassroots economic movement.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of Community Barter Systems",
+    "metrics": "population 161,661,929 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
