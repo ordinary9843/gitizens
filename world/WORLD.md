@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-07-14 — [Law 057](laws/law-057.md)*
+*Last updated: 2026-07-14*
 
 ---
 
