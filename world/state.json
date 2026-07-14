@@ -3,7 +3,7 @@
   "laws_count": 58,
   "last_enacted": "2026-07-14",
   "founded_date": "2026-06-10",
-  "world_summary": "Gitizens, founded in June 2026, excels in education, industry, and welfare, maintaining zero pollution and a stable population of 245 million in the Modern Era.",
+  "world_summary": "In the Modern Era, Gitizens boasts a stable population of 249 million, with perfect scores in education, industry, welfare, green policy, and defense.",
   "treasury": 100000,
   "currency": "Git Coins",
   "stars_last_counted": 1,
@@ -12,7 +12,7 @@
   "welfare": 100,
   "green_policy": 100,
   "defense": 100,
-  "population": 245101170,
+  "population": 249519352,
   "pollution": 0,
   "stability": 60,
   "tags_applied": [
@@ -31,5 +31,5 @@
     "{\"message\":\"You do not have permission to view the stargazers of this repository\",\"documentation_url\":\"https://docs.github.com/rest/activity/starring#list-stargazers\",\"status\":\"403\"}"
   ],
   "last_narrator_date": "2026-07-14T02:37:17.942581+00:00",
-  "next_tick_at": "2026-07-14T22:00:00Z"
+  "next_tick_at": "2026-07-14T23:00:00Z"
 }
