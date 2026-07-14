@@ -1,13 +1,5 @@
 [
   {
-    "number": 37,
-    "title": "Wellbeing through Community Engagement Act",
-    "issue_number": 316,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/316",
-    "enacted_date": "2026-06-27",
-    "era": "Modern Era"
-  },
-  {
     "number": 38,
     "title": "Elevate Our Scholars Initiative",
     "issue_number": 322,
@@ -157,6 +149,14 @@
     "issue_number": 655,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/655",
     "enacted_date": "2026-07-13",
+    "era": "Modern Era"
+  },
+  {
+    "number": 57,
+    "title": "Innovation Catalyst Program",
+    "issue_number": 673,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/673",
+    "enacted_date": "2026-07-14",
     "era": "Modern Era"
   }
 ]
