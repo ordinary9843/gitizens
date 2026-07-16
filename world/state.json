@@ -3,7 +3,7 @@
   "laws_count": 60,
   "last_enacted": "2026-07-16",
   "founded_date": "2026-06-10",
-  "world_summary": "In the Modern Era, Gitizens boasts a pollution-free population of 350 million, with perfect scores in education, industry, and green policies, and a stable treasury.",
+  "world_summary": "In the Modern Era, Gitizens thrives with a pollution-free population of 350 million, achieving perfect scores in education, industry, welfare, and green policies.",
   "treasury": 99900,
   "currency": "Git Coins",
   "stars_last_counted": 1,
@@ -14,7 +14,7 @@
   "defense": 100,
   "population": 350013959,
   "pollution": 0,
-  "stability": 60,
+  "stability": 59,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -30,6 +30,6 @@
     "sykar-f",
     "{\"message\":\"You do not have permission to view the stargazers of this repository\",\"documentation_url\":\"https://docs.github.com/rest/activity/starring#list-stargazers\",\"status\":\"403\"}"
   ],
-  "last_narrator_date": "2026-07-15T00:00:09.628327+00:00",
-  "next_tick_at": "2026-07-16T00:00:00Z"
+  "last_narrator_date": "2026-07-16T02:57:40.718367+00:00",
+  "next_tick_at": "2026-07-16T03:00:00Z"
 }
