@@ -69,3 +69,4 @@
 | 58 | [law-058](../world/laws/law-058.md) | [#676](https://github.com/ordinary9843/gitizens/issues/676) Empower Educators Initiative | 0+1 0-1 | 2026-07-14 |
 | 59 | [law-059](../world/laws/law-059.md) | [#701](https://github.com/ordinary9843/gitizens/issues/701) Knowledge Nexus Initiative | 0+1 0-1 | 2026-07-15 |
 | 60 | [law-060](../world/laws/law-060.md) | [#732](https://github.com/ordinary9843/gitizens/issues/732) Wellness for All Initiative | 0+1 0-1 | 2026-07-16 |
+| 61 | [law-061](../world/laws/law-061.md) | [#736](https://github.com/ordinary9843/gitizens/issues/736) Elevate Learning Initiative | 0+1 0-1 | 2026-07-16 |
