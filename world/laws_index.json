@@ -1,13 +1,5 @@
 [
   {
-    "number": 40,
-    "title": "Education Renaissance Initiative",
-    "issue_number": 356,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/356",
-    "enacted_date": "2026-06-30",
-    "era": "Modern Era"
-  },
-  {
     "number": 41,
     "title": "Green Innovation Fund",
     "issue_number": 360,
@@ -157,6 +149,14 @@
     "issue_number": 701,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/701",
     "enacted_date": "2026-07-15",
+    "era": "Modern Era"
+  },
+  {
+    "number": 60,
+    "title": "Wellness for All Initiative",
+    "issue_number": 732,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/732",
+    "enacted_date": "2026-07-16",
     "era": "Modern Era"
   }
 ]
