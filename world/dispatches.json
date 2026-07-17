@@ -1,12 +1,5 @@
 [
   {
-    "tick": 313,
-    "date": "2026-07-16",
-    "narrative": "In a significant shift within the Gitizens civilization, the latest tick has unveiled a surge in alternative currency adoption, reflecting a growing trend among the populace of 402,323,371. With the treasury standing firm at 100,000 GC and stability slightly improved to 61 out of 100, citizens are increasingly embracing innovative financial systems, potentially reshaping the economic landscape. As pollution remains nonexistent, the focus on sustainable practices appears to be resonating with the community, heralding a new chapter for the Gitizens.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Alternative Currency Adoption",
-    "metrics": "population 402,323,371 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 314,
     "date": "2026-07-16",
     "narrative": "In a significant shift for the Gitizens civilization, the recent tick saw an autonomous governance adjustment following a surge in alternative currency adoption, reflecting the evolving economic landscape. With a population of over 424 million and a treasury standing at 100,000 GC, stability holds at a precarious 60 out of 100, raising concerns amid a pollution index of zero, suggesting a potential imbalance within the thriving society. As citizen feedback continues to shape policy, the implications of this financial evolution remain to be seen.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant development for the Gitizens civilization, a surge in alternative currency adoption has been reported, reflecting a growing trend among the populace of 537 million. With treasury reserves stabilizing at 100,000 GC and overall stability resting at 61 out of 100, the shift promises to reshape economic interactions and foster innovation across the Modern Era. As pollution remains a non-issue at 0 percent, the foundations for sustainable growth appear to be firmly in place.",
     "changes": "autonomous tick applied \u00b7 event: Surge in Alternative Currency Adoption",
     "metrics": "population 537,318,952 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 323,
+    "date": "2026-07-17",
+    "narrative": "In a significant development for the Gitizens of the Modern Era, the population has surged to 557,424,797 as the treasury stands firm at 100,000 GC. Amidst a stability rating of 60 out of 100, citizens are witnessing a notable event with a surge in alternative currency adoption, reflecting an evolving economic landscape. As pollution remains at a controlled 0, the community's commitment to sustainable growth is evident, even as feedback from two citizens has been incorporated into the governance process.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Alternative Currency Adoption",
+    "metrics": "population 557,424,797 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
