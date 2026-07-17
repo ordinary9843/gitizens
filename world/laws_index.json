@@ -1,13 +1,5 @@
 [
   {
-    "number": 42,
-    "title": "Digital Learning Revolution Act",
-    "issue_number": 378,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/378",
-    "enacted_date": "2026-07-01",
-    "era": "Modern Era"
-  },
-  {
     "number": 43,
     "title": "Wellness for All Initiative",
     "issue_number": 399,
@@ -157,6 +149,14 @@
     "issue_number": 736,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/736",
     "enacted_date": "2026-07-16",
+    "era": "Modern Era"
+  },
+  {
+    "number": 62,
+    "title": "Innovative Learning Expansion Initiative",
+    "issue_number": 760,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/760",
+    "enacted_date": "2026-07-17",
     "era": "Modern Era"
   }
 ]
