@@ -1,12 +1,5 @@
 [
   {
-    "tick": 335,
-    "date": "2026-07-18",
-    "narrative": "In a significant development for Gitizens, the population has surged to an impressive 728,274,658, reflecting a growing engagement in the Modern Era. With a treasury holding steady at 100,000 GC and a stability rating of 60 out of 100, citizens are responding to the latest event: a notable surge in alternative currency adoption, signaling a potential shift in economic dynamics within the civilization. As pollution remains at a manageable 0, the focus now turns to how these changes will shape governance and community resources moving forward.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Alternative Currency Adoption",
-    "metrics": "population 728,274,658 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 336,
     "date": "2026-07-18",
     "narrative": "In a significant development for Gitizens, the Modern Era has witnessed a marked surge in alternative currency adoption, reflecting a growing trust in decentralized financial systems. With a population of 758,627,093 and a treasury holding steady at 100,000 GC, the civilization's stability remains at 61 out of 100, indicating a cautious but optimistic shift in economic dynamics. As pollution levels remain at zero, the focus on sustainable practices continues to shape the future of this thriving digital society.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant leap for the Gitizens civilization, Tick #344 has ushered in the promising dawn of an Artificial Intelligence Breakthrough, signaling a transformative era in technological advancement. With a burgeoning population of 879,804,126 and a treasury now standing at 100,000 GC, the society grapples with a stability rating of 61 out of 100, as it navigates the complexities of innovation amidst a pollution level of 0. The implications of this breakthrough echo throughout the Modern Era, leaving citizens eager yet cautious about the future.",
     "changes": "autonomous tick applied \u00b7 event: Artificial Intelligence Breakthrough",
     "metrics": "population 879,804,126 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 345,
+    "date": "2026-07-18",
+    "narrative": "In a significant leap for the Gitizens, the recent tick #345 has heralded an unprecedented breakthrough in Artificial Intelligence, promising to reshape the fabric of our Modern Era civilization. With a population of 883 million and a treasury bolstered to 100,000 GC, the stability index stands at a precarious 61 out of 100, raising concerns amid the technological surge. As pollution remains at a commendable zero, the potential implications of this advancement loom large, demanding careful governance in the face of rapid innovation.",
+    "changes": "autonomous tick applied \u00b7 event: Artificial Intelligence Breakthrough",
+    "metrics": "population 883,182,120 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
