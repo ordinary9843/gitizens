@@ -71,3 +71,4 @@
 | 60 | [law-060](../world/laws/law-060.md) | [#732](https://github.com/ordinary9843/gitizens/issues/732) Wellness for All Initiative | 0+1 0-1 | 2026-07-16 |
 | 61 | [law-061](../world/laws/law-061.md) | [#736](https://github.com/ordinary9843/gitizens/issues/736) Elevate Learning Initiative | 0+1 0-1 | 2026-07-16 |
 | 62 | [law-062](../world/laws/law-062.md) | [#760](https://github.com/ordinary9843/gitizens/issues/760) Innovative Learning Expansion Initiative | 0+1 0-1 | 2026-07-17 |
+| 63 | [law-063](../world/laws/law-063.md) | [#781](https://github.com/ordinary9843/gitizens/issues/781) Knowledge Expansion Program | 0+1 0-1 | 2026-07-18 |

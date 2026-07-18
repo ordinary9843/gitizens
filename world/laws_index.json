@@ -1,13 +1,5 @@
 [
   {
-    "number": 43,
-    "title": "Wellness for All Initiative",
-    "issue_number": 399,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/399",
-    "enacted_date": "2026-07-02",
-    "era": "Modern Era"
-  },
-  {
     "number": 44,
     "title": "Scholarly Horizons Initiative",
     "issue_number": 402,
@@ -157,6 +149,14 @@
     "issue_number": 760,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/760",
     "enacted_date": "2026-07-17",
+    "era": "Modern Era"
+  },
+  {
+    "number": 63,
+    "title": "Knowledge Expansion Program",
+    "issue_number": 781,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/781",
+    "enacted_date": "2026-07-18",
     "era": "Modern Era"
   }
 ]
