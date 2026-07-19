@@ -1,13 +1,5 @@
 [
   {
-    "number": 45,
-    "title": "The Community Enrichment Act",
-    "issue_number": 420,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/420",
-    "enacted_date": "2026-07-03",
-    "era": "Modern Era"
-  },
-  {
     "number": 46,
     "title": "Welfare Enhancement Initiative",
     "issue_number": 445,
@@ -156,6 +148,14 @@
     "title": "Advanced Learning Integrations Law",
     "issue_number": 813,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/813",
+    "enacted_date": "2026-07-19",
+    "era": "Modern Era"
+  },
+  {
+    "number": 65,
+    "title": "Enhanced Community Support Initiative",
+    "issue_number": 819,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/819",
     "enacted_date": "2026-07-19",
     "era": "Modern Era"
   }
