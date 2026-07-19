@@ -1,13 +1,5 @@
 [
   {
-    "number": 44,
-    "title": "Scholarly Horizons Initiative",
-    "issue_number": 402,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/402",
-    "enacted_date": "2026-07-02",
-    "era": "Modern Era"
-  },
-  {
     "number": 45,
     "title": "The Community Enrichment Act",
     "issue_number": 420,
@@ -157,6 +149,14 @@
     "issue_number": 781,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/781",
     "enacted_date": "2026-07-18",
+    "era": "Modern Era"
+  },
+  {
+    "number": 64,
+    "title": "Advanced Learning Integrations Law",
+    "issue_number": 813,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/813",
+    "enacted_date": "2026-07-19",
     "era": "Modern Era"
   }
 ]
