@@ -1,25 +1,25 @@
 {
-  "id": "evt-llm-5327",
-  "category": "scientific",
-  "rarity": "rare",
-  "title": "Artificial Intelligence Breakthrough",
-  "description": "A team of researchers in Gitizens has developed a revolutionary AI capable of accelerating scientific discoveries and optimizing governance. The technology promises to enhance productivity but raises ethical concerns about its implementation and potential dependence on automated systems.",
-  "flavor": "As the news spreads, debates ignite about the balance between innovation and humanity's core values.",
+  "id": "evt-llm-8391",
+  "category": "social",
+  "rarity": "uncommon",
+  "title": "Rise of the Learning Communities",
+  "description": "With the recent artificial intelligence breakthrough enhancing educational quality, citizens have formed localized 'learning communities' that prioritize collaboration and knowledge sharing. These communities are seeing a surge in cultural exchange and grassroots innovation, but some are feeling excluded from this new social dynamic.",
+  "flavor": "Knowledge is flowing like a river, carving new paths in society.",
   "immediate_effects": {
-    "education": 15,
-    "industry": 20
+    "stability": 3,
+    "cultural_exchange": 8
   },
   "response_consequence": {
-    "welfare": -10,
-    "defense": -5
+    "inclusivity": 10,
+    "social_conflict": -4
   },
   "default_consequence": {
-    "stability": -5,
-    "educational_quality": 10
+    "stability": 1,
+    "social_conflict": 2
   },
-  "response_hint": "Enacting laws regulating AI usage could mitigate risks and ensure equitable benefits across society.",
-  "duration_hours": 48.0,
-  "chained_from": null,
-  "fired_at": "2026-07-18T21:50:41.487579+00:00",
-  "issue_number": 809
+  "response_hint": "Passing laws to promote inclusivity in these communities could reduce tensions and enhance overall societal cohesion.",
+  "duration_hours": 72.0,
+  "chained_from": "evt-llm-5327",
+  "fired_at": "2026-07-20T21:59:15.799877+00:00",
+  "issue_number": 855
 }
