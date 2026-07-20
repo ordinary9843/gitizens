@@ -1,13 +1,5 @@
 [
   {
-    "number": 46,
-    "title": "Welfare Enhancement Initiative",
-    "issue_number": 445,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/445",
-    "enacted_date": "2026-07-04",
-    "era": "Modern Era"
-  },
-  {
     "number": 47,
     "title": "Sustained Well-Being Initiative",
     "issue_number": 472,
@@ -157,6 +149,14 @@
     "issue_number": 819,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/819",
     "enacted_date": "2026-07-19",
+    "era": "Modern Era"
+  },
+  {
+    "number": 66,
+    "title": "Innovative Learning Enrichment Act",
+    "issue_number": 840,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/840",
+    "enacted_date": "2026-07-20",
     "era": "Modern Era"
   }
 ]
