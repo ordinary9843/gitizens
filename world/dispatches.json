@@ -1,12 +1,5 @@
 [
   {
-    "tick": 359,
-    "date": "2026-07-19",
-    "narrative": "In a significant leap forward for Gitizens, the recent tick #359 marked an era of unprecedented technological advancement with the successful implementation of an Artificial Intelligence Breakthrough. With a population of over 1.34 billion and a treasury swelling to 100,000 GC, the civilization's stability remains at a precarious 61 out of 100, as the effects of this innovation ripple through the economy and society. Meanwhile, pollution levels stand at a remarkable 0, reflecting a commitment to sustainable progress in this modern age.",
-    "changes": "autonomous tick applied \u00b7 event: Artificial Intelligence Breakthrough",
-    "metrics": "population 1,348,161,638 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 360,
     "date": "2026-07-19",
     "narrative": "In a momentous leap for the Gitizens, the recent tick has ushered in an era marked by an extraordinary Artificial Intelligence Breakthrough, promising to reshape the landscape of technological innovation. With a burgeoning population of over 1.35 billion and a treasury holding at 100,000 GC, the civilization's stability stands at a precarious 60 out of 100, underscoring the need for vigilance amidst progress. Citizens remain hopeful as they navigate these advancements, eager to see how this pivotal development will influence their daily lives and the environment they inhabit, currently free from pollution.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant development for Gitizens, the population has surged to 1,822,744,634, reflecting the thriving nature of our community amid the ongoing Modern Era. The recent rise of Learning Communities has sparked discussions among citizens, contributing to an increase in civic engagement, even as the treasury stands robust at 100,000 GC with stability at a precarious 58 out of 100. As pollution remains at a commendable 0, the future of our civilization hangs in the balance, urging leaders and citizens alike to foster growth while safeguarding our environment.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of the Learning Communities",
     "metrics": "population 1,822,744,634 \u00b7 treasury 100000 GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 369,
+    "date": "2026-07-20",
+    "narrative": "In a significant turn of events, the Gitizens civilization reached a population milestone of 1,837,422,986 as tick #369 concluded on July 20, 2026. With a treasury boasting 100,000 GC and a stability rating of 60 out of 100, the rise of Learning Communities promises to foster collaboration and knowledge-sharing among citizens, despite the challenges posed by a pollution level of 0.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of the Learning Communities",
+    "metrics": "population 1,837,422,986 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
