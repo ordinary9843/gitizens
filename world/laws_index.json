@@ -1,13 +1,5 @@
 [
   {
-    "number": 47,
-    "title": "Sustained Well-Being Initiative",
-    "issue_number": 472,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/472",
-    "enacted_date": "2026-07-05",
-    "era": "Modern Era"
-  },
-  {
     "number": 48,
     "title": "Universal Wellness Program",
     "issue_number": 516,
@@ -157,6 +149,14 @@
     "issue_number": 840,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/840",
     "enacted_date": "2026-07-20",
+    "era": "Modern Era"
+  },
+  {
+    "number": 67,
+    "title": "Elevate Education Initiative",
+    "issue_number": 859,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/859",
+    "enacted_date": "2026-07-21",
     "era": "Modern Era"
   }
 ]
