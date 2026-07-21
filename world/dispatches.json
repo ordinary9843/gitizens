@@ -1,12 +1,5 @@
 [
   {
-    "tick": 364,
-    "date": "2026-07-20",
-    "narrative": "In a groundbreaking development, the citizens of Gitizens celebrated a momentous Artificial Intelligence Breakthrough this tick, marking a significant leap forward in technological advancement. With a current population of 1,653,147,455 and a treasury holding steady at 100,000 GC, the civilization's stability remains at 60 out of 100, reflecting a cautious optimism amidst the era's challenges. As the modern world continues to evolve, the promise of AI is set to reshape the lives of millions in unforeseen ways.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Artificial Intelligence Breakthrough",
-    "metrics": "population 1,653,147,455 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 365,
     "date": "2026-07-20",
     "narrative": "In a groundbreaking development, the Gitizens civilization has marked a significant milestone with an Artificial Intelligence Breakthrough, heralding a new era of technological advancement. As the population reaches a staggering 1.7 billion, the treasury stands at 100,000 GC, while stability holds at a respectable 61 out of 100, paving the way for potential growth and innovation amidst a pollution-free environment.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant development for the Gitizens, the recent autonomous tick has ushered in the Rise of the Learning Communities, fostering an environment of collaboration and knowledge-sharing among the population of over 2.1 billion. With a treasury bolstered to 100,000 GC and a stability rating of 60 out of 100, citizens are urged to engage actively in this promising initiative, which aims to enhance educational resources and communal bonds. As pollution remains at a commendable 0%, the potential for growth and innovation is ripe in this modern era.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of the Learning Communities",
     "metrics": "population 2,146,555,680 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 374,
+    "date": "2026-07-21",
+    "narrative": "In a significant development during Tick #374, the Gitizens civilization has embraced the Rise of the Learning Communities, fostering collaboration among its 2.18 billion inhabitants. With a treasury of 100,000 GC and a stability rating of 59 out of 100, the community stands at a pivotal moment, as citizen feedback influences the trajectory of this modern era. Environmental indicators remain positive, with pollution levels maintained at zero, highlighting a collective commitment to sustainable progress.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of the Learning Communities",
+    "metrics": "population 2,183,536,796 \u00b7 treasury 100000 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
   }
 ]
