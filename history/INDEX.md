@@ -76,3 +76,4 @@
 | 65 | [law-065](../world/laws/law-065.md) | [#819](https://github.com/ordinary9843/gitizens/issues/819) Enhanced Community Support Initiative | 0+1 0-1 | 2026-07-19 |
 | 66 | [law-066](../world/laws/law-066.md) | [#840](https://github.com/ordinary9843/gitizens/issues/840) Innovative Learning Enrichment Act | 0+1 0-1 | 2026-07-20 |
 | 67 | [law-067](../world/laws/law-067.md) | [#859](https://github.com/ordinary9843/gitizens/issues/859) Elevate Education Initiative | 0+1 0-1 | 2026-07-21 |
+| 68 | [law-068](../world/laws/law-068.md) | [#883](https://github.com/ordinary9843/gitizens/issues/883) Knowledge Expansion Pact | 0+1 0-1 | 2026-07-22 |

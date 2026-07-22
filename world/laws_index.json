@@ -1,13 +1,5 @@
 [
   {
-    "number": 48,
-    "title": "Universal Wellness Program",
-    "issue_number": 516,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/516",
-    "enacted_date": "2026-07-07",
-    "era": "Modern Era"
-  },
-  {
     "number": 49,
     "title": "Holistic Health Promotion Act",
     "issue_number": 533,
@@ -157,6 +149,14 @@
     "issue_number": 859,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/859",
     "enacted_date": "2026-07-21",
+    "era": "Modern Era"
+  },
+  {
+    "number": 68,
+    "title": "Knowledge Expansion Pact",
+    "issue_number": 883,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/883",
+    "enacted_date": "2026-07-22",
     "era": "Modern Era"
   }
 ]
