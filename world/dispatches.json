@@ -1,12 +1,5 @@
 [
   {
-    "tick": 390,
-    "date": "2026-07-22",
-    "narrative": "In a pivotal moment for Gitizens, the completion of Tick #390 on July 22, 2026, has ushered in the promising event known as the Rise of the Learning Communities. With a burgeoning population of 3,897,557,844 and a treasury standing at 100,000 GC, the civilization grapples with a stability rating of 60 out of 100, raising concerns as the balance of progress and sustainability hangs in the balance. As communities mobilize to harness the power of collective knowledge, the implications for future growth and stability are profound.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of the Learning Communities",
-    "metrics": "population 3,897,557,844 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 391,
     "date": "2026-07-23",
     "narrative": "In a significant development for the Gitizens, the latest autonomous tick has ushered in the Rise of the Learning Communities, a movement poised to enhance knowledge-sharing among the population of over 4.1 billion. With a treasury balance of 100,000 GC and a stability rating of 61 out of 100, the Gitizens stand at a critical juncture, as they navigate the challenges and opportunities presented by this burgeoning educational initiative. As pollution levels remain at a commendable 0, the focus now shifts to fostering intellectual growth in the Modern Era.",
@@ -68,5 +61,12 @@
     "narrative": "In a landmark development for the Gitizens, the Rise of the Learning Communities initiative has sparked a surge in collaboration among the population of 5,667,077,984, aiming to enhance knowledge sharing and innovation. With treasury reserves at a robust 100,000 GC and stability slightly improved to 59 out of 100, the community is cautiously optimistic about the potential for growth and progress in the Modern Era. Meanwhile, pollution levels remain at a commendable 0, reflecting an ongoing commitment to sustainable development.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Rise of the Learning Communities",
     "metrics": "population 5,667,077,984 \u00b7 treasury 100000 GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 400,
+    "date": "2026-07-23",
+    "narrative": "In a historic turn of events, the Cultural Renaissance has ignited a fervent global interest, captivating the minds of the 5,791,892,096 citizens of Gitizens. As the treasury stands robust at 100,000 GC and stability holds at a commendable 72 out of 100, the world is poised for a transformative era of creativity and innovation. With pollution at a pristine 0, the stage is set for a flourishing of artistic expression that promises to redefine the very fabric of society.",
+    "changes": "autonomous tick applied \u00b7 event: Cultural Renaissance Sparks Global Interest",
+    "metrics": "population 5,791,892,096 \u00b7 treasury 100000 GC \u00b7 stability 72/100 \u00b7 pollution 0/100"
   }
 ]

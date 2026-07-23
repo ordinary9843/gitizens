@@ -1,25 +1,25 @@
 {
-  "id": "evt-llm-8391",
+  "id": "evt-llm-4721",
   "category": "social",
-  "rarity": "uncommon",
-  "title": "Rise of the Learning Communities",
-  "description": "With the recent artificial intelligence breakthrough enhancing educational quality, citizens have formed localized 'learning communities' that prioritize collaboration and knowledge sharing. These communities are seeing a surge in cultural exchange and grassroots innovation, but some are feeling excluded from this new social dynamic.",
-  "flavor": "Knowledge is flowing like a river, carving new paths in society.",
+  "rarity": "rare",
+  "title": "Cultural Renaissance Sparks Global Interest",
+  "description": "An unexpected surge in the arts and cultural movements has captivated the Global populace, leading to a significant increase in artistic collaborations and community-driven projects. This cultural renaissance inspires citizens to explore their creative side, fostering unity and innovation.",
+  "flavor": "The streets are alive with music and art, as Gitizens embrace their creative expression.",
   "immediate_effects": {
-    "stability": 3,
-    "cultural_exchange": 8
+    "stability": 10,
+    "welfare": 5
   },
   "response_consequence": {
-    "inclusivity": 10,
-    "social_conflict": -4
+    "stability": 15,
+    "welfare": 10
   },
   "default_consequence": {
-    "stability": 1,
-    "social_conflict": 2
+    "stability": 5,
+    "welfare": 2
   },
-  "response_hint": "Passing laws to promote inclusivity in these communities could reduce tensions and enhance overall societal cohesion.",
-  "duration_hours": 72.0,
-  "chained_from": "evt-llm-5327",
-  "fired_at": "2026-07-20T21:59:15.799877+00:00",
-  "issue_number": 855
+  "response_hint": "Enacting laws that support the arts could further amplify this cultural wave and strengthen community ties.",
+  "duration_hours": 120.0,
+  "chained_from": null,
+  "fired_at": "2026-07-23T22:55:51.971896+00:00",
+  "issue_number": 930
 }
