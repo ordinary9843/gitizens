@@ -1,13 +1,5 @@
 [
   {
-    "number": 49,
-    "title": "Holistic Health Promotion Act",
-    "issue_number": 533,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/533",
-    "enacted_date": "2026-07-08",
-    "era": "Modern Era"
-  },
-  {
     "number": 50,
     "title": "Knowledge Renaissance Act",
     "issue_number": 546,
@@ -157,6 +149,14 @@
     "issue_number": 883,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/883",
     "enacted_date": "2026-07-22",
+    "era": "Modern Era"
+  },
+  {
+    "number": 69,
+    "title": "Wellness for All Initiative",
+    "issue_number": 938,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/938",
+    "enacted_date": "2026-07-24",
     "era": "Modern Era"
   }
 ]
