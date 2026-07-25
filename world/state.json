@@ -3,7 +3,7 @@
   "laws_count": 69,
   "last_enacted": "2026-07-24",
   "founded_date": "2026-06-10",
-  "world_summary": "The Gitizens civilization thrives in the Modern Era, boasting a stable population of 5.07 billion with perfect scores in education, industry, welfare, and green policies.",
+  "world_summary": "The Gitizens civilization flourishes with a stable population of 5.07 billion, perfect scores in education, industry, welfare, and green policies, and a treasury of 100,000 Git Coins.",
   "treasury": 100000,
   "currency": "Git Coins",
   "stars_last_counted": 6,
@@ -12,9 +12,9 @@
   "welfare": 100,
   "green_policy": 100,
   "defense": 100,
-  "population": 10801869919,
+  "population": 11728358556,
   "pollution": 0,
-  "stability": 65,
+  "stability": 64,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -31,5 +31,5 @@
     "{\"message\":\"You do not have permission to view the stargazers of this repository\",\"documentation_url\":\"https://docs.github.com/rest/activity/starring#list-stargazers\",\"status\":\"403\"}"
   ],
   "last_narrator_date": "2026-07-25T00:03:15.996860+00:00",
-  "next_tick_at": "2026-07-25T01:00:00Z"
+  "next_tick_at": "2026-07-25T05:00:00Z"
 }
