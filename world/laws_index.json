@@ -1,13 +1,5 @@
 [
   {
-    "number": 50,
-    "title": "Knowledge Renaissance Act",
-    "issue_number": 546,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/546",
-    "enacted_date": "2026-07-09",
-    "era": "Modern Era"
-  },
-  {
     "number": 51,
     "title": "Scholarship Empowerment Initiative",
     "issue_number": 565,
@@ -157,6 +149,14 @@
     "issue_number": 938,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/938",
     "enacted_date": "2026-07-24",
+    "era": "Modern Era"
+  },
+  {
+    "number": 70,
+    "title": "Enhanced Community Wellbeing Act",
+    "issue_number": 999,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/999",
+    "enacted_date": "2026-07-26",
     "era": "Modern Era"
   }
 ]
