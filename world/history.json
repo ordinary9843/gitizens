@@ -1,21 +1,5 @@
 [
   {
-    "tick": 327,
-    "date": "2026-07-17T17:11:00Z",
-    "laws_count": 62,
-    "era": "Modern Era",
-    "education": 100,
-    "industry": 100,
-    "welfare": 100,
-    "green_policy": 100,
-    "defense": 100,
-    "pollution": 0,
-    "population": 618491781,
-    "stability": 61,
-    "treasury": 100000,
-    "active_event": "evt-llm-2051"
-  },
-  {
     "tick": 328,
     "date": "2026-07-17T19:06:57Z",
     "laws_count": 62,
@@ -1596,6 +1580,22 @@
     "pollution": 0,
     "population": 18430793487,
     "stability": 60,
+    "treasury": 100000,
+    "active_event": "evt-llm-4721"
+  },
+  {
+    "tick": 427,
+    "date": "2026-07-26T09:12:34Z",
+    "laws_count": 69,
+    "era": "Modern Era",
+    "education": 100,
+    "industry": 100,
+    "welfare": 100,
+    "green_policy": 100,
+    "defense": 100,
+    "pollution": 0,
+    "population": 18408715047,
+    "stability": 61,
     "treasury": 100000,
     "active_event": "evt-llm-4721"
   }
