@@ -79,3 +79,4 @@
 | 68 | [law-068](../world/laws/law-068.md) | [#883](https://github.com/ordinary9843/gitizens/issues/883) Knowledge Expansion Pact | 0+1 0-1 | 2026-07-22 |
 | 69 | [law-069](../world/laws/law-069.md) | [#938](https://github.com/ordinary9843/gitizens/issues/938) Wellness for All Initiative | 0+1 0-1 | 2026-07-24 |
 | 70 | [law-070](../world/laws/law-070.md) | [#999](https://github.com/ordinary9843/gitizens/issues/999) Enhanced Community Wellbeing Act | 0+1 0-1 | 2026-07-26 |
+| 71 | [law-071](../world/laws/law-071.md) | [#1009](https://github.com/ordinary9843/gitizens/issues/1009) Universal Wellness Integration Act | 0+1 0-1 | 2026-07-27 |

@@ -1,13 +1,5 @@
 [
   {
-    "number": 51,
-    "title": "Scholarship Empowerment Initiative",
-    "issue_number": 565,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/565",
-    "enacted_date": "2026-07-10",
-    "era": "Modern Era"
-  },
-  {
     "number": 52,
     "title": "Industrial Revitalization Initiative",
     "issue_number": 575,
@@ -157,6 +149,14 @@
     "issue_number": 999,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/999",
     "enacted_date": "2026-07-26",
+    "era": "Modern Era"
+  },
+  {
+    "number": 71,
+    "title": "Universal Wellness Integration Act",
+    "issue_number": 1009,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1009",
+    "enacted_date": "2026-07-27",
     "era": "Modern Era"
   }
 ]
