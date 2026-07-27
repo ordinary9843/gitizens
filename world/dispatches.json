@@ -1,12 +1,5 @@
 [
   {
-    "tick": 431,
-    "date": "2026-07-26",
-    "narrative": "In a significant development for the Gitizens civilization, Tick #431 has concluded with a population soaring to 22,295,712,617 and a treasury balance of 99,500 GC, reflecting robust economic health despite a stability rating of 61 out of 100. The recent enactment of a pivotal law, coupled with the application of two citizen feedbacks, coincided with a Cultural Renaissance that has ignited global interest, fostering a renewed sense of unity and creativity among the populace. As pollution remains at a pristine 0, the stage is set for an era of cultural and social revital",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Cultural Renaissance Sparks Global Interest",
-    "metrics": "population 22,295,712,617 \u00b7 treasury 99500 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 432,
     "date": "2026-07-26",
     "narrative": "In a remarkable turn of events, the Global Cultural Renaissance has ignited a fervent interest across the Gitizens, with the population of 23 billion now more engaged than ever in the arts and humanities. Meanwhile, the treasury stands at 100,000 Git Coins, offering a glimmer of potential for investment in creative initiatives, as the civilization grapples with stability rated at 61 out of 100. As pollution remains at a commendable zero, citizens are encouraged to harness this cultural momentum for a brighter, more sustainable future.",
@@ -68,5 +61,12 @@
     "narrative": "In a remarkable turn of events, the Cultural Renaissance has ignited a global fervor, captivating the attention of the 32 billion citizens of Gitizens. With a treasury holding steady at 100,000 GC and stability at 60 out of 100, this cultural awakening promises to reshape societal values and foster unprecedented artistic expression. As the world stands at the brink of transformation, the echoes of innovation resonate throughout the Modern Era.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cultural Renaissance Sparks Global Interest",
     "metrics": "population 32,197,286,780 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 441,
+    "date": "2026-07-27",
+    "narrative": "In a remarkable display of cultural vitality, the Gitizens have entered a Cultural Renaissance, capturing the imagination of 34 billion inhabitants and igniting global interest across the civilization. As treasury reserves bolster to 100,000 GitHub Credits and stability holds steady at 60, citizens engage in vibrant exchanges of art and knowledge, signaling a promising era of creativity. With pollution levels at a commendable 0, the path forward appears bright for a society poised on the brink of innovation.",
+    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cultural Renaissance Sparks Global Interest",
+    "metrics": "population 34,151,376,524 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
