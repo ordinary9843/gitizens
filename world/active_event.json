@@ -1,25 +1,25 @@
 {
-  "id": "evt-llm-4721",
-  "category": "social",
-  "rarity": "rare",
-  "title": "Cultural Renaissance Sparks Global Interest",
-  "description": "An unexpected surge in the arts and cultural movements has captivated the Global populace, leading to a significant increase in artistic collaborations and community-driven projects. This cultural renaissance inspires citizens to explore their creative side, fostering unity and innovation.",
-  "flavor": "The streets are alive with music and art, as Gitizens embrace their creative expression.",
+  "id": "evt-llm-5832",
+  "category": "economic",
+  "rarity": "uncommon",
+  "title": "Surge in Creative Industries",
+  "description": "The recent cultural renaissance has led to a boom in creative industries, with new startups flourishing in arts, music, and technology. This surge has attracted significant investments, driving economic growth across multiple regions.",
+  "flavor": "As art galleries and music venues buzz with activity, entrepreneurs seize the moment to innovate and inspire.",
   "immediate_effects": {
-    "stability": 10,
-    "welfare": 5
+    "stability": 3,
+    "welfare": 2,
+    "economic_growth": 10
   },
   "response_consequence": {
-    "stability": 15,
-    "welfare": 10
+    "investment": 8,
+    "employment": 5
   },
   "default_consequence": {
-    "stability": 5,
-    "welfare": 2
+    "economic_growth": 7
   },
-  "response_hint": "Enacting laws that support the arts could further amplify this cultural wave and strengthen community ties.",
-  "duration_hours": 120.0,
-  "chained_from": null,
-  "fired_at": "2026-07-23T22:55:51.971896+00:00",
-  "issue_number": 930
+  "response_hint": "Implementing tax breaks for creative industries can incentivize further investment and growth.",
+  "duration_hours": 48.0,
+  "chained_from": "evt-llm-4721",
+  "fired_at": "2026-07-28T22:57:47.160511+00:00",
+  "issue_number": 1055
 }
