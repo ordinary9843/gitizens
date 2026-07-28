@@ -1,13 +1,5 @@
 [
   {
-    "number": 52,
-    "title": "Industrial Revitalization Initiative",
-    "issue_number": 575,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/575",
-    "enacted_date": "2026-07-10",
-    "era": "Modern Era"
-  },
-  {
     "number": 53,
     "title": "Industry Innovation Incentive",
     "issue_number": 587,
@@ -157,6 +149,14 @@
     "issue_number": 1009,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1009",
     "enacted_date": "2026-07-27",
+    "era": "Modern Era"
+  },
+  {
+    "number": 72,
+    "title": "Happiness Integration Initiative",
+    "issue_number": 1031,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1031",
+    "enacted_date": "2026-07-28",
     "era": "Modern Era"
   }
 ]
