@@ -1,13 +1,5 @@
 [
   {
-    "number": 53,
-    "title": "Industry Innovation Incentive",
-    "issue_number": 587,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/587",
-    "enacted_date": "2026-07-11",
-    "era": "Modern Era"
-  },
-  {
     "number": 54,
     "title": "Industrial Renaissance Act",
     "issue_number": 624,
@@ -157,6 +149,14 @@
     "issue_number": 1031,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1031",
     "enacted_date": "2026-07-28",
+    "era": "Modern Era"
+  },
+  {
+    "number": 73,
+    "title": "Learning for All Initiative",
+    "issue_number": 1056,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1056",
+    "enacted_date": "2026-07-29",
     "era": "Modern Era"
   }
 ]

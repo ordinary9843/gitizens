@@ -81,3 +81,4 @@
 | 70 | [law-070](../world/laws/law-070.md) | [#999](https://github.com/ordinary9843/gitizens/issues/999) Enhanced Community Wellbeing Act | 0+1 0-1 | 2026-07-26 |
 | 71 | [law-071](../world/laws/law-071.md) | [#1009](https://github.com/ordinary9843/gitizens/issues/1009) Universal Wellness Integration Act | 0+1 0-1 | 2026-07-27 |
 | 72 | [law-072](../world/laws/law-072.md) | [#1031](https://github.com/ordinary9843/gitizens/issues/1031) Happiness Integration Initiative | 0+1 0-1 | 2026-07-28 |
+| 73 | [law-073](../world/laws/law-073.md) | [#1056](https://github.com/ordinary9843/gitizens/issues/1056) Learning for All Initiative | 0+1 0-1 | 2026-07-29 |

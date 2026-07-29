@@ -1,10 +1,10 @@
 {
   "era": "Modern Era",
-  "laws_count": 72,
-  "last_enacted": "2026-07-28",
+  "laws_count": 73,
+  "last_enacted": "2026-07-29",
   "founded_date": "2026-06-10",
-  "world_summary": "In the prosperous Modern Era, Gitizens thrives with a population of 39 billion, achieving perfect scores in education, industry, welfare, green policy, and defense.",
-  "treasury": 100000,
+  "world_summary": "In the thriving Modern Era, Gitizens boasts a population of 39 billion with perfect scores in education, industry, welfare, green policy, and defense.",
+  "treasury": 99900,
   "currency": "Git Coins",
   "stars_last_counted": 6,
   "education": 100,
@@ -12,7 +12,7 @@
   "welfare": 100,
   "green_policy": 100,
   "defense": 100,
-  "population": 55885534639,
+  "population": 57234893428,
   "pollution": 0,
   "stability": 68,
   "tags_applied": [
