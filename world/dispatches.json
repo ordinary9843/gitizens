@@ -1,12 +1,5 @@
 [
   {
-    "tick": 444,
-    "date": "2026-07-28",
-    "narrative": "In a striking turn of events, the Cultural Renaissance has ignited a fervent global interest among Gitizens, fostering creativity and innovation across the Modern Era. With a population now exceeding 39 billion and a treasury bolstered to 100,000 GitCoin, the civilization stands at a critical juncture, as stability holds at 62 out of 100 and pollution remains nonexistent. As the world embraces this artistic revival, citizens eagerly anticipate the transformative impact it will have on their society.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Cultural Renaissance Sparks Global Interest",
-    "metrics": "population 39,014,224,714 \u00b7 treasury 100000 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 445,
     "date": "2026-07-28",
     "narrative": "In a remarkable turn of events, the Gitizens civilization has entered a Cultural Renaissance, igniting global interest and creativity among its 41.6 billion residents. As the treasury swells to 98,300 GC amidst a stability rating of 61, the community's engagement is reflected in two citizen feedbacks applied this tick, alongside the enactment of a new law aimed at fostering innovation. With pollution levels at a commendable zero, the stage is set for a flourishing era of artistic and intellectual advancement.",
@@ -68,5 +61,12 @@
     "narrative": "In a significant development for the Gitizens, the latest tick reveals a surge in creative industries, reflecting a burgeoning cultural renaissance among the population of 55,885,534,639. With a treasury holding steady at 100,000 GC and stability at a commendable 68 out of 100, the realm stands poised for further growth. However, as the creative tide rises, vigilance is necessary to maintain the current level of prosperity and stability.",
     "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Creative Industries",
     "metrics": "population 55,885,534,639 \u00b7 treasury 100000 GC \u00b7 stability 68/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 454,
+    "date": "2026-07-29",
+    "narrative": "In a remarkable turn of events, Gitizens experienced a significant surge in creative industries this tick, coinciding with the enactment of a new law aimed at fostering innovation. As the population reached an unprecedented 57 billion, the treasury stood at 99,900 GC, while stability remained steady at 67 out of 100, indicating a resilient society amidst the bustling activity. The autonomous tick applied two citizen feedbacks, reflecting a responsive government striving to keep pace with its vibrant populace.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Creative Industries",
+    "metrics": "population 57,234,893,428 \u00b7 treasury 99900 GC \u00b7 stability 67/100 \u00b7 pollution 0/100"
   }
 ]
