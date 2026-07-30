@@ -1,12 +1,5 @@
 [
   {
-    "tick": 464,
-    "date": "2026-07-29",
-    "narrative": "In a remarkable turn of events, the Gitizens civilization has witnessed a significant surge in creative industries, contributing to a burgeoning economy. With a population now exceeding 81 billion and a treasury bolstered to 100,000 GitHub Credits, the stability of the realm stands at a cautious 60 out of 100. As the Modern Era unfolds, citizens remain vigilant amid the challenges of growth, with pollution levels holding steady at zero.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Creative Industries",
-    "metrics": "population 81,388,648,434 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 465,
     "date": "2026-07-30",
     "narrative": "In a significant development for the Gitizens civilization, tick #465 has concluded with the enactment of a new law, reflecting the community's commitment to progress amidst a population of 85,872,139,249. The latest surge in creative industries has invigorated the economy, with the treasury standing at 99,800 GC, while stability holds steady at 63 out of 100. As pollution remains at a low 0%, the future looks bright for innovation and growth in this modern era.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 473: autonomous tick applied \u00b7 event: Surge in Creative Industries.",
     "changes": "autonomous tick applied \u00b7 event: Surge in Creative Industries",
     "metrics": "population 112,299,699,069 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 474,
+    "date": "2026-07-30",
+    "narrative": "Tick 474: autonomous tick applied \u00b7 event: AI Breakthrough.",
+    "changes": "autonomous tick applied \u00b7 event: AI Breakthrough",
+    "metrics": "population 114,699,195,657 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]

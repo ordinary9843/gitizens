@@ -1,25 +1,27 @@
 {
-  "id": "evt-llm-5832",
-  "category": "economic",
+  "id": "evt-ai-breakthrough",
+  "category": "scientific",
   "rarity": "uncommon",
-  "title": "Surge in Creative Industries",
-  "description": "The recent cultural renaissance has led to a boom in creative industries, with new startups flourishing in arts, music, and technology. This surge has attracted significant investments, driving economic growth across multiple regions.",
-  "flavor": "As art galleries and music venues buzz with activity, entrepreneurs seize the moment to innovate and inspire.",
+  "title": "AI Breakthrough",
+  "description": "A domestic research institute has published a groundbreaking AI model that surpasses human performance on multiple benchmarks.",
+  "flavor": "Tech company shares surged; governments of other nations are requesting collaboration.",
+  "trigger_conditions": {
+    "education": {
+      "min": 40
+    }
+  },
   "immediate_effects": {
-    "stability": 3,
-    "welfare": 2,
-    "economic_growth": 10
+    "education": 10,
+    "industry": 5
   },
+  "default_consequence": {},
   "response_consequence": {
-    "investment": 8,
-    "employment": 5
+    "education": 8,
+    "treasury": 80
   },
-  "default_consequence": {
-    "economic_growth": 7
-  },
-  "response_hint": "Implementing tax breaks for creative industries can incentivize further investment and growth.",
-  "duration_hours": 48.0,
-  "chained_from": "evt-llm-4721",
-  "fired_at": "2026-07-28T22:57:47.160511+00:00",
-  "issue_number": 1055
+  "response_hint": "Passing an AI industry promotion act can convert technological leadership into long-term economic advantage.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-07-30T23:06:39.759033+00:00",
+  "issue_number": 1102
 }
