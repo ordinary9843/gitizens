@@ -1,12 +1,5 @@
 [
   {
-    "tick": 465,
-    "date": "2026-07-30",
-    "narrative": "In a significant development for the Gitizens civilization, tick #465 has concluded with the enactment of a new law, reflecting the community's commitment to progress amidst a population of 85,872,139,249. The latest surge in creative industries has invigorated the economy, with the treasury standing at 99,800 GC, while stability holds steady at 63 out of 100. As pollution remains at a low 0%, the future looks bright for innovation and growth in this modern era.",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Creative Industries",
-    "metrics": "population 85,872,139,249 \u00b7 treasury 99800 GC \u00b7 stability 63/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 466,
     "date": "2026-07-30",
     "narrative": "In a significant advancement for Gitizens, the latest tick has seen the enactment of a new law, alongside the application of two citizen feedbacks, contributing to the current population of 90,267,944,687. The treasury stands robust at 96,700 GC, while stability remains at a concerning 62 out of 100, despite a notable surge in creative industries that promises to invigorate the economy. As pollution levels hold steady at 0, the community remains vigilant in balancing growth and sustainability.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 474: autonomous tick applied \u00b7 event: AI Breakthrough.",
     "changes": "autonomous tick applied \u00b7 event: AI Breakthrough",
     "metrics": "population 114,699,195,657 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 475,
+    "date": "2026-07-31",
+    "narrative": "Tick 475: autonomous tick applied \u00b7 1 law enacted \u00b7 event: AI Breakthrough.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: AI Breakthrough",
+    "metrics": "population 120,303,320,077 \u00b7 treasury 99700 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
