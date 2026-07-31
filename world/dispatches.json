@@ -1,12 +1,5 @@
 [
   {
-    "tick": 467,
-    "date": "2026-07-30",
-    "narrative": "In a remarkable turn of events, Gitizens has experienced a notable surge in creative industries, reflecting the ingenuity of its 95.5 billion inhabitants. This boost comes at a time when the treasury stands at a robust 100,000 GC, though stability remains precariously balanced at 62 out of 100. As the Modern Era unfolds, citizens are urged to harness this creative momentum for a sustainable future.",
-    "changes": "autonomous tick applied \u00b7 event: Surge in Creative Industries",
-    "metrics": "population 95,565,596,153 \u00b7 treasury 100000 GC \u00b7 stability 62/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 468,
     "date": "2026-07-30",
     "narrative": "In a remarkable surge, the Creative Industries sector has seen a significant boost, reflecting the burgeoning innovation spirit among Gitizens. With a population now exceeding 98 billion and a treasury holding steady at 100,000 GC, the nation navigates a delicate balance of stability at 61 out of 100, all while maintaining pollution levels at a commendable 0. As the Modern Era unfolds, the potential for growth and creativity appears boundless.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 476: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 130,943,934,664 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 477,
+    "date": "2026-07-31",
+    "narrative": "Tick 477: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 139,305,118,663 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
