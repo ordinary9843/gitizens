@@ -1,13 +1,5 @@
 [
   {
-    "number": 56,
-    "title": "Fortify Our Future Initiative",
-    "issue_number": 655,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/655",
-    "enacted_date": "2026-07-13",
-    "era": "Modern Era"
-  },
-  {
     "number": 57,
     "title": "Innovation Catalyst Program",
     "issue_number": 673,
@@ -157,6 +149,14 @@
     "issue_number": 1086,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1086",
     "enacted_date": "2026-07-30",
+    "era": "Modern Era"
+  },
+  {
+    "number": 76,
+    "title": "Strengthen Education",
+    "issue_number": 1103,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1103",
+    "enacted_date": "2026-07-31",
     "era": "Modern Era"
   }
 ]

@@ -84,3 +84,4 @@
 | 73 | [law-073](../world/laws/law-073.md) | [#1056](https://github.com/ordinary9843/gitizens/issues/1056) Learning for All Initiative | 0+1 0-1 | 2026-07-29 |
 | 74 | [law-074](../world/laws/law-074.md) | [#1083](https://github.com/ordinary9843/gitizens/issues/1083) Innovative Learning Expansion Act | 0+1 0-1 | 2026-07-30 |
 | 75 | [law-075](../world/laws/law-075.md) | [#1086](https://github.com/ordinary9843/gitizens/issues/1086) Welfare Enhancement Act | 0+1 0-1 | 2026-07-30 |
+| 76 | [law-076](../world/laws/law-076.md) | [#1103](https://github.com/ordinary9843/gitizens/issues/1103) Strengthen Education | 0+1 0-1 | 2026-07-31 |
