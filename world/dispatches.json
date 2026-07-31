@@ -1,12 +1,5 @@
 [
   {
-    "tick": 472,
-    "date": "2026-07-30",
-    "narrative": "Tick 472: autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Creative Industries.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Creative Industries",
-    "metrics": "population 111,174,006,302 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 473,
     "date": "2026-07-30",
     "narrative": "Tick 473: autonomous tick applied \u00b7 event: Surge in Creative Industries.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 481: autonomous tick applied \u00b7 event: Foreign Direct Investment.",
     "changes": "autonomous tick applied \u00b7 event: Foreign Direct Investment",
     "metrics": "population 157,103,660,036 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 482,
+    "date": "2026-07-31",
+    "narrative": "Tick 482: autonomous tick applied \u00b7 event: Foreign Direct Investment.",
+    "changes": "autonomous tick applied \u00b7 event: Foreign Direct Investment",
+    "metrics": "population 162,233,056,093 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
