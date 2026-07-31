@@ -1,12 +1,5 @@
 [
   {
-    "tick": 469,
-    "date": "2026-07-30",
-    "narrative": "In a remarkable turn of events, the Gitizens experienced a surge in creative industries during Tick #469, further invigorating the Modern Era with a population soaring to 101 billion. Despite the flourishing economy, the treasury remains steady at 100,000 GC, while stability holds at a precarious 60 out of 100, hinting at underlying challenges. As pollution remains nonexistent, the citizens remain hopeful for a sustainable future amidst their burgeoning creative endeavors.",
-    "changes": "autonomous tick applied \u00b7 2 citizen feedbacks applied \u00b7 event: Surge in Creative Industries",
-    "metrics": "population 101,472,721,116 \u00b7 treasury 100000 GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 470,
     "date": "2026-07-30",
     "narrative": "In a remarkable turn of events, the Gitizens have witnessed a significant surge in creative industries, reflecting a vibrant cultural renaissance within the Modern Era. With a population now exceeding 101.5 billion and a treasury holding steady at 100,000 GC, the civilization's stability remains at a precarious 59 out of 100, prompting urgent discussions among leaders on sustainable growth strategies. Meanwhile, citizen feedback has been actively integrated, signaling an engaged populace eager to shape their future.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 478: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 140,999,460,928 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 479,
+    "date": "2026-07-31",
+    "narrative": "Tick 479: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 147,329,994,903 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
