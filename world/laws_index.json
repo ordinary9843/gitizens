@@ -1,13 +1,5 @@
 [
   {
-    "number": 57,
-    "title": "Innovation Catalyst Program",
-    "issue_number": 673,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/673",
-    "enacted_date": "2026-07-14",
-    "era": "Modern Era"
-  },
-  {
     "number": 58,
     "title": "Empower Educators Initiative",
     "issue_number": 676,
@@ -157,6 +149,14 @@
     "issue_number": 1103,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1103",
     "enacted_date": "2026-07-31",
+    "era": "Modern Era"
+  },
+  {
+    "number": 77,
+    "title": "Strengthen Education",
+    "issue_number": 1109,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1109",
+    "enacted_date": "2026-08-01",
     "era": "Modern Era"
   }
 ]

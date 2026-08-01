@@ -1,10 +1,10 @@
 {
   "era": "Modern Era",
-  "laws_count": 76,
-  "last_enacted": "2026-07-31",
+  "laws_count": 77,
+  "last_enacted": "2026-08-01",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 100000,
+  "treasury": 99500,
   "currency": "Git Coins",
   "stars_last_counted": 6,
   "education": 100,
@@ -12,7 +12,7 @@
   "welfare": 100,
   "green_policy": 100,
   "defense": 100,
-  "population": 171279414612,
+  "population": 177474041166,
   "pollution": 0,
   "stability": 61,
   "tags_applied": [
