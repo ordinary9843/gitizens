@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-ufo-sighting",
+  "category": "cosmic",
+  "rarity": "rare",
+  "title": "Mass UFO Sighting",
+  "description": "Citizens in dozens of cities nationwide have simultaneously photographed unidentified flying objects; the authorities cannot explain it.",
+  "flavor": "The Ministry of Defence says it is a 'weather balloon'; no one believes them.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "stability": -5,
+    "education": 3
+  },
+  "default_consequence": {
+    "stability": -5
+  },
+  "response_consequence": {
+    "defense": 3,
+    "education": 5
+  },
+  "response_hint": "Passing a space security monitoring act can let the government face unknown threats with a scientific approach.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-02T18:02:31.183350+00:00",
+  "issue_number": 1121
+}
