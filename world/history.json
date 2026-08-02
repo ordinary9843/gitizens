@@ -1,21 +1,5 @@
 [
   {
-    "tick": 406,
-    "date": "2026-07-24T14:54:04Z",
-    "laws_count": 69,
-    "era": "Modern Era",
-    "education": 100,
-    "industry": 100,
-    "welfare": 100,
-    "green_policy": 100,
-    "defense": 100,
-    "pollution": 0,
-    "population": 8778279644,
-    "stability": 70,
-    "treasury": 100000,
-    "active_event": "evt-llm-4721"
-  },
-  {
     "tick": 407,
     "date": "2026-07-24T16:41:40Z",
     "laws_count": 69,
@@ -1596,6 +1580,22 @@
     "pollution": 0,
     "population": 376499735848,
     "stability": 56,
+    "treasury": 100000,
+    "active_event": "evt-ufo-sighting"
+  },
+  {
+    "tick": 506,
+    "date": "2026-08-02T20:09:10Z",
+    "laws_count": 78,
+    "era": "Modern Era",
+    "education": 100,
+    "industry": 100,
+    "welfare": 100,
+    "green_policy": 100,
+    "defense": 100,
+    "pollution": 0,
+    "population": 397183631066,
+    "stability": 60,
     "treasury": 100000,
     "active_event": "evt-ufo-sighting"
   }
