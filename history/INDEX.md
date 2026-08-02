@@ -86,3 +86,4 @@
 | 75 | [law-075](../world/laws/law-075.md) | [#1086](https://github.com/ordinary9843/gitizens/issues/1086) Welfare Enhancement Act | 0+1 0-1 | 2026-07-30 |
 | 76 | [law-076](../world/laws/law-076.md) | [#1103](https://github.com/ordinary9843/gitizens/issues/1103) Strengthen Education | 0+1 0-1 | 2026-07-31 |
 | 77 | [law-077](../world/laws/law-077.md) | [#1109](https://github.com/ordinary9843/gitizens/issues/1109) Strengthen Education | 0+1 0-1 | 2026-08-01 |
+| 78 | [law-078](../world/laws/law-078.md) | [#1116](https://github.com/ordinary9843/gitizens/issues/1116) Strengthen Education | 0+1 0-1 | 2026-08-02 |

@@ -1,13 +1,5 @@
 [
   {
-    "number": 58,
-    "title": "Empower Educators Initiative",
-    "issue_number": 676,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/676",
-    "enacted_date": "2026-07-14",
-    "era": "Modern Era"
-  },
-  {
     "number": 59,
     "title": "Knowledge Nexus Initiative",
     "issue_number": 701,
@@ -157,6 +149,14 @@
     "issue_number": 1109,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1109",
     "enacted_date": "2026-08-01",
+    "era": "Modern Era"
+  },
+  {
+    "number": 78,
+    "title": "Strengthen Education",
+    "issue_number": 1116,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1116",
+    "enacted_date": "2026-08-02",
     "era": "Modern Era"
   }
 ]
