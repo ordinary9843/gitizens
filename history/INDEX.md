@@ -88,3 +88,4 @@
 | 77 | [law-077](../world/laws/law-077.md) | [#1109](https://github.com/ordinary9843/gitizens/issues/1109) Strengthen Education | 0+1 0-1 | 2026-08-01 |
 | 78 | [law-078](../world/laws/law-078.md) | [#1116](https://github.com/ordinary9843/gitizens/issues/1116) Strengthen Education | 0+1 0-1 | 2026-08-02 |
 | 79 | [law-079](../world/laws/law-079.md) | [#1124](https://github.com/ordinary9843/gitizens/issues/1124) Strengthen Education | 0+1 0-1 | 2026-08-03 |
+| 80 | [law-080](../world/laws/law-080.md) | [#1128](https://github.com/ordinary9843/gitizens/issues/1128) Strengthen Welfare | 0+1 0-1 | 2026-08-03 |

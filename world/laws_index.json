@@ -1,13 +1,5 @@
 [
   {
-    "number": 60,
-    "title": "Wellness for All Initiative",
-    "issue_number": 732,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/732",
-    "enacted_date": "2026-07-16",
-    "era": "Modern Era"
-  },
-  {
     "number": 61,
     "title": "Elevate Learning Initiative",
     "issue_number": 736,
@@ -156,6 +148,14 @@
     "title": "Strengthen Education",
     "issue_number": 1124,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1124",
+    "enacted_date": "2026-08-03",
+    "era": "Modern Era"
+  },
+  {
+    "number": 80,
+    "title": "Strengthen Welfare",
+    "issue_number": 1128,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1128",
     "enacted_date": "2026-08-03",
     "era": "Modern Era"
   }
