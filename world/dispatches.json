@@ -1,12 +1,5 @@
 [
   {
-    "tick": 500,
-    "date": "2026-08-02",
-    "narrative": "Tick 500: autonomous tick applied \u00b7 event: Surveillance Technology Emerges.",
-    "changes": "autonomous tick applied \u00b7 event: Surveillance Technology Emerges",
-    "metrics": "population 312,388,575,433 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 501,
     "date": "2026-08-02",
     "narrative": "Tick 501: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 509: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 408,998,104,723 \u00b7 treasury 100000 GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 510,
+    "date": "2026-08-03",
+    "narrative": "Tick 510: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 435,648,097,970 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
