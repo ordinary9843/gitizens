@@ -1,13 +1,5 @@
 [
   {
-    "number": 59,
-    "title": "Knowledge Nexus Initiative",
-    "issue_number": 701,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/701",
-    "enacted_date": "2026-07-15",
-    "era": "Modern Era"
-  },
-  {
     "number": 60,
     "title": "Wellness for All Initiative",
     "issue_number": 732,
@@ -157,6 +149,14 @@
     "issue_number": 1116,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1116",
     "enacted_date": "2026-08-02",
+    "era": "Modern Era"
+  },
+  {
+    "number": 79,
+    "title": "Strengthen Education",
+    "issue_number": 1124,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1124",
+    "enacted_date": "2026-08-03",
     "era": "Modern Era"
   }
 ]
