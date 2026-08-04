@@ -1325,6 +1325,27 @@ class TestProcessIssueOsError:
         state = json.loads((tmp_path / "world/state.json").read_text())
         assert state.get("laws_count") == BASE_STATE["laws_count"]
 
+    def test_failed_reactions_skips_issue(self, tmp_path, monkeypatch):
+        # A failed API call should skip the issue and NOT close it as zero votes
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world" / "reps.json").write_text("[]")
+
+        issue = {
+            "number": 42,
+            "title": "A proposal",
+            "body": "## Effect\n```yaml\ntype: declaration\n```",
+            "createdAt": "2023-01-01T00:00:00Z",
+            "author": {"login": "user"}
+        }
+
+        with patch("scripts.engine.proposals.get_reactions", side_effect=_engine_proposals.GitHubAPIError("API down")), \
+             patch("scripts.engine.proposals.run") as mock_run:
+            _engine_proposals.process_issue(issue)
+            
+            # Assert it was skipped: no run calls (no comment, no close, no edit)
+            mock_run.assert_not_called()
+
 
 # ===========================================================================
 # process_ai_proposal — timing skip (lines 251-252) and OSError (lines 325-327)

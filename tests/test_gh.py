@@ -62,6 +62,12 @@ class TestRun:
             result = gh.run(["git", "push"])
         assert result == "partial output"
 
+    def test_nonzero_exit_with_check_raises_error(self):
+        proc = _make_completed_process(returncode=1, stdout="partial output", stderr="some error")
+        with patch("engine.gh.subprocess.run", return_value=proc):
+            with pytest.raises(gh.GitHubAPIError, match="Command git push failed: some error"):
+                gh.run(["git", "push"], check=True)
+
     def test_nonzero_exit_with_empty_stderr_no_warn(self):
         # When stderr is empty, no warning is printed but stdout is still returned.
         proc = _make_completed_process(returncode=1, stdout="out", stderr="")

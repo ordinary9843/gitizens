@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 from .constants import VOTING_PERIOD_DAYS, AI_VOTING_HOURS, POLICY_METRICS, get_policy_cost
-from .gh import run, gh_json, get_reactions, REPO, SKIP_TIMING
+from .gh import run, gh_json, get_reactions, REPO, SKIP_TIMING, GitHubAPIError
 from . import gh as _gh
 from .state import read_state, write_state, read_stats, write_stats
 from .world import determine_era, check_threshold_tags, run_world_engine, apply_effect, apply_tags
@@ -78,7 +78,12 @@ def process_issue(issue: dict):
         print(f"  #{number}: voting period not over, skipping")
         return
 
-    for_votes, against_votes, for_voters, against_voters = get_reactions(number)
+    try:
+        for_votes, against_votes, for_voters, against_voters = get_reactions(number)
+    except GitHubAPIError as e:
+        print(f"  #{number}: failed to fetch reactions, skipping ({e})")
+        return
+
     today = now.strftime("%Y-%m-%d")
     clean_title = re.sub(r"^\[PROPOSAL\]\s*", "", title).strip()
 
