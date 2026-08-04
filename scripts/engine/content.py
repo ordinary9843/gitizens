@@ -7,7 +7,7 @@ from urllib.parse import quote as _url_quote
 
 from openai import OpenAI
 
-from .constants import CATEGORIES, POLICY_METRICS, BASE_STATE_FIELDS, ANNALS_INTERVAL
+from .constants import CATEGORIES, POLICY_METRICS, BASE_STATE_FIELDS, ANNALS_INTERVAL, format_number
 from .gh import run, gh_json, REPO, GITHUB_TOKEN
 from .state import read_json, read_state, write_state
 from .world import pollution_level
@@ -154,8 +154,8 @@ def update_readme(state: dict, stats: dict, law_number: int | None = None, date:
     )
 
     era_b  = _badge_url_val(era)
-    pop_b  = str(state.get("population", 0))
-    trs_b  = str(state.get("treasury", 0))
+    pop_b  = format_number(state.get("population", 0))
+    trs_b  = format_number(state.get("treasury", 0))
     stb_b  = str(state.get("stability", 0))
     laws_b = str(laws_count)
     pol_b  = str(state.get("pollution", 0))

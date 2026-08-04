@@ -79,3 +79,25 @@ CATEGORY_MULTIPLIERS: dict[str, list[tuple[str, str, int | float, float]]] = {
     "scientific": [("education",    "high", 65, 1.5)],
     "social":     [("welfare",      "low",  40, 1.5), ("stability",    "low",  40, 1.5)],
 }
+
+def format_number(num: int | float) -> str:
+    """Format large numbers with K, M, B suffixes (e.g. 1.2M, 15.4K)."""
+    if num is None:
+        return "0"
+    try:
+        num = float(num)
+    except (ValueError, TypeError):
+        return "0"
+        
+    abs_num = abs(num)
+    if abs_num >= 1_000_000_000:
+        return f"{num / 1_000_000_000:.1f}B".replace(".0B", "B")
+    if abs_num >= 1_000_000:
+        return f"{num / 1_000_000:.1f}M".replace(".0M", "M")
+    if abs_num >= 10_000:
+        return f"{num / 1_000:.1f}K".replace(".0K", "K")
+        
+    # If it's an integer and < 10000, just format with commas, else fallback to standard string
+    if isinstance(num, float) and num.is_integer():
+        return f"{int(num):,}"
+    return f"{num:,}"

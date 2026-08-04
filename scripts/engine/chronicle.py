@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .constants import WORLD_GENERATION_RULES, THRESHOLD_TAGS
+from .constants import WORLD_GENERATION_RULES, THRESHOLD_TAGS, format_number
 from .gh import run, gh_json, REPO
 from .state import read_json, read_state, write_state, read_stats, write_stats
 from .content import client, upsert_bot_comment
@@ -300,8 +300,8 @@ def save_dispatch(state: dict, tick_changed: bool, laws_passed: int,
         return
 
     metrics_str = (
-        f"population {state.get('population', 0):,} · "
-        f"treasury {state.get('treasury', 0)} GC · "
+        f"population {format_number(state.get('population', 0))} · "
+        f"treasury {format_number(state.get('treasury', 0))} GC · "
         f"stability {state.get('stability', 0)}/100 · "
         f"pollution {state.get('pollution', 0)}/100"
     )

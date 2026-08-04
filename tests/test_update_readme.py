@@ -81,7 +81,7 @@ class TestMain:
         self._write_readme(tmp_path)
         update_readme.main()
         readme = (tmp_path / "README.md").read_text(encoding="utf-8")
-        assert "1234" in readme
+        assert "1,234" in readme
 
     def test_treasury_in_badge(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)

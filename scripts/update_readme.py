@@ -2,8 +2,15 @@
 """Rewrite the world-state badge block in README.md from current state.json."""
 import json
 import re
+import sys
+import os
 from pathlib import Path
 from urllib.parse import quote
+
+# Ensure scripts/ is in sys.path so engine resolves correctly
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from engine.constants import format_number
 
 
 def _badge_val(s: str) -> str:
@@ -15,8 +22,8 @@ def main():
     state = json.loads(Path("world/state.json").read_text(encoding="utf-8"))
 
     era    = _badge_val(state.get("era", "Founding Era"))
-    pop    = str(state.get("population", 0))
-    trs    = str(state.get("treasury", 0))
+    pop    = format_number(state.get("population", 0))
+    trs    = format_number(state.get("treasury", 0))
     stb    = str(state.get("stability", 0))
     laws   = str(state.get("laws_count", 0))
     pol    = str(state.get("pollution", 0))
