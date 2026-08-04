@@ -66,11 +66,12 @@ Open the [live dashboard](https://ordinary9843.github.io/gitizens/) and scroll t
 
 | Mechanic | How it works |
 |----------|-------------|
-| **Policy laws** | Change education / industry / welfare / green_policy / defense (costs 100 Git Coins) |
-| **Idle growth** | World ticks every hour regardless of votes — population grows, pollution drifts, stability shifts |
+| **Policy laws** | Change education / industry / welfare / green_policy / defense (cost scales with population: 100 + pop/100 GC) |
+| **Idle growth** | World ticks every hour regardless of votes — population grows, pollution drifts, stability shifts, deducts upkeep costs |
 | **Random events** | 15% chance per tick — drought, stock crash, alien signal, pandemic, and 47 more |
 | **Era progression** | Founding → Industrial → Modern → Golden Age (or Crisis Age if things go wrong) |
 | **Treasury** | Earned from GitHub stars (×10 GC) + industrial output + population tax |
+| **Crises & Disasters**| High pollution (>=90) triggers eco-disasters (-20% pop). Treasury bankruptcy (<0 GC) crashes stability and welfare. |
 | **Buildings** | Auto-created/removed by the world engine based on metric thresholds |
 
 ---

@@ -20,7 +20,7 @@ changes:
 <!--
 Effect type examples:
 
-Policy (costs 100 Git Coins):
+Policy (cost scales with population: 100 + pop/100 Git Coins):
   type: policy
   changes:
     education: +10        # valid metrics: education, industry, welfare, green_policy, defense
