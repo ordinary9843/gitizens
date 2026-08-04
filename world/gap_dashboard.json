@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-04T16:11:25.728220+00:00",
+  "updated_at": "2026-08-04T18:26:51.888667+00:00",
   "pending": [],
   "at_risk": [
     {
@@ -13,9 +13,9 @@
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 71,
+      "current": 85,
       "target": 20,
-      "gap": 51
+      "gap": 65
     }
   ],
   "milestones_achieved": [
