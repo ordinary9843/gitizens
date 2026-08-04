@@ -6,7 +6,7 @@
   "world_summary": "",
   "treasury": 100000,
   "currency": "Git Coins",
-  "stars_last_counted": 6,
+  "stars_last_counted": 7,
   "education": 98,
   "industry": 100,
   "welfare": 95,
@@ -23,6 +23,7 @@
   ],
   "known_stargazers": [
     "DoddiC",
+    "bsmensah-ctrl",
     "cjswoto",
     "nulldataset",
     "ordinary9843",
