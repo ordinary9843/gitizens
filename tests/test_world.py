@@ -95,21 +95,21 @@ class TestIdleEconomy:
     def test_industrial_income(self):
         state = {**BASE_STATE, "industry": 30}  # 30//10 = 3 GC
         new = self._run_tick(state)
-        maint = (new["population"] // 1000 * 5) + (30 // 10 * 2)
+        maint = (new["population"] // 1000 * 1) + (30 // 10 * 2)
         assert new["treasury"] == max(0, BASE_STATE["treasury"] + 3 + (new["population"] // 500) - maint)
 
     def test_industrial_income_max(self):
         state = {**BASE_STATE, "industry": 80}  # 80//10 = 8 GC
         new = self._run_tick(state)
         pop_income = new["population"] // 500
-        maint = (new["population"] // 1000 * 5) + (80 // 10 * 2)
+        maint = (new["population"] // 1000 * 1) + (80 // 10 * 2)
         assert new["treasury"] == max(0, BASE_STATE["treasury"] + 8 + pop_income - maint)
 
     def test_population_income(self):
         state = {**BASE_STATE, "population": 1000}  # 1000//500 = 2 GC
         new = self._run_tick(state)
         ind_income = state["industry"] // 10
-        maint = (new["population"] // 1000 * 5) + (state["industry"] // 10 * 2)
+        maint = (new["population"] // 1000 * 1) + (state["industry"] // 10 * 2)
         assert new["treasury"] == max(0, state["treasury"] + ind_income + (new["population"] // 500) - maint)
 
     def test_welfare_population_bonus(self):
@@ -131,6 +131,16 @@ class TestIdleEconomy:
                  "industry": 80, "green_policy": 0}
         new = self._run_tick(state)
         assert new["population"] < state["population"]
+
+    def test_very_high_pollution_penalty(self):
+        # Above 90 pollution triggers the severe 20% pop wipeout and -15 stability penalty
+        state = {**BASE_STATE, "pollution": 90, "welfare": 50,
+                 "industry": 80, "green_policy": 0, "population": 1000, "stability": 80}
+        new = self._run_tick(state)
+        # 1000 * 0.8 = 800 (or slightly different due to normal tick birth/death before the wipeout)
+        assert new["population"] <= 850
+        assert new["stability"] < 70
+
 
     def test_era_recomputed_in_tick(self):
         state = {**BASE_STATE, "industry": 65, "education": 55, "pollution": 0, "stability": 79}

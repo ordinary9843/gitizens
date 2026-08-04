@@ -224,7 +224,8 @@ def world_autonomous_tick() -> bool:
 
         industry_income = ind // 10
         pop_income      = new_pop // 500
-        maintenance_cost = (new_pop // 1000 * 5) + (ind // 10 * 2)
+        # Reduce population maintenance cost from 5 per 1000 to 1 per 1000 so population growth doesn't drain treasury
+        maintenance_cost = (new_pop // 1000 * 1) + (ind // 10 * 2)
         new_treasury = treasury + industry_income + pop_income - maintenance_cost
 
         if new_treasury < 0:

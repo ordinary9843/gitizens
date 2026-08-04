@@ -139,3 +139,29 @@ class TestHealthCheck:
         
         out = capsys.readouterr().out
         assert "Health issue already exists (#999)" in out
+
+    def test_naive_datetime(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        # Without Z
+        next_tick = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S")
+        self._setup_world(tmp_path, next_tick_at=next_tick)
+        with patch("scripts.health_check.gh_json", return_value=[]):
+            health_check.main()
+        assert "World is healthy" in capsys.readouterr().out
+
+    @patch("scripts.health_check.gh_json")
+    def test_gh_json_exception(self, mock_gh_json, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        next_tick = (datetime.now(timezone.utc) - timedelta(hours=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        self._setup_world(tmp_path, next_tick_at=next_tick)
+        
+        mock_gh_json.side_effect = Exception("API Error")
+        
+        with patch("scripts.health_check.run") as mock_run:
+            with pytest.raises(SystemExit) as exc:
+                health_check.main()
+            assert exc.value.code == 1
+            assert mock_run.call_count == 1
+        
+        assert "Failed to query issues: API Error" in capsys.readouterr().out
+

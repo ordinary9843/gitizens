@@ -3069,19 +3069,28 @@ function renderWorldStats(state) {
   const stb = state.stability || 0;
   const stbClr = stb >= 60 ? '#10d870' : stb >= 40 ? '#e8a020' : '#f03040';
 
+  function formatNumber(num) {
+    if (num == null) return "0";
+    let absNum = Math.abs(num);
+    if (absNum >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+    if (absNum >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+    if (absNum >= 1e4) return (num / 1e3).toFixed(1) + 'K';
+    return num.toLocaleString();
+  }
+
   function deltaBadge(key) {
     if (!_prevMetrics) return '';
     const d = (state[key]||0) - (_prevMetrics[key]||0);
     if (d === 0) return '';
-    const sign = d > 0 ? '+' : '';
+    const sign = d > 0 ? '+' : '-';
     const col  = d > 0 ? '#10d870' : '#f03040';
-    return `<span class="delta-badge" style="color:${col}">${sign}${d}</span>`;
+    return `<span class="delta-badge" style="color:${col}">${sign}${formatNumber(Math.abs(d))}</span>`;
   }
 
   document.getElementById('world-stats').innerHTML = [
-    { label:'Population', key:'population', value:(state.population||0).toLocaleString(), color:'#bcd2ec' },
+    { label:'Population', key:'population', value:formatNumber(state.population), color:'#bcd2ec' },
     { label:'Stability',  key:'stability',  value:`${stb}/100`,                           color:stbClr    },
-    { label:'Treasury',   key:'treasury',   value:`${(state.treasury||0).toLocaleString()} GC`, color:'#e8a020' },
+    { label:'Treasury',   key:'treasury',   value:`${formatNumber(state.treasury)} GC`, color:'#e8a020' },
     { label:'Laws',       key:'laws_count', value: state.laws_count || 0,                 color:'#bcd2ec' },
     { label:'Era',        key:'era',        value: state.era || '—',                      color:'#4e6e94' },
   ].map(({label, key, value, color}) => `

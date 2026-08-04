@@ -5,10 +5,15 @@ import os
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-# Ensure scripts/ is in sys.path so the engine package resolves correctly
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import subprocess
 
-from engine.gh import run, gh_json, REPO
+REPO = os.environ.get("GITHUB_REPOSITORY", "ordinary9843/gitizens")
+
+def run(cmd, check=True):
+    return subprocess.run(cmd, check=check, capture_output=True, text=True).stdout
+
+def gh_json(cmd):
+    return json.loads(run(cmd))
 
 def main():
     state_path = Path("world/state.json")

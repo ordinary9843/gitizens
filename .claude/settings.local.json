@@ -6,7 +6,9 @@
       "Write(*)",
       "Edit(*)",
       "Glob(*)",
-      "Grep(*)"
+      "Grep(*)",
+      "WebSearch",
+      "PowerShell($env:GITHUB_TOKEN=\"test-token\"; $env:GITHUB_REPOSITORY=\"test/repo\"; cd D:\\\\Workspace\\\\gitizens\\\\scripts; python -c \"from engine.constants import VALID_TYPES; print\\(VALID_TYPES\\)\")"
     ]
   },
   "hooks": {
