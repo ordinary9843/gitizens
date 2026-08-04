@@ -93,17 +93,18 @@ class TestIdleEconomy:
                 return state
 
     def test_industrial_income(self):
-        state = {**BASE_STATE, "industry": 30}  # 30//10 = 3 GC
+        state = {**BASE_STATE, "industry": 30, "welfare": 0, "defense": 0, "green_policy": 0} 
         new = self._run_tick(state)
-        maint = (new["population"] // 1000 * 1) + (30 // 10 * 2)
-        assert new["treasury"] == max(0, BASE_STATE["treasury"] + 3 + (new["population"] // 500) - maint)
+        maint = new["population"] // 1000
+        # industry 30 * 10 = 300 GC
+        assert new["treasury"] == max(0, BASE_STATE["treasury"] + 300 + (new["population"] // 200) - maint)
 
     def test_industrial_income_max(self):
-        state = {**BASE_STATE, "industry": 80}  # 80//10 = 8 GC
+        state = {**BASE_STATE, "industry": 80, "welfare": 0, "defense": 0, "green_policy": 0}
         new = self._run_tick(state)
-        pop_income = new["population"] // 500
-        maint = (new["population"] // 1000 * 1) + (80 // 10 * 2)
-        assert new["treasury"] == max(0, BASE_STATE["treasury"] + 8 + pop_income - maint)
+        pop_income = new["population"] // 200
+        maint = new["population"] // 1000
+        assert new["treasury"] == max(0, BASE_STATE["treasury"] + 800 + pop_income - maint)
 
     def test_population_invalid_value_skipped(self):
         state = {**BASE_STATE, "population": 500}
@@ -122,11 +123,11 @@ class TestIdleEconomy:
             assert mock_write.call_args[0][0]["treasury"] == 100
 
     def test_population_income(self):
-        state = {**BASE_STATE, "population": 1000}  # 1000//500 = 2 GC
+        state = {**BASE_STATE, "population": 1000, "welfare": 0, "defense": 0, "green_policy": 0}
         new = self._run_tick(state)
-        ind_income = state["industry"] // 10
-        maint = (new["population"] // 1000 * 1) + (state["industry"] // 10 * 2)
-        assert new["treasury"] == max(0, state["treasury"] + ind_income + (new["population"] // 500) - maint)
+        ind_income = state["industry"] * 10
+        maint = new["population"] // 1000
+        assert new["treasury"] == max(0, state["treasury"] + ind_income + (new["population"] // 200) - maint)
 
     def test_welfare_population_bonus(self):
         # High welfare grows population (births > deaths, no migration penalty).
@@ -143,19 +144,19 @@ class TestIdleEconomy:
     def test_high_pollution_population_penalty(self):
         # Extreme pollution combined with neutral welfare causes population decline
         # (pop>70 death bonus dominates birth rate).
-        state = {**BASE_STATE, "pollution": 70, "welfare": 50,
+        state = {**BASE_STATE, "pollution": 75, "welfare": 50,
                  "industry": 80, "green_policy": 0}
         new = self._run_tick(state)
         assert new["population"] < state["population"]
 
     def test_very_high_pollution_penalty(self):
-        # Above 90 pollution triggers the severe 20% pop wipeout and -15 stability penalty
-        state = {**BASE_STATE, "pollution": 90, "welfare": 50,
+        # Above 80 pollution triggers the severe 10% pop wipeout and -10 stability penalty
+        state = {**BASE_STATE, "pollution": 85, "welfare": 50,
                  "industry": 80, "green_policy": 0, "population": 1000, "stability": 80}
         new = self._run_tick(state)
-        # 1000 * 0.8 = 800 (or slightly different due to normal tick birth/death before the wipeout)
-        assert new["population"] <= 850
-        assert new["stability"] < 70
+        # 1000 * 0.9 = 900
+        assert new["population"] <= 950
+        assert new["stability"] < 75
 
     def test_carrying_capacity_overcrowding(self):
         # High population well beyond carrying capacity
@@ -1007,7 +1008,7 @@ class TestComputePopulationDelta:
         assert new < 2000
 
     def test_low_defense_triggers_migration_out(self):
-        new = self._call(pop=2000, welfare=60, defense=20)
+        new = self._call(pop=2000, welfare=20, defense=20)
         assert new < 2000
 
     def test_compound_collapse(self):
@@ -1394,7 +1395,7 @@ class TestAutonomousTickWelfareStabilityBonus:
         state = {
             "industry": 0, "green_policy": 0, "welfare": 90,
             "defense": 50, "pollution": 0, "population": 1000,
-            "stability": 50, "treasury": 100, "era": "Founding Era",
+            "stability": 50, "treasury": 10000, "era": "Founding Era",
             "next_tick_at": (datetime.now(timezone.utc) - timedelta(hours=3)
                              ).strftime("%Y-%m-%dT%H:%M:%SZ"),
         }

@@ -32,8 +32,8 @@ def compute_population_delta(
 ) -> int:
     """Return the new population after one tick of bidirectional dynamics.
 
-    Inputs are clamped at 0 for safety. Result is floored at POPULATION_FLOOR
-    so the civilization can never go extinct (gameplay sanity).
+    Uses Logistic Growth model so population smoothly approaches carrying capacity.
+    Result is floored at POPULATION_FLOOR.
     """
     pop = max(0, int(pop))
     welfare    = max(0, int(welfare))
@@ -43,37 +43,31 @@ def compute_population_delta(
     treasury   = max(0, int(treasury))
     rng = rng or random
 
-    birth_rate = 0.010
-    if welfare > 60:    birth_rate += 0.005
-    if treasury > 1000: birth_rate += 0.005
-    if stability > 70:  birth_rate += 0.003
-
-    death_rate = 0.008
-    if pollution > 70:  death_rate += 0.010
-    elif pollution > 50: death_rate += 0.006
-    if welfare < 30:    death_rate += 0.004
-
-    migration_rate = 0.0
-    if stability < 30:  migration_rate -= 0.015
-    if defense < 30:    migration_rate -= 0.008
-    if welfare > 70 and pollution < 30: migration_rate += 0.005
-
-    births    = round(pop * birth_rate)
-    deaths    = round(pop * death_rate)
-    migration = round(pop * migration_rate)
-    noise     = round(pop * rng.uniform(-POPULATION_NOISE_PCT, POPULATION_NOISE_PCT))
+    # Base growth rate (r)
+    # Starts at +0.015, penalized by pollution, low welfare, and low stability.
+    r = 0.015
+    if welfare > 60:    r += 0.005
+    if treasury > 1000: r += 0.005
+    if stability > 70:  r += 0.003
     
-    raw_new_pop = pop + births - deaths + migration + noise
+    if pollution > 70:  r -= 0.020
+    elif pollution > 50: r -= 0.010
+    if welfare < 30:    r -= 0.010
+    if stability < 30:  r -= 0.020
+    if defense < 30:    r -= 0.010
 
-    # Logistic growth / Carrying capacity
-    # Base capacity is 5000, max policy capacity brings it to around 100_000+
-    capacity = 5000 + (welfare * 200) + (industry * 100) + (green_policy * 100)
-    
-    if raw_new_pop > capacity:
-        # Overcrowding penalty: population crashes towards capacity
-        overcrowding_ratio = raw_new_pop / capacity
-        penalty = min(0.20, 0.05 * overcrowding_ratio)  # Max 20% crash per tick
-        raw_new_pop = int(raw_new_pop * (1.0 - penalty))
+    # Carrying capacity (K)
+    K = 5000 + (welfare * 300) + (industry * 100) + (green_policy * 100)
+
+    # Logistic Growth: Delta = r * pop * (1 - pop/K)
+    # To handle extreme overpopulation (The Great Correction), we enforce a hard crash.
+    if pop > K * 2:
+        crash = min(0.20, max(0.10, pop / max(1, K * 10)))
+        raw_new_pop = int(pop * (1.0 - crash))
+    else:
+        delta = r * pop * (1.0 - (pop / K))
+        noise = pop * rng.uniform(-POPULATION_NOISE_PCT, POPULATION_NOISE_PCT)
+        raw_new_pop = int(pop + delta + noise)
 
     return max(POPULATION_FLOOR, raw_new_pop)
 
@@ -237,31 +231,32 @@ def world_autonomous_tick() -> bool:
             industry=ind, green_policy=grn,
         )
 
-        target_stb = max(0, min(100, 30 + wel // 5 + dfn // 10 - new_pol // 10))
+        target_stb = max(0, min(100, 30 + wel // 4 + dfn // 4 - new_pol // 3))
         new_stb = stb + (1 if stb < target_stb else (-1 if stb > target_stb else 0))
         if wel > 80:
             new_stb = min(100, new_stb + 1)
 
-        industry_income = ind // 10
-        pop_income      = new_pop // 500
+        industry_income = ind * 10
+        pop_income      = new_pop // 200
         
-        # Non-linear maintenance cost: larger populations are quadratically more expensive
-        # 1 GC per 1000 citizens base, plus overhead that scales with every 100,000 citizens
-        base_maintenance = new_pop // 1000
-        overhead = (new_pop // 100_000) ** 2
-        maintenance_cost = base_maintenance + overhead + (ind // 10 * 2)
+        infra_cost      = new_pop // 1000
+        welfare_cost    = wel * 2
+        defense_cost    = dfn * 2
+        green_cost      = grn * 2
+        
+        maintenance_cost = infra_cost + welfare_cost + defense_cost + green_cost
         
         new_treasury = treasury + industry_income + pop_income - maintenance_cost
 
         if new_treasury < 0:
             new_treasury = 0
-            new_stb = max(0, new_stb - 10)
-            wel = max(0, wel - 5)
+            new_stb = max(0, new_stb - 5)
+            wel = max(0, wel - 2)
             state["welfare"] = wel
 
-        if new_pol >= 90:
-            new_pop = int(new_pop * 0.8)
-            new_stb = max(0, new_stb - 15)
+        if new_pol >= 80:
+            new_pop = int(new_pop * 0.9)
+            new_stb = max(0, new_stb - 10)
 
         new_treasury = min(100_000, new_treasury)
 
