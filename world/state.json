@@ -7,13 +7,13 @@
   "treasury": 0,
   "currency": "Git Coins",
   "stars_last_counted": 7,
-  "education": 98,
-  "industry": 100,
-  "welfare": 60,
-  "green_policy": 97,
-  "defense": 100,
-  "population": 553473558251,
-  "pollution": 0,
+  "education": 96,
+  "industry": 97,
+  "welfare": 45,
+  "green_policy": 94,
+  "defense": 99,
+  "population": 276176425600,
+  "pollution": 24,
   "stability": 0,
   "tags_applied": [
     "era/founding-era",
@@ -32,5 +32,5 @@
     "{\"message\":\"You do not have permission to view the stargazers of this repository\",\"documentation_url\":\"https://docs.github.com/rest/activity/starring#list-stargazers\",\"status\":\"403\"}"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-08-04T08:00:00Z"
+  "next_tick_at": "2026-08-04T11:00:00Z"
 }

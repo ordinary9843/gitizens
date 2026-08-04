@@ -1,14 +1,28 @@
 {
-  "updated_at": "2026-08-04T07:38:55.912605+00:00",
+  "updated_at": "2026-08-04T10:32:32.992498+00:00",
   "pending": [],
-  "at_risk": [],
+  "at_risk": [
+    {
+      "name": "Social Housing District",
+      "metric": "welfare",
+      "current": 45,
+      "removal_at": 48
+    }
+  ],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 0,
+      "current": 24,
       "target": 60,
-      "gap": 60
+      "gap": 36
+    },
+    {
+      "tag": "recovery/air-cleaned",
+      "metric": "pollution",
+      "current": 24,
+      "target": 20,
+      "gap": 4
     }
   ],
   "milestones_achieved": [
