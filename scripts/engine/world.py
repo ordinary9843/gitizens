@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .constants import (
-    POLICY_METRICS, POLICY_COST, _EVOLVE_BLOCKED,
+    POLICY_METRICS, get_policy_cost, _EVOLVE_BLOCKED,
     WORLD_GENERATION_RULES, THRESHOLD_TAGS,
 )
 from .state import read_json, write_json, read_state, write_state
@@ -224,7 +224,20 @@ def world_autonomous_tick() -> bool:
 
         industry_income = ind // 10
         pop_income      = new_pop // 500
-        new_treasury = min(100_000, treasury + industry_income + pop_income)
+        maintenance_cost = (new_pop // 1000 * 5) + (ind // 10 * 2)
+        new_treasury = treasury + industry_income + pop_income - maintenance_cost
+
+        if new_treasury < 0:
+            new_treasury = 0
+            new_stb = max(0, new_stb - 10)
+            wel = max(0, wel - 5)
+            state["welfare"] = wel
+
+        if new_pol >= 90:
+            new_pop = int(new_pop * 0.8)
+            new_stb = max(0, new_stb - 15)
+
+        new_treasury = min(100_000, new_treasury)
 
         state.update({
             "pollution":  new_pol,
@@ -304,7 +317,7 @@ def apply_effect(effect_data: dict | None, law_number: int, extra_cost: int = 0)
                 current = state.get(metric, 0)
                 state[metric] = max(0, min(100, current + int(delta)))
         if state.get("treasury") is not None:
-            state["treasury"] = max(0, state["treasury"] - POLICY_COST - max(0, int(extra_cost)))
+            state["treasury"] = max(0, state["treasury"] - get_policy_cost(state) - max(0, int(extra_cost)))
         write_state(state)
 
     elif etype == "evolve":

@@ -4,7 +4,7 @@ import yaml
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from .constants import VOTING_PERIOD_DAYS, AI_VOTING_HOURS, POLICY_METRICS, POLICY_COST
+from .constants import VOTING_PERIOD_DAYS, AI_VOTING_HOURS, POLICY_METRICS, get_policy_cost
 from .gh import run, gh_json, get_reactions, REPO, SKIP_TIMING
 from . import gh as _gh
 from .state import read_state, write_state, read_stats, write_stats
@@ -117,7 +117,8 @@ def process_issue(issue: dict):
 
             treasury = state_before.get("treasury", 0)
             currency = state_before.get("currency", "Git Coins")
-            total_cost = POLICY_COST + extra_cost
+            policy_cost = get_policy_cost(state_before)
+            total_cost = policy_cost + extra_cost
             if treasury < total_cost:
                 print(f"  #{number}: TREASURY BLOCKED — needs {total_cost}, has {treasury}")
                 stats = read_stats()
@@ -125,7 +126,7 @@ def process_issue(issue: dict):
                 stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
                 write_stats(stats)
                 penalty_note = (
-                    f" (base **{POLICY_COST}** + repeat-touch surcharge **{extra_cost}**)"
+                    f" (base **{policy_cost}** + repeat-touch surcharge **{extra_cost}**)"
                     if extra_cost > 0 else ""
                 )
                 run(["gh", "issue", "comment", str(number), "--repo", REPO,
@@ -167,9 +168,10 @@ def process_issue(issue: dict):
         cost_line = ""
         if effect_data and effect_data.get("type") == "policy":
             currency  = state_before.get("currency", "Git Coins")
-            total_cost = POLICY_COST + extra_cost
+            policy_cost = get_policy_cost(state_before)
+            total_cost = policy_cost + extra_cost
             cost_breakdown = (
-                f" (base {POLICY_COST} + surcharge {extra_cost})" if extra_cost > 0 else ""
+                f" (base {policy_cost} + surcharge {extra_cost})" if extra_cost > 0 else ""
             )
             cost_line = (
                 f"**Treasury:** -{total_cost} {currency}{cost_breakdown} "
@@ -291,7 +293,8 @@ def process_ai_proposal(issue: dict):
 
         treasury = state_before.get("treasury", 0)
         currency = state_before.get("currency", "Git Coins")
-        total_cost = POLICY_COST + extra_cost
+        policy_cost = get_policy_cost(state_before)
+        total_cost = policy_cost + extra_cost
         if treasury < total_cost:
             print(f"  AI-proposal #{number}: TREASURY BLOCKED — needs {total_cost}, has {treasury}")
             stats = read_stats()
@@ -299,7 +302,7 @@ def process_ai_proposal(issue: dict):
             stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
             write_stats(stats)
             penalty_note = (
-                f" (base **{POLICY_COST}** + repeat-touch surcharge **{extra_cost}**)"
+                f" (base **{policy_cost}** + repeat-touch surcharge **{extra_cost}**)"
                 if extra_cost > 0 else ""
             )
             run(["gh", "issue", "comment", str(number), "--repo", REPO,

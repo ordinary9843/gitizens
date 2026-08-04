@@ -95,19 +95,22 @@ class TestIdleEconomy:
     def test_industrial_income(self):
         state = {**BASE_STATE, "industry": 30}  # 30//10 = 3 GC
         new = self._run_tick(state)
-        assert new["treasury"] == BASE_STATE["treasury"] + 3 + (new["population"] // 500)
+        maint = (new["population"] // 1000 * 5) + (30 // 10 * 2)
+        assert new["treasury"] == max(0, BASE_STATE["treasury"] + 3 + (new["population"] // 500) - maint)
 
     def test_industrial_income_max(self):
         state = {**BASE_STATE, "industry": 80}  # 80//10 = 8 GC
         new = self._run_tick(state)
         pop_income = new["population"] // 500
-        assert new["treasury"] == BASE_STATE["treasury"] + 8 + pop_income
+        maint = (new["population"] // 1000 * 5) + (80 // 10 * 2)
+        assert new["treasury"] == max(0, BASE_STATE["treasury"] + 8 + pop_income - maint)
 
     def test_population_income(self):
         state = {**BASE_STATE, "population": 1000}  # 1000//500 = 2 GC
         new = self._run_tick(state)
         ind_income = state["industry"] // 10
-        assert new["treasury"] == state["treasury"] + ind_income + (new["population"] // 500)
+        maint = (new["population"] // 1000 * 5) + (state["industry"] // 10 * 2)
+        assert new["treasury"] == max(0, state["treasury"] + ind_income + (new["population"] // 500) - maint)
 
     def test_welfare_population_bonus(self):
         # High welfare grows population (births > deaths, no migration penalty).

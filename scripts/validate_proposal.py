@@ -16,7 +16,7 @@ from openai import OpenAI
 # Resolve engine package from the same directory as this script
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from engine.constants import (
-    COOLDOWN_DAYS, POLICY_COST, POLICY_METRICS,
+    COOLDOWN_DAYS, get_policy_cost, POLICY_METRICS,
     VALID_TYPES, _EVOLVE_BLOCKED,
 )
 
@@ -316,14 +316,15 @@ def validate():
             state    = read_json(Path("world/state.json"))
             treasury = state.get("treasury", 0)
             currency = state.get("currency", "Git Coins")
-            if treasury >= POLICY_COST:
+            policy_cost = get_policy_cost(state)
+            if treasury >= policy_cost:
                 status = f"Treasury check passed. Current balance: **{treasury} {currency}**."
             else:
                 status = (f"Treasury insufficient. Balance: **{treasury} {currency}** "
-                          f"— short by **{POLICY_COST - treasury} {currency}**. "
+                          f"— short by **{policy_cost - treasury} {currency}**. "
                           f"This proposal will be blocked at tally unless the treasury is replenished.")
             gh("issue", "comment", ISSUE_NUMBER, "--repo", REPO, "--body",
-               f"**Cost notice:** Enacting this policy costs **{POLICY_COST} {currency}**.\n\n{status}")
+               f"**Cost notice:** Enacting this policy costs **{policy_cost} {currency}**.\n\n{status}")
         except Exception as e:
             print(f"  [WARN] treasury notice failed: {e}")
 

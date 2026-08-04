@@ -23,7 +23,10 @@ CATEGORY_COLORS = {
 
 POLICY_METRICS = {"education", "industry", "welfare", "green_policy", "defense"}
 VALID_TYPES = {"declaration", "policy", "evolve", "state_patch"}
-POLICY_COST = 100
+def get_policy_cost(state: dict) -> int:
+    population = state.get("population", 1000)
+    return 100 + (population // 100)
+
 
 BASE_STATE_FIELDS = {
     "era", "laws_count", "last_enacted", "world_summary", "founded_date",
