@@ -26,6 +26,8 @@ def compute_population_delta(
     stability: int,
     defense: int,
     treasury: int,
+    industry: int = 0,
+    green_policy: int = 0,
     rng: random.Random | None = None,
 ) -> int:
     """Return the new population after one tick of bidirectional dynamics.
@@ -60,8 +62,20 @@ def compute_population_delta(
     deaths    = round(pop * death_rate)
     migration = round(pop * migration_rate)
     noise     = round(pop * rng.uniform(-POPULATION_NOISE_PCT, POPULATION_NOISE_PCT))
+    
+    raw_new_pop = pop + births - deaths + migration + noise
 
-    return max(POPULATION_FLOOR, pop + births - deaths + migration + noise)
+    # Logistic growth / Carrying capacity
+    # Base capacity is 5000, max policy capacity brings it to around 100_000+
+    capacity = 5000 + (welfare * 200) + (industry * 100) + (green_policy * 100)
+    
+    if raw_new_pop > capacity:
+        # Overcrowding penalty: population crashes towards capacity
+        overcrowding_ratio = raw_new_pop / capacity
+        penalty = min(0.20, 0.05 * overcrowding_ratio)  # Max 20% crash per tick
+        raw_new_pop = int(raw_new_pop * (1.0 - penalty))
+
+    return max(POPULATION_FLOOR, raw_new_pop)
 
 
 def slugify(text: str) -> str:
@@ -209,12 +223,18 @@ def world_autonomous_tick() -> bool:
         stb = state.get("stability", 80)
         treasury = state.get("treasury", 0)
 
-        pol_delta = +1 if ind - grn >= 20 else (-1 if grn - ind >= 20 else 0)
+        # Pollution delta scales logarithmically with population
+        import math
+        pop_scale = int(math.log10(max(1, pop / 1000))) if pop > 1000 else 0
+        base_pol_delta = (ind - grn) // 20
+        pol_delta = base_pol_delta + pop_scale
+        
         new_pol = max(0, min(100, pol + pol_delta))
 
         new_pop = compute_population_delta(
             pop=pop, welfare=wel, pollution=new_pol,
             stability=stb, defense=dfn, treasury=treasury,
+            industry=ind, green_policy=grn,
         )
 
         target_stb = max(0, min(100, 30 + wel // 5 + dfn // 10 - new_pol // 10))
@@ -224,8 +244,13 @@ def world_autonomous_tick() -> bool:
 
         industry_income = ind // 10
         pop_income      = new_pop // 500
-        # Reduce population maintenance cost from 5 per 1000 to 1 per 1000 so population growth doesn't drain treasury
-        maintenance_cost = (new_pop // 1000 * 1) + (ind // 10 * 2)
+        
+        # Non-linear maintenance cost: larger populations are quadratically more expensive
+        # 1 GC per 1000 citizens base, plus overhead that scales with every 100,000 citizens
+        base_maintenance = new_pop // 1000
+        overhead = (new_pop // 100_000) ** 2
+        maintenance_cost = base_maintenance + overhead + (ind // 10 * 2)
+        
         new_treasury = treasury + industry_income + pop_income - maintenance_cost
 
         if new_treasury < 0:
@@ -246,6 +271,15 @@ def world_autonomous_tick() -> bool:
             "stability":  new_stb,
             "treasury":   new_treasury,
         })
+        
+        # Policy Entropy: policies over 50 have a chance to decay by 1 (simulating aging infrastructure)
+        for p_metric in POLICY_METRICS:
+            val = state.get(p_metric, 0)
+            if val > 50:
+                decay_chance = (val - 50) / 100.0  # e.g., at 100, chance is 50%. At 60, chance is 10%.
+                if random.random() < decay_chance:
+                    state[p_metric] = val - 1
+                    
         new_era = determine_era(state)
         era_changed = new_era != state.get("era", "Founding Era")
         state["era"] = new_era

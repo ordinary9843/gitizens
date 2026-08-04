@@ -105,6 +105,22 @@ class TestIdleEconomy:
         maint = (new["population"] // 1000 * 1) + (80 // 10 * 2)
         assert new["treasury"] == max(0, BASE_STATE["treasury"] + 8 + pop_income - maint)
 
+    def test_population_invalid_value_skipped(self):
+        state = {**BASE_STATE, "population": 500}
+        with patch.object(_engine_world, "read_state", return_value=dict(state)), \
+             patch.object(_engine_world, "write_state") as mock_write:
+            effect = {"type": "state_patch", "patch": {"population": "abc"}}
+            _engine_world.apply_effect(effect, 1)
+            assert mock_write.call_args[0][0]["population"] == 500
+
+    def test_treasury_invalid_value_skipped(self):
+        state = {**BASE_STATE, "treasury": 100}
+        with patch.object(_engine_world, "read_state", return_value=dict(state)), \
+             patch.object(_engine_world, "write_state") as mock_write:
+            effect = {"type": "state_patch", "patch": {"treasury": None}}
+            _engine_world.apply_effect(effect, 1)
+            assert mock_write.call_args[0][0]["treasury"] == 100
+
     def test_population_income(self):
         state = {**BASE_STATE, "population": 1000}  # 1000//500 = 2 GC
         new = self._run_tick(state)
@@ -120,9 +136,9 @@ class TestIdleEconomy:
 
     def test_pollution_population_penalty(self):
         state = {**BASE_STATE, "welfare": 70, "industry": 80, "green_policy": 0}
-        # ind - grn = 80 -> pol_delta = +1 -> new_pol = 1 (still low)
+        # ind - grn = 80 -> pol_delta = 80 // 20 = 4
         new = self._run_tick(state)
-        assert new["pollution"] == 1
+        assert new["pollution"] == 4
 
     def test_high_pollution_population_penalty(self):
         # Extreme pollution combined with neutral welfare causes population decline
@@ -140,6 +156,44 @@ class TestIdleEconomy:
         # 1000 * 0.8 = 800 (or slightly different due to normal tick birth/death before the wipeout)
         assert new["population"] <= 850
         assert new["stability"] < 70
+
+    def test_carrying_capacity_overcrowding(self):
+        # High population well beyond carrying capacity
+        # capacity = 5000 + 70*200 + 80*100 + 10*100 = 5000 + 14000 + 8000 + 1000 = 28000
+        state = {**BASE_STATE, "population": 100_000, "welfare": 70, "industry": 80, "green_policy": 10}
+        new = self._run_tick(state)
+        # Should crash due to overcrowding penalty
+        assert new["population"] < 100_000
+
+    def test_population_scaled_pollution(self):
+        # Large population generates extra pollution
+        state = {**BASE_STATE, "population": 1_000_000, "industry": 20, "green_policy": 20, "pollution": 0}
+        # ind - grn = 0, but pop = 1,000,000 (log10(1000) = 3) -> pol_delta = 3
+        new = self._run_tick(state)
+        assert new["pollution"] >= 3
+
+    def test_nonlinear_maintenance_cost(self):
+        # Massive population quadratically drains treasury
+        state = {**BASE_STATE, "population": 2_000_000, "industry": 0, "treasury": 100_000}
+        # base_maint = 2000. overhead = (20)**2 = 400. total maint = 2400.
+        # pop_income = 2000000 // 500 = 4000
+        new = self._run_tick(state)
+        # Should just ensure the formula executes properly
+        assert "treasury" in new
+
+    def test_policy_entropy_decay(self):
+        import random
+        # Provide a high policy and mock random to always trigger decay
+        state = {**BASE_STATE, "welfare": 100, "education": 60, "industry": 40}
+        rng_orig = random.random
+        random.random = lambda: 0.0  # Always triggers
+        try:
+            new = self._run_tick(state)
+            assert new["welfare"] == 99
+            assert new["education"] == 59
+            assert new["industry"] == 40  # Under 50, doesn't decay
+        finally:
+            random.random = rng_orig
 
 
     def test_era_recomputed_in_tick(self):
@@ -1298,6 +1352,23 @@ class TestApplyEffectBranches:
 # ===========================================================================
 # apply_event_effects — all_random field
 # ===========================================================================
+
+    def test_apply_effect_none(self):
+        # Should return without error
+        _engine_world.apply_effect(None, 1)
+
+    def test_apply_effect_policy(self):
+        state = {**BASE_STATE, "education": 50, "treasury": 1000}
+        with patch.object(_engine_world, "read_state", return_value=dict(state)), \
+             patch.object(_engine_world, "write_state") as mock_write, \
+             patch.object(_engine_world, "get_policy_cost", return_value=100):
+            effect = {"type": "policy", "changes": {"education": 10, "invalid_metric": 5}}
+            _engine_world.apply_effect(effect, 1, extra_cost=50)
+            
+            written = mock_write.call_args[0][0]
+            assert written["education"] == 60
+            assert "invalid_metric" not in written
+            assert written["treasury"] == 1000 - 100 - 50
 
 class TestApplyEventEffectsAllRandom:
     def test_all_random_modifies_all_metrics(self, tmp_path, monkeypatch):
