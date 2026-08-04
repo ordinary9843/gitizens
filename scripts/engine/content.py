@@ -13,10 +13,13 @@ from .state import read_json, read_state, write_state
 from .world import pollution_level
 
 
-client = OpenAI(
-    base_url="https://models.inference.ai.azure.com",
-    api_key=GITHUB_TOKEN,
-)
+try:
+    client = OpenAI(
+        base_url="https://models.inference.ai.azure.com",
+        api_key=GITHUB_TOKEN or "dummy-token",
+    )
+except Exception:
+    client = None
 
 _LLM_EXCLUDE = {"known_stargazers", "tags_applied"}
 
