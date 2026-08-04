@@ -1,12 +1,5 @@
 [
   {
-    "tick": 512,
-    "date": "2026-08-03",
-    "narrative": "Tick 512: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 482,339,785,981 \u00b7 treasury 100000 GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 513,
     "date": "2026-08-03",
     "narrative": "Tick 513: autonomous tick applied \u00b7 event: Simulation Theory Proven.",
@@ -67,6 +60,13 @@
     "date": "2026-08-04",
     "narrative": "Tick 521: autonomous tick applied.",
     "changes": "autonomous tick applied",
+    "metrics": "population 276.2B \u00b7 treasury 0 GC \u00b7 stability 0/100 \u00b7 pollution 24/100"
+  },
+  {
+    "tick": 522,
+    "date": "2026-08-04",
+    "narrative": "Tick 522: event: Coup Attempt.",
+    "changes": "event: Coup Attempt",
     "metrics": "population 276.2B \u00b7 treasury 0 GC \u00b7 stability 0/100 \u00b7 pollution 24/100"
   }
 ]
