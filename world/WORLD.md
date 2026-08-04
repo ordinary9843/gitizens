@@ -8,10 +8,10 @@
 
 | Field | Value |
 |-------|-------|
-| Era | Modern Era |
+| Era | Crisis Age |
 | Laws enacted | 80 |
 | Last enacted | 2026-08-03 |
-| Treasury | 100,000 Git Coins |
+| Treasury | 0 Git Coins |
 
 ### Policy
 
@@ -19,7 +19,7 @@
 |--------|-------|
 | Education | 98/100 |
 | Industry | 100/100 |
-| Welfare | 95/100 |
+| Welfare | 75/100 |
 | Green Policy | 97/100 |
 | Defense | 100/100 |
 | Pollution *(derived)* | 0/100 |
