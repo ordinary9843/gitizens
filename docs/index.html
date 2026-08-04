@@ -6,6 +6,9 @@
   <title>GITIZENS — Civilization Simulator</title>
   <link rel="icon" type="image/png" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -561,8 +564,7 @@
 <div id="city-frame">
   <div id="city-container">
     <div id="loading">FETCHING WORLD STATE…</div>
-    <canvas id="city-bg"></canvas>
-    <canvas id="city-fg"></canvas>
+    <div id="webgl-container" style="width:100%; height:100%;"></div>
   </div>
 </div>
 
@@ -862,2044 +864,433 @@ if (typeof Chart !== 'undefined') {
 
 let _radarChart = null, _histChart = null;
 
-// ── Canvas city state ─────────────────────────────────────────────────────────
-
-let _bgCtx = null, _fgCtx = null, _cityW = 900, _cityH = 380, _cityGY = 290;
+// ── Three.js city state ─────────────────────────────────────────────────────────
+let scene, camera, renderer, controls;
+let cityGroup;
 let _S = {};
 let _animFrame = null;
-let _animTime = 0;
-
-let _stars = [];
-
-let _weatherType = null;
-const _rain = [];
-
-let _buildingHits = [];
-let _winSpots = [];
-let _streetlights = [];
-let _treeBranches = [];
-let _neonSigns = [];
-let _searchlights = [];
-let _buildingRises = [];
-let _seenBuildingNames = new Set();
-let _cityInitialized = false;
-let _nightFactor = 1; // 0 = full day, 1 = full night
-let _antennaBlinks = [];
-let _manholes = [];
-let _flags = [];
-let _elevators = [];
-let _gondolas = [];
-let _laundryLines = [];
-
-let _eventExpiry = null;
-let _eventCountdownTimer = null;
-
+let sunLight, hemiLight;
 let _prevMetrics = null;
 
-// ── Smoke particle system ─────────────────────────────────────────────────────
-
-const _smoke = [];
-let _chimneys = [];
-
-function spawnSmoke() {
-  _chimneys.forEach(({x, y, intensity}) => {
-    if (Math.random() > 0.12) return;
-    _smoke.push({
-      x, y,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: -0.6 - Math.random() * 0.6,
-      alpha: 0.22 + Math.random() * 0.18 * intensity,
-      r: 5 + Math.random() * 3,
-      decay: 0.004 + Math.random() * 0.003,
-    });
-    if (_smoke.length > 200) _smoke.splice(0, 20);
-  });
+let _seed = 12345;
+function seededRandom() {
+  _seed = (_seed * 9301 + 49297) % 233280;
+  return _seed / 233280;
 }
 
-function drawSmoke(ctx) {
-  for (let i = _smoke.length - 1; i >= 0; i--) {
-    const p = _smoke[i];
-    p.x += p.vx; p.y += p.vy; p.alpha -= p.decay; p.r += 0.08;
-    if (p.alpha <= 0) { _smoke.splice(i, 1); continue; }
-    ctx.globalAlpha = p.alpha;
-    ctx.fillStyle = '#999';
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
-}
+let modelsLoaded = {};
+let _walkers = [];
+let _vehicles = [];
+let _gridHelper = null;
+let _groundPlane = null;
 
-// ── Rain particle system ──────────────────────────────────────────────────────
-
-function setWeatherFromEvent(evt) {
-  if (!evt || !evt.id) { _weatherType = null; return; }
-  const t = ((evt.title || '') + ' ' + (evt.description || '')).toLowerCase();
-  if (evt.is_crisis) _weatherType = 'crisis';
-  else if (/storm|rain|flood|hurricane|typhoon/.test(t)) _weatherType = 'rain';
-  else if (/drought|dry|heat|arid|wildfir/.test(t)) _weatherType = 'drought';
-  else _weatherType = null;
-  if (/earthquake|quake|tremor|seism/.test(t)) triggerScreenShake(1);
-}
-
-function spawnRain() {
-  if (_rain.length > 250) return;
-  for (let i = 0; i < 5; i++) {
-    _rain.push({
-      x: Math.random() * (_cityW + 80) - 40,
-      y: -8,
-      vy: 9 + Math.random() * 5,
-      vx: -1.5 - Math.random() * 0.8,
-      len: 9 + Math.random() * 7,
-      alpha: 0.25 + Math.random() * 0.3,
-    });
-  }
-}
-
-function drawRain(ctx) {
-  ctx.strokeStyle = '#7ec8e3';
-  ctx.lineWidth = 1;
-  for (let i = _rain.length - 1; i >= 0; i--) {
-    const p = _rain[i];
-    p.x += p.vx; p.y += p.vy;
-    if (p.y > _cityH + 10) { _rain.splice(i, 1); continue; }
-    ctx.globalAlpha = p.alpha;
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-    ctx.lineTo(p.x + p.vx * (p.len / p.vy), p.y + p.len);
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
-}
-
-// ── Cloud system ─────────────────────────────────────────────────────────────
-
-const _clouds = [];
-
-function initClouds() {
-  _clouds.length = 0;
-  const pol = (_S.pollution || 0);
-  const count = pol > 60 ? 6 : pol > 30 ? 4 : 3;
-  for (let i = 0; i < count; i++) {
-    _clouds.push({
-      x: Math.random() * _cityW,
-      y: 22 + Math.random() * 68,
-      speed: 0.05 + Math.random() * 0.11,
-      scale: 0.45 + Math.random() * 0.9,
-      alpha: pol > 50 ? 0.09 + Math.random() * 0.08 : 0.04 + Math.random() * 0.055,
-    });
-  }
-}
-
-function drawClouds(ctx) {
-  if (_clouds.length === 0) initClouds();
-  const pol = _S.pollution || 0;
-  const base = pol > 55 ? '#2e1a0e' : pol > 25 ? '#182034' : '#1c2840';
-  _clouds.forEach(c => {
-    c.x += c.speed;
-    if (c.x > _cityW + 140) c.x = -140;
-    ctx.globalAlpha = c.alpha;
-    ctx.fillStyle = base;
-    const s = c.scale;
-    ctx.beginPath(); ctx.ellipse(c.x,      c.y,      30*s, 13*s, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(c.x+25*s, c.y+5*s,  22*s, 11*s, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(c.x-20*s, c.y+6*s,  18*s, 9*s,  0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(c.x+8*s,  c.y-9*s,  20*s, 12*s, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(c.x-7*s,  c.y-5*s,  15*s, 9*s,  0, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
-  });
-}
-
-// ── Bird flock system ─────────────────────────────────────────────────────────
-
-const _birds = [];
-let _birdTimer = 0;
-
-function spawnBirds() {
-  if (++_birdTimer < 580 + ~~(Math.random() * 480)) return;
-  if (_birds.length > 0) return;
-  _birdTimer = 0;
-  const count = 4 + ~~(Math.random() * 5);
-  const fromLeft = Math.random() > 0.5;
-  const startX = fromLeft ? -30 : _cityW + 30;
-  const dir = fromLeft ? 1 : -1;
-  const startY = 16 + Math.random() * 52;
-  for (let i = 0; i < count; i++) {
-    _birds.push({
-      x: startX + (Math.random() - 0.5) * 50,
-      y: startY + (Math.random() - 0.5) * 24,
-      vx: dir * (0.85 + Math.random() * 0.65),
-      vy: (Math.random() - 0.5) * 0.18,
-      phase: Math.random() * Math.PI * 2,
-      sz: 0.6 + Math.random() * 0.45,
-    });
-  }
-}
-
-function drawBirds(ctx) {
-  ctx.lineCap = 'round';
-  for (let i = _birds.length - 1; i >= 0; i--) {
-    const b = _birds[i];
-    b.x += b.vx; b.y += b.vy;
-    b.phase = (b.phase + 0.14) % (Math.PI * 2);
-    if (b.x < -90 || b.x > _cityW + 90) { _birds.splice(i, 1); continue; }
-    const wing = Math.sin(b.phase) * 4.5 * b.sz;
-    ctx.globalAlpha = 0.48;
-    ctx.strokeStyle = '#8ab4c8';
-    ctx.lineWidth = 1.1 * b.sz;
-    ctx.beginPath();
-    ctx.moveTo(b.x - 7*b.sz, b.y + wing);
-    ctx.quadraticCurveTo(b.x - 3*b.sz, b.y, b.x, b.y);
-    ctx.quadraticCurveTo(b.x + 3*b.sz, b.y, b.x + 7*b.sz, b.y + wing);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-  }
-}
-
-// ── Shooting star ─────────────────────────────────────────────────────────────
-
-let _shootingStar = null;
-let _shootingStarTimer = 0;
-
-function updateShootingStar(ctx) {
-  const pol = _S.pollution || 0;
-  if (++_shootingStarTimer > 700 + ~~(Math.random() * 700) && !_shootingStar) {
-    if (Math.random() < (1 - pol / 100) * 0.55) {
-      _shootingStarTimer = 0;
-      const fromLeft = Math.random() > 0.5;
-      const mag = 3.5 + Math.random() * 3;
-      _shootingStar = {
-        x: fromLeft ? _cityW * 0.05 + Math.random() * _cityW * 0.35
-                    : _cityW * 0.6  + Math.random() * _cityW * 0.35,
-        y: 6 + Math.random() * 42,
-        vx: (fromLeft ? 1 : -1) * mag,
-        vy: 1.1 + Math.random() * 1.3,
-        life: 1.0,
-        decay: 0.024 + Math.random() * 0.018,
-        len: 38 + Math.random() * 48,
-      };
-    }
-  }
-  if (!_shootingStar) return;
-  const ss = _shootingStar;
-  const mag = Math.hypot(ss.vx, ss.vy);
-  const nx = ss.vx / mag, ny = ss.vy / mag;
-  const tx = ss.x - nx * ss.len * ss.life;
-  const ty = ss.y - ny * ss.len * ss.life;
-  const grad = ctx.createLinearGradient(tx, ty, ss.x, ss.y);
-  grad.addColorStop(0, 'rgba(255,255,200,0)');
-  grad.addColorStop(0.7, `rgba(255,255,230,${ss.life * 0.5})`);
-  grad.addColorStop(1, `rgba(255,255,250,${ss.life * 0.95})`);
-  ctx.strokeStyle = grad; ctx.lineWidth = 1.8 * ss.life; ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(ss.x, ss.y); ctx.stroke();
-  ctx.globalAlpha = ss.life * 0.9; ctx.fillStyle = 'white';
-  ctx.beginPath(); ctx.arc(ss.x, ss.y, 2 * ss.life, 0, Math.PI * 2); ctx.fill();
-  // Halo
-  ctx.globalAlpha = ss.life * 0.25; ctx.fillStyle = '#ffffc8';
-  ctx.beginPath(); ctx.arc(ss.x, ss.y, 5 * ss.life, 0, Math.PI * 2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ss.x += ss.vx; ss.y += ss.vy;
-  ss.life -= ss.decay;
-  if (ss.life <= 0 || ss.y > _cityGY * 0.45) _shootingStar = null;
-}
-
-// ── Day / Night cycle ─────────────────────────────────────────────────────────
-
-function updateNightFactor() {
-  const now = new Date();
-  const h = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
-  const DAWN = 6, DUSK = 18, TRANS = 1.5;
-  let bright = 0;
-  if      (h >= DAWN - TRANS && h < DAWN) bright = (h - (DAWN - TRANS)) / TRANS;
-  else if (h >= DAWN && h < DUSK)         bright = 1;
-  else if (h >= DUSK && h < DUSK + TRANS) bright = 1 - (h - DUSK) / TRANS;
-  _nightFactor = 1 - Math.max(0, Math.min(1, bright));
-}
-
-function drawDayNight(ctx) {
-  const W = _cityW, GY = _cityGY;
-  const now = new Date();
-  const h = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
-  const dayBright = 1 - _nightFactor;
-
-  // Golden hour / dawn / dusk warm horizon glow (no heavy overlay — just colour)
-  const isGolden = (h > 4.5 && h < 8.5) || (h > 16 && h < 21);
-  if (isGolden && dayBright > 0.5) {
-    const gt = h < 12
-      ? Math.min(1, (h - 4.5) / 2) * Math.min(1, (8.5 - h) / 2)
-      : Math.min(1, (h - 16) / 2) * Math.min(1, (21 - h) / 2);
-    const goldenA = gt * 0.38;
-    const hG = ctx.createLinearGradient(0, GY - 110, 0, GY - 5);
-    hG.addColorStop(0, 'rgba(0,0,0,0)');
-    hG.addColorStop(0.5, `rgba(210,95,18,${goldenA})`);
-    hG.addColorStop(1,   `rgba(250,140,25,${goldenA * 1.2})`);
-    ctx.fillStyle = hG; ctx.fillRect(0, GY - 110, W, 110);
-    const sunX = W * (h < 12 ? 0.15 : 0.85);
-    const sG = ctx.createRadialGradient(sunX, GY - 8, 0, sunX, GY - 8, 80);
-    sG.addColorStop(0, `rgba(255,195,55,${goldenA * 0.7})`);
-    sG.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = sG; ctx.fillRect(sunX - 80, GY - 88, 160, 88);
-  }
-
-  // Sun disc — only show when clearly daytime (avoid overlapping with moon at dawn/dusk)
-  if (dayBright > 0.5) {
-    const sunArc = Math.max(0, Math.min(1, (h - 6) / 12));
-    const sunX = W * (0.18 + sunArc * 0.64);
-    const sunY = GY * (0.30 - Math.sin(sunArc * Math.PI) * 0.14);
-    const discA = dayBright * 0.42;
-    const dG = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 28);
-    dG.addColorStop(0,    `rgba(255,252,200,${discA})`);
-    dG.addColorStop(0.4,  `rgba(255,235,90,${discA * 0.6})`);
-    dG.addColorStop(1,    'rgba(0,0,0,0)');
-    ctx.fillStyle = dG; ctx.fillRect(sunX - 28, sunY - 28, 56, 56);
-  }
-}
-
-function drawMoon(ctx) {
-  const now = new Date();
-  const h = now.getUTCHours() + now.getUTCMinutes() / 60;
-  if (_nightFactor < 0.5) return;
-  const W = _cityW, GY = _cityGY;
-  // Moon arc: rises at dusk, sets at dawn
-  const nt = h < 6 ? (h + 6) / 12 : h >= 18 ? (h - 18) / 12 : -1;
-  if (nt < 0) return;
-  const mx = W * (0.18 + nt * 0.64);
-  const my = GY * (0.45 - Math.sin(nt * Math.PI) * 0.26);
-  // Moon phase (day of month → phase angle)
-  const phaseOffset = (now.getUTCDate() % 29.5) / 29.5;
-  // Glow halo
-  const moonA = _nightFactor * 0.9;
-  const haloG = ctx.createRadialGradient(mx, my, 6, mx, my, 30);
-  haloG.addColorStop(0, `rgba(200,215,255,${moonA * 0.18})`);
-  haloG.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = haloG; ctx.fillRect(mx - 30, my - 30, 60, 60);
-  // Moon disc
-  ctx.save();
-  ctx.fillStyle = `rgba(210,225,255,${moonA * 0.92})`;
-  ctx.beginPath(); ctx.arc(mx, my, 8, 0, Math.PI * 2); ctx.fill();
-  // Crescent shadow
-  const shadowOffset = Math.cos(phaseOffset * Math.PI * 2) * 9;
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.fillStyle = `rgba(0,0,0,${0.82})`;
-  ctx.beginPath(); ctx.arc(mx + shadowOffset, my, 7.5, 0, Math.PI * 2); ctx.fill();
-  ctx.restore();
-}
-
-// ── Aurora Borealis ───────────────────────────────────────────────────────────
-
-function drawAurora(ctx) {
-  const pol = _S.pollution || 0;
-  const stab = _S.stability || 0;
-  if (pol > 24 || stab < 66) return;
-  const W = ctx.canvas.width, H = ctx.canvas.height;
-  const t = _animTime * 0.008;
-  const intensity = Math.max(0, (1 - pol / 25) * ((stab - 65) / 35));
-  const bands = [
-    { baseY: H * 0.08, amp: 18, color: [0, 220, 130] },
-    { baseY: H * 0.13, amp: 14, color: [60, 100, 255] },
-    { baseY: H * 0.18, amp: 10, color: [160, 50, 240] },
+function preloadModels() {
+  const loader = new THREE.GLTFLoader();
+  const models = [
+    'building-small-a', 'building-small-b', 'building-small-c', 'building-small-d',
+    'building-garage', 'grass-trees', 'grass-trees-tall', 'pavement-fountain',
+    'pavement', 'grass', 'road-straight', 'road-intersection'
   ];
-  ctx.save();
-  for (let bi = 0; bi < bands.length; bi++) {
-    const b = bands[bi];
-    const [r, g, bl] = b.color;
-    const grad = ctx.createLinearGradient(0, b.baseY - b.amp - 12, 0, b.baseY + b.amp + 12);
-    grad.addColorStop(0, `rgba(${r},${g},${bl},0)`);
-    grad.addColorStop(0.4, `rgba(${r},${g},${bl},${(0.18 + bi * 0.04) * intensity})`);
-    grad.addColorStop(0.6, `rgba(${r},${g},${bl},${(0.22 + bi * 0.04) * intensity})`);
-    grad.addColorStop(1, `rgba(${r},${g},${bl},0)`);
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.moveTo(0, b.baseY);
-    const steps = 40;
-    for (let i = 0; i <= steps; i++) {
-      const px = (i / steps) * W;
-      const py = b.baseY + Math.sin(i * 0.38 + t + bi * 1.4) * b.amp
-                         + Math.sin(i * 0.19 + t * 0.6 + bi * 2.2) * b.amp * 0.45;
-      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-    }
-    for (let i = steps; i >= 0; i--) {
-      const px = (i / steps) * W;
-      const py = b.baseY + Math.sin(i * 0.38 + t + bi * 1.4) * b.amp
-                         + Math.sin(i * 0.19 + t * 0.6 + bi * 2.2) * b.amp * 0.45
-                         + b.amp * 1.6;
-      ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    ctx.fill();
-  }
-  ctx.restore();
-}
-
-// ── Walker system ─────────────────────────────────────────────────────────────
-
-const _walkers = [];
-const WALKER_COLS = ['#c0d4ee','#4e6e94','#e8a020','#10d870','#00b8e0','#b058f8','#f07830','#00d4bc'];
-
-function initWalkers(pop) {
-  const target = Math.min(~~(pop / 55), 28);
-  while (_walkers.length > target) _walkers.pop();
-  while (_walkers.length < target) {
-    const i = _walkers.length;
-    _walkers.push({
-      x: Math.random() * _cityW,
-      dir: Math.random() > 0.5 ? 1 : -1,
-      speed: 0.22 + Math.random() * 0.44,
-      color: WALKER_COLS[i % WALKER_COLS.length],
-      jacket: WALKER_COLS[(i + 4) % WALKER_COLS.length],
-      sz: 0.82 + Math.random() * 0.36,
-      phase: Math.random() * Math.PI * 2,
-      hat: Math.random() < 0.28,
-    });
-  }
-}
-
-function drawWalker(ctx, w) {
-  const {x, color, jacket, sz, phase, dir, hat} = w;
-  const walkerAlpha = w.alpha !== undefined ? w.alpha : 1;
-  const GY = _cityGY;
-  const leg = Math.sin(phase) * 4 * sz;
-  const arm = Math.cos(phase) * 2.8 * sz;
-  ctx.save();
-  ctx.translate(x, 0);
-  ctx.scale(dir, 1);
-  ctx.lineCap = 'round';
-
-  // Ground shadow
-  ctx.globalAlpha = 0.2 * walkerAlpha;
-  ctx.fillStyle = '#000';
-  ctx.beginPath(); ctx.ellipse(0, GY - 1, 5.5*sz, 1.6*sz, 0, 0, Math.PI*2); ctx.fill();
-  ctx.globalAlpha = walkerAlpha;
-
-  // Legs
-  ctx.strokeStyle = color; ctx.lineWidth = 1.7 * sz;
-  ctx.beginPath(); ctx.moveTo(0, GY-5*sz); ctx.lineTo(leg+2*sz, GY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(0, GY-5*sz); ctx.lineTo(-leg+2*sz, GY); ctx.stroke();
-
-  // Body / jacket
-  ctx.strokeStyle = jacket || color; ctx.lineWidth = 2.6 * sz;
-  ctx.beginPath(); ctx.moveTo(0, GY-13*sz); ctx.lineTo(0, GY-5*sz); ctx.stroke();
-
-  // Arms
-  ctx.strokeStyle = color; ctx.lineWidth = 1.5 * sz;
-  ctx.beginPath(); ctx.moveTo(arm*0.38, GY-12.5*sz); ctx.lineTo(arm, GY-7*sz); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(-arm*0.38, GY-12.5*sz); ctx.lineTo(-arm, GY-8*sz); ctx.stroke();
-
-  // Head
-  ctx.fillStyle = color;
-  ctx.beginPath(); ctx.arc(0, GY - 16*sz, 2.8*sz, 0, Math.PI*2); ctx.fill();
-
-  // Hat (28% walkers)
-  if (hat) {
-    ctx.fillStyle = jacket || color;
-    ctx.fillRect(-3.5*sz, GY-20*sz, 7*sz, 2.4*sz);   // brim
-    ctx.fillRect(-2.2*sz, GY-23.8*sz, 4.4*sz, 4*sz); // crown
-  }
-
-  ctx.restore();
-}
-
-// ── Vehicle system ────────────────────────────────────────────────────────────
-
-const _vehicles = [];
-const VEHICLE_COLS = ['#c0392b','#e67e22','#f1c40f','#ecf0f1','#3498db','#95a5a6','#2c3e50','#27ae60'];
-
-function _eraVehicleType() {
-  const era = (_S && _S.era) || '';
-  if (era.includes('Golden')) return Math.random() < 0.25 ? 'hover' : 'sleek';
-  if (era.includes('Industrial')) return Math.random() < 0.3 ? 'steam' : 'cart';
-  if (era.includes('Modern')) return Math.random() < 0.2 ? 'truck' : 'car';
-  // Founding Era
-  return Math.random() < 0.55 ? 'cart' : 'car';
-}
-
-function initVehicles(pop) {
-  const target = Math.min(~~(pop / 380), 7);
-  while (_vehicles.length > target) _vehicles.pop();
-  while (_vehicles.length < target) {
-    const type = _eraVehicleType();
-    const wMap = {cart: 34, steam: 36, car: 28 + ~~(Math.random()*8), truck: 40, sleek: 32, hover: 30};
-    _vehicles.push({
-      x: Math.random() * _cityW,
-      dir: Math.random() > 0.5 ? 1 : -1,
-      speed: (type === 'cart' ? 0.28 : type === 'hover' ? 1.1 : 0.65) + Math.random() * 0.55,
-      color: VEHICLE_COLS[~~(Math.random() * VEHICLE_COLS.length)],
-      roofColor: VEHICLE_COLS[~~(Math.random() * VEHICLE_COLS.length)],
-      w: wMap[type] || 28,
-      type,
-      hoverPhase: Math.random() * Math.PI * 2,
-    });
-  }
-}
-
-function drawVehicle(ctx, v) {
-  const GY = _cityGY;
-  const w = v.w;
-  ctx.save();
-  if (v.dir < 0) { ctx.translate(v.x + w, 0); ctx.scale(-1, 1); } else { ctx.translate(v.x, 0); }
-
-  if (v.type === 'cart') {
-    // Horse-drawn cart
-    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.5, 2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
-    // Cart body
-    ctx.fillStyle = '#8B5E2A';
-    ctx.beginPath(); ctx.roundRect(w*0.35, GY-10, w*0.55, 10, 1); ctx.fill();
-    ctx.fillStyle = '#6B3E0A'; ctx.fillRect(w*0.35, GY-13, w*0.55, 4);
-    // Wheels
-    [[w*0.42, GY],[w*0.82, GY]].forEach(([wx, wy]) => {
-      ctx.strokeStyle = '#4a3010'; ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.arc(wx, wy, 5, 0, Math.PI*2); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(wx-5,wy); ctx.lineTo(wx+5,wy); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(wx,wy-5); ctx.lineTo(wx,wy+5); ctx.stroke();
-    });
-    // Horse body
-    ctx.fillStyle = '#6e4520';
-    ctx.beginPath(); ctx.ellipse(w*0.14, GY-7, 10, 5, -0.15, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(w*0.08, GY-13, 4, 0, Math.PI*2); ctx.fill();
-    ctx.strokeStyle = '#8a5a2a'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(w*0.04,GY-3); ctx.lineTo(w*0.02,GY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(w*0.14,GY-3); ctx.lineTo(w*0.12,GY); ctx.stroke();
-    // Harness line
-    ctx.strokeStyle = '#3a2808'; ctx.lineWidth = 0.7;
-    ctx.beginPath(); ctx.moveTo(w*0.24,GY-7); ctx.lineTo(w*0.35,GY-8); ctx.stroke();
-  } else if (v.type === 'steam') {
-    // Steam-era car (boxy, tall)
-    ctx.globalAlpha = 0.15; ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.5, 2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
-    ctx.fillStyle = v.color;
-    ctx.beginPath(); ctx.roundRect(0, GY-13, w, 13, 2); ctx.fill();
-    ctx.fillStyle = v.roofColor;
-    ctx.beginPath(); ctx.roundRect(w*0.1, GY-22, w*0.8, 10, [3,3,0,0]); ctx.fill();
-    ctx.fillStyle = 'rgba(120,180,220,0.6)';
-    ctx.fillRect(w*0.15, GY-20, w*0.28, 6); ctx.fillRect(w*0.57, GY-20, w*0.28, 6);
-    // Steam pipe
-    ctx.strokeStyle = '#333'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(w*0.82, GY-22); ctx.lineTo(w*0.82, GY-30); ctx.stroke();
-    ctx.fillStyle = '#555';
-    ctx.beginPath(); ctx.ellipse(w*0.82, GY-30, 3, 1.5, 0, 0, Math.PI*2); ctx.fill();
-    // Wheels
-    [w*0.18, w*0.78].forEach(wx => {
-      ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(wx, GY, 5, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#666'; ctx.beginPath(); ctx.arc(wx, GY, 2.5, 0, Math.PI*2); ctx.fill();
-    });
-    ctx.fillStyle = '#fffac8'; ctx.fillRect(w-2.5, GY-11, 2.5, 2.5);
-    ctx.fillStyle = '#ff4040'; ctx.fillRect(0, GY-11, 2.5, 2.5);
-  } else if (v.type === 'hover') {
-    // Golden Age hover car
-    const hov = Math.sin(_animTime * 0.08 + v.hoverPhase) * 2.5;
-    const h = 9;
-    ctx.globalAlpha = 0.12 + Math.abs(hov) * 0.02; ctx.fillStyle = '#80c8ff';
-    ctx.beginPath(); ctx.ellipse(w*0.5, GY+1, w*0.44, 2.2, 0, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
-    // Repulsor glow
-    const repG = ctx.createRadialGradient(w*0.5, GY-2+hov, 0, w*0.5, GY-2+hov, w*0.52);
-    repG.addColorStop(0, 'rgba(60,180,255,0.14)'); repG.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = repG; ctx.fillRect(0, GY-10+hov, w, 12);
-    // Sleek body (no wheels)
-    ctx.fillStyle = v.color;
-    ctx.beginPath(); ctx.roundRect(0, GY-h+hov, w, h, [4,4,2,2]); ctx.fill();
-    // Canopy
-    ctx.fillStyle = v.roofColor;
-    ctx.beginPath(); ctx.roundRect(w*0.18, GY-h-6+hov, w*0.64, 7, [4,4,0,0]); ctx.fill();
-    ctx.fillStyle = 'rgba(120,220,255,0.8)';
-    ctx.fillRect(w*0.22, GY-h-4.5+hov, w*0.55, 4);
-    // Accent light strip
-    ctx.fillStyle = '#00e4ff'; ctx.globalAlpha = 0.6;
-    ctx.fillRect(0, GY-h+1+hov, w, 1.5);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#fffac8'; ctx.fillRect(w-2, GY-h+3+hov, 2, 2);
-  } else if (v.type === 'sleek') {
-    // Modern sleek car (Golden Age contemporary)
-    const h = 10;
-    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.52, 2.2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
-    ctx.fillStyle = v.color;
-    ctx.beginPath(); ctx.roundRect(0, GY-h, w, h, [0,0,2,2]); ctx.fill();
-    ctx.fillStyle = v.roofColor;
-    ctx.beginPath(); ctx.roundRect(w*0.2, GY-h-8, w*0.6, 9, [3,3,0,0]); ctx.fill();
-    ctx.fillStyle = 'rgba(140,230,255,0.75)';
-    ctx.fillRect(w*0.24, GY-h-6.5, w*0.52, 5);
-    ctx.fillStyle = '#ffee80'; ctx.fillRect(w-2.5, GY-h+3.5, 2.5, 2.5);
-    ctx.fillStyle = '#ff3030'; ctx.fillRect(0, GY-h+3.5, 2.5, 2.5);
-    [w*0.18, w*0.78].forEach(wx => {
-      ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(wx, GY, 3.8, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#666';    ctx.beginPath(); ctx.arc(wx, GY, 1.8, 0, Math.PI*2); ctx.fill();
-    });
-  } else if (v.type === 'truck') {
-    // Standard truck
-    const h = 12;
-    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.52, 2.2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
-    ctx.fillStyle = v.color;
-    ctx.beginPath(); ctx.roundRect(0, GY-h, w, h, 2); ctx.fill();
-    ctx.fillStyle = v.roofColor;
-    ctx.beginPath(); ctx.roundRect(w*0.62, GY-h-9, w*0.36, 9, [2,2,0,0]); ctx.fill();
-    ctx.fillStyle = 'rgba(140,220,255,0.72)';
-    ctx.fillRect(w*0.65, GY-h-7.5, w*0.28, 5.5);
-    ctx.fillStyle = '#fffac8'; ctx.fillRect(w-2.5, GY-h+3.5, 2.5, 2.5);
-    ctx.fillStyle = '#ff4040'; ctx.fillRect(0, GY-h+3.5, 2.5, 2.5);
-    [w*0.12, w*0.82].forEach(wx => {
-      ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(wx, GY, 4, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#555';    ctx.beginPath(); ctx.arc(wx, GY, 2, 0, Math.PI*2); ctx.fill();
-    });
-  } else {
-    // Standard car
-    const h = 10;
-    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.ellipse(w*0.5, GY, w*0.52, 2.2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
-    ctx.fillStyle = v.color;
-    ctx.beginPath(); ctx.roundRect(0, GY-h, w, h, 2); ctx.fill();
-    ctx.fillStyle = v.roofColor;
-    ctx.beginPath(); ctx.roundRect(w*0.22, GY-h-7, w*0.55, 7, [2,2,0,0]); ctx.fill();
-    ctx.fillStyle = 'rgba(140,220,255,0.72)';
-    ctx.fillRect(w*0.26, GY-h-5.5, w*0.20, 4.5);
-    ctx.fillRect(w*0.52, GY-h-5.5, w*0.20, 4.5);
-    ctx.fillStyle = '#fffac8'; ctx.fillRect(w-2.5, GY-h+3.5, 2.5, 2.5);
-    ctx.fillStyle = '#ff4040'; ctx.fillRect(0, GY-h+3.5, 2.5, 2.5);
-    [w*0.17, w*0.76].forEach(wx => {
-      ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(wx, GY, 3.6, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#555';    ctx.beginPath(); ctx.arc(wx, GY, 1.9, 0, Math.PI*2); ctx.fill();
-    });
-  }
-
-  ctx.restore();
-}
-
-// ── Leaf particles ────────────────────────────────────────────────────────────
-
-const _leaves = [];
-
-function spawnLeaves() {
-  if (!_treeBranches.length) return;
-  const gp = _S.green_policy || 0;
-  if (gp < 20 || Math.random() > 0.035 + gp * 0.0008) return;
-  if (_leaves.length > 65) return;
-  const src = _treeBranches[~~(Math.random() * _treeBranches.length)];
-  const leafCols = ['#3a7a18','#4a9a20','#6ab830','#a8c840','#c8a820','#d89020','#c87020'];
-  _leaves.push({
-    x: src.x + (Math.random() - 0.5) * src.rx * 1.4,
-    y: src.y + (Math.random() - 0.5) * src.ry * 0.6,
-    vx: (Math.random() - 0.5) * 0.55,
-    vy: 0.25 + Math.random() * 0.38,
-    rot: Math.random() * Math.PI * 2,
-    rotV: (Math.random() - 0.5) * 0.11,
-    color: leafCols[~~(Math.random() * leafCols.length)],
-    life: 1,
-    sz: 2.4 + Math.random() * 1.8,
-    seed: ~~(Math.random() * 1000),
-  });
-}
-
-function drawLeaves(ctx) {
-  for (let i = _leaves.length - 1; i >= 0; i--) {
-    const l = _leaves[i];
-    l.x += l.vx + Math.sin(_animTime * 0.02 + l.seed * 0.04) * 0.22;
-    l.y += l.vy;
-    l.rot += l.rotV;
-    l.life -= 0.0035;
-    if (l.life <= 0 || l.y > _cityGY + 4) { _leaves.splice(i, 1); continue; }
-    ctx.save();
-    ctx.globalAlpha = Math.min(l.life, 0.82);
-    ctx.translate(l.x, l.y);
-    ctx.rotate(l.rot);
-    ctx.fillStyle = l.color;
-    ctx.beginPath(); ctx.ellipse(0, 0, l.sz, l.sz * 0.52, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-  }
-}
-
-// ── Rain puddle reflections ────────────────────────────────────────────────────
-
-const _puddles = [];
-let _puddleTimer = 0;
-
-function updatePuddles(ctx) {
-  if (++_puddleTimer % 15 === 0 && _puddles.length < 10) {
-    _puddles.push({
-      x: 18 + Math.random() * (_cityW - 36),
-      r: 0.5,
-      maxR: 12 + Math.random() * 16,
-      alpha: 0.38 + Math.random() * 0.14,
-    });
-  }
-  for (let i = _puddles.length - 1; i >= 0; i--) {
-    const p = _puddles[i];
-    p.r += 0.52;
-    p.alpha -= 0.0075;
-    if (p.alpha <= 0 || p.r > p.maxR) { _puddles.splice(i, 1); continue; }
-    ctx.save();
-    ctx.globalAlpha = p.alpha;
-    ctx.strokeStyle = 'rgba(160,210,255,1)';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    ctx.ellipse(p.x, _cityGY - 1.5, p.r * 2.4, p.r * 0.52, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  }
-}
-
-// ── Confetti (Golden Age) ─────────────────────────────────────────────────────
-
-const _confetti = [];
-const CONFETTI_COLS = ['#f8e060','#f07030','#50d8a0','#5090e8','#d060d8','#f04060'];
-
-function spawnConfetti() {
-  const era = (_S && _S.era) || '';
-  if (!era.includes('Golden')) return;
-  if (_confetti.length > 120) return;
-  if (Math.random() > 0.08) return;
-  _confetti.push({
-    x: Math.random() * _cityW,
-    y: -8,
-    vx: (Math.random() - 0.5) * 1.6,
-    vy: 0.5 + Math.random() * 0.7,
-    rot: Math.random() * Math.PI * 2,
-    rotV: (Math.random() - 0.5) * 0.14,
-    w: 5 + Math.random() * 5,
-    h: 3 + Math.random() * 3,
-    color: CONFETTI_COLS[~~(Math.random() * CONFETTI_COLS.length)],
-    life: 1,
-  });
-}
-
-function drawConfetti(ctx) {
-  spawnConfetti();
-  for (let i = _confetti.length - 1; i >= 0; i--) {
-    const c = _confetti[i];
-    c.x += c.vx + Math.sin(_animTime * 0.02 + i * 0.3) * 0.4;
-    c.y += c.vy;
-    c.rot += c.rotV;
-    c.life -= 0.0035;
-    if (c.life <= 0 || c.y > _cityGY + 4) { _confetti.splice(i, 1); continue; }
-    ctx.save();
-    ctx.globalAlpha = Math.min(c.life, 0.85);
-    ctx.translate(c.x, c.y); ctx.rotate(c.rot);
-    ctx.fillStyle = c.color;
-    ctx.fillRect(-c.w * 0.5, -c.h * 0.5, c.w, c.h);
-    ctx.restore();
-  }
-}
-
-// ── Crisis fire & embers ───────────────────────────────────────────────────────
-
-const _embers = [];
-let _fireSpots = [];
-
-function updateFireSpots() {
-  if (_weatherType !== 'crisis') { _fireSpots = []; return; }
-  if (_fireSpots.length) return;
-  for (let i = 0; i < 4; i++) {
-    _fireSpots.push({x: 40 + Math.random() * (_cityW - 80), y: _cityGY});
-  }
-}
-
-function drawFire(ctx) {
-  updateFireSpots();
-  if (!_fireSpots.length) { for (let i = _embers.length-1; i>=0; i--) _embers.splice(i,1); return; }
-  // Spawn embers
-  _fireSpots.forEach(fs => {
-    if (_embers.length < 80 && Math.random() < 0.35) {
-      _embers.push({
-        x: fs.x + (Math.random()-0.5)*8,
-        y: fs.y,
-        vx: (Math.random()-0.5)*0.9,
-        vy: -(1.2 + Math.random()*1.4),
-        r: 1.2 + Math.random()*1.4,
-        life: 1,
-        col: Math.random() < 0.5 ? '#ff6010' : '#ffb820',
-      });
-    }
-    // Draw flame core
-    for (let f = 0; f < 3; f++) {
-      const fh = 18 + f * 8;
-      const fw = 8 - f * 2;
-      const fG = ctx.createRadialGradient(fs.x, fs.y, 0, fs.x, fs.y - fh * 0.5, fh);
-      fG.addColorStop(0, `rgba(255,200,60,0.7)`);
-      fG.addColorStop(0.4, `rgba(255,80,10,0.4)`);
-      fG.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.save();
-      ctx.globalAlpha = 0.65 - f * 0.15;
-      ctx.fillStyle = fG;
-      const wave = Math.sin(_animTime * 0.12 + fs.x * 0.05 + f) * fw;
-      ctx.translate(wave, 0);
-      ctx.fillRect(fs.x - fw - 6, fs.y - fh, (fw + 6) * 2, fh);
-      ctx.restore();
-    }
-  });
-  // Draw embers
-  for (let i = _embers.length - 1; i >= 0; i--) {
-    const e = _embers[i];
-    e.x += e.vx; e.y += e.vy; e.vy *= 0.97; e.vx += Math.sin(_animTime*0.08+i*0.5)*0.04;
-    e.life -= 0.018;
-    if (e.life <= 0 || e.y < _cityGY - 80) { _embers.splice(i, 1); continue; }
-    ctx.save();
-    ctx.globalAlpha = e.life * 0.8;
-    ctx.fillStyle = e.col;
-    ctx.beginPath(); ctx.arc(e.x, e.y, e.r * e.life, 0, Math.PI*2); ctx.fill();
-    ctx.restore();
-  }
-}
-
-// ── Building demolition ────────────────────────────────────────────────────────
-
-let _demolitions = [];
-let _prevActiveNames = new Set();
-
-function checkDemolitions(active) {
-  const cur = new Set(active.map(a => a.name));
-  _prevActiveNames.forEach(name => {
-    if (!cur.has(name) && _seenBuildingNames.has(name)) {
-      const hit = _buildingHits.find(h => h.name === name);
-      if (hit) {
-        const chunks = [];
-        for (let ci = 0; ci < 18; ci++) {
-          chunks.push({
-            x: hit.x + Math.random() * hit.w,
-            y: _cityGY - Math.random() * 120,
-            vx: (Math.random() - 0.5) * 3.5,
-            vy: -2 - Math.random() * 2,
-            w: 6 + Math.random() * 10,
-            h: 4 + Math.random() * 8,
-            rot: Math.random() * Math.PI,
-            rotV: (Math.random() - 0.5) * 0.18,
-            life: 1,
-            col: ['#2a3848','#3a4858','#1e2c38'][~~(Math.random()*3)],
-          });
-        }
-        _demolitions.push({chunks, done: false});
-        _seenBuildingNames.delete(name);
-      }
-    }
-  });
-  _prevActiveNames = cur;
-}
-
-function drawDemolitions(ctx) {
-  for (let di = _demolitions.length - 1; di >= 0; di--) {
-    const dem = _demolitions[di];
-    let allDone = true;
-    dem.chunks.forEach(c => {
-      if (c.life <= 0) return;
-      allDone = false;
-      c.x += c.vx; c.y += c.vy; c.vy += 0.18; c.rot += c.rotV; c.life -= 0.012;
-      ctx.save();
-      ctx.globalAlpha = c.life * 0.9;
-      ctx.translate(c.x, c.y); ctx.rotate(c.rot);
-      ctx.fillStyle = c.col;
-      ctx.fillRect(-c.w*0.5, -c.h*0.5, c.w, c.h);
-      ctx.restore();
-    });
-    if (allDone) _demolitions.splice(di, 1);
-  }
-}
-
-// ── Puddle building reflections ────────────────────────────────────────────────
-
-function drawPuddleReflections(ctx) {
-  if (_weatherType !== 'rain' || !_buildingHits.length) return;
-  const GY = _cityGY;
-  _buildingHits.forEach(bh => {
-    const bx = bh.x + bh.w * 0.5;
-    // Mirror slice from building base (GY down to GY+18)
-    const srcY = GY - 22;
-    ctx.save();
-    ctx.globalAlpha = 0.12;
-    ctx.translate(bx, GY + 4);
-    ctx.scale(1, -0.28); // squish + flip
-    ctx.drawImage(_bgCtx.canvas, bh.x, srcY, bh.w, 22, -bh.w*0.5, 0, bh.w, 22);
-    ctx.restore();
-  });
-}
-
-// ── Lens flare ────────────────────────────────────────────────────────────────
-
-function drawLensFlare(ctx, sx, sy, brightness, color) {
-  if (brightness < 0.05) return;
-  ctx.save();
-  // Cross spikes
-  const arms = [[1,0],[0,1],[0.7,0.7],[-0.7,0.7]];
-  const a = brightness * 0.35;
-  arms.forEach(([dx, dy]) => {
-    const len = 22 + brightness * 16;
-    const g = ctx.createLinearGradient(sx, sy, sx + dx*len, sy + dy*len);
-    g.addColorStop(0, color.replace('1)', `${a})`));
-    g.addColorStop(1, color.replace('1)', '0)'));
-    ctx.strokeStyle = g; ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.moveTo(sx - dx*len, sy - dy*len);
-    ctx.lineTo(sx + dx*len, sy + dy*len); ctx.stroke();
-  });
-  // Ghost orbs along flare axis (use logical coords, keep orbs near the light source)
-  const orbs = [0.25, 0.45, 0.65];
-  orbs.forEach((t, i) => {
-    const ox = sx * (1 - t) + _cityW * 0.5 * t;
-    const oy = sy * (1 - t) + _cityGY * 0.5 * t;
-    if (oy < _cityGY * 0.5) return;
-    const r = (6 - i * 1.5) * brightness;
-    const oG = ctx.createRadialGradient(ox, oy, 0, ox, oy, r * 2);
-    oG.addColorStop(0, color.replace('1)', `${a * 0.4})`));
-    oG.addColorStop(1, color.replace('1)', '0)'));
-    ctx.fillStyle = oG; ctx.fillRect(ox - r*2, oy - r*2, r*4, r*4);
-  });
-  ctx.restore();
-}
-
-// ── Earthquake screen shake ────────────────────────────────────────────────────
-
-let _shakeIntensity = 0;
-let _shakeX = 0, _shakeY = 0;
-
-function triggerScreenShake(intensity) {
-  _shakeIntensity = Math.max(_shakeIntensity, intensity);
-}
-
-function updateScreenShake() {
-  if (_shakeIntensity < 0.01) { _shakeX = 0; _shakeY = 0; return; }
-  _shakeX = (Math.random() - 0.5) * _shakeIntensity * 8;
-  _shakeY = (Math.random() - 0.5) * _shakeIntensity * 5;
-  _shakeIntensity *= 0.88;
-  if (_shakeIntensity < 0.02) _shakeIntensity = 0;
-}
-
-// ── Lightning system ──────────────────────────────────────────────────────────
-
-let _lightning = null;
-let _lightningTimer = 0;
-
-function drawLightning(ctx) {
-  if (_weatherType !== 'crisis') { _lightning = null; return; }
-  if (++_lightningTimer > 90 + ~~(Math.random() * 180) && !_lightning) {
-    _lightningTimer = 0;
-    const sx = 20 + Math.random() * (_cityW - 40);
-    const segments = [];
-    let cx = sx, cy = _cityGY * 0.15;
-    while (cy < _cityGY - 20) {
-      const nx = cx + (Math.random() - 0.5) * 28;
-      const ny = cy + 14 + Math.random() * 16;
-      segments.push([cx, cy, nx, ny]);
-      cx = nx; cy = ny;
-    }
-    _lightning = {segments, life: 1, decay: 0.09 + Math.random() * 0.06};
-  }
-  if (!_lightning) return;
-  const {segments, life} = _lightning;
-  ctx.save();
-  ctx.globalAlpha = life * 0.85;
-  // Flash fill
-  ctx.fillStyle = `rgba(220,230,255,${life * 0.07})`;
-  ctx.fillRect(0, 0, _cityW, _cityH);
-  // Main bolt
-  ctx.strokeStyle = `rgba(200,220,255,${life})`; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
-  ctx.beginPath();
-  segments.forEach(([x1, y1, x2, y2], i) => { i === 0 ? ctx.moveTo(x1, y1) : null; ctx.lineTo(x2, y2); });
-  ctx.stroke();
-  // Bright core
-  ctx.strokeStyle = `rgba(255,255,255,${life * 0.9})`; ctx.lineWidth = 0.9;
-  ctx.beginPath();
-  segments.forEach(([x1, y1, x2, y2], i) => { i === 0 ? ctx.moveTo(x1, y1) : null; ctx.lineTo(x2, y2); });
-  ctx.stroke();
-  ctx.restore();
-  _lightning.life -= _lightning.decay;
-  if (_lightning.life <= 0) _lightning = null;
-}
-
-// ── Heat shimmer ──────────────────────────────────────────────────────────────
-
-function drawHeatShimmer(ctx) {
-  if (!_chimneys.length) return;
-  const ind = _S.industry || 0;
-  if (ind < 30) return;
-  const strength = (ind - 30) / 70;
-  _chimneys.forEach(ch => {
-    const h = 28 + strength * 24;
-    for (let i = 0; i < 4; i++) {
-      const py = ch.y - i * 8 - 4;
-      const wave = Math.sin(_animTime * 0.048 + ch.x * 0.07 + i * 0.8) * 3.5 * strength;
-      ctx.save();
-      ctx.globalAlpha = 0.055 * strength * (1 - i * 0.22);
-      ctx.strokeStyle = 'rgba(255,140,40,1)'; ctx.lineWidth = 5 - i * 0.7;
-      ctx.beginPath();
-      ctx.moveTo(ch.x + wave, py);
-      ctx.quadraticCurveTo(ch.x + wave + Math.sin(_animTime * 0.03 + i) * 4, py - 5, ch.x + wave * 0.5, py - 10);
-      ctx.stroke();
-      ctx.restore();
-    }
-  });
-}
-
-// ── Buildings ─────────────────────────────────────────────────────────────────
-
-const BUILDINGS = {
-
-  'City Park': { w:90, order:0,
-    draw(ctx, x, gy, S) {
-      const lush = Math.min((S.green_policy || 35) / 85, 1);
-      const darkG = lerpColor('#1a3012', '#0d2208', lush);
-      const midG  = lerpColor('#223818', '#162a10', lush);
-      [[10,58],[26,74],[46,66],[64,72],[80,56]].forEach(([px, h]) => {
-        const h2 = h * (0.85 + lush * 0.3);
-        const tx = x+px+6, ty = gy-h2*0.36-h2*0.42;
-        ctx.strokeStyle = '#2a4522'; ctx.lineWidth = 4; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(tx, gy); ctx.lineTo(tx, gy-h2*0.36); ctx.stroke();
-        // Shadow canopy
-        ctx.globalAlpha = 0.5; ctx.fillStyle = '#0a1a06';
-        ctx.beginPath(); ctx.ellipse(tx+3, ty+4, h2*0.3, h2*0.38, 0, 0, Math.PI*2); ctx.fill();
-        ctx.globalAlpha = 1;
-        // Main canopy
-        ctx.fillStyle = darkG;
-        ctx.beginPath(); ctx.ellipse(tx, ty, h2*0.3, h2*0.44, 0, 0, Math.PI*2); ctx.fill();
-        // Highlight
-        ctx.globalAlpha = 0.25; ctx.fillStyle = midG;
-        ctx.beginPath(); ctx.ellipse(tx-h2*0.08, ty-h2*0.1, h2*0.18, h2*0.24, -0.3, 0, Math.PI*2); ctx.fill();
-        ctx.globalAlpha = 1;
-        _treeBranches.push({x: tx, y: ty, rx: h2*0.3, ry: h2*0.44, color: midG, phase: px * 0.61});
-      });
-    }},
-
-  'Nature Reserve': { w:124, order:1,
-    draw(ctx, x, gy, S) {
-      const lush = Math.min((S.green_policy || 65) / 100, 1);
-      const col1 = lerpColor('#162410', '#0d1a08', lush);
-      const col2 = lerpColor('#1a2e14', '#112210', lush);
-      // Mountain shadows
-      ctx.globalAlpha = 0.35; ctx.fillStyle = '#060e04';
-      ctx.beginPath(); ctx.moveTo(x+4, gy); ctx.lineTo(x+36, gy-90); ctx.lineTo(x+68, gy); ctx.closePath(); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(x+48, gy); ctx.lineTo(x+82, gy-108); ctx.lineTo(x+122, gy); ctx.closePath(); ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = col1;
-      ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x+32, gy-90); ctx.lineTo(x+64, gy); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = col2;
-      ctx.beginPath(); ctx.moveTo(x+44, gy); ctx.lineTo(x+78, gy-108); ctx.lineTo(x+118, gy); ctx.closePath(); ctx.fill();
-      // Snow caps (when green_policy >= 75)
-      if (lush >= 0.75) {
-        const snow = Math.min((lush - 0.75) / 0.25, 1);
-        ctx.globalAlpha = snow * 0.88;
-        ctx.fillStyle = '#d8ecf8';
-        ctx.beginPath(); ctx.moveTo(x+32, gy-90); ctx.lineTo(x+20, gy-72); ctx.lineTo(x+44, gy-72); ctx.closePath(); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+78, gy-108); ctx.lineTo(x+63, gy-85); ctx.lineTo(x+93, gy-85); ctx.closePath(); ctx.fill();
-        ctx.globalAlpha = snow * 0.4; ctx.fillStyle = 'white';
-        ctx.beginPath(); ctx.moveTo(x+32, gy-90); ctx.lineTo(x+28, gy-80); ctx.lineTo(x+36, gy-80); ctx.closePath(); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(x+78, gy-108); ctx.lineTo(x+73, gy-95); ctx.lineTo(x+83, gy-95); ctx.closePath(); ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-      ctx.fillStyle = '#e3b341'; ctx.globalAlpha = 0.7;
-      ctx.beginPath(); ctx.moveTo(x+32, gy-90); ctx.lineTo(x+36, gy-100); ctx.lineTo(x+40, gy-90); ctx.closePath(); ctx.fill();
-      ctx.globalAlpha = 1;
-      [[12,42],[94,48],[112,38]].forEach(([px, h]) => {
-        ctx.strokeStyle = '#2a4522'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(x+px, gy); ctx.lineTo(x+px, gy-h*0.42); ctx.stroke();
-        ctx.fillStyle = '#1f4016';
-        ctx.beginPath(); ctx.ellipse(x+px, gy-h*0.42-h*0.42, h*0.3, h*0.44, 0, 0, Math.PI*2); ctx.fill();
-        _treeBranches.push({x: x+px, y: gy-h*0.42-h*0.42, rx: h*0.3, ry: h*0.44, color: '#1f4016', phase: px * 0.55});
-      });
-    }},
-
-  'Community Center': { w:82, order:2,
-    draw(ctx, x, gy, S) {
-      const wel = S ? (S.welfare || 50) : 50;
-      ctx.fillStyle = '#1f481f'; ctx.fillRect(x, gy-47, 82, 47);
-      ctx.fillStyle = '#10d870'; ctx.fillRect(x, gy-54, 82, 8);
-      [6,19,32,45,58,70].forEach(wx => {
-        const lit = wHash(wx, 17) < wel;
-        glowWindow(ctx, x+wx, gy-40, 10, 13, '#10d870', lit);
-        ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.6; ctx.strokeRect(x+wx, gy-40, 10, 13);
-      });
-      ctx.fillStyle = '#0d1e0d'; ctx.fillRect(x+34, gy-22, 14, 22);
-      // AC unit on roof
-      ctx.fillStyle = '#183a18'; ctx.fillRect(x+6, gy-62, 22, 8);
-      ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.5; ctx.strokeRect(x+6, gy-62, 22, 8);
-      ctx.fillStyle = '#102a10'; ctx.fillRect(x+9, gy-64, 4, 3);
-      ctx.fillRect(x+15, gy-64, 4, 3); ctx.fillRect(x+21, gy-64, 4, 3);
-      // Antenna
-      ctx.strokeStyle = '#7a987a'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x+66, gy-54); ctx.lineTo(x+66, gy-73); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x+61, gy-69); ctx.lineTo(x+71, gy-69); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x+63, gy-65); ctx.lineTo(x+69, gy-65); ctx.stroke();
-      ctx.fillStyle = '#10d870'; ctx.globalAlpha = 0.7;
-      ctx.beginPath(); ctx.arc(x+66, gy-73, 2, 0, Math.PI*2); ctx.fill();
-      ctx.globalAlpha = 1;
-    }},
-
-  'Social Housing District': { w:114, order:3,
-    draw(ctx, x, gy, S) {
-      const wel = S.welfare || 50;
-      [[0,72,30],[38,92,30],[78,66,30]].forEach(([bx, bh, bw]) => {
-        ctx.fillStyle = '#1a3a1a'; ctx.fillRect(x+bx, gy-bh, bw, bh);
-        for (let row = 0; row < ~~(bh/17); row++) {
-          [4,13,22].forEach(col => {
-            const lit = wHash(bx+col, row) < wel;
-            ctx.globalAlpha = 0.88;
-            glowWindow(ctx, x+bx+col, gy-bh+7+row*17, 7, 9, '#c8a830', lit);
-            ctx.globalAlpha = 1;
-          });
+  
+  models.forEach(name => {
+    loader.load(`assets/models/${name}.glb`, (gltf) => {
+      gltf.scene.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          if (child.material) {
+             child.material = child.material.clone();
+          }
         }
       });
-      // Water tower on tallest block (bx=38, bh=92)
-      const twx = x + 53, twy = gy - 92;
-      ctx.fillStyle = '#253225'; ctx.fillRect(twx-3, twy-14, 6, 14);
-      ctx.fillStyle = '#1a2e1a';
-      ctx.beginPath(); ctx.ellipse(twx, twy-14, 9, 5, 0, 0, Math.PI*2); ctx.fill();
-      ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.5;
-      ctx.beginPath(); ctx.ellipse(twx, twy-14, 9, 5, 0, 0, Math.PI*2); ctx.stroke();
-    }},
-
-  'Public School': { w:72, order:4,
-    draw(ctx, x, gy, S) {
-      const edu = S ? (S.education || 50) : 50;
-      ctx.fillStyle = '#3a2e10'; ctx.fillRect(x+5, gy-58, 62, 58);
-      ctx.fillStyle = '#e3b341';
-      ctx.beginPath(); ctx.moveTo(x, gy-58); ctx.lineTo(x+36, gy-80); ctx.lineTo(x+72, gy-58); ctx.closePath(); ctx.fill();
-      [8,21,34,47].forEach(wx => {
-        const lit = wHash(wx, 11) < edu;
-        glowWindow(ctx, x+wx, gy-48, 11, 14, '#e3b341', lit);
-        ctx.strokeStyle = '#e3b341'; ctx.lineWidth = 0.7; ctx.strokeRect(x+wx, gy-48, 11, 14);
-      });
-      ctx.fillStyle = '#0d1117'; ctx.fillRect(x+28, gy-22, 16, 22);
-      ctx.strokeStyle = '#c9d1d9'; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(x+36, gy-80); ctx.lineTo(x+36, gy-97); ctx.stroke();
-      // Flagpole flag wave hint
-      ctx.fillStyle = '#e3b341';
-      ctx.beginPath(); ctx.moveTo(x+36, gy-97); ctx.lineTo(x+50, gy-89); ctx.lineTo(x+36, gy-82); ctx.closePath(); ctx.fill();
-    }},
-
-  'National University': { w:82, order:5,
-    draw(ctx, x, gy, S) {
-      const edu = S.education || 60;
-      ctx.fillStyle = '#0e2240'; ctx.fillRect(x+11, gy-98, 60, 98);
-      ctx.fillStyle = '#163460';
-      ctx.beginPath(); ctx.ellipse(x+41, gy-98, 33, 19, 0, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#00b8e0'; ctx.globalAlpha = 0.5;
-      ctx.fillRect(x, gy-68, 82, 7);
-      ctx.globalAlpha = 1;
-      for (let i = 0; i < 5; i++) {
-        [15,32,49].forEach((jx, j) => {
-          const lit = wHash(i*3+j, 7) < edu;
-          glowWindow(ctx, x+jx, gy-91+i*18, 11, 13, '#00b8e0', lit);
-          ctx.strokeStyle = '#00b8e0'; ctx.lineWidth = 0.5; ctx.strokeRect(x+jx, gy-91+i*18, 11, 13);
-        });
+      modelsLoaded[name] = gltf.scene;
+      
+      if (Object.keys(modelsLoaded).length === models.length && _S.population) {
+        renderCityBg(_S);
       }
-      ctx.strokeStyle = '#c9d1d9'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x+41, gy-117); ctx.lineTo(x+41, gy-131); ctx.stroke();
-      ctx.fillStyle = '#00b8e0';
-      ctx.beginPath(); ctx.arc(x+41, gy-134, 5, 0, Math.PI*2); ctx.fill();
-    }},
+    });
+  });
+}
 
-  'Academy of Sciences': { w:76, order:6,
-    draw(ctx, x, gy, S) {
-      const edu = S.education || 80;
-      ctx.fillStyle = '#0a1928'; ctx.fillRect(x+10, gy-115, 56, 115);
-      ctx.fillStyle = '#0f2840';
-      ctx.beginPath(); ctx.moveTo(x+5, gy-115); ctx.lineTo(x+38, gy-140); ctx.lineTo(x+71, gy-115); ctx.closePath(); ctx.fill();
-      for (let i = 0; i < 6; i++) {
-        [[15,2],[48,5]].forEach(([jx, seed]) => {
-          const lit = wHash(i, seed) < edu;
-          glowWindow(ctx, x+jx, gy-107+i*17, 13, 12, '#00b8e0', lit);
-          ctx.strokeStyle = '#00b8e0'; ctx.lineWidth = 0.6; ctx.strokeRect(x+jx, gy-107+i*17, 13, 12);
-        });
-      }
-      ctx.strokeStyle = '#c9d1d9'; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(x+38, gy-140); ctx.lineTo(x+38, gy-162); ctx.stroke();
-      ctx.strokeStyle = '#00b8e0'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(x+38, gy-164, 4, 0, Math.PI*2); ctx.stroke();
-      ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x+26, gy-156); ctx.lineTo(x+50, gy-156); ctx.stroke();
-      ctx.globalAlpha = 1;
-      // AC units
-      ctx.globalAlpha = 0.4; ctx.fillStyle = '#c8d8e8';
-      [14,26,48].forEach(ax => ctx.fillRect(x+ax, gy-117, 8, 4));
-      ctx.globalAlpha = 1;
-      _antennaBlinks.push({x: x+38, y: gy-163, phase: x * 0.06 + 1.5});
-      // Elevator shaft indicator
-      _elevators.push({x: x+31, top: gy-112, bot: gy-10, color: '#00b8e0'});
-      // Window cleaning gondola
-      _gondolas.push({x: x+22, roofY: gy-115, w: 28, color: '#00b8e0'});
-    }},
-
-  'Military Barracks': { w:88, order:7,
-    draw(ctx, x, gy, S) {
-      const def = S ? (S.defense || 40) : 40;
-      ctx.fillStyle = '#29200a'; ctx.fillRect(x, gy-56, 88, 56);
-      ctx.fillStyle = '#f07830'; ctx.globalAlpha = 0.65;
-      ctx.fillRect(x, gy-60, 88, 5); ctx.globalAlpha = 1;
-      [5,20,36,52,68].forEach(wx => {
-        const lit = wHash(wx, 23) < def;
-        glowWindow(ctx, x+wx, gy-49, 13, 13, '#f07830', lit);
-        ctx.strokeStyle = '#f07830'; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.75;
-        ctx.strokeRect(x+wx, gy-49, 13, 13); ctx.globalAlpha = 1;
-      });
-      ctx.fillStyle = '#0d1117'; ctx.fillRect(x+35, gy-24, 18, 24);
-      ctx.strokeStyle = '#f07830'; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.4;
-      ctx.beginPath(); ctx.moveTo(x, gy-56); ctx.lineTo(x, gy); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x+88, gy-56); ctx.lineTo(x+88, gy); ctx.stroke();
-      ctx.globalAlpha = 1;
-      // Rooftop battlements (crenellations)
-      ctx.fillStyle = '#2e2509';
-      ctx.fillRect(x, gy-66, 88, 7);  // parapet wall
-      ctx.fillStyle = '#3a2e0d';
-      for (let bx = 1; bx <= 74; bx += 13) {
-        ctx.fillRect(x+bx, gy-75, 10, 10);  // merlons
-      }
-      // Flagpole on left merlon
-      ctx.strokeStyle = '#8a7040'; ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.moveTo(x+6, gy-75); ctx.lineTo(x+6, gy-92); ctx.stroke();
-      ctx.globalAlpha = 1;
-      _flags.push({px: x+6, py: gy-92, len: 18, h: 11, color: '#f07830', phase: x*0.04+0.5});
-    }},
-
-  'Defense Ministry': { w:102, order:8,
-    draw(ctx, x, gy, S) {
-      const def = S ? (S.defense || 50) : 50;
-      ctx.fillStyle = '#1a0f05'; ctx.fillRect(x+16, gy-112, 70, 112);
-      ctx.fillStyle = '#241406'; ctx.fillRect(x, gy-72, 16, 72);
-      ctx.fillStyle = '#241406'; ctx.fillRect(x+86, gy-72, 16, 72);
-      ctx.fillStyle = '#f07830'; ctx.fillRect(x+16, gy-118, 70, 7);
-      for (let i = 0; i < 5; i++) {
-        [22,40,58].forEach(jx => {
-          const lit = wHash(jx + i*5, 29) < def;
-          glowWindow(ctx, x+jx, gy-108+i*21, 14, 16, '#f07830', lit);
-          ctx.strokeStyle = '#f07830'; ctx.lineWidth = 0.5; ctx.strokeRect(x+jx, gy-108+i*21, 14, 16);
-        });
-      }
-      ctx.fillStyle = '#0d1117'; ctx.fillRect(x+42, gy-30, 18, 30);
-      ctx.strokeStyle = '#f07830'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x+51, gy-118); ctx.lineTo(x+51, gy-136); ctx.stroke();
-      ctx.fillStyle = '#f07830';
-      // Flag (animated wave registered separately)
-      _flags.push({px: x+51, py: gy-136, len: 22, h: 14, color: '#f07830', phase: x*0.03});
-      // Searchlight base (corner turrets)
-      [[x+4, gy-72], [x+90, gy-72]].forEach(([sx, sy]) => {
-        ctx.fillStyle = '#3a1e08';
-        ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI * 2); ctx.fill();
-        _searchlights.push({x: sx, y: sy, phase: sx * 0.03});
-      });
-    }},
-
-  'Manufacturing District': { w:98, order:9,
-    draw(ctx, x, gy, S) {
-      const ind = S.industry || 35;
-      const intensity = 0.15 + ind / 100 * 0.55;
-      ctx.fillStyle = '#1a1020'; ctx.fillRect(x, gy-62, 98, 62);
-      ctx.fillStyle = '#b058f8'; ctx.globalAlpha = 0.5;
-      ctx.fillRect(x, gy-67, 98, 6); ctx.globalAlpha = 1;
-      [6,22,38,54,70,84].forEach(wx => {
-        const lit = wHash(wx, 31) < ind;
-        glowWindow(ctx, x+wx, gy-55, 12, 19, '#b058f8', lit);
-        ctx.strokeStyle = '#b058f8'; ctx.lineWidth = 0.4; ctx.strokeRect(x+wx, gy-55, 12, 19);
-      });
-      [[18,28],[44,34],[70,25]].forEach(([cx, ch]) => {
-        ctx.fillStyle = '#2a1a30'; ctx.fillRect(x+cx-5, gy-ch-62, 10, ch);
-        _chimneys.push({x: x+cx, y: gy-ch-62, intensity});
-      });
-      _neonSigns.push({x: x+49, y: gy-68, label: 'FACTORY', color: '#b058f8', phase: x * 0.01});
-      // Water tower
-      ctx.fillStyle = '#281830'; ctx.fillRect(x+80, gy-75, 10, 14);
-      ctx.fillStyle = '#3a2240';
-      ctx.beginPath(); ctx.ellipse(x+85, gy-75, 9, 5, 0, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(x+85, gy-61, 9, 5, 0, 0, Math.PI*2); ctx.fill();
-      // AC units
-      ctx.globalAlpha = 0.5; ctx.fillStyle = '#e0e8f0';
-      [6,20,34].forEach(ax => ctx.fillRect(x+ax, gy-63, 8, 5));
-      ctx.globalAlpha = 1;
-      // Rooftop antenna with blink light
-      ctx.strokeStyle = '#5a6a7a'; ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.moveTo(x+8, gy-62); ctx.lineTo(x+8, gy-80); ctx.stroke();
-      _antennaBlinks.push({x: x+8, y: gy-81, phase: x * 0.05});
-    }},
-
-  'Industrial Complex': { w:122, order:10,
-    draw(ctx, x, gy, S) {
-      const ind = S.industry || 55;
-      const intensity = 0.2 + ind / 100 * 0.5;
-      ctx.fillStyle = '#150f1e'; ctx.fillRect(x, gy-82, 122, 82);
-      ctx.fillStyle = '#1c1530'; ctx.fillRect(x+62, gy-88, 36, 88);
-      ctx.fillStyle = '#b058f8'; ctx.globalAlpha = 0.6;
-      ctx.fillRect(x, gy-90, 122, 6); ctx.globalAlpha = 1;
-      [8,25,42].forEach(cx => {
-        ctx.fillStyle = '#22182e'; ctx.fillRect(x+cx-4, gy-118, 9, 34);
-        _chimneys.push({x: x+cx, y: gy-118, intensity});
-      });
-      [72,88,104].forEach(cx => {
-        ctx.fillStyle = '#22182e'; ctx.fillRect(x+cx-4, gy-124, 9, 40);
-        _chimneys.push({x: x+cx, y: gy-124, intensity});
-      });
-      for (let i = 0; i < 4; i++) {
-        [5,27,49].forEach(jx => {
-          const lit = wHash(jx + i*3, 37) < ind;
-          glowWindow(ctx, x+jx, gy-74+i*19, 16, 13, '#b058f8', lit);
-          ctx.strokeStyle = '#b058f8'; ctx.lineWidth = 0.4; ctx.strokeRect(x+jx, gy-74+i*19, 16, 13);
-        });
-      }
-      _neonSigns.push({x: x+61, y: gy-92, label: 'COMPLEX', color: '#c070ff', phase: x * 0.013 + 1.2});
-      // AC units on tower roof
-      ctx.globalAlpha = 0.45; ctx.fillStyle = '#d0dce8';
-      [68,82,96].forEach(ax => ctx.fillRect(x+ax, gy-90, 7, 4));
-      ctx.globalAlpha = 1;
-      _antennaBlinks.push({x: x+88, y: gy-128, phase: x * 0.04 + 0.8});
-    }},
-
-  'Heavy Industry Zone': { w:142, order:11,
-    draw(ctx, x, gy, S) {
-      const ind = S.industry || 80;
-      const intensity = 0.3 + ind / 100 * 0.55;
-      ctx.fillStyle = '#12091a'; ctx.fillRect(x, gy-97, 142, 97);
-      ctx.fillStyle = '#18102a'; ctx.fillRect(x+42, gy-108, 52, 108);
-      ctx.fillStyle = '#b058f8'; ctx.globalAlpha = 0.7;
-      ctx.fillRect(x, gy-103, 142, 7); ctx.globalAlpha = 1;
-      [10,30,52,92,112,132].forEach(cx => {
-        ctx.fillStyle = '#1e1228'; ctx.fillRect(x+cx-5, gy-140, 10, 44);
-        _chimneys.push({x: x+cx, y: gy-140, intensity});
-      });
-      for (let i = 0; i < 4; i++) {
-        const litL = wHash(5, i + 41) < ind, litR = wHash(105, i + 41) < ind;
-        glowWindow(ctx, x+5, gy-88+i*22, 32, 16, '#b058f8', litL);
-        ctx.strokeStyle = '#b058f8'; ctx.lineWidth = 0.4; ctx.strokeRect(x+5, gy-88+i*22, 32, 16);
-        glowWindow(ctx, x+105, gy-88+i*22, 32, 16, '#b058f8', litR);
-        ctx.strokeRect(x+105, gy-88+i*22, 32, 16);
-      }
-      _neonSigns.push({x: x+71, y: gy-106, label: 'INDUSTRY', color: '#d080ff', phase: x * 0.009 + 2.4});
-    }},
-
-  'Eco-Research Center': { w:80, order:12,
-    draw(ctx, x, gy, S) {
-      const eco = S ? (S.green_policy || 60) : 60;
-      ctx.fillStyle = '#0a2010'; ctx.fillRect(x+10, gy-87, 60, 87);
-      ctx.fillStyle = '#123018';
-      ctx.beginPath(); ctx.ellipse(x+40, gy-87, 35, 22, 0, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#10d870'; ctx.globalAlpha = 0.45;
-      ctx.fillRect(x, gy-62, 80, 5); ctx.globalAlpha = 1;
-      for (let i = 0; i < 4; i++) {
-        [16,46].forEach(jx => {
-          const lit = wHash(jx, i + 53) < eco;
-          glowWindow(ctx, x+jx, gy-80+i*20, 16, 15, '#10d870', lit);
-          ctx.strokeStyle = '#10d870'; ctx.lineWidth = 0.6; ctx.strokeRect(x+jx, gy-80+i*20, 16, 15);
-        });
-      }
-      ctx.strokeStyle = '#10d870'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x+40, gy-109); ctx.lineTo(x+40, gy-126); ctx.stroke();
-      ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.arc(x+40, gy-128, 5, 0, Math.PI*2); ctx.stroke();
-      // Solar panel array on flat roof
-      const panelRows = [[gy-88, 3], [gy-93, 3]];
-      panelRows.forEach(([py, count]) => {
-        for (let pi = 0; pi < count; pi++) {
-          const px = x + 14 + pi * 17;
-          ctx.fillStyle = '#0a3060'; ctx.fillRect(px, py, 14, 7);
-          ctx.strokeStyle = '#1a6090'; ctx.lineWidth = 0.6; ctx.strokeRect(px, py, 14, 7);
-          ctx.strokeStyle = 'rgba(30,120,180,0.5)'; ctx.lineWidth = 0.4;
-          ctx.beginPath(); ctx.moveTo(px+7, py); ctx.lineTo(px+7, py+7); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(px, py+3.5); ctx.lineTo(px+14, py+3.5); ctx.stroke();
-          // Glint
-          ctx.fillStyle = 'rgba(100,200,255,0.18)';
-          ctx.fillRect(px+1, py+1, 4, 2);
-        }
-      });
-    }},
-
-  'Smog Zone': { w:112, order:13,
-    draw(ctx, x, gy) {
-      ctx.globalAlpha = 0.65;
-      ctx.fillStyle = '#2a1e18';
-      ctx.beginPath(); ctx.ellipse(x+32, gy-32, 44, 26, 0, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#251812';
-      ctx.beginPath(); ctx.ellipse(x+74, gy-44, 48, 30, 0, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#1a1208';
-      ctx.beginPath(); ctx.ellipse(x+54, gy-60, 52, 24, 0, 0, Math.PI*2); ctx.fill();
-      ctx.globalAlpha = 1;
-    }},
-};
-
-// ── Canvas init ───────────────────────────────────────────────────────────────
+function activeStructures(s) {
+  const RULES = [
+    { m:'education',    t:25, name:'Public School'           },
+    { m:'education',    t:55, name:'National University'     },
+    { m:'education',    t:80, name:'Academy of Sciences'     },
+    { m:'industry',     t:25, name:'Manufacturing District'  },
+    { m:'industry',     t:55, name:'Industrial Complex'      },
+    { m:'industry',     t:80, name:'Heavy Industry Zone'     },
+    { m:'welfare',      t:30, name:'Community Center'        },
+    { m:'welfare',      t:60, name:'Social Housing District' },
+    { m:'green_policy', t:35, name:'City Park'               },
+    { m:'green_policy', t:65, name:'Nature Reserve'          },
+    { m:'green_policy', t:85, name:'Eco-Research Center'     },
+    { m:'defense',      t:30, name:'Military Barracks'       },
+    { m:'defense',      t:65, name:'Defense Ministry'        },
+    { m:'pollution',    t:60, name:'Smog Zone'               },
+  ];
+  return RULES.filter(r => (s[r.m] || 0) >= r.t);
+}
 
 function initCityCanvas() {
-  const container = document.getElementById('city-container');
-  const W = Math.max(container.clientWidth || 900, 400);
-  const H = 350;
-  const dpr = window.devicePixelRatio || 1;
-  ['city-bg', 'city-fg'].forEach(id => {
-    const c = document.getElementById(id);
-    c.width  = W * dpr; c.height = H * dpr;
-    c.style.width = W + 'px'; c.style.height = H + 'px';
-    c.getContext('2d').scale(dpr, dpr);
+  const container = document.getElementById('webgl-container');
+  if (!container) return;
+  if (renderer) return;
+
+  preloadModels();
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x8ab4c8);
+  scene.fog = new THREE.FogExp2(0x8ab4c8, 0.0012);
+
+  camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 1, 4000);
+  camera.position.set(0, 300, 500);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  container.appendChild(renderer.domElement);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.maxPolarAngle = Math.PI / 2 - 0.02;
+  controls.minDistance = 20;
+  controls.maxDistance = 2000;
+  controls.target.set(0, 0, 0);
+
+  hemiLight = new THREE.HemisphereLight(0xffffff, 0x445544, 0.6);
+  scene.add(hemiLight);
+
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  sunLight.castShadow = true;
+  sunLight.shadow.mapSize.width = 2048;
+  sunLight.shadow.mapSize.height = 2048;
+  sunLight.shadow.camera.near = 0.5;
+  sunLight.shadow.camera.far = 2500;
+  const d = 800;
+  sunLight.shadow.camera.left = -d;
+  sunLight.shadow.camera.right = d;
+  sunLight.shadow.camera.top = d;
+  sunLight.shadow.camera.bottom = -d;
+  sunLight.shadow.bias = -0.0005;
+  scene.add(sunLight);
+  
+  // Infinite Ground Plane
+  const groundGeo = new THREE.PlaneGeometry(10000, 10000);
+  const groundMat = new THREE.MeshStandardMaterial({ 
+    color: 0x2c3b2c, // Dark subtle green for infinite ground
+    roughness: 1.0,
+    metalness: 0.0
   });
-  _bgCtx = document.getElementById('city-bg').getContext('2d');
-  _fgCtx = document.getElementById('city-fg').getContext('2d');
-  _cityW = W; _cityH = H;
-}
+  _groundPlane = new THREE.Mesh(groundGeo, groundMat);
+  _groundPlane.rotation.x = -Math.PI / 2;
+  _groundPlane.position.y = -0.1;
+  _groundPlane.receiveShadow = true;
+  scene.add(_groundPlane);
 
-// ── City background render ────────────────────────────────────────────────────
+  // Infinite Grid Helper
+  // 10000 size, 333 divisions means each cell is ~30 units (matching TILE_SIZE)
+  _gridHelper = new THREE.GridHelper(10000, 333, 0x3d523d, 0x3d523d);
+  _gridHelper.position.y = 0;
+  scene.add(_gridHelper);
 
-function renderCityBg(state) {
-  _S = state;
-  _winSpots = []; _streetlights = []; _treeBranches = []; _neonSigns = []; _searchlights = [];
-  _antennaBlinks = []; _manholes = [];
-  _flags = []; _elevators = []; _gondolas = []; _laundryLines = [];
-  const ctx = _bgCtx;
-  if (!ctx) return;
-  const W = _cityW, H = _cityH, GY = _cityGY;
-  ctx.clearRect(0, 0, W, H);
+  cityGroup = new THREE.Group();
+  scene.add(cityGroup);
 
-  const pol = state.pollution || 0;
-  const stb = state.stability || 79;
-  const pt  = Math.min(pol / 100, 1);
-
-  const era = state.era || '';
-  // Era-based sky bias (layered on top of pollution shift)
-  const eraGolden    = era.includes('Golden');
-  const eraIndustrial= era.includes('Industrial');
-  const eraModern    = era.includes('Modern');
-
-  const skyTop  = lerpColor('#040d1e', '#1e0a02', pt);
-  const skyMid  = lerpColor('#071428', '#160a04', pt);
-  const skyBot  = lerpColor('#0a1830', '#1a0a06', pt);
-  const gndCol  = lerpColor('#080e18', '#160e06', pt * 0.7);
-  const gndLine = lerpColor('#1e3828', '#3a1a06', pt);
-  const horizonGlowCol = lerpColor('rgba(0,184,224,0.20)', 'rgba(200,80,20,0.28)', pt);
-
-  const skyGrd = ctx.createLinearGradient(0, 0, 0, GY);
-  skyGrd.addColorStop(0,    skyTop);
-  skyGrd.addColorStop(0.55, skyMid);
-  skyGrd.addColorStop(1,    skyBot);
-  ctx.fillStyle = skyGrd; ctx.fillRect(0, 0, W, H);
-
-  const horizGrd = ctx.createLinearGradient(0, GY - 90, 0, GY);
-  horizGrd.addColorStop(0, 'rgba(0,0,0,0)');
-  horizGrd.addColorStop(1, horizonGlowCol);
-  ctx.fillStyle = horizGrd; ctx.fillRect(0, GY - 90, W, 90);
-
-  // Era-specific sky tint overlays
-  if (eraGolden) {
-    const gg = ctx.createLinearGradient(0, GY - 130, 0, GY);
-    gg.addColorStop(0, 'rgba(0,0,0,0)');
-    gg.addColorStop(0.55, 'rgba(200,130,20,0.07)');
-    gg.addColorStop(1, 'rgba(240,170,40,0.16)');
-    ctx.fillStyle = gg; ctx.fillRect(0, GY - 130, W, 130);
-    // Top golden fringe
-    ctx.globalAlpha = 0.05; ctx.fillStyle = '#ffd060';
-    ctx.fillRect(0, 0, W, GY * 0.18); ctx.globalAlpha = 1;
-  } else if (eraIndustrial) {
-    ctx.globalAlpha = 0.07; ctx.fillStyle = '#b05818';
-    ctx.fillRect(0, 0, W, GY * 0.55); ctx.globalAlpha = 1;
-    // Extra smoggy horizon amber
-    const ig = ctx.createLinearGradient(0, GY - 80, 0, GY);
-    ig.addColorStop(0, 'rgba(0,0,0,0)');
-    ig.addColorStop(1, 'rgba(180,80,20,0.10)');
-    ctx.fillStyle = ig; ctx.fillRect(0, GY - 80, W, 80);
-  } else if (eraModern) {
-    ctx.globalAlpha = 0.06; ctx.fillStyle = '#0030c0';
-    ctx.fillRect(0, 0, W, GY * 0.28); ctx.globalAlpha = 1;
-  }
-
-  // Stars
-  const starOp = Math.max(0, (50 - pol) / 50 * 0.85);
-  _stars = [];
-  const STAR_DEFS = [
-    [.05,.4,1.8],[.14,.15,1.2],[.24,.75,2.2],[.35,.25,1.0],[.46,.08,1.6],
-    [.55,.65,1.1],[.64,.18,2.0],[.73,.72,1.4],[.83,.35,1.8],[.93,.08,1.0],
-    [.10,.65,1.3],[.29,.55,1.7],[.42,.28,1.1],[.61,.48,2.4],[.76,.68,1.5],
-    [.08,.22,1.0],[.19,.48,1.9],[.51,.32,1.2],[.67,.55,1.6],[.88,.18,1.3],
-    [.97,.42,1.0],[.32,.70,2.0],[.44,.12,1.4],[.78,.08,1.0],[.03,.58,1.7],
-  ];
-  STAR_DEFS.forEach(([fx, fy, r], i) => {
-    const sx = ~~(fx*W), sy = ~~(fy*70+5);
-    const baseAlpha = starOp * (0.35 + (i % 4) * 0.16);
-    _stars.push({x: sx, y: sy, r, phase: i * 0.74, baseAlpha});
-    if (baseAlpha > 0.04) {
-      ctx.globalAlpha = baseAlpha * 0.45;
-      ctx.fillStyle = i % 5 === 0 ? '#e8d5b0' : i % 5 === 1 ? '#b8d4f0' : 'white';
-      ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2); ctx.fill();
-      if (r >= 2.0 && baseAlpha > 0.28) {
-        ctx.globalAlpha = baseAlpha * 0.1;
-        ctx.strokeStyle = 'white'; ctx.lineWidth = 0.5;
-        ctx.beginPath(); ctx.moveTo(sx-5,sy); ctx.lineTo(sx+5,sy); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(sx,sy-5); ctx.lineTo(sx,sy+5); ctx.stroke();
-      }
-    }
+  window.addEventListener('resize', () => {
+    if (!renderer) return;
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
   });
-  ctx.globalAlpha = 1;
-
-  if (_weatherType === 'drought') {
-    ctx.globalAlpha = 0.22;
-    ctx.fillStyle = '#f07830';
-    ctx.fillRect(0, 0, W, GY);
-    ctx.globalAlpha = 1;
-  }
-
-  if (pol > 30) {
-    const haze = Math.min((pol-30)/70 * 0.28, 0.28);
-    ctx.globalAlpha = haze; ctx.fillStyle = '#4a2810';
-    ctx.fillRect(0, 0, W, GY); ctx.globalAlpha = 1;
-  }
-
-  const stabClr = stb >= 70 ? '#10d870' : stb >= 40 ? '#e8a020' : '#f03040';
-  const stabOp  = 0.03 + stb / 100 * 0.05;
-  const stabGrd = ctx.createLinearGradient(0, GY-18, 0, GY);
-  stabGrd.addColorStop(0, hexAlpha(stabClr, stabOp));
-  stabGrd.addColorStop(1, hexAlpha(stabClr, 0));
-  ctx.fillStyle = stabGrd; ctx.fillRect(0, GY-18, W, 18);
-
-  ctx.fillStyle = gndCol; ctx.fillRect(0, GY, W, H-GY);
-
-  // Ground line with amber glow
-  const groundGrd = ctx.createLinearGradient(0, 0, W, 0);
-  groundGrd.addColorStop(0,   'rgba(0,0,0,0)');
-  groundGrd.addColorStop(0.2, gndLine);
-  groundGrd.addColorStop(0.8, gndLine);
-  groundGrd.addColorStop(1,   'rgba(0,0,0,0)');
-  ctx.strokeStyle = groundGrd; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(0, GY); ctx.lineTo(W, GY); ctx.stroke();
-
-  // Ground fog
-  const fogGrd = ctx.createLinearGradient(0, GY, 0, GY + 44);
-  fogGrd.addColorStop(0, 'rgba(10,24,48,0.35)');
-  fogGrd.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = fogGrd; ctx.fillRect(0, GY, W, 44);
-
-  // Distant city silhouette (depth layer, blurred for depth-of-field)
-  const _silH = [55,80,44,96,60,72,50,88,40,68,76,54,90,48,64,82,58,70,46,84,62,78,52,86,66];
-  const _slotW = W / _silH.length;
-  ctx.save();
-  ctx.filter = 'blur(1.8px)';
-  ctx.globalAlpha = 0.07 + (1 - pt) * 0.07;
-  ctx.fillStyle = lerpColor('#0c1a2e', '#120c06', pt);
-  _silH.forEach((h, i) => {
-    const bx = i * _slotW + _slotW * 0.12;
-    const bw = _slotW * 0.6;
-    const bh = h * 0.52;
-    ctx.fillRect(bx, GY - bh, bw, bh);
-    if (h > 64) {
-      ctx.globalAlpha = 0.05 + (1 - pt) * 0.05;
-      ctx.fillStyle = '#c8a830';
-      for (let row = 0; row < 3; row++) {
-        [bw * 0.18, bw * 0.52].forEach(wx => {
-          ctx.fillRect(bx + wx, GY - bh + 8 + row * 10, 3, 5);
-        });
-      }
-      ctx.globalAlpha = 0.07 + (1 - pt) * 0.07;
-      ctx.fillStyle = lerpColor('#0c1a2e', '#120c06', pt);
-    }
-  });
-  ctx.restore();
-  ctx.globalAlpha = 1;
-
-  // Buildings
-  _chimneys = [];
-  _buildingHits = [];
-  const active = activeStructures(state)
-    .map(s => ({...s, b: BUILDINGS[s.name]}))
-    .filter(s => s.b)
-    .sort((a, b) => a.b.order - b.b.order);
-  if (_cityInitialized) checkDemolitions(active);
-
-  if (active.length === 0) {
-    ctx.fillStyle = '#2a3e58'; ctx.font = '11px "Share Tech Mono", monospace'; ctx.textAlign = 'center';
-    ctx.fillText('NO STRUCTURES YET — PASS POLICY LAWS TO DEVELOP THE CIVILIZATION', W/2, GY-30);
-    ctx.textAlign = 'left';
-  } else {
-    const GAP  = 16;
-    const totW = active.reduce((s,a) => s + a.b.w + GAP, -GAP);
-    let cx = Math.max(20, (W - totW) / 2);
-    active.forEach(({b, m, name}) => {
-      ctx.save();
-      b.draw(ctx, cx, GY, state);
-      ctx.restore();
-      const mm = METRIC_META[m];
-      if (mm) {
-        const glowGrd = ctx.createLinearGradient(cx, GY, cx, GY+38);
-        glowGrd.addColorStop(0, mm.color + '28');
-        glowGrd.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = glowGrd; ctx.fillRect(cx, GY, b.w, 38);
-        ctx.globalAlpha = 0.7; ctx.fillStyle = mm.color;
-        ctx.fillRect(cx, GY, b.w, 2);
-        ctx.globalAlpha = 0.75; ctx.fillStyle = mm.color;
-        ctx.font = '8px "Share Tech Mono", monospace'; ctx.textAlign = 'center';
-        ctx.fillText(mm.abbr, cx + b.w/2, GY+16);
-        ctx.globalAlpha = 1; ctx.textAlign = 'left';
-      }
-      _buildingHits.push({x: cx, w: b.w, name, metric: m, value: state[m]||0});
-      if (!_seenBuildingNames.has(name)) {
-        _seenBuildingNames.add(name);
-        if (_cityInitialized) {
-          _buildingRises.push({x: cx, w: b.w, startFrame: _animTime});
-        }
-      }
-      cx += b.w + GAP;
-    });
-
-    // Chimney tip heat glow
-    _chimneys.forEach(({x, y, intensity}) => {
-      const htG = ctx.createRadialGradient(x, y, 0, x, y, 22);
-      htG.addColorStop(0, `rgba(240,90,15,${0.42 * intensity})`);
-      htG.addColorStop(0.45, `rgba(200,55,8,${0.18 * intensity})`);
-      htG.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = htG; ctx.fillRect(x-22, y-22, 44, 44);
-    });
-
-    // Streetlights in building gaps
-    if (active.length > 1) {
-      let slx = Math.max(20, (W - totW) / 2);
-      active.forEach(({b}, ai) => {
-        slx += b.w;
-        if (ai < active.length - 1) {
-          const lx = slx + GAP * 0.5;
-          ctx.strokeStyle = '#3a5070'; ctx.lineWidth = 1.5; ctx.lineCap = 'butt';
-          ctx.beginPath(); ctx.moveTo(lx, GY); ctx.lineTo(lx, GY-32); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(lx, GY-32); ctx.lineTo(lx+8, GY-36); ctx.stroke();
-          ctx.fillStyle = '#f8e080'; ctx.globalAlpha = 0.92;
-          ctx.beginPath(); ctx.arc(lx+8, GY-36, 3.5, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
-          const lg = ctx.createRadialGradient(lx+8, GY-36, 0, lx+8, GY-36, 42);
-          lg.addColorStop(0, 'rgba(248,224,80,0.16)'); lg.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = lg; ctx.fillRect(lx-30, GY-74, 74, 74);
-          _streetlights.push({x: lx+8, y: GY-36});
-          // Laundry line between building edges (every other gap)
-          if (ai % 2 === 0 && GAP >= 14) {
-            const la = slx - b.w, lb = slx + GAP;
-            const laH = GY - 38 - (wHash(ai, 77) % 18);
-            const lbH = GY - 34 - (wHash(ai, 89) % 14);
-            _laundryLines.push({x1: la, y1: laH, x2: lb, y2: lbH,
-              items: [
-                {t: 0.18, col: '#c04040', w: 7, h: 9},
-                {t: 0.40, col: '#e8d090', w: 8, h: 10},
-                {t: 0.62, col: '#4090d0', w: 6, h: 11},
-                {t: 0.82, col: '#60c060', w: 9, h: 8},
-              ]
-            });
-          }
-          slx += GAP;
-        }
-      });
-    }
-
-    // Subtle ground cobblestone grid
-    ctx.globalAlpha = 0.028; ctx.strokeStyle = '#4a6080'; ctx.lineWidth = 1;
-    for (let gx = 0; gx < W; gx += 44) {
-      ctx.beginPath(); ctx.moveTo(gx, GY+2); ctx.lineTo(gx, H); ctx.stroke();
-    }
-    for (let gy2 = 6; gy2 < H - GY; gy2 += 16) {
-      ctx.beginPath(); ctx.moveTo(0, GY+gy2); ctx.lineTo(W, GY+gy2); ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-
-    // Road center dashed line
-    ctx.globalAlpha = 0.12; ctx.strokeStyle = '#f0e060'; ctx.lineWidth = 1.2;
-    ctx.setLineDash([18, 14]);
-    ctx.beginPath(); ctx.moveTo(0, GY + 22); ctx.lineTo(W, GY + 22); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Zebra crosswalks in building gaps
-    if (active.length > 1) {
-      let zbx = Math.max(20, (W - totW) / 2);
-      active.forEach(({b}, ai) => {
-        zbx += b.w;
-        if (ai < active.length - 1) {
-          const cx2 = zbx + GAP * 0.5;
-          ctx.globalAlpha = 0.095; ctx.fillStyle = '#d0d8e8';
-          for (let zi = 0; zi < 5; zi++) {
-            ctx.fillRect(cx2 - 6, GY + 4 + zi * 5, 12, 3);
-          }
-          // Manhole in gap
-          const mhx = cx2, mhy = GY + 30;
-          ctx.globalAlpha = 0.18; ctx.fillStyle = '#1a2838';
-          ctx.beginPath(); ctx.ellipse(mhx, mhy, 5.5, 2.5, 0, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = '#2a3848'; ctx.lineWidth = 0.8;
-          ctx.beginPath(); ctx.ellipse(mhx, mhy, 5.5, 2.5, 0, 0, Math.PI * 2); ctx.stroke();
-          _manholes.push({x: mhx, y: mhy});
-        }
-        zbx += GAP;
-      });
-    }
-
-    ctx.globalAlpha = 1;
-  }
-
-  // After first render, mark initialized so subsequent state updates can trigger rise/demolition
-  if (!_cityInitialized) {
-    _prevActiveNames = new Set(active.map(a => a.name));
-    _cityInitialized = true;
-  }
-
-  // Clear loading text — actual fade-out is handled by animLoop after first render
-  const _loadEl = document.getElementById('loading');
-  if (_loadEl) _loadEl.textContent = '';
-}
-
-// ── Animation loop ────────────────────────────────────────────────────────────
-
-function animLoop() {
-  const ctx = _fgCtx;
-  if (!ctx) { _animFrame = null; return; }
-  _animTime++;
-
-  // Screen shake
-  updateScreenShake();
-  const W = _cityW, H = _cityH;
-  ctx.clearRect(0, 0, W, H);
-  if (_shakeIntensity > 0.01) {
-    ctx.save();
-    ctx.translate(_shakeX, _shakeY);
-  }
-
-  // Day / night cycle (first pass — sky underneath everything)
-  updateNightFactor();
-  drawDayNight(ctx);
-
-  if (_stars.length && _cityGY > 0 && _nightFactor > 0.05) {
-    ctx.fillStyle = 'white';
-    _stars.forEach(s => {
-      const alpha = s.baseAlpha * _nightFactor * (0.5 + Math.sin(_animTime * 0.04 + s.phase) * 0.5);
-      if (alpha <= 0.02) return;
-      ctx.globalAlpha = Math.min(alpha, 1);
-      const r = s.r * (0.85 + Math.sin(_animTime * 0.025 + s.phase + 1) * 0.15);
-      ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2); ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-  }
-
-  // Moon
-  drawMoon(ctx);
-
-  // Aurora borealis (lowest sky layer, only when clean & stable)
-  drawAurora(ctx);
-
-  // Clouds (sky layer, behind buildings via low y)
-  drawClouds(ctx);
-
-  // Shooting star
-  updateShootingStar(ctx);
-
-  // Bird flocks
-  spawnBirds();
-  drawBirds(ctx);
-
-  spawnLeaves();
-  drawLeaves(ctx);
-
-  drawHeatShimmer(ctx);
-
-  spawnSmoke();
-  drawSmoke(ctx);
-
-  // Window shimmer pulse
-  _winSpots.forEach(ws => {
-    const t = Math.sin(_animTime * 0.052 + ws.phase);
-    if (t < 0.58) return;
-    const a = (t - 0.58) * 0.22;
-    const hcx = ws.x + ws.w * 0.5, hcy = ws.y + ws.h * 0.5;
-    const rg = ctx.createRadialGradient(hcx, hcy, 0, hcx, hcy, Math.max(ws.w, ws.h) * 2.0);
-    rg.addColorStop(0, hexAlpha(ws.color, Math.min(a * 2.8, 0.7)));
-    rg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = rg;
-    ctx.fillRect(ws.x - ws.w * 1.2, ws.y - ws.h * 1.2, ws.w * 3.4, ws.h * 3.4);
-  });
-
-  // Streetlight pulse + ground cone (brighter at night)
-  if (_nightFactor > 0.05) {
-    _streetlights.forEach(sl => {
-      const pulse = (0.88 + Math.sin(_animTime * 0.038 + sl.x * 0.009) * 0.12) * _nightFactor;
-      const ag = ctx.createRadialGradient(sl.x, sl.y, 0, sl.x, sl.y, 44 * pulse);
-      ag.addColorStop(0, `rgba(248,224,80,${0.18 * pulse})`);
-      ag.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = ag; ctx.fillRect(sl.x - 44, sl.y - 44, 88, 88);
-      // Ground cone of light
-      const coneA = _nightFactor * 0.12 * pulse;
-      const coneG = ctx.createLinearGradient(sl.x, sl.y, sl.x, _cityGY + 10);
-      coneG.addColorStop(0, `rgba(248,224,80,${coneA})`);
-      coneG.addColorStop(1, 'rgba(248,224,80,0)');
-      ctx.save();
-      ctx.fillStyle = coneG;
-      ctx.beginPath();
-      ctx.moveTo(sl.x, sl.y);
-      ctx.lineTo(sl.x - 26, _cityGY + 10);
-      ctx.lineTo(sl.x + 26, _cityGY + 10);
-      ctx.closePath();
-      ctx.fill();
-      // Ground ellipse
-      const gG = ctx.createRadialGradient(sl.x, _cityGY, 0, sl.x, _cityGY, 28);
-      gG.addColorStop(0, `rgba(248,224,80,${coneA * 1.4})`);
-      gG.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = gG; ctx.fillRect(sl.x-28, _cityGY-6, 56, 16);
-      ctx.restore();
-    });
-  }
-
-  // Searchlight beams (Defense Ministry)
-  _searchlights.forEach(sl => {
-    const angle = Math.sin(_animTime * 0.011 + sl.phase) * 0.72 - Math.PI * 0.5;
-    const len = 110;
-    const ex = sl.x + Math.cos(angle) * len;
-    const ey = sl.y + Math.sin(angle) * len;
-    const beam = ctx.createLinearGradient(sl.x, sl.y, ex, ey);
-    beam.addColorStop(0, 'rgba(255,245,190,0.28)');
-    beam.addColorStop(1, 'rgba(255,245,190,0)');
-    ctx.save();
-    ctx.fillStyle = beam;
-    ctx.beginPath();
-    ctx.moveTo(sl.x, sl.y);
-    ctx.lineTo(sl.x + Math.cos(angle - 0.09) * len, sl.y + Math.sin(angle - 0.09) * len);
-    ctx.lineTo(sl.x + Math.cos(angle + 0.09) * len, sl.y + Math.sin(angle + 0.09) * len);
-    ctx.closePath();
-    ctx.fill();
-    // Core bright line
-    ctx.globalAlpha = 0.18;
-    ctx.strokeStyle = 'rgba(255,255,220,1)'; ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.moveTo(sl.x, sl.y); ctx.lineTo(ex, ey); ctx.stroke();
-    ctx.restore();
-  });
-
-  // Antenna blink lights
-  _antennaBlinks.forEach(ab => {
-    const on = Math.sin(_animTime * 0.06 + ab.phase) > 0.6;
-    if (!on) return;
-    ctx.save();
-    ctx.globalAlpha = 0.85;
-    ctx.fillStyle = '#ff2020';
-    ctx.beginPath(); ctx.arc(ab.x, ab.y, 1.8, 0, Math.PI * 2); ctx.fill();
-    const rg = ctx.createRadialGradient(ab.x, ab.y, 0, ab.x, ab.y, 8);
-    rg.addColorStop(0, 'rgba(255,30,30,0.35)');
-    rg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = rg; ctx.fillRect(ab.x - 8, ab.y - 8, 16, 16);
-    ctx.restore();
-  });
-
-  // Manhole steam vents
-  _manholes.forEach(mh => {
-    if (Math.random() > 0.015) return;
-    // Spawn a puff — just draw inline for simplicity
-  });
-  if ((_animTime & 7) === 0) {
-    _manholes.forEach(mh => {
-      const steamA = 0.08 + Math.sin(_animTime * 0.05 + mh.x) * 0.04;
-      ctx.save();
-      ctx.globalAlpha = steamA;
-      ctx.fillStyle = 'rgba(200,210,230,1)';
-      const sy = mh.y - 12 - (_animTime % 40) * 0.4;
-      ctx.beginPath(); ctx.ellipse(mh.x, sy, 4, 6, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    });
-  }
-
-  // Neon signs (industrial buildings)
-  _neonSigns.forEach(ns => {
-    const t = _animTime * 0.17 + ns.phase;
-    const flicker = Math.sin(t) > -0.88 ? 1 : (Math.random() > 0.55 ? 0.15 : 1);
-    ctx.save();
-    ctx.globalAlpha = flicker * 0.92;
-    ctx.font = 'bold 7px monospace';
-    ctx.textAlign = 'center';
-    ctx.shadowColor = ns.color; ctx.shadowBlur = 10;
-    ctx.fillStyle = ns.color;
-    ctx.fillText(ns.label, ns.x, ns.y);
-    ctx.shadowBlur = 4;
-    ctx.fillText(ns.label, ns.x, ns.y);
-    ctx.shadowBlur = 0;
-    ctx.restore();
-  });
-
-  // Waving flags
-  _flags.forEach(fl => {
-    const t = _animTime * 0.055 + fl.phase;
-    ctx.save();
-    ctx.strokeStyle = fl.color; ctx.lineWidth = 1;
-    ctx.fillStyle = fl.color; ctx.globalAlpha = 0.85;
-    ctx.beginPath();
-    ctx.moveTo(fl.px, fl.py);
-    for (let s = 0; s <= 8; s++) {
-      const sx = fl.px + (s / 8) * fl.len;
-      const sy = fl.py + Math.sin(t - s * 0.55) * (s / 8) * (fl.h * 0.45)
-                       + (s / 8) * (fl.h * 0.35);
-      s === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
-    }
-    for (let s = 8; s >= 0; s--) {
-      const sx = fl.px + (s / 8) * fl.len;
-      const sy = fl.py + Math.sin(t - s * 0.55) * (s / 8) * (fl.h * 0.45)
-                       + (s / 8) * (fl.h * 0.35) + fl.h;
-      ctx.lineTo(sx, sy);
-    }
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
-  });
-
-  // Elevator lights
-  _elevators.forEach(el => {
-    const period = 280;
-    const pos = (_animTime % period) / period;
-    const ey = el.top + (el.bot - el.top) * (pos < 0.5 ? pos * 2 : (1 - pos) * 2);
-    ctx.save();
-    ctx.globalAlpha = 0.45;
-    ctx.fillStyle = el.color;
-    ctx.fillRect(el.x, ey - 2, 4, 5);
-    ctx.restore();
-  });
-
-  // Window cleaning gondolas
-  _gondolas.forEach(g => {
-    const period = 420;
-    const pos = (_animTime % period) / period;
-    const gy2 = g.roofY + pos * (Math.abs(g.roofY) + 80);
-    ctx.save();
-    ctx.globalAlpha = 0.5;
-    ctx.strokeStyle = g.color; ctx.lineWidth = 0.7;
-    ctx.beginPath(); ctx.moveTo(g.x, g.roofY); ctx.lineTo(g.x, gy2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(g.x + g.w, g.roofY); ctx.lineTo(g.x + g.w, gy2); ctx.stroke();
-    ctx.fillStyle = 'rgba(200,220,240,0.6)';
-    ctx.fillRect(g.x - 2, gy2, g.w + 4, 6);
-    ctx.restore();
-  });
-
-  // Laundry lines
-  _laundryLines.forEach(ll => {
-    const sway = Math.sin(_animTime * 0.018 + ll.x1 * 0.01) * 1.5;
-    ctx.save();
-    ctx.strokeStyle = 'rgba(180,180,190,0.28)'; ctx.lineWidth = 0.7;
-    ctx.beginPath(); ctx.moveTo(ll.x1, ll.y1 + sway); ctx.lineTo(ll.x2, ll.y2 + sway); ctx.stroke();
-    ll.items.forEach(item => {
-      const ix = ll.x1 + (ll.x2 - ll.x1) * item.t;
-      const iy = ll.y1 + (ll.y2 - ll.y1) * item.t + sway;
-      const swayI = Math.sin(_animTime * 0.025 + item.t * 8) * 1.8;
-      ctx.fillStyle = item.col; ctx.globalAlpha = 0.7;
-      ctx.fillRect(ix - item.w * 0.5 + swayI * 0.3, iy, item.w, item.h);
-      ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 0.4;
-      ctx.strokeRect(ix - item.w * 0.5 + swayI * 0.3, iy, item.w, item.h);
-    });
-    ctx.globalAlpha = 1;
-    ctx.restore();
-  });
-
-  // Tree canopy sway
-  _treeBranches.forEach(t => {
-    const sway  = Math.sin(_animTime * 0.022 + t.phase) * 2.4;
-    const breathe = (Math.sin(_animTime * 0.036 + t.phase + 0.8) * 0.5 + 0.5) * 0.085;
-    ctx.globalAlpha = breathe;
-    ctx.fillStyle = t.color;
-    ctx.beginPath();
-    ctx.ellipse(t.x + sway, t.y - 0.5, t.rx * 0.92, t.ry * 0.80, sway * 0.022, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-  });
-
-  _vehicles.forEach(v => {
-    v.x += v.speed * v.dir;
-    if (v.x > _cityW + v.w + 10) v.x = -v.w - 10;
-    if (v.x < -v.w - 10)         v.x = _cityW + v.w + 10;
-    drawVehicle(ctx, v);
-  });
-
-  _walkers.forEach((w, wi) => {
-    if (w.entering) {
-      w.x += w.speed * w.dir * 0.55;
-      w.phase = (w.phase + w.speed * 0.06) % (Math.PI * 2);
-      w.sz *= 0.935;
-      w.alpha = (w.alpha !== undefined ? w.alpha : 1) * 0.925;
-      if (w.alpha < 0.04) {
-        const newDir = Math.random() > 0.5 ? 1 : -1;
-        const i = wi;
-        Object.assign(w, {
-          x: newDir > 0 ? -24 : _cityW + 24,
-          dir: newDir,
-          speed: 0.22 + Math.random() * 0.44,
-          sz: 0.82 + Math.random() * 0.36,
-          phase: Math.random() * Math.PI * 2,
-          hat: Math.random() < 0.28,
-          color: WALKER_COLS[i % WALKER_COLS.length],
-          jacket: WALKER_COLS[(i + 4) % WALKER_COLS.length],
-          alpha: 1,
-          entering: false,
-        });
-      } else {
-        drawWalker(ctx, w);
-      }
-      return;
-    }
-
-    w.x += w.speed * w.dir;
-    w.phase = (w.phase + w.speed * 0.09) % (Math.PI * 2);
-    if (w.x > _cityW + 24) w.x = -24;
-    if (w.x < -24)         w.x = _cityW + 24;
-
-    // Detect building entrance
-    if (_buildingHits.length) {
-      for (const bh of _buildingHits) {
-        const entryEdge = w.dir > 0 ? bh.x : bh.x + bh.w;
-        if (Math.abs(w.x - entryEdge) < w.speed * 2 && Math.random() < 0.018) {
-          w.entering = true;
-          w.alpha = 1;
-          break;
-        }
-      }
-    }
-
-    drawWalker(ctx, w);
-  });
-
-  if (_weatherType === 'rain') {
-    spawnRain();
-    drawRain(ctx);
-    updatePuddles(ctx);
-  } else {
-    _puddles.length = 0;
-    _puddleTimer = 0;
-  }
-  if (_weatherType === 'crisis') {
-    const pulse = (Math.sin(_animTime * 0.035) * 0.5 + 0.5) * 0.1;
-    ctx.globalAlpha = pulse;
-    ctx.fillStyle = '#f03040';
-    ctx.fillRect(0, 0, _cityW, _cityH);
-    ctx.globalAlpha = 1;
-    drawLightning(ctx);
-  }
-
-  // Puddle reflections (during rain)
-  drawPuddleReflections(ctx);
-
-  // Fire & embers (crisis)
-  if (_weatherType === 'crisis') drawFire(ctx);
-
-  // Golden Age confetti
-  drawConfetti(ctx);
-
-  // Building demolition chunks
-  drawDemolitions(ctx);
-
-  // Fade out loading overlay after first few frames (city is fully rendered by then)
-  if (_animTime === 3) {
-    const loadEl = document.getElementById('loading');
-    if (loadEl && loadEl.style.display !== 'none') {
-      loadEl.style.opacity = '0';
-      setTimeout(() => { loadEl.style.display = 'none'; }, 700);
-    }
-  }
-
-  // Building rise animation (new buildings slide up from ground)
-  for (let i = _buildingRises.length - 1; i >= 0; i--) {
-    const rise = _buildingRises[i];
-    const elapsed = _animTime - rise.startFrame;
-    const progress = Math.min(1, elapsed / 52);
-    if (progress >= 1) { _buildingRises.splice(i, 1); continue; }
-    const coverH = Math.ceil(210 * (1 - progress));
-    ctx.save();
-    ctx.fillStyle = '#04080e';
-    ctx.fillRect(rise.x, _cityGY - coverH, rise.w + 1, coverH);
-    // Glowing reveal edge
-    const edgeG = ctx.createLinearGradient(0, _cityGY - coverH - 6, 0, _cityGY - coverH);
-    edgeG.addColorStop(0, 'rgba(80,160,255,0)');
-    edgeG.addColorStop(1, `rgba(80,160,255,${0.35 * (1 - progress)})`);
-    ctx.fillStyle = edgeG;
-    ctx.fillRect(rise.x, _cityGY - coverH - 6, rise.w + 1, 6);
-    ctx.restore();
-  }
-
-  // Lens flares on streetlights (night only)
-  if (_nightFactor > 0.3) {
-    _streetlights.forEach(sl => {
-      drawLensFlare(ctx, sl.x, sl.y, _nightFactor * 0.5, 'rgba(255,240,140,1)');
-    });
-  }
-
-  // Close shake transform
-  if (_shakeIntensity > 0.01) ctx.restore();
 
   _animFrame = requestAnimationFrame(animLoop);
 }
 
+function renderCityBg(state) {
+  _S = state || {};
+  _seed = 42; 
+  _walkers = [];
+  _vehicles = [];
+  
+  const loadEl = document.getElementById('loading');
+  if (loadEl && loadEl.style.display !== 'none') {
+    loadEl.style.opacity = '0';
+    setTimeout(() => { loadEl.style.display = 'none'; }, 700);
+  }
+
+  while(cityGroup.children.length > 0){ 
+      cityGroup.remove(cityGroup.children[0]); 
+  }
+
+  if (Object.keys(modelsLoaded).length < 12) return;
+
+  const pop = state.population || 0;
+  const TILE_SIZE = 30;
+  
+  // Grid size dynamic based on population, ensuring it grows naturally
+  // Pop 0 -> 9x9 grid, Pop 1M -> 21x21 grid, Pop 5M -> 31x31 grid
+  let GRID_SIZE = 9 + Math.floor(Math.sqrt(pop) / 50); 
+  if (GRID_SIZE % 2 === 0) GRID_SIZE += 1; // Keep it odd
+  if (GRID_SIZE > 51) GRID_SIZE = 51; // Cap to avoid freezing
+  
+  const offset = (GRID_SIZE - 1) / 2;
+  const occupiedTiles = {};
+  
+  // 1. Generate Roads ONLY (ground is already handled by infinite plane/grid)
+  for(let x=0; x<GRID_SIZE; x++) {
+      for(let z=0; z<GRID_SIZE; z++) {
+          const isRoadX = x % 4 === 0;
+          const isRoadZ = z % 4 === 0;
+          let mName = null;
+          let rot = 0;
+          
+          if (isRoadX && isRoadZ) {
+              mName = 'road-intersection';
+              occupiedTiles[`${x}_${z}`] = true;
+          } else if (isRoadX) {
+              mName = 'road-straight';
+              rot = Math.PI / 2;
+              occupiedTiles[`${x}_${z}`] = true;
+          } else if (isRoadZ) {
+              mName = 'road-straight';
+              occupiedTiles[`${x}_${z}`] = true;
+          }
+          
+          if (mName && modelsLoaded[mName]) {
+              const mesh = modelsLoaded[mName].clone();
+              mesh.scale.set(TILE_SIZE, TILE_SIZE, TILE_SIZE);
+              mesh.position.set((x - offset) * TILE_SIZE, 0.1, (z - offset) * TILE_SIZE);
+              mesh.rotation.y = rot;
+              cityGroup.add(mesh);
+          }
+      }
+  }
+
+  // 2. Determine available tiles for buildings
+  const availableTiles = [];
+  for(let x=0; x<GRID_SIZE; x++) {
+      for(let z=0; z<GRID_SIZE; z++) {
+          // Reserve center for landmarks
+          if (Math.abs(x - offset) <= 2 && Math.abs(z - offset) <= 2) continue;
+          if (!occupiedTiles[`${x}_${z}`]) availableTiles.push({x, z});
+      }
+  }
+  
+  // Shuffle available tiles
+  for(let i = availableTiles.length - 1; i > 0; i--) {
+      const j = Math.floor(seededRandom() * (i + 1));
+      [availableTiles[i], availableTiles[j]] = [availableTiles[j], availableTiles[i]];
+  }
+
+  const bgModels = ['building-small-a', 'building-small-b', 'building-small-c', 'building-small-d'];
+  
+  // Logical scaling: Use logarithmic scale so it doesn't just fill the map randomly.
+  // Base off population magnitude + welfare level
+  const popMag = Math.max(0, Math.log10(pop || 1));
+  let requiredBuildings = Math.floor(popMag * 4) + Math.floor((state.welfare || 0) / 10);
+  if (requiredBuildings < 1) requiredBuildings = 1;
+  const baseCount = Math.min(availableTiles.length, requiredBuildings);
+  
+  // 3. Spawn Background Buildings
+  for(let i=0; i<baseCount; i++) {
+    const t = availableTiles[i];
+    occupiedTiles[`${t.x}_${t.z}`] = true;
+
+    const mName = bgModels[Math.floor(seededRandom() * bgModels.length)];
+    const mesh = modelsLoaded[mName].clone();
+    
+    const hue = seededRandom();
+    const sat = 0.4 + seededRandom() * 0.4;
+    const lit = 0.3 + seededRandom() * 0.5;
+    const bColor = new THREE.Color().setHSL(hue, sat, lit);
+
+    mesh.traverse((child) => {
+        if (child.isMesh && child.material) {
+            child.material = child.material.clone();
+            child.material.color = bColor;
+        }
+    });
+    
+    mesh.scale.set(TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    mesh.position.set((t.x - offset) * TILE_SIZE, 0.1, (t.z - offset) * TILE_SIZE);
+    mesh.rotation.y = Math.floor(seededRandom() * 4) * (Math.PI / 2);
+    cityGroup.add(mesh);
+  }
+
+  // 4. Spawn Active Structures (Landmarks) in the center area
+  const structures = activeStructures(state);
+  const colorMap = {
+    'education': 0x00b8e0, 'industry': 0xb058f8, 'welfare': 0x10d870,
+    'green_policy': 0x00d4bc, 'defense': 0xf07830, 'pollution': 0xf03040
+  };
+  
+  let lx = offset - 2;
+  let lz = offset - 2;
+
+  structures.forEach((struct) => {
+    let mName = 'building-small-c';
+    if (struct.m === 'education') mName = 'building-small-b';
+    else if (struct.m === 'industry') mName = 'building-garage';
+    else if (struct.m === 'green_policy') mName = 'grass-trees-tall';
+    else if (struct.m === 'welfare') mName = 'pavement-fountain';
+    else if (struct.m === 'defense') mName = 'building-garage';
+
+    const mesh = modelsLoaded[mName].clone();
+    const lmColor = new THREE.Color(colorMap[struct.m] || 0xdddddd);
+    mesh.traverse((child) => {
+        if (child.isMesh && child.material) {
+            child.material = child.material.clone();
+            child.material.color = lmColor;
+            child.material.emissive = lmColor;
+            child.material.emissiveIntensity = 0.2;
+        }
+    });
+
+    mesh.scale.set(TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    mesh.position.set((lx - offset) * TILE_SIZE, 0.1, (lz - offset) * TILE_SIZE);
+    mesh.rotation.y = Math.PI / 2;
+    cityGroup.add(mesh);
+    
+    const now = new Date();
+    const h = now.getUTCHours() + now.getUTCMinutes() / 60;
+    const sunH = Math.sin(((h - 6) / 24) * Math.PI * 2);
+    if (sunH < 0.2) {
+       const pLight = new THREE.PointLight(0xffffaa, 0.8, 150);
+       pLight.position.set(0, 40, 0);
+       mesh.add(pLight);
+    }
+
+    lx += 1;
+    if (lx > offset + 2) {
+      lx = offset - 2;
+      lz += 1;
+    }
+  });
+
+  // 5. Spawn Vehicles on Roads
+  const vCount = Math.min(30, 2 + Math.floor(popMag * 2) + Math.floor((state.industry || 0) / 10));
+  const carGeo = new THREE.BoxGeometry(4, 3, 8);
+  for(let i=0; i<vCount; i++) {
+     const vMat = new THREE.MeshStandardMaterial({color: new THREE.Color().setHSL(seededRandom(), 0.8, 0.5)});
+     const car = new THREE.Mesh(carGeo, vMat);
+     const isVertical = seededRandom() > 0.5;
+     
+     let roadIndex = Math.floor(seededRandom() * (GRID_SIZE/4)) * 4;
+     if (isVertical) {
+         car.position.set((roadIndex - offset) * TILE_SIZE, 2, (seededRandom()-0.5)*GRID_SIZE*TILE_SIZE);
+     } else {
+         car.position.set((seededRandom()-0.5)*GRID_SIZE*TILE_SIZE, 2, (roadIndex - offset) * TILE_SIZE);
+         car.rotation.y = Math.PI / 2;
+     }
+     
+     car.castShadow = true;
+     car.receiveShadow = true;
+     car.userData = {
+         isVertical: isVertical,
+         speed: 0.8 + seededRandom() * 1.5,
+         dir: seededRandom() > 0.5 ? 1 : -1,
+         maxRange: (GRID_SIZE * TILE_SIZE) / 2
+     };
+     cityGroup.add(car);
+     _vehicles.push(car);
+  }
+
+  // 6. Spawn Walkers on empty tiles
+  const wCount = Math.min(60, 4 + Math.floor(popMag * 4) + Math.floor((state.welfare || 0) / 10));
+  const wGeo = new THREE.CylinderGeometry(1, 1, 4, 6);
+  for(let i=0; i<wCount; i++) {
+     const wMat = new THREE.MeshStandardMaterial({color: new THREE.Color().setHSL(seededRandom(), 0.6, 0.6)});
+     const walker = new THREE.Mesh(wGeo, wMat);
+     walker.position.set((seededRandom()-0.5)*GRID_SIZE*TILE_SIZE, 2, (seededRandom()-0.5)*GRID_SIZE*TILE_SIZE);
+     walker.castShadow = true;
+     walker.receiveShadow = true;
+     walker.userData = {
+         axis: seededRandom() > 0.5 ? 'x' : 'z',
+         speed: 0.2 + seededRandom() * 0.4,
+         dir: seededRandom() > 0.5 ? 1 : -1,
+         bobPhase: seededRandom() * Math.PI * 2,
+         maxRange: (GRID_SIZE * TILE_SIZE) / 2
+     };
+     cityGroup.add(walker);
+     _walkers.push(walker);
+  }
+}
+
+function animLoop() {
+  if (!renderer || !scene || !camera) return;
+  
+  const now = new Date();
+  const h = now.getUTCHours() + now.getUTCMinutes() / 60 + now.getUTCSeconds() / 3600;
+  
+  const angle = ((h - 6) / 24) * Math.PI * 2;
+  const sunR = 600;
+  sunLight.position.x = Math.cos(angle) * sunR;
+  sunLight.position.y = Math.sin(angle) * sunR;
+  sunLight.position.z = 100;
+  
+  const sunH = Math.sin(angle);
+  sunLight.intensity = Math.max(0, sunH * 1.5);
+  
+  let skyColor = new THREE.Color(0x040810);
+  if (sunH > 0.2) skyColor.setHex(0x5ca0d3);
+  else if (sunH > -0.1) skyColor.setHex(0xd97634);
+  
+  const pol = _S.pollution || 0;
+  if (pol > 50) skyColor.lerp(new THREE.Color(0x4a3c31), (pol - 50)/50 * 0.8);
+  
+  scene.background = skyColor;
+  if(scene.fog) scene.fog.color = skyColor;
+  
+  // Update ground grid to match pollution if necessary
+  if (_gridHelper && _groundPlane) {
+      const gColor = new THREE.Color(0x2c3b2c);
+      if (pol > 50) gColor.lerp(new THREE.Color(0x3b332c), (pol - 50)/50 * 0.8);
+      _groundPlane.material.color = gColor;
+  }
+  
+  hemiLight.intensity = Math.max(0.15, sunH * 0.6);
+
+  // Update vehicles
+  _vehicles.forEach(v => {
+      if (v.userData.isVertical) {
+          v.position.z += v.userData.speed * v.userData.dir;
+          if (v.position.z > v.userData.maxRange) v.position.z = -v.userData.maxRange;
+          if (v.position.z < -v.userData.maxRange) v.position.z = v.userData.maxRange;
+      } else {
+          v.position.x += v.userData.speed * v.userData.dir;
+          if (v.position.x > v.userData.maxRange) v.position.x = -v.userData.maxRange;
+          if (v.position.x < -v.userData.maxRange) v.position.x = v.userData.maxRange;
+      }
+  });
+
+  // Update walkers
+  const time = Date.now() * 0.005;
+  _walkers.forEach(w => {
+      w.position[w.userData.axis] += w.userData.speed * w.userData.dir;
+      w.position.y = 2 + Math.abs(Math.sin(time * w.userData.speed * 5 + w.userData.bobPhase)) * 1.2;
+      
+      if (w.position[w.userData.axis] > w.userData.maxRange) w.position[w.userData.axis] = -w.userData.maxRange;
+      if (w.position[w.userData.axis] < -w.userData.maxRange) w.position[w.userData.axis] = w.userData.maxRange;
+      
+      if (Math.random() < 0.005) {
+          w.userData.axis = w.userData.axis === 'x' ? 'z' : 'x';
+          w.userData.dir = Math.random() > 0.5 ? 1 : -1;
+      }
+  });
+
+  controls.update();
+  renderer.render(scene, camera);
+  
+  _animFrame = requestAnimationFrame(animLoop);
+}
 // ── Chart.js radar ────────────────────────────────────────────────────────────
 
 function renderRadar(state) {
@@ -3618,8 +2009,7 @@ async function load() {
   initCityCanvas();
   renderCityBg(s);
   if (_animFrame) cancelAnimationFrame(_animFrame);
-  initWalkers(s.population || 0);
-  initVehicles(s.population || 0);
+  // removed initWalkers and initVehicles for 3D
   animLoop();
   renderRadar(s);
   renderWorldStats(s);
@@ -3654,28 +2044,7 @@ let _resizeTimer  = null;
 // ── Building hover tooltip ────────────────────────────────────────────────────
 
 (function setupBuildingTooltip() {
-  const container = document.getElementById('city-container');
-  const tooltip   = document.getElementById('building-tooltip');
-
-  container.addEventListener('mousemove', e => {
-    const rect = container.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-    if (my > _cityGY || !_buildingHits.length) { tooltip.style.display = 'none'; return; }
-    const hit = _buildingHits.find(h => mx >= h.x && mx <= h.x + h.w);
-    if (hit) {
-      const mm = METRIC_META[hit.metric];
-      tooltip.innerHTML = `<strong>${hit.name}</strong>`
-        + `<span style="color:var(--muted);margin-left:8px">${mm ? mm.label : hit.metric}: ${hit.value}</span>`;
-      const tx = Math.min(e.clientX + 14, window.innerWidth - 200);
-      tooltip.style.left = tx + 'px';
-      tooltip.style.top  = (e.clientY - 12) + 'px';
-      tooltip.style.display = 'block';
-    } else {
-      tooltip.style.display = 'none';
-    }
-  });
-  container.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+  // disabled for 3D version
 })();
 
 // Advanced propose options (?advanced=1)
@@ -3694,10 +2063,9 @@ window.addEventListener('resize', () => {
   _resizeTimer = setTimeout(() => {
     if (!lastState) return;
     cancelAnimationFrame(_animFrame);
-    _smoke.length = 0;
+    // removed smoke and initWalkers
     initCityCanvas();
     renderCityBg(lastState);
-    initWalkers(lastState.population || 0);
     animLoop();
   }, 150);
 });
