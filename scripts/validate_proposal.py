@@ -248,8 +248,8 @@ def validate():
                         v = int(val)
                     except (TypeError, ValueError):
                         fail("state_patch `treasury` must be an integer.")
-                    if not (0 <= v <= 100_000):
-                        fail("state_patch `treasury` must be between 0 and 100,000.")
+                    if not (0 <= v <= 1_000_000_000):
+                        fail("state_patch `treasury` must be between 0 and 1,000,000,000.")
                 elif key == "currency":
                     if not isinstance(val, str) or not val.strip() or len(val) > 30:
                         fail("state_patch `currency` must be a non-empty string (max 30 chars).")

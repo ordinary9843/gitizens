@@ -258,7 +258,7 @@ def world_autonomous_tick() -> bool:
             new_pop = int(new_pop * 0.9)
             new_stb = max(0, new_stb - 10)
 
-        new_treasury = min(100_000, new_treasury)
+        new_treasury = min(1_000_000_000, new_treasury)
 
         state.update({
             "pollution":  new_pol,
@@ -389,7 +389,7 @@ def apply_effect(effect_data: dict | None, law_number: int, extra_cost: int = 0)
                     print(f"  [BLOCKED] state_patch key '{key}' invalid value '{val}' — skipped")
             elif key == "treasury":
                 try:
-                    state[key] = max(0, min(100_000, int(val)))
+                    state[key] = max(0, min(1_000_000_000, int(val)))
                 except (TypeError, ValueError):
                     print(f"  [BLOCKED] state_patch key '{key}' invalid value '{val}' — skipped")
             else:

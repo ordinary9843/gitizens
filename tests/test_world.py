@@ -175,7 +175,7 @@ class TestIdleEconomy:
 
     def test_nonlinear_maintenance_cost(self):
         # Massive population quadratically drains treasury
-        state = {**BASE_STATE, "population": 2_000_000, "industry": 0, "treasury": 100_000}
+        state = {**BASE_STATE, "population": 2_000_000, "industry": 0, "treasury": 1_000_000_000}
         # base_maint = 2000. overhead = (20)**2 = 400. total maint = 2400.
         # pop_income = 2000000 // 500 = 4000
         new = self._run_tick(state)
@@ -292,10 +292,10 @@ class TestApplyEffectStatePatch:
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
         (tmp_path / "world/state.json").write_text(json.dumps({**BASE_STATE}))
-        effect = {"type": "state_patch", "patch": {"treasury": 9_999_999}}
+        effect = {"type": "state_patch", "patch": {"treasury": 2_000_000_000}}
         tv.apply_effect(effect, None)
         state = json.loads((tmp_path / "world/state.json").read_text())
-        assert state["treasury"] == 100_000
+        assert state["treasury"] == 1_000_000_000
 
 
 # ===========================================================================
@@ -346,13 +346,13 @@ class TestAutonomousTickTreasuryCap:
     def test_treasury_never_exceeds_100000(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        state = {**BASE_STATE, "treasury": 99_990, "industry": 80, "population": 1000}
+        state = {**BASE_STATE, "treasury": 1_000_000_000 - 5, "industry": 80, "population": 1000}
         (tmp_path / "world/state.json").write_text(json.dumps(state))
         with patch.object(_engine_world, "write_state") as ws, \
              patch.object(_engine_world, "run", return_value=""):
             tv.world_autonomous_tick()
             written = ws.call_args[0][0]
-        assert written["treasury"] <= 100_000
+        assert written["treasury"] <= 1_000_000_000
 
 
 # ===========================================================================

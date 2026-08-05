@@ -398,7 +398,7 @@ def collect_star_income():
 
     income = len(new_logins) * 10
     currency = state.get("currency", "Git Coins")
-    state["treasury"] = min(100_000, state.get("treasury", 0) + income)
+    state["treasury"] = min(1_000_000_000, state.get("treasury", 0) + income)
     write_state(state)
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     run(["git", "add", "world/state.json"])
