@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-08-05T17:28:32.172989+00:00",
+  "updated_at": "2026-08-05T19:28:22.793824+00:00",
   "pending": [],
   "at_risk": [
     {
       "name": "Social Housing District",
       "metric": "welfare",
-      "current": 50,
+      "current": 38,
       "removal_at": 48
     }
   ],

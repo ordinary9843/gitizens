@@ -1,1 +1,26 @@
-{}
+{
+  "id": "evt-famine",
+  "category": "natural",
+  "rarity": "uncommon",
+  "title": "Famine Crisis",
+  "description": "The prolonged drought has drained grain reserves, and famine signals are spreading through rural provinces. Social order is fraying.",
+  "flavor": "Bread prices have quintupled overnight. Aid queues stretch around the block.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "welfare": -12,
+    "stability": -8
+  },
+  "default_consequence": {
+    "population": -500,
+    "welfare": -8
+  },
+  "response_consequence": {
+    "welfare": 5,
+    "stability": 3
+  },
+  "response_hint": "Passing an emergency food relief act can mobilise reserves and request allied aid.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-05T19:28:20.911872+00:00",
+  "issue_number": 1141
+}
