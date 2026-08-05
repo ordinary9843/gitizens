@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-05*
+*Last updated: 2026-08-05 — [Law 081](laws/law-081.md)*
 
 ---
 
@@ -9,19 +9,19 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 80 |
-| Last enacted | 2026-08-03 |
-| Treasury | 48,654,004 Git Coins |
+| Laws enacted | 81 |
+| Last enacted | 2026-08-05 |
+| Treasury | 53,998,213 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 88/100 |
+| Education | 87/100 |
 | Industry | 90/100 |
-| Welfare | 45/100 |
-| Green Policy | 84/100 |
-| Defense | 93/100 |
+| Welfare | 50/100 |
+| Green Policy | 82/100 |
+| Defense | 92/100 |
 | Pollution *(derived)* | 100/100 |
 
 ---
@@ -60,6 +60,7 @@
 | `sec-001` | Manufacturing District | [Law 007](laws/law-007.md) | industry >= 25 |
 | `sec-002` | Industrial Complex | [Law 015](laws/law-015.md) | industry >= 55 |
 | `sec-003` | Heavy Industry Zone | — | industry >= 80 |
+| `sec-004` | Smog Zone | [Law 081](laws/law-081.md) | pollution >= 60 |
 
 ---
 

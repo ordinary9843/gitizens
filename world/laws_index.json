@@ -1,13 +1,5 @@
 [
   {
-    "number": 61,
-    "title": "Elevate Learning Initiative",
-    "issue_number": 736,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/736",
-    "enacted_date": "2026-07-16",
-    "era": "Modern Era"
-  },
-  {
     "number": 62,
     "title": "Innovative Learning Expansion Initiative",
     "issue_number": 760,
@@ -158,5 +150,13 @@
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1128",
     "enacted_date": "2026-08-03",
     "era": "Modern Era"
+  },
+  {
+    "number": 81,
+    "title": "Strengthen Welfare",
+    "issue_number": 1137,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1137",
+    "enacted_date": "2026-08-05",
+    "era": "Crisis Age"
   }
 ]
