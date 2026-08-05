@@ -444,7 +444,7 @@ class TestValidateFunction:
         vp = self._vp(tmp_path)
         self._run_fail(vp, "[PROPOSAL] Test",
                        _GOOD_DESC + "## Effect\n\n```yaml\ntype: state_patch\n"
-                       "patch:\n  treasury: 200000\n```\n")
+                       "patch:\n  treasury: 2000000000\n```\n")
 
     def test_state_patch_treasury_non_int_fails(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
