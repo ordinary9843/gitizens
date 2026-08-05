@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-04*
+*Last updated: 2026-08-05*
 
 ---
 
@@ -20,8 +20,8 @@
 | Education | 89/100 |
 | Industry | 91/100 |
 | Welfare | 45/100 |
-| Green Policy | 89/100 |
-| Defense | 95/100 |
+| Green Policy | 87/100 |
+| Defense | 94/100 |
 | Pollution *(derived)* | 100/100 |
 
 ---
