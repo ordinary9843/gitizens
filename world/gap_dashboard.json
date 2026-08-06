@@ -1,14 +1,15 @@
 {
-  "updated_at": "2026-08-05T22:57:38.555686+00:00",
-  "pending": [],
-  "at_risk": [
+  "updated_at": "2026-08-06T00:03:13.963964+00:00",
+  "pending": [
     {
       "name": "Social Housing District",
       "metric": "welfare",
-      "current": 38,
-      "removal_at": 48
+      "current": 35,
+      "target": 60,
+      "gap": 25
     }
   ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "recovery/air-cleaned",
