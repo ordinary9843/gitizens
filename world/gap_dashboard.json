@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-06T00:03:13.963964+00:00",
+  "updated_at": "2026-08-06T04:11:38.242893+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -9,7 +9,14 @@
       "gap": 25
     }
   ],
-  "at_risk": [],
+  "at_risk": [
+    {
+      "name": "Eco-Research Center",
+      "metric": "green_policy",
+      "current": 76,
+      "removal_at": 75
+    }
+  ],
   "milestones_pending": [
     {
       "tag": "recovery/air-cleaned",
