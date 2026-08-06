@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-05*
+*Last updated: 2026-08-06 — [Law 082](laws/law-082.md)*
 
 ---
 
@@ -9,17 +9,17 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 81 |
-| Last enacted | 2026-08-05 |
-| Treasury | 60,616,410 Git Coins |
+| Laws enacted | 82 |
+| Last enacted | 2026-08-06 |
+| Treasury | 60,592,903 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 83/100 |
-| Industry | 84/100 |
-| Welfare | 38/100 |
+| Industry | 83/100 |
+| Welfare | 43/100 |
 | Green Policy | 80/100 |
 | Defense | 89/100 |
 | Pollution *(derived)* | 100/100 |
@@ -41,7 +41,6 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `dst-001` | City Park | [Law 006](laws/law-006.md) | green_policy >= 35 |
-| `dst-002` | Social Housing District | [Law 010](laws/law-010.md) | welfare >= 60 |
 | `dst-003` | Nature Reserve | — | green_policy >= 65 |
 
 ### Buildings
@@ -66,4 +65,6 @@
 
 ## Archive
 
-*(none)*
+| ID | Name | Demolished by | Reason |
+|----|------|---------------|--------|
+| `dst-002` | Social Housing District | [Law 082](laws/law-082.md) | welfare < 48 |
