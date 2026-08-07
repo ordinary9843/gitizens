@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-07T04:54:02.612026+00:00",
+  "updated_at": "2026-08-07T06:08:52.648323+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -11,9 +11,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 72,
+      "current": 70,
       "target": 85,
-      "gap": 13
+      "gap": 15
     }
   ],
   "at_risk": [],
