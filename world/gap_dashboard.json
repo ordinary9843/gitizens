@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-07T14:51:46.703173+00:00",
+  "updated_at": "2026-08-07T15:55:01.733811+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -20,7 +20,7 @@
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 74,
+      "current": 73,
       "removal_at": 70
     }
   ],
