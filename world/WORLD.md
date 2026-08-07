@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-06*
+*Last updated: 2026-08-07 — [Law 083](laws/law-083.md)*
 
 ---
 
@@ -9,19 +9,19 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 82 |
-| Last enacted | 2026-08-06 |
-| Treasury | 60,626,191 Git Coins |
+| Laws enacted | 83 |
+| Last enacted | 2026-08-07 |
+| Treasury | 60,576,322 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 78/100 |
-| Industry | 86/100 |
-| Welfare | 42/100 |
-| Green Policy | 74/100 |
-| Defense | 93/100 |
+| Education | 77/100 |
+| Industry | 84/100 |
+| Welfare | 47/100 |
+| Green Policy | 73/100 |
+| Defense | 92/100 |
 | Pollution *(derived)* | 100/100 |
 
 ---
@@ -50,7 +50,6 @@
 | `bld-001` | Public School | [Law 001](laws/law-001.md) | education >= 25 |
 | `bld-002` | Community Center | [Law 003](laws/law-003.md) | welfare >= 30 |
 | `bld-003` | Military Barracks | [Law 008](laws/law-008.md) | defense >= 30 |
-| `bld-004` | Eco-Research Center | [Law 023](laws/law-023.md) | green_policy >= 85 |
 
 ### Sectors
 
@@ -67,4 +66,5 @@
 
 | ID | Name | Demolished by | Reason |
 |----|------|---------------|--------|
+| `bld-004` | Eco-Research Center | [Law 083](laws/law-083.md) | green_policy < 75 |
 | `dst-002` | Social Housing District | [Law 082](laws/law-082.md) | welfare < 48 |
