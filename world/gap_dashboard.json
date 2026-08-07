@@ -1,22 +1,22 @@
 {
-  "updated_at": "2026-08-06T23:58:08.101431+00:00",
+  "updated_at": "2026-08-07T02:55:29.958379+00:00",
   "pending": [
-    {
-      "name": "Social Housing District",
-      "metric": "welfare",
-      "current": 42,
-      "target": 60,
-      "gap": 18
-    }
-  ],
-  "at_risk": [
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 74,
-      "removal_at": 75
+      "current": 73,
+      "target": 85,
+      "gap": 12
+    },
+    {
+      "name": "Social Housing District",
+      "metric": "welfare",
+      "current": 47,
+      "target": 60,
+      "gap": 13
     }
   ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "recovery/air-cleaned",
