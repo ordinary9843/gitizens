@@ -1,21 +1,5 @@
 [
   {
-    "tick": 451,
-    "date": "2026-07-28T19:22:19Z",
-    "laws_count": 72,
-    "era": "Modern Era",
-    "education": 100,
-    "industry": 100,
-    "welfare": 100,
-    "green_policy": 100,
-    "defense": 100,
-    "pollution": 0,
-    "population": 53262395384,
-    "stability": 60,
-    "treasury": 100000,
-    "active_event": "evt-llm-4721"
-  },
-  {
     "tick": 452,
     "date": "2026-07-28T21:06:47Z",
     "laws_count": 72,
@@ -1597,6 +1581,22 @@
     "population": 5909,
     "stability": 0,
     "treasury": 60581205,
+    "active_event": "evt-coup-attempt"
+  },
+  {
+    "tick": 551,
+    "date": "2026-08-07T14:51:46Z",
+    "laws_count": 83,
+    "era": "Crisis Age",
+    "education": 74,
+    "industry": 78,
+    "welfare": 47,
+    "green_policy": 69,
+    "defense": 92,
+    "pollution": 100,
+    "population": 5162,
+    "stability": 0,
+    "treasury": 60581592,
     "active_event": "evt-coup-attempt"
   }
 ]
