@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-07T21:37:45.821836+00:00",
+  "updated_at": "2026-08-07T22:33:48.153545+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -31,6 +31,13 @@
       "current": 100,
       "target": 20,
       "gap": 80
+    },
+    {
+      "tag": "milestone/population-boom",
+      "metric": "population",
+      "current": 1914,
+      "target": 2000,
+      "gap": 86
     }
   ],
   "milestones_achieved": [
