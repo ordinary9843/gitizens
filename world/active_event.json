@@ -1,27 +1,27 @@
 {
-  "id": "evt-mass-resignation",
-  "category": "social",
-  "rarity": "rare",
-  "title": "Mass Resignation Day",
-  "description": "The 'lying flat' movement reaches a peak as vast numbers of workers announce their resignations on the same day, concentrated in factories and the service industry.",
-  "flavor": "Factory owners are in a panic, but workers' social media posts are racking up millions of likes.",
-  "trigger_conditions": {},
+  "id": "evt-ai-breakthrough",
+  "category": "scientific",
+  "rarity": "uncommon",
+  "title": "AI Breakthrough",
+  "description": "A domestic research institute has published a groundbreaking AI model that surpasses human performance on multiple benchmarks.",
+  "flavor": "Tech company shares surged; governments of other nations are requesting collaboration.",
+  "trigger_conditions": {
+    "education": {
+      "min": 40
+    }
+  },
   "immediate_effects": {
-    "industry": -10,
-    "welfare": 5,
-    "stability": -8
+    "education": 10,
+    "industry": 5
   },
-  "default_consequence": {
-    "industry": -5,
-    "treasury": -30
-  },
+  "default_consequence": {},
   "response_consequence": {
-    "welfare": 8,
-    "stability": 3
+    "education": 8,
+    "treasury": 80
   },
-  "response_hint": "Passing a labour rights reform act can address the demands and gradually restore productivity.",
+  "response_hint": "Passing an AI industry promotion act can convert technological leadership into long-term economic advantage.",
   "duration_hours": 4,
   "issue_label": "event",
-  "fired_at": "2026-08-08T11:27:49.608638+00:00",
-  "issue_number": 1162
+  "fired_at": "2026-08-08T15:28:05.550505+00:00",
+  "issue_number": 1164
 }
