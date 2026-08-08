@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-08T04:56:02.517289+00:00",
+  "updated_at": "2026-08-08T05:42:32.174326+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -26,7 +26,7 @@
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 72,
+      "current": 71,
       "removal_at": 70
     }
   ],
@@ -41,9 +41,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 1216,
+      "current": 1083,
       "target": 2000,
-      "gap": 784
+      "gap": 917
     }
   ],
   "milestones_achieved": [
