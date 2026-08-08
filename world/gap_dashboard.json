@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-08T08:39:41.268634+00:00",
+  "updated_at": "2026-08-08T09:36:16.005711+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -11,9 +11,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 68,
+      "current": 67,
       "target": 85,
-      "gap": 17
+      "gap": 18
     }
   ],
   "at_risk": [
@@ -41,9 +41,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 725,
+      "current": 629,
       "target": 2000,
-      "gap": 1275
+      "gap": 1371
     }
   ],
   "milestones_achieved": [
