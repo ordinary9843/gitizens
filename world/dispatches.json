@@ -1,12 +1,5 @@
 [
   {
-    "tick": 566,
-    "date": "2026-08-08",
-    "narrative": "Tick 566: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 836 \u00b7 treasury 60.5M GC \u00b7 stability 0/100 \u00b7 pollution 100/100"
-  },
-  {
     "tick": 567,
     "date": "2026-08-08",
     "narrative": "Tick 567: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 575: autonomous tick applied \u00b7 event: AI Breakthrough.",
     "changes": "autonomous tick applied \u00b7 event: AI Breakthrough",
     "metrics": "population 261 \u00b7 treasury 60.5M GC \u00b7 stability 0/100 \u00b7 pollution 95/100"
+  },
+  {
+    "tick": 576,
+    "date": "2026-08-08",
+    "narrative": "Tick 576: autonomous tick applied \u00b7 event: AI Breakthrough.",
+    "changes": "autonomous tick applied \u00b7 event: AI Breakthrough",
+    "metrics": "population 231 \u00b7 treasury 60.5M GC \u00b7 stability 0/100 \u00b7 pollution 94/100"
   }
 ]
