@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-08-08T10:32:05.468120+00:00",
+  "updated_at": "2026-08-08T11:27:50.419418+00:00",
   "pending": [
     {
       "name": "Social Housing District",
       "metric": "welfare",
-      "current": 47,
+      "current": 52,
       "target": 60,
-      "gap": 13
+      "gap": 8
     },
     {
       "name": "Eco-Research Center",
@@ -26,7 +26,7 @@
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 70,
+      "current": 60,
       "removal_at": 70
     }
   ],
@@ -41,9 +41,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 557,
+      "current": 495,
       "target": 2000,
-      "gap": 1443
+      "gap": 1505
     }
   ],
   "milestones_achieved": [
