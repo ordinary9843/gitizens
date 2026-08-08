@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-08T17:28:49.341326+00:00",
+  "updated_at": "2026-08-08T18:36:00.363266+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -28,16 +28,16 @@
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 94,
+      "current": 93,
       "target": 20,
-      "gap": 74
+      "gap": 73
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 231,
+      "current": 204,
       "target": 2000,
-      "gap": 1769
+      "gap": 1796
     }
   ],
   "milestones_achieved": [
