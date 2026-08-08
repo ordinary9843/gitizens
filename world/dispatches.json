@@ -1,12 +1,5 @@
 [
   {
-    "tick": 572,
-    "date": "2026-08-08",
-    "narrative": "Tick 572: autonomous tick applied \u00b7 event: Mass Resignation Day.",
-    "changes": "autonomous tick applied \u00b7 event: Mass Resignation Day",
-    "metrics": "population 396 \u00b7 treasury 60.5M GC \u00b7 stability 0/100 \u00b7 pollution 98/100"
-  },
-  {
     "tick": 573,
     "date": "2026-08-08",
     "narrative": "Tick 573: autonomous tick applied \u00b7 event: Mass Resignation Day.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 581: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 122 \u00b7 treasury 60.5M GC \u00b7 stability 0/100 \u00b7 pollution 89/100"
+  },
+  {
+    "tick": 582,
+    "date": "2026-08-08",
+    "narrative": "Tick 582: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 107 \u00b7 treasury 60.5M GC \u00b7 stability 0/100 \u00b7 pollution 88/100"
   }
 ]

@@ -11,18 +11,18 @@
 | Era | Crisis Age |
 | Laws enacted | 84 |
 | Last enacted | 2026-08-08 |
-| Treasury | 60,488,423 Git Coins |
+| Treasury | 60,488,613 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 79/100 |
-| Industry | 58/100 |
-| Welfare | 52/100 |
+| Industry | 57/100 |
+| Welfare | 51/100 |
 | Green Policy | 65/100 |
-| Defense | 78/100 |
-| Pollution *(derived)* | 89/100 |
+| Defense | 77/100 |
+| Pollution *(derived)* | 88/100 |
 
 ---
 
