@@ -93,3 +93,4 @@
 | 82 | [law-082](../world/laws/law-082.md) | [#1143](https://github.com/ordinary9843/gitizens/issues/1143) Strengthen Welfare | 0+1 0-1 | 2026-08-06 |
 | 83 | [law-083](../world/laws/law-083.md) | [#1148](https://github.com/ordinary9843/gitizens/issues/1148) Strengthen Welfare | 0+1 0-1 | 2026-08-07 |
 | 84 | [law-084](../world/laws/law-084.md) | [#1158](https://github.com/ordinary9843/gitizens/issues/1158) Strengthen Welfare | 0+1 0-1 | 2026-08-08 |
+| 85 | [law-085](../world/laws/law-085.md) | [#1168](https://github.com/ordinary9843/gitizens/issues/1168) Strengthen Welfare | 0+1 0-1 | 2026-08-09 |

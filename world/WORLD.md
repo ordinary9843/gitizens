@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-08*
+*Last updated: 2026-08-09 — [Law 085](laws/law-085.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 84 |
-| Last enacted | 2026-08-08 |
-| Treasury | 60,488,613 Git Coins |
+| Laws enacted | 85 |
+| Last enacted | 2026-08-09 |
+| Treasury | 60,284,083 Git Coins |
 
 ### Policy
 
@@ -19,10 +19,10 @@
 |--------|-------|
 | Education | 79/100 |
 | Industry | 57/100 |
-| Welfare | 51/100 |
+| Welfare | 56/100 |
 | Green Policy | 65/100 |
-| Defense | 77/100 |
-| Pollution *(derived)* | 88/100 |
+| Defense | 76/100 |
+| Pollution *(derived)* | 86/100 |
 
 ---
 
@@ -57,7 +57,6 @@
 |----|------|----------|---------|
 | `sec-001` | Manufacturing District | [Law 007](laws/law-007.md) | industry >= 25 |
 | `sec-002` | Industrial Complex | [Law 015](laws/law-015.md) | industry >= 55 |
-| `sec-003` | Heavy Industry Zone | — | industry >= 80 |
 | `sec-004` | Smog Zone | [Law 081](laws/law-081.md) | pollution >= 60 |
 
 ---
@@ -68,3 +67,4 @@
 |----|------|---------------|--------|
 | `bld-004` | Eco-Research Center | [Law 083](laws/law-083.md) | green_policy < 75 |
 | `dst-002` | Social Housing District | [Law 082](laws/law-082.md) | welfare < 48 |
+| `sec-003` | Heavy Industry Zone | [Law 085](laws/law-085.md) | industry < 70 |

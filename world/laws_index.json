@@ -1,13 +1,5 @@
 [
   {
-    "number": 65,
-    "title": "Enhanced Community Support Initiative",
-    "issue_number": 819,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/819",
-    "enacted_date": "2026-07-19",
-    "era": "Modern Era"
-  },
-  {
     "number": 66,
     "title": "Innovative Learning Enrichment Act",
     "issue_number": 840,
@@ -157,6 +149,14 @@
     "issue_number": 1158,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1158",
     "enacted_date": "2026-08-08",
+    "era": "Crisis Age"
+  },
+  {
+    "number": 85,
+    "title": "Strengthen Welfare",
+    "issue_number": 1168,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1168",
+    "enacted_date": "2026-08-09",
     "era": "Crisis Age"
   }
 ]
