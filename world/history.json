@@ -1,21 +1,5 @@
 [
   {
-    "tick": 500,
-    "date": "2026-08-02T09:07:53Z",
-    "laws_count": 78,
-    "era": "Modern Era",
-    "education": 100,
-    "industry": 100,
-    "welfare": 100,
-    "green_policy": 100,
-    "defense": 100,
-    "pollution": 0,
-    "population": 312388575433,
-    "stability": 61,
-    "treasury": 100000,
-    "active_event": "evt-surveillance-tech"
-  },
-  {
     "tick": 501,
     "date": "2026-08-02T11:15:36Z",
     "laws_count": 78,
@@ -1597,6 +1581,22 @@
     "population": 100,
     "stability": 10,
     "treasury": 60287586,
+    "active_event": null
+  },
+  {
+    "tick": 600,
+    "date": "2026-08-09T20:30:51Z",
+    "laws_count": 86,
+    "era": "Crisis Age",
+    "education": 80,
+    "industry": 60,
+    "welfare": 61,
+    "green_policy": 63,
+    "defense": 69,
+    "pollution": 67,
+    "population": 100,
+    "stability": 11,
+    "treasury": 60287798,
     "active_event": null
   }
 ]
