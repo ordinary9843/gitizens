@@ -1,12 +1,5 @@
 [
   {
-    "tick": 582,
-    "date": "2026-08-08",
-    "narrative": "Tick 582: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 107 \u00b7 treasury 60.5M GC \u00b7 stability 0/100 \u00b7 pollution 88/100"
-  },
-  {
     "tick": 583,
     "date": "2026-08-09",
     "narrative": "Tick 583: autonomous tick applied \u00b7 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 591: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Everyone Suddenly Starts Painting.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Everyone Suddenly Starts Painting",
     "metrics": "population 100 \u00b7 treasury 60.3M GC \u00b7 stability 2/100 \u00b7 pollution 76/100"
+  },
+  {
+    "tick": 592,
+    "date": "2026-08-09",
+    "narrative": "Tick 592: autonomous tick applied \u00b7 event: Everyone Suddenly Starts Painting.",
+    "changes": "autonomous tick applied \u00b7 event: Everyone Suddenly Starts Painting",
+    "metrics": "population 100 \u00b7 treasury 60.3M GC \u00b7 stability 3/100 \u00b7 pollution 75/100"
   }
 ]
