@@ -1,13 +1,6 @@
 {
-  "updated_at": "2026-08-09T08:41:29.383307+00:00",
+  "updated_at": "2026-08-09T09:38:22.115726+00:00",
   "pending": [
-    {
-      "name": "Social Housing District",
-      "metric": "welfare",
-      "current": 56,
-      "target": 60,
-      "gap": 4
-    },
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
@@ -28,9 +21,9 @@
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 79,
+      "current": 78,
       "target": 20,
-      "gap": 59
+      "gap": 58
     },
     {
       "tag": "milestone/population-boom",
