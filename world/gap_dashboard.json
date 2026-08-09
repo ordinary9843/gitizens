@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-09T09:38:22.115726+00:00",
+  "updated_at": "2026-08-09T10:33:36.162605+00:00",
   "pending": [
     {
       "name": "Eco-Research Center",
@@ -21,9 +21,9 @@
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 78,
+      "current": 77,
       "target": 20,
-      "gap": 58
+      "gap": 57
     },
     {
       "tag": "milestone/population-boom",
