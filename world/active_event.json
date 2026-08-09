@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-time-traveler",
+  "category": "weird",
+  "rarity": "rare",
+  "title": "Time Traveller Claims",
+  "description": "A mysterious man at a press conference claims to be from the year 2087 and accurately predicts three minor events.",
+  "flavor": "No one believes him, but all three prophecies came true within seventy-two hours.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "education": 2,
+    "stability": -5
+  },
+  "default_consequence": {
+    "stability": -8
+  },
+  "response_consequence": {
+    "education": 8,
+    "stability": 3
+  },
+  "response_hint": "Passing a 'Future Studies' special committee establishment act can at least give the affair an official account.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-09T05:03:40.218024+00:00",
+  "issue_number": 1170
+}
