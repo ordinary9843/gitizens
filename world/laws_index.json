@@ -1,13 +1,5 @@
 [
   {
-    "number": 68,
-    "title": "Knowledge Expansion Pact",
-    "issue_number": 883,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/883",
-    "enacted_date": "2026-07-22",
-    "era": "Modern Era"
-  },
-  {
     "number": 69,
     "title": "Wellness for All Initiative",
     "issue_number": 938,
@@ -156,6 +148,14 @@
     "title": "Strengthen Industry",
     "issue_number": 1178,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1178",
+    "enacted_date": "2026-08-10",
+    "era": "Crisis Age"
+  },
+  {
+    "number": 88,
+    "title": "Strengthen Welfare",
+    "issue_number": 1179,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1179",
     "enacted_date": "2026-08-10",
     "era": "Crisis Age"
   }
