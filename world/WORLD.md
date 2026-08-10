@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-10*
+*Last updated: 2026-08-10 — [Law 089](laws/law-089.md)*
 
 ---
 
@@ -9,18 +9,18 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 88 |
+| Laws enacted | 89 |
 | Last enacted | 2026-08-10 |
-| Treasury | 59,880,556 Git Coins |
+| Treasury | 59,880,975 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 75/100 |
+| Education | 74/100 |
 | Industry | 65/100 |
 | Welfare | 65/100 |
-| Green Policy | 61/100 |
+| Green Policy | 66/100 |
 | Defense | 69/100 |
 | Pollution *(derived)* | 62/100 |
 

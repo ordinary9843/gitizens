@@ -1,13 +1,5 @@
 [
   {
-    "number": 69,
-    "title": "Wellness for All Initiative",
-    "issue_number": 938,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/938",
-    "enacted_date": "2026-07-24",
-    "era": "Modern Era"
-  },
-  {
     "number": 70,
     "title": "Enhanced Community Wellbeing Act",
     "issue_number": 999,
@@ -156,6 +148,14 @@
     "title": "Strengthen Welfare",
     "issue_number": 1179,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1179",
+    "enacted_date": "2026-08-10",
+    "era": "Crisis Age"
+  },
+  {
+    "number": 89,
+    "title": "Strengthen Green Policy",
+    "issue_number": 1180,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1180",
     "enacted_date": "2026-08-10",
     "era": "Crisis Age"
   }
