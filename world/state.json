@@ -4,17 +4,17 @@
   "last_enacted": "2026-08-10",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 59882211,
+  "treasury": 59882707,
   "currency": "Git Coins",
   "stars_last_counted": 6,
-  "education": 72,
+  "education": 71,
   "industry": 64,
   "welfare": 64,
   "green_policy": 65,
   "defense": 67,
-  "population": 100,
-  "pollution": 57,
-  "stability": 29,
+  "population": 103,
+  "pollution": 55,
+  "stability": 31,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -32,5 +32,5 @@
     "{\"message\":\"You do not have permission to view the stargazers of this repository\",\"documentation_url\":\"https://docs.github.com/rest/activity/starring#list-stargazers\",\"status\":\"403\"}"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-08-10T15:00:00Z"
+  "next_tick_at": "2026-08-10T17:00:00Z"
 }
