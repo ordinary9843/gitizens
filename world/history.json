@@ -1,21 +1,5 @@
 [
   {
-    "tick": 513,
-    "date": "2026-08-03T14:36:56Z",
-    "laws_count": 79,
-    "era": "Modern Era",
-    "education": 100,
-    "industry": 100,
-    "welfare": 100,
-    "green_policy": 100,
-    "defense": 100,
-    "pollution": 0,
-    "population": 495480099772,
-    "stability": 31,
-    "treasury": 100000,
-    "active_event": "evt-simulation-theory"
-  },
-  {
     "tick": 514,
     "date": "2026-08-03T17:08:35Z",
     "laws_count": 79,
@@ -1598,5 +1582,21 @@
     "stability": 32,
     "treasury": 59882955,
     "active_event": null
+  },
+  {
+    "tick": 613,
+    "date": "2026-08-10T18:56:01Z",
+    "laws_count": 89,
+    "era": "Industrial Era",
+    "education": 71,
+    "industry": 64,
+    "welfare": 72,
+    "green_policy": 65,
+    "defense": 66,
+    "pollution": 53,
+    "population": 105,
+    "stability": 38,
+    "treasury": 59883205,
+    "active_event": "evt-cultural-renaissance"
   }
 ]
