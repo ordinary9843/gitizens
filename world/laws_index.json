@@ -1,13 +1,5 @@
 [
   {
-    "number": 71,
-    "title": "Universal Wellness Integration Act",
-    "issue_number": 1009,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1009",
-    "enacted_date": "2026-07-27",
-    "era": "Modern Era"
-  },
-  {
     "number": 72,
     "title": "Happiness Integration Initiative",
     "issue_number": 1031,
@@ -158,5 +150,13 @@
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1186",
     "enacted_date": "2026-08-11",
     "era": "Industrial Era"
+  },
+  {
+    "number": 91,
+    "title": "Strengthen Green Policy",
+    "issue_number": 1187,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1187",
+    "enacted_date": "2026-08-11",
+    "era": "Modern Era"
   }
 ]

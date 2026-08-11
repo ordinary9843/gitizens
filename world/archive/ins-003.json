@@ -1,0 +1,10 @@
+{
+  "id": "ins-003",
+  "name": "Academy of Sciences",
+  "built_law": 21,
+  "built_at": "2026-06-19T21:11:37.108360+00:00",
+  "auto_trigger": "education >= 80",
+  "demolished_law": 91,
+  "demolished_at": "2026-08-11T03:42:54.778623+00:00",
+  "auto_reason": "education < 70"
+}
