@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-11T19:01:53.262376+00:00",
+  "updated_at": "2026-08-11T20:41:39.042622+00:00",
   "pending": [
     {
       "name": "Eco-Research Center",
@@ -28,23 +28,23 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 31,
+      "current": 30,
       "target": 60,
-      "gap": 29
+      "gap": 30
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 31,
+      "current": 30,
       "target": 20,
-      "gap": 11
+      "gap": 10
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 157,
+      "current": 160,
       "target": 2000,
-      "gap": 1843
+      "gap": 1840
     }
   ],
   "milestones_achieved": [
