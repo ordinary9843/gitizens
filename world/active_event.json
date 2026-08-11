@@ -1,1 +1,24 @@
-{}
+{
+  "id": "evt-water-recovery",
+  "category": "natural",
+  "rarity": "uncommon",
+  "title": "Water Resource Recovery",
+  "description": "The government's conservation measures have paid off \u2014 reservoir levels are rising and agricultural output is stabilising.",
+  "flavor": "Farmers are smiling again, and water-saving habits have taken root across the nation.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "green_policy": 5,
+    "welfare": 5
+  },
+  "default_consequence": {},
+  "response_consequence": {
+    "green_policy": 5,
+    "population": 100,
+    "treasury": 20
+  },
+  "response_hint": "Passing a sustainable water management act can lock in the gains and build long-term drought resilience.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-11T17:55:40.937885+00:00",
+  "issue_number": 1192
+}

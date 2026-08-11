@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-08-11T16:01:59.463764+00:00",
+  "updated_at": "2026-08-11T17:55:42.847164+00:00",
   "pending": [
+    {
+      "name": "Eco-Research Center",
+      "metric": "green_policy",
+      "current": 73,
+      "target": 85,
+      "gap": 12
+    },
     {
       "name": "Academy of Sciences",
       "metric": "education",
@@ -14,13 +21,6 @@
       "current": 65,
       "target": 80,
       "gap": 15
-    },
-    {
-      "name": "Eco-Research Center",
-      "metric": "green_policy",
-      "current": 68,
-      "target": 85,
-      "gap": 17
     }
   ],
   "at_risk": [],
@@ -28,23 +28,23 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 34,
+      "current": 33,
       "target": 60,
-      "gap": 26
+      "gap": 27
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 34,
+      "current": 33,
       "target": 20,
-      "gap": 14
+      "gap": 13
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 149,
+      "current": 151,
       "target": 2000,
-      "gap": 1851
+      "gap": 1849
     }
   ],
   "milestones_achieved": [
