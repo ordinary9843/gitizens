@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-11T22:40:09.286474+00:00",
+  "updated_at": "2026-08-11T23:38:56.338437+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -28,23 +28,23 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 28,
+      "current": 27,
       "target": 60,
-      "gap": 32
+      "gap": 33
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 28,
+      "current": 27,
       "target": 20,
-      "gap": 8
+      "gap": 7
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 170,
+      "current": 173,
       "target": 2000,
-      "gap": 1830
+      "gap": 1827
     }
   ],
   "milestones_achieved": [
