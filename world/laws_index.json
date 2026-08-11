@@ -1,13 +1,5 @@
 [
   {
-    "number": 70,
-    "title": "Enhanced Community Wellbeing Act",
-    "issue_number": 999,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/999",
-    "enacted_date": "2026-07-26",
-    "era": "Modern Era"
-  },
-  {
     "number": 71,
     "title": "Universal Wellness Integration Act",
     "issue_number": 1009,
@@ -158,5 +150,13 @@
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1180",
     "enacted_date": "2026-08-10",
     "era": "Crisis Age"
+  },
+  {
+    "number": 90,
+    "title": "Strengthen Industry",
+    "issue_number": 1186,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1186",
+    "enacted_date": "2026-08-11",
+    "era": "Industrial Era"
   }
 ]
