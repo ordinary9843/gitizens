@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-08-11T01:40:37.245294+00:00",
+  "updated_at": "2026-08-11T03:42:58.332825+00:00",
   "pending": [
+    {
+      "name": "Academy of Sciences",
+      "metric": "education",
+      "current": 69,
+      "target": 80,
+      "gap": 11
+    },
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
@@ -11,19 +18,12 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 64,
+      "current": 69,
       "target": 85,
-      "gap": 21
+      "gap": 16
     }
   ],
-  "at_risk": [
-    {
-      "name": "Academy of Sciences",
-      "metric": "education",
-      "current": 70,
-      "removal_at": 70
-    }
-  ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",
@@ -42,9 +42,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 117,
+      "current": 122,
       "target": 2000,
-      "gap": 1883
+      "gap": 1878
     }
   ],
   "milestones_achieved": [
