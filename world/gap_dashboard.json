@@ -1,6 +1,13 @@
 {
-  "updated_at": "2026-08-12T01:51:39.825838+00:00",
+  "updated_at": "2026-08-12T04:07:27.246020+00:00",
   "pending": [
+    {
+      "name": "Heavy Industry Zone",
+      "metric": "industry",
+      "current": 69,
+      "target": 80,
+      "gap": 11
+    },
     {
       "name": "Academy of Sciences",
       "metric": "education",
@@ -14,13 +21,6 @@
       "current": 72,
       "target": 85,
       "gap": 13
-    },
-    {
-      "name": "Heavy Industry Zone",
-      "metric": "industry",
-      "current": 64,
-      "target": 80,
-      "gap": 16
     }
   ],
   "at_risk": [],
@@ -28,23 +28,23 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 25,
+      "current": 22,
       "target": 60,
-      "gap": 35
+      "gap": 38
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 25,
+      "current": 22,
       "target": 20,
-      "gap": 5
+      "gap": 2
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 177,
+      "current": 193,
       "target": 2000,
-      "gap": 1823
+      "gap": 1807
     }
   ],
   "milestones_achieved": [
