@@ -1,13 +1,5 @@
 [
   {
-    "number": 74,
-    "title": "Innovative Learning Expansion Act",
-    "issue_number": 1083,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1083",
-    "enacted_date": "2026-07-30",
-    "era": "Modern Era"
-  },
-  {
     "number": 75,
     "title": "Welfare Enhancement Act",
     "issue_number": 1086,
@@ -156,6 +148,14 @@
     "title": "Strengthen Industry",
     "issue_number": 1197,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1197",
+    "enacted_date": "2026-08-12",
+    "era": "Modern Era"
+  },
+  {
+    "number": 94,
+    "title": "Strengthen Defense",
+    "issue_number": 1198,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1198",
     "enacted_date": "2026-08-12",
     "era": "Modern Era"
   }
