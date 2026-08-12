@@ -103,3 +103,4 @@
 | 92 | [law-092](../world/laws/law-092.md) | [#1188](https://github.com/ordinary9843/gitizens/issues/1188) Strengthen Defense | 0+1 0-1 | 2026-08-11 |
 | 93 | [law-093](../world/laws/law-093.md) | [#1197](https://github.com/ordinary9843/gitizens/issues/1197) Strengthen Industry | 0+1 0-1 | 2026-08-12 |
 | 94 | [law-094](../world/laws/law-094.md) | [#1198](https://github.com/ordinary9843/gitizens/issues/1198) Strengthen Defense | 0+1 0-1 | 2026-08-12 |
+| 95 | [law-095](../world/laws/law-095.md) | [#1199](https://github.com/ordinary9843/gitizens/issues/1199) Strengthen Education | 0+1 0-1 | 2026-08-12 |

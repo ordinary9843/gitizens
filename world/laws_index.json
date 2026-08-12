@@ -1,13 +1,5 @@
 [
   {
-    "number": 75,
-    "title": "Welfare Enhancement Act",
-    "issue_number": 1086,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1086",
-    "enacted_date": "2026-07-30",
-    "era": "Modern Era"
-  },
-  {
     "number": 76,
     "title": "Strengthen Education",
     "issue_number": 1103,
@@ -156,6 +148,14 @@
     "title": "Strengthen Defense",
     "issue_number": 1198,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1198",
+    "enacted_date": "2026-08-12",
+    "era": "Modern Era"
+  },
+  {
+    "number": 95,
+    "title": "Strengthen Education",
+    "issue_number": 1199,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1199",
     "enacted_date": "2026-08-12",
     "era": "Modern Era"
   }
