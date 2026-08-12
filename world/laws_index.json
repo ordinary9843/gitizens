@@ -1,13 +1,5 @@
 [
   {
-    "number": 73,
-    "title": "Learning for All Initiative",
-    "issue_number": 1056,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1056",
-    "enacted_date": "2026-07-29",
-    "era": "Modern Era"
-  },
-  {
     "number": 74,
     "title": "Innovative Learning Expansion Act",
     "issue_number": 1083,
@@ -157,6 +149,14 @@
     "issue_number": 1188,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1188",
     "enacted_date": "2026-08-11",
+    "era": "Modern Era"
+  },
+  {
+    "number": 93,
+    "title": "Strengthen Industry",
+    "issue_number": 1197,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1197",
+    "enacted_date": "2026-08-12",
     "era": "Modern Era"
   }
 ]
