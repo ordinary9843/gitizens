@@ -1,21 +1,5 @@
 [
   {
-    "tick": 538,
-    "date": "2026-08-06T00:03:13Z",
-    "laws_count": 82,
-    "era": "Crisis Age",
-    "education": 83,
-    "industry": 83,
-    "welfare": 35,
-    "green_policy": 80,
-    "defense": 89,
-    "pollution": 100,
-    "population": 2187883,
-    "stability": 0,
-    "treasury": 60592903,
-    "active_event": null
-  },
-  {
     "tick": 539,
     "date": "2026-08-06T04:11:38Z",
     "laws_count": 82,
@@ -1598,5 +1582,21 @@
     "stability": 72,
     "treasury": 59890095,
     "active_event": "evt-nobel-peace"
+  },
+  {
+    "tick": 638,
+    "date": "2026-08-12T06:13:34Z",
+    "laws_count": 94,
+    "era": "Modern Era",
+    "education": 67,
+    "industry": 68,
+    "welfare": 69,
+    "green_policy": 72,
+    "defense": 71,
+    "pollution": 20,
+    "population": 203,
+    "stability": 70,
+    "treasury": 59890446,
+    "active_event": null
   }
 ]
