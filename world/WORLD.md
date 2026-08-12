@@ -11,18 +11,18 @@
 | Era | Modern Era |
 | Laws enacted | 95 |
 | Last enacted | 2026-08-12 |
-| Treasury | 59,891,645 Git Coins |
+| Treasury | 59,892,165 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 71/100 |
-| Industry | 68/100 |
+| Education | 70/100 |
+| Industry | 67/100 |
 | Welfare | 69/100 |
-| Green Policy | 70/100 |
+| Green Policy | 69/100 |
 | Defense | 69/100 |
-| Pollution *(derived)* | 15/100 |
+| Pollution *(derived)* | 13/100 |
 
 ---
 
