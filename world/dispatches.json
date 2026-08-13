@@ -1,12 +1,5 @@
 [
   {
-    "tick": 646,
-    "date": "2026-08-12",
-    "narrative": "Tick 646: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 284 \u00b7 treasury 59.9M GC \u00b7 stability 62/100 \u00b7 pollution 7/100"
-  },
-  {
     "tick": 647,
     "date": "2026-08-12",
     "narrative": "Tick 647: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 655: autonomous tick applied \u00b7 event: Cultural Renaissance.",
     "changes": "autonomous tick applied \u00b7 event: Cultural Renaissance",
     "metrics": "population 405 \u00b7 treasury 59.1M GC \u00b7 stability 64/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 656,
+    "date": "2026-08-13",
+    "narrative": "Tick 656: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Cultural Renaissance.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Cultural Renaissance",
+    "metrics": "population 422 \u00b7 treasury 59.1M GC \u00b7 stability 65/100 \u00b7 pollution 0/100"
   }
 ]
