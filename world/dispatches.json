@@ -1,12 +1,5 @@
 [
   {
-    "tick": 651,
-    "date": "2026-08-13",
-    "narrative": "Tick 651: autonomous tick applied \u00b7 event: Surveillance Technology Emerges.",
-    "changes": "autonomous tick applied \u00b7 event: Surveillance Technology Emerges",
-    "metrics": "population 327 \u00b7 treasury 59.9M GC \u00b7 stability 58/100 \u00b7 pollution 1/100"
-  },
-  {
     "tick": 652,
     "date": "2026-08-13",
     "narrative": "Tick 652: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Surveillance Technology Emerges.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 660: autonomous tick applied \u00b7 event: Billionaire Donates Entire Fortune.",
     "changes": "autonomous tick applied \u00b7 event: Billionaire Donates Entire Fortune",
     "metrics": "population 480 \u00b7 treasury 59.1M GC \u00b7 stability 71/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 661,
+    "date": "2026-08-13",
+    "narrative": "Tick 661: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 504 \u00b7 treasury 59.1M GC \u00b7 stability 71/100 \u00b7 pollution 0/100"
   }
 ]
