@@ -1,13 +1,5 @@
 [
   {
-    "number": 78,
-    "title": "Strengthen Education",
-    "issue_number": 1116,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1116",
-    "enacted_date": "2026-08-02",
-    "era": "Modern Era"
-  },
-  {
     "number": 79,
     "title": "Strengthen Education",
     "issue_number": 1124,
@@ -156,6 +148,14 @@
     "title": "Strengthen Welfare",
     "issue_number": 1207,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1207",
+    "enacted_date": "2026-08-13",
+    "era": "Modern Era"
+  },
+  {
+    "number": 98,
+    "title": "Strengthen Education",
+    "issue_number": 1209,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1209",
     "enacted_date": "2026-08-13",
     "era": "Modern Era"
   }
