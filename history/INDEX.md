@@ -108,3 +108,4 @@
 | 97 | [law-097](../world/laws/law-097.md) | [#1207](https://github.com/ordinary9843/gitizens/issues/1207) Strengthen Welfare | 0+1 0-1 | 2026-08-13 |
 | 98 | [law-098](../world/laws/law-098.md) | [#1209](https://github.com/ordinary9843/gitizens/issues/1209) Strengthen Education | 0+1 0-1 | 2026-08-13 |
 | 99 | [law-099](../world/laws/law-099.md) | [#1210](https://github.com/ordinary9843/gitizens/issues/1210) Strengthen Green Policy | 0+1 0-1 | 2026-08-13 |
+| 100 | [law-100](../world/laws/law-100.md) | [#1212](https://github.com/ordinary9843/gitizens/issues/1212) Strengthen Defense | 0+1 0-1 | 2026-08-13 |

@@ -1,13 +1,5 @@
 [
   {
-    "number": 80,
-    "title": "Strengthen Welfare",
-    "issue_number": 1128,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1128",
-    "enacted_date": "2026-08-03",
-    "era": "Modern Era"
-  },
-  {
     "number": 81,
     "title": "Strengthen Welfare",
     "issue_number": 1137,
@@ -156,6 +148,14 @@
     "title": "Strengthen Green Policy",
     "issue_number": 1210,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1210",
+    "enacted_date": "2026-08-13",
+    "era": "Modern Era"
+  },
+  {
+    "number": 100,
+    "title": "Strengthen Defense",
+    "issue_number": 1212,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1212",
     "enacted_date": "2026-08-13",
     "era": "Modern Era"
   }
