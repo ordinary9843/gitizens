@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-13T14:56:36.467758+00:00",
+  "updated_at": "2026-08-13T16:00:03.998792+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -18,9 +18,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 72,
+      "current": 71,
       "target": 85,
-      "gap": 13
+      "gap": 14
     }
   ],
   "at_risk": [],
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 464,
+      "current": 469,
       "target": 2000,
-      "gap": 1536
+      "gap": 1531
     }
   ],
   "milestones_achieved": [
