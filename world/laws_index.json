@@ -1,13 +1,5 @@
 [
   {
-    "number": 84,
-    "title": "Strengthen Welfare",
-    "issue_number": 1158,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1158",
-    "enacted_date": "2026-08-08",
-    "era": "Crisis Age"
-  },
-  {
     "number": 85,
     "title": "Strengthen Welfare",
     "issue_number": 1168,
@@ -156,6 +148,14 @@
     "title": "Strengthen Green Policy",
     "issue_number": 1219,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1219",
+    "enacted_date": "2026-08-14",
+    "era": "Modern Era"
+  },
+  {
+    "number": 104,
+    "title": "Strengthen Education",
+    "issue_number": 1221,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1221",
     "enacted_date": "2026-08-14",
     "era": "Modern Era"
   }
