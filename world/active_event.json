@@ -1,1 +1,27 @@
-{}
+{
+  "id": "evt-epidemic",
+  "category": "health",
+  "rarity": "common",
+  "title": "Epidemic Outbreak",
+  "description": "A new virus has appeared simultaneously in multiple cities, spreading faster than public health authorities can handle.",
+  "flavor": "Face masks are sold out online; hospital emergency rooms are overflowing.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "welfare": -10,
+    "stability": -8,
+    "population": -200
+  },
+  "default_consequence": {
+    "population": -300,
+    "welfare": -5
+  },
+  "response_consequence": {
+    "welfare": 5,
+    "stability": 3
+  },
+  "response_hint": "Passing a public health emergency response act can mobilise resources to contain the epidemic's spread.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-14T22:21:41.148575+00:00",
+  "issue_number": 1225
+}
