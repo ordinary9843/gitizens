@@ -1,21 +1,5 @@
 [
   {
-    "tick": 572,
-    "date": "2026-08-08T13:44:18Z",
-    "laws_count": 84,
-    "era": "Crisis Age",
-    "education": 71,
-    "industry": 60,
-    "welfare": 52,
-    "green_policy": 66,
-    "defense": 79,
-    "pollution": 98,
-    "population": 396,
-    "stability": 0,
-    "treasury": 60486635,
-    "active_event": "evt-mass-resignation"
-  },
-  {
     "tick": 573,
     "date": "2026-08-08T14:30:37Z",
     "laws_count": 84,
@@ -1597,6 +1581,22 @@
     "population": 578,
     "stability": 66,
     "treasury": 59080747,
+    "active_event": null
+  },
+  {
+    "tick": 672,
+    "date": "2026-08-14T13:03:48Z",
+    "laws_count": 103,
+    "era": "Modern Era",
+    "education": 67,
+    "industry": 67,
+    "welfare": 73,
+    "green_policy": 71,
+    "defense": 73,
+    "pollution": 0,
+    "population": 602,
+    "stability": 66,
+    "treasury": 59081234,
     "active_event": null
   }
 ]
