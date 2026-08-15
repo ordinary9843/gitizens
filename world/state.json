@@ -4,7 +4,7 @@
   "last_enacted": "2026-08-15",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 57449918,
+  "treasury": 57450143,
   "currency": "Git Coins",
   "stars_last_counted": 7,
   "education": 68,
@@ -12,7 +12,7 @@
   "welfare": 58,
   "green_policy": 67,
   "defense": 68,
-  "population": 365,
+  "population": 368,
   "pollution": 0,
   "stability": 61,
   "tags_applied": [
@@ -33,5 +33,5 @@
     "{\"message\":\"You do not have permission to view the stargazers of this repository\",\"documentation_url\":\"https://docs.github.com/rest/activity/starring#list-stargazers\",\"status\":\"403\"}"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-08-15T19:00:00Z"
+  "next_tick_at": "2026-08-15T20:00:00Z"
 }
