@@ -1,21 +1,5 @@
 [
   {
-    "tick": 599,
-    "date": "2026-08-09T19:32:20Z",
-    "laws_count": 86,
-    "era": "Crisis Age",
-    "education": 80,
-    "industry": 60,
-    "welfare": 61,
-    "green_policy": 63,
-    "defense": 70,
-    "pollution": 68,
-    "population": 100,
-    "stability": 10,
-    "treasury": 60287586,
-    "active_event": null
-  },
-  {
     "tick": 600,
     "date": "2026-08-09T20:30:51Z",
     "laws_count": 86,
@@ -1597,6 +1581,22 @@
     "population": 363,
     "stability": 61,
     "treasury": 57449458,
+    "active_event": "evt-asteroid-mining"
+  },
+  {
+    "tick": 699,
+    "date": "2026-08-15T17:19:23Z",
+    "laws_count": 105,
+    "era": "Industrial Era",
+    "education": 68,
+    "industry": 61,
+    "welfare": 58,
+    "green_policy": 67,
+    "defense": 68,
+    "pollution": 0,
+    "population": 363,
+    "stability": 61,
+    "treasury": 57449683,
     "active_event": "evt-asteroid-mining"
   }
 ]
