@@ -11,7 +11,7 @@
 | Era | Industrial Era |
 | Laws enacted | 105 |
 | Last enacted | 2026-08-15 |
-| Treasury | 57,450,818 Git Coins |
+| Treasury | 57,451,044 Git Coins |
 
 ### Policy
 
@@ -20,7 +20,7 @@
 | Education | 68/100 |
 | Industry | 61/100 |
 | Welfare | 58/100 |
-| Green Policy | 67/100 |
+| Green Policy | 66/100 |
 | Defense | 68/100 |
 | Pollution *(derived)* | 0/100 |
 
