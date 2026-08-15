@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-15T13:29:20.730461+00:00",
+  "updated_at": "2026-08-15T14:21:13.166149+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 345,
+      "current": 352,
       "target": 2000,
-      "gap": 1655
+      "gap": 1648
     }
   ],
   "milestones_achieved": [
