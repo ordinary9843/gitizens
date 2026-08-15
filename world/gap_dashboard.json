@@ -1,26 +1,26 @@
 {
-  "updated_at": "2026-08-14T23:20:34.237160+00:00",
+  "updated_at": "2026-08-15T01:10:17.290376+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 71,
+      "current": 70,
       "target": 80,
-      "gap": 9
+      "gap": 10
     },
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 66,
+      "current": 65,
       "target": 80,
-      "gap": 14
+      "gap": 15
     },
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 69,
+      "current": 68,
       "target": 85,
-      "gap": 16
+      "gap": 17
     }
   ],
   "at_risk": [],
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 558,
+      "current": 583,
       "target": 2000,
-      "gap": 1442
+      "gap": 1417
     }
   ],
   "milestones_achieved": [
