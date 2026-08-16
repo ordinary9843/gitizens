@@ -11,8 +11,9 @@ from openai import OpenAI
 
 from engine.state import load_active_event
 from engine.chronicle import _load_entity_names
-
-POLICY_METRICS = ["education", "industry", "welfare", "green_policy", "defense"]
+# Import canonical POLICY_METRICS as a sorted list for consistent ordering.
+from engine.constants import POLICY_METRICS as _POLICY_METRICS_SET
+POLICY_METRICS: list[str] = sorted(_POLICY_METRICS_SET)
 MAX_DELTA_PROPOSAL = 8
 MAX_DELTA_FEEDBACK = 2
 
@@ -85,9 +86,26 @@ def _post_issue(repo: str, title: str, body: str, label: str) -> int:
 
 
 def generate_ai_proposal(client: OpenAI, state: dict, repo: str) -> int:
-    """Generate one [AI-PROPOSAL] issue targeting the weakest policy metric."""
-    weakest = min(POLICY_METRICS, key=lambda m: state.get(m, 0))
-    weakest_val = state.get(weakest, 0)
+    """Generate one [AI-PROPOSAL] issue.
+
+    Normally targets the weakest policy metric.  When pollution is elevated
+    (> 40) there is a 40 % chance the AI instead proposes a green-policy /
+    industry trade-off to address the environmental threat, giving the world
+    more varied AI proposals.
+    """
+    import random as _random
+    pollution = state.get("pollution", 0)
+    # Decide the proposal angle
+    if pollution > 40 and _random.random() < 0.4:
+        # Pollution-reduction angle: boost green_policy or reduce industry
+        weakest = "green_policy"
+        weakest_val = state.get(weakest, 0)
+        angle = "reduce pollution"
+    else:
+        weakest = min(POLICY_METRICS, key=lambda m: state.get(m, 0))
+        weakest_val = state.get(weakest, 0)
+        angle = f"improve {weakest.replace('_', ' ')}"
+
     metrics_str = ", ".join(f"{m}={state.get(m,0)}" for m in POLICY_METRICS)
     buildings_context, laws_context, event_context = _load_extra_context()
 
@@ -97,11 +115,12 @@ def generate_ai_proposal(client: OpenAI, state: dict, repo: str) -> int:
             messages=[{"role": "user", "content": (
                 "You are an AI citizen of Gitizens, a GitHub-based civilization.\n"
                 f"Current world: era={state.get('era')}, treasury={state.get('treasury')} GC, "
-                f"population={state.get('population')}, stability={state.get('stability')}\n"
+                f"population={state.get('population')}, stability={state.get('stability')}, "
+                f"pollution={pollution}\n"
                 f"Policy metrics: {metrics_str}\n"
                 f"{buildings_context}{laws_context}{event_context}\n"
-                f"The weakest metric is '{weakest}' at {weakest_val}/100. "
-                "Propose a policy law to address this.\n\n"
+                f"Your proposal should {angle}. "
+                f"The target metric is '{weakest}' (currently {weakest_val}/100).\n\n"
                 "Respond in JSON with exactly these keys:\n"
                 '{"title": "short law title (no prefix)", '
                 '"description": "2-3 sentence description of what this law does and why", '

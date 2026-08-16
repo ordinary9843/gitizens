@@ -19,12 +19,7 @@ from engine.constants import (
     COOLDOWN_DAYS, get_policy_cost, POLICY_METRICS,
     VALID_TYPES, _EVOLVE_BLOCKED,
 )
-
-ISSUE_NUMBER = os.environ["ISSUE_NUMBER"]
-ISSUE_TITLE  = os.environ["ISSUE_TITLE"]
-ISSUE_BODY   = os.environ.get("ISSUE_BODY", "")
-GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
-REPO         = os.environ["GITHUB_REPOSITORY"]
+from engine.citizens import check_proposal_cooldown as _engine_check_cooldown
 
 REQUIRED_FIELDS = {
     "policy":      ["changes"],
@@ -32,6 +27,15 @@ REQUIRED_FIELDS = {
     "state_patch": ["patch"],
     "declaration": [],
 }
+
+ISSUE_NUMBER = os.environ["ISSUE_NUMBER"]
+ISSUE_TITLE  = os.environ["ISSUE_TITLE"]
+ISSUE_BODY   = os.environ.get("ISSUE_BODY", "")
+GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
+REPO         = os.environ["GITHUB_REPOSITORY"]
+
+# State fields to exclude when summarising state for LLM context
+_LLM_EXCLUDE = {"known_stargazers", "tags_applied"}
 
 # state_patch allowlist — any key outside this set is rejected
 _PATCH_ALLOWED = {
@@ -62,35 +66,14 @@ def fail(reason: str, label: str = "invalid"):
     sys.exit(0)
 
 
-def check_cooldown_for_proposal(effect_data: dict) -> tuple[bool, str]:
-    if not effect_data or effect_data.get("type") != "policy":
-        return True, ""
-    path = Path("world/proposal_cooldowns.json")
-    if not path.exists():
-        return True, ""
-    try:
-        cooldowns = json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return True, ""
-    today = datetime.now(timezone.utc).date()
-    for metric in effect_data.get("changes", {}):
-        if metric not in cooldowns:
-            continue
-        entry = cooldowns[metric]
-        if isinstance(entry, dict):
-            date_str = entry.get("last_date", "")
-        elif isinstance(entry, str):
-            date_str = entry
-        else:
-            continue
-        try:
-            last_date = datetime.fromisoformat(date_str).date()
-        except (ValueError, TypeError):
-            continue
-        if (today - last_date).days < COOLDOWN_DAYS:
-            until = (last_date + timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
-            return False, f"metric '{metric}' on cooldown until {until}"
-    return True, ""
+def check_cooldown_for_proposal(effect_data: dict) -> tuple[bool, str, int]:
+    """Thin wrapper around the engine's canonical cooldown checker.
+
+    Uses `engine.citizens.check_proposal_cooldown` so that both validate and
+    tally use identical logic (including the legacy cooldown migration).
+    Returns (allowed, reason, extra_cost).
+    """
+    return _engine_check_cooldown(effect_data)
 
 
 def load_world_context() -> dict:
@@ -261,8 +244,7 @@ def validate():
                     except ValueError:
                         fail(f"state_patch `founded_date` must be a valid ISO date, got '{val}'.")
 
-    # LLM contextual validation
-    _LLM_EXCLUDE = {"known_stargazers", "tags_applied"}
+    # LLM contextual validation — failures fall back to allowing through
     ctx = load_world_context()
     state_summary = json.dumps(
         {k: v for k, v in ctx["state"].items() if k not in _LLM_EXCLUDE},
@@ -275,38 +257,42 @@ def validate():
         effect_summary = (f"\nEffect type: {effect_data.get('type')}\n"
                           f"Effect data: {json.dumps(effect_data, ensure_ascii=False)}")
 
-    client = OpenAI(base_url="https://models.inference.ai.azure.com", api_key=GITHUB_TOKEN)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": (
-            "You are a validator for a GitHub-based civilization called Gitizens.\n\n"
-            f"Current world state: {state_summary}\n"
-            f"Existing structures:\n{entity_summary}\n\n"
-            "Evaluate this proposal:\n"
-            f"Title: {ISSUE_TITLE}\n"
-            f"Description: {description}{effect_summary}\n\n"
-            "Check ALL of the following:\n"
-            "1. Does the proposal have a clear, actionable voting intent?\n"
-            "2. Is it coherent and meaningful in the context of the current world?\n"
-            "3. For policy proposals: are the metric changes plausible given the description?\n\n"
-            "Fail ONLY if there is a concrete, specific problem with one of the above.\n"
-            "Creative, humorous, or controversial proposals are VALID as long as the intent is clear.\n"
-            'Reply in JSON only: {"valid": true/false, "reason": "one sentence"}'
-        )}],
-        max_tokens=120,
-        temperature=0,
-    )
-    raw = response.choices[0].message.content.strip()
+    result = {"valid": True}  # default: allow through if LLM unavailable
     try:
-        result = json.loads(raw)
-    except json.JSONDecodeError:
-        result = {"valid": True}
+        client = OpenAI(base_url="https://models.inference.ai.azure.com", api_key=GITHUB_TOKEN)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": (
+                "You are a validator for a GitHub-based civilization called Gitizens.\n\n"
+                f"Current world state: {state_summary}\n"
+                f"Existing structures:\n{entity_summary}\n\n"
+                "Evaluate this proposal:\n"
+                f"Title: {ISSUE_TITLE}\n"
+                f"Description: {description}{effect_summary}\n\n"
+                "Check ALL of the following:\n"
+                "1. Does the proposal have a clear, actionable voting intent?\n"
+                "2. Is it coherent and meaningful in the context of the current world?\n"
+                "3. For policy proposals: are the metric changes plausible given the description?\n\n"
+                "Fail ONLY if there is a concrete, specific problem with one of the above.\n"
+                "Creative, humorous, or controversial proposals are VALID as long as the intent is clear.\n"
+                'Reply in JSON only: {"valid": true/false, "reason": "one sentence"}'
+            )}],
+            max_tokens=120,
+            temperature=0,
+        )
+        raw = response.choices[0].message.content.strip()
+        try:
+            result = json.loads(raw)
+        except json.JSONDecodeError:
+            result = {"valid": True}
+    except Exception as e:
+        print(f"  [WARN] LLM validation unavailable: {e} — falling back to allow")
 
     if not result.get("valid", True):
         fail(f"{result.get('reason', 'Proposal did not pass review.')}")
 
     if effect_data and effect_data.get("type") == "policy":
-        ok, reason = check_cooldown_for_proposal(effect_data)
+        ok, reason, extra_cost_warn = check_cooldown_for_proposal(effect_data)
         if not ok:
             fail(f"Proposal cooldown active: {reason}", label="rejected")
 
@@ -317,14 +303,22 @@ def validate():
             treasury = state.get("treasury", 0)
             currency = state.get("currency", "Git Coins")
             policy_cost = get_policy_cost(state)
-            if treasury >= policy_cost:
+            total_notice_cost = policy_cost + (extra_cost_warn if 'extra_cost_warn' in dir() else 0)
+            if treasury >= total_notice_cost:
                 status = f"Treasury check passed. Current balance: **{treasury} {currency}**."
             else:
                 status = (f"Treasury insufficient. Balance: **{treasury} {currency}** "
-                          f"— short by **{policy_cost - treasury} {currency}**. "
+                          f"\u2014 short by **{total_notice_cost - treasury} {currency}**. "
                           f"This proposal will be blocked at tally unless the treasury is replenished.")
+            penalty_note = ""
+            if extra_cost_warn and extra_cost_warn > 0:
+                penalty_note = (
+                    f"\n\n\u26a0\ufe0f **Repeat-touch surcharge:** +{extra_cost_warn} {currency} "
+                    f"(metric recently modified — cooldown penalty applies at tally)."
+                )
             gh("issue", "comment", ISSUE_NUMBER, "--repo", REPO, "--body",
-               f"**Cost notice:** Enacting this policy costs **{policy_cost} {currency}**.\n\n{status}")
+               f"**Cost notice:** Enacting this policy costs **{total_notice_cost} {currency}**."
+               f"{penalty_note}\n\n{status}")
         except Exception as e:
             print(f"  [WARN] treasury notice failed: {e}")
 

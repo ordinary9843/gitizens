@@ -657,17 +657,17 @@ class TestUpdateLawsIndex:
         assert len(data) == 2
         assert data[-1]["title"] == "New Law"
 
-    def test_caps_at_20_entries(self, tmp_path, monkeypatch):
+    def test_caps_at_200_entries(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
         existing = [{"number": i, "title": f"Law {i}", "issue_number": i,
                      "issue_url": "http://x", "enacted_date": "2026-01-01", "era": "Test"}
-                    for i in range(1, 21)]
+                    for i in range(1, 201)]
         (tmp_path / "world/laws_index.json").write_text(json.dumps(existing))
-        tv.update_laws_index(21, "Overflow Law", 100, "http://z",
+        tv.update_laws_index(201, "Overflow Law", 100, "http://z",
                              "Founding Era", "2026-06-13")
         data = json.loads((tmp_path / "world/laws_index.json").read_text())
-        assert len(data) == 20
+        assert len(data) == 200
         assert data[-1]["title"] == "Overflow Law"
         assert data[0]["title"] == "Law 2"  # oldest entry dropped
 

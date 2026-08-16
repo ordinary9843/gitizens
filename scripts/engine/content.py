@@ -251,7 +251,11 @@ def upsert_bot_comment(issue_num: int, body: str):
         if result:
             print(f"  Updated pinned comment #{comment_id} on issue #{issue_num}")
             return
-        print(f"  [WARN] PATCH failed for comment #{comment_id}, posting new")
+        # PATCH failed (comment likely deleted).  Remove the stale ID so we
+        # don't try it again on the next run.
+        print(f"  [WARN] PATCH failed for comment #{comment_id}, clearing stale ID and posting new")
+        ids.pop(str(issue_num), None)
+        _PINNED_IDS_PATH.write_text(json.dumps(ids, indent=2) + "\n", encoding="utf-8")
     else:
         Path(payload_path).unlink(missing_ok=True)
     with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, encoding="utf-8") as tf:

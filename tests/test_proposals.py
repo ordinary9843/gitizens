@@ -405,7 +405,7 @@ class TestValidateCooldown:
     def test_no_cooldown_file_returns_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 10}})
         assert ok
 
@@ -416,7 +416,7 @@ class TestValidateCooldown:
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": today}))
-        ok, reason = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, reason, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 10}})
         assert not ok
         assert "education" in reason
@@ -428,27 +428,27 @@ class TestValidateCooldown:
         old = (datetime.now(timezone.utc) - timedelta(days=4)).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": old}))
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 10}})
         assert ok
 
     def test_non_policy_always_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal({"type": "declaration"})
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal({"type": "declaration"})
         assert ok
 
     def test_none_returns_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(None)
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(None)
         assert ok
 
     def test_corrupted_json_returns_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
         (tmp_path / "world/proposal_cooldowns.json").write_text("INVALID_JSON")
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 10}})
         assert ok
 
@@ -457,7 +457,7 @@ class TestValidateCooldown:
         (tmp_path / "world").mkdir()
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": "not-a-date"}))
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 10}})
         assert ok
 
@@ -1141,7 +1141,10 @@ class TestAiProposalAtomicClose:
         assert "world_md" in call_order, "generate_world_md must be called"
         close_idx = min(i for i, v in enumerate(call_order) if v == "close")
         wmd_idx = call_order.index("world_md")
-        assert close_idx < wmd_idx, f"close (idx {close_idx}) must come before world_md (idx {wmd_idx})"
+        # After the fix, issue is closed LAST (after all file writes) so that a
+        # mid-processing failure leaves the issue open for re-processing.
+        assert wmd_idx < close_idx, (
+            f"world_md (idx {wmd_idx}) must come before close (idx {close_idx})")
 
 
 # ===========================================================================
@@ -1322,8 +1325,10 @@ class TestProcessIssueOsError:
             _engine_proposals.process_issue(issue)
             _engine_proposals.SKIP_TIMING = False
         assert "ERROR" in capsys.readouterr().out
+        # write_state now runs BEFORE the law-file write, so laws_count IS
+        # persisted even on OSError (this is intentional: the number is reserved).
         state = json.loads((tmp_path / "world/state.json").read_text())
-        assert state.get("laws_count") == BASE_STATE["laws_count"]
+        assert state.get("laws_count") == BASE_STATE["laws_count"] + 1
 
     def test_failed_reactions_skips_issue(self, tmp_path, monkeypatch):
         # A failed API call should skip the issue and NOT close it as zero votes

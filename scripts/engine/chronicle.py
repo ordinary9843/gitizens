@@ -40,8 +40,9 @@ def update_laws_index(law_number: int, title: str, issue_number: int,
         "enacted_date": date,
         "era": era,
     })
-    if len(data) > 20:
-        data = data[-20:]
+    # Keep at most the last 200 entries to stay manageable without losing meaningful history.
+    if len(data) > 200:
+        data = data[-200:]
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
@@ -63,8 +64,14 @@ def _load_entity_names() -> set[str]:
     return names
 
 
-def _build_gap_dashboard(state: dict,
-                          entity_names: set[str] | None = None) -> str:
+def _compute_gap_data(state: dict, entity_names: set[str] | None = None) -> dict:
+    """Shared computation used by both _build_gap_dashboard and write_gap_dashboard_json.
+
+    Returns a dict with keys:
+        pending  : list of (gap, metric, value, appear, name)
+        at_risk  : list of (metric, value, remove, name)
+        milestones_pending : list of (field, direction, threshold, tag_name, gap, value)
+    """
     if entity_names is None:
         entity_names = _load_entity_names()
 
@@ -82,30 +89,46 @@ def _build_gap_dashboard(state: dict,
         elif exists and value <= remove + 4:
             at_risk.append((metric, value, remove, name))
 
-    lines: list[str] = ["## What Needs Your Vote\n"]
-
     pending.sort()
-    for gap, metric, value, appear, name in pending[:3]:
-        lines.append(f"- **{name}** — {metric} {value}/{appear} (needs +{gap})")
-
-    for metric, value, remove, name in at_risk:
-        lines.append(f"- **{name}** at risk — {metric} {value} (removal if < {remove})")
 
     applied = state.get("tags_applied", [])
+    milestones_pending: list[tuple[str, str, int, str, int, int]] = []
     for field, direction, threshold, tag_name in THRESHOLD_TAGS:
         if tag_name in applied:
             continue
         value = state.get(field, 0)
         if direction == "above":
             gap = threshold - value
-            if 0 < gap <= 10:
-                lines.append(f"- Milestone **{tag_name}** — {field} {value}/{threshold} "
-                              f"(needs +{gap})")
-        elif direction == "below":
+        else:
             gap = value - threshold
-            if 0 < gap <= 10:
-                lines.append(f"- Milestone **{tag_name}** — {field} {value} -> {threshold} "
-                              f"(needs -{gap})")
+        if gap > 0:
+            milestones_pending.append((field, direction, threshold, tag_name, gap, value))
+
+    return {"pending": pending, "at_risk": at_risk, "milestones_pending": milestones_pending}
+
+
+def _build_gap_dashboard(state: dict,
+                          entity_names: set[str] | None = None) -> str:
+    data = _compute_gap_data(state, entity_names)
+    pending  = data["pending"]
+    at_risk  = data["at_risk"]
+    milestones_pending = data["milestones_pending"]
+
+    lines: list[str] = ["## What Needs Your Vote\n"]
+
+    for gap, metric, value, appear, name in pending[:3]:
+        lines.append(f"- **{name}** — {metric} {value}/{appear} (needs +{gap})")
+
+    for metric, value, remove, name in at_risk:
+        lines.append(f"- **{name}** at risk — {metric} {value} (removal if < {remove})")
+
+    for field, direction, threshold, tag_name, gap, value in milestones_pending:
+        if direction == "above" and 0 < gap <= 10:
+            lines.append(f"- Milestone **{tag_name}** — {field} {value}/{threshold} "
+                          f"(needs +{gap})")
+        elif direction == "below" and 0 < gap <= 10:
+            lines.append(f"- Milestone **{tag_name}** — {field} {value} -> {threshold} "
+                          f"(needs -{gap})")
 
     if len(lines) == 1:
         lines.append("- All near-threshold goals reached — explore new frontiers!")
@@ -115,46 +138,32 @@ def _build_gap_dashboard(state: dict,
 
 def write_gap_dashboard_json(state: dict):
     entity_names = _load_entity_names()
-    pending: list[dict] = []
-    at_risk: list[dict] = []
+    data = _compute_gap_data(state, entity_names)
 
-    for metric, appear, _cat, name, remove in WORLD_GENERATION_RULES:
-        if metric == "pollution":
-            continue
-        value = state.get(metric, 0)
-        exists = name.strip().lower() in entity_names
-        if not exists and value < appear:
-            gap = appear - value
-            pending.append({"name": name, "metric": metric, "current": value,
-                            "target": appear, "gap": gap})
-        elif exists and value <= remove + 4:
-            at_risk.append({"name": name, "metric": metric, "current": value,
-                            "removal_at": remove})
-
-    pending.sort(key=lambda x: x["gap"])
-
+    pending_dicts = [
+        {"name": name, "metric": metric, "current": value,
+         "target": appear, "gap": gap}
+        for gap, metric, value, appear, name in data["pending"]
+    ]
+    at_risk_dicts = [
+        {"name": name, "metric": metric, "current": value, "removal_at": remove}
+        for metric, value, remove, name in data["at_risk"]
+    ]
     milestones_achieved = state.get("tags_applied", [])
-    milestones_pending: list[dict] = []
-    for field, direction, threshold, tag_name in THRESHOLD_TAGS:
-        if tag_name in milestones_achieved:
-            continue
-        value = state.get(field, 0)
-        if direction == "above":
-            gap = threshold - value
-        else:
-            gap = value - threshold
-        if gap > 0:
-            milestones_pending.append({"tag": tag_name, "metric": field,
-                                       "current": value, "target": threshold, "gap": gap})
+    milestones_pending_dicts = [
+        {"tag": tag_name, "metric": field, "current": value,
+         "target": threshold, "gap": gap}
+        for field, direction, threshold, tag_name, gap, value in data["milestones_pending"]
+    ]
 
-    data = {
+    out = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
-        "pending": pending[:3],
-        "at_risk": at_risk,
-        "milestones_pending": milestones_pending,
+        "pending": pending_dicts[:3],
+        "at_risk": at_risk_dicts,
+        "milestones_pending": milestones_pending_dicts,
         "milestones_achieved": milestones_achieved,
     }
-    Path("world/gap_dashboard.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    Path("world/gap_dashboard.json").write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
 
 
 def generate_leaderboard():
@@ -377,7 +386,12 @@ def collect_star_income():
     if not raw or not raw.strip():
         print("  [WARN] collect_star_income: stargazers API returned empty — skipping")
         return
-    current_logins = {line.strip() for line in raw.splitlines() if line.strip()}
+    # Filter out any lines that look like JSON error objects (e.g. 403 responses
+    # returned as a JSON string when the jq query is applied to an error body).
+    current_logins = {
+        line.strip() for line in raw.splitlines()
+        if line.strip() and not line.strip().startswith("{")
+    }
 
     if state.get("known_stargazers") is None:
         state["known_stargazers"] = sorted(current_logins)

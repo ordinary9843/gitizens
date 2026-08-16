@@ -55,27 +55,27 @@ class TestValidateCooldownVP:
     def test_no_file_returns_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert ok
 
     def test_non_policy_returns_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal({"type": "declaration"})
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal({"type": "declaration"})
         assert ok
 
     def test_none_returns_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(None)
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(None)
         assert ok
 
     def test_corrupted_json_returns_ok(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
         (tmp_path / "world/proposal_cooldowns.json").write_text("INVALID")
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert ok
 
@@ -85,7 +85,7 @@ class TestValidateCooldownVP:
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": today}))
-        ok, reason = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, reason, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert not ok
         assert "education" in reason
@@ -95,7 +95,7 @@ class TestValidateCooldownVP:
         (tmp_path / "world").mkdir()
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": "not-a-date"}))
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert ok
 
@@ -104,7 +104,7 @@ class TestValidateCooldownVP:
         (tmp_path / "world").mkdir()
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"defense": "2026-01-01"}))
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert ok
 
@@ -114,7 +114,7 @@ class TestValidateCooldownVP:
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": {"last_date": today, "streak": 1}}))
-        ok, reason = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, reason, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert not ok
         assert "education" in reason
@@ -127,7 +127,7 @@ class TestValidateCooldownVP:
         expired_date = (datetime.now(timezone.utc) - timedelta(days=COOLDOWN_DAYS)).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": {"last_date": expired_date, "streak": 2}}))
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert ok  # COOLDOWN_DAYS days ago is exactly expired
 
@@ -138,7 +138,7 @@ class TestValidateCooldownVP:
         yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": {"last_date": yesterday, "streak": 1}}))
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert ok  # COOLDOWN_DAYS=1 → 1 day ago is expired
 
@@ -148,7 +148,7 @@ class TestValidateCooldownVP:
         # integer value — neither dict nor str — should be skipped (else: continue at line 85)
         (tmp_path / "world/proposal_cooldowns.json").write_text(
             json.dumps({"education": 42}))
-        ok, _ = self._vp(tmp_path).check_cooldown_for_proposal(
+        ok, _, _ = self._vp(tmp_path).check_cooldown_for_proposal(
             {"type": "policy", "changes": {"education": 5}})
         assert ok
 

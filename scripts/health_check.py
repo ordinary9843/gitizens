@@ -9,8 +9,16 @@ import subprocess
 
 REPO = os.environ.get("GITHUB_REPOSITORY", "ordinary9843/gitizens")
 
-def run(cmd, check=True):
-    return subprocess.run(cmd, check=check, capture_output=True, text=True).stdout
+def run(cmd, check=False):
+    """Run a shell command and return stdout.  Errors are logged, not raised."""
+    try:
+        result = subprocess.run(cmd, check=check, capture_output=True, text=True)
+        if result.returncode != 0 and result.stderr.strip():
+            print(f"  [WARN] {' '.join(cmd[:2])}: {result.stderr.strip()[:200]}")
+        return result.stdout
+    except Exception as e:
+        print(f"  [WARN] run({cmd[:2]}): {e}")
+        return ""
 
 def gh_json(cmd):
     return json.loads(run(cmd))
@@ -84,9 +92,12 @@ def main():
             for issue in health_issues:
                 number = issue["number"]
                 print(f"Closing resolved health issue #{number}")
-                run(["gh", "issue", "comment", str(number), "--repo", REPO,
-                     "--body", "The world has resumed ticking and is now healthy. Closing this alert."])
-                run(["gh", "issue", "close", str(number), "--repo", REPO])
+                try:
+                    run(["gh", "issue", "comment", str(number), "--repo", REPO,
+                         "--body", "The world has resumed ticking and is now healthy. Closing this alert."])
+                    run(["gh", "issue", "close", str(number), "--repo", REPO])
+                except Exception as e:
+                    print(f"  [WARN] Could not close health issue #{number}: {e}")
 
 if __name__ == "__main__":  # pragma: no cover
     main()

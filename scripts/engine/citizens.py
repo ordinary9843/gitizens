@@ -212,7 +212,24 @@ def select_weekly_representatives():
         return
     if not citizens:
         return
-    top3 = sorted(citizens.items(), key=lambda x: x[1].get("total_votes", 0), reverse=True)[:3]
+    now = datetime.now(timezone.utc)
+    # Recency-weighted score: votes cast within the last 30 days count 2×,
+    # older votes count 1×, ensuring active newcomers can reach the top 3.
+    def _weighted_score(item: tuple) -> float:
+        username, data = item
+        base_votes = data.get("total_votes", 0)
+        last_active_str = data.get("last_active", "")
+        try:
+            last_dt = datetime.fromisoformat(last_active_str.replace("Z", "+00:00"))
+            if last_dt.tzinfo is None:
+                last_dt = last_dt.replace(tzinfo=timezone.utc)
+            days_inactive = (now - last_dt).days
+        except (ValueError, TypeError, AttributeError):
+            days_inactive = 9999
+        recency_bonus = base_votes if days_inactive <= 30 else 0
+        return base_votes + recency_bonus
+
+    top3 = sorted(citizens.items(), key=_weighted_score, reverse=True)[:3]
     representatives = [u for u, _ in top3]
     today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     next_str = (datetime.now(timezone.utc) + timedelta(days=REPRESENTATIVE_DAYS)).strftime("%Y-%m-%d")

@@ -149,8 +149,35 @@ def process_issue(issue: dict):
         print(f"  #{number}: PASSED ({for_votes}+1 {against_votes}-1) -> law-{law_number:03d}")
         narrative = generate_narrative(clean_title, for_votes, against_votes, state_before)
 
+        # Load active event and apply crisis multiplier BEFORE treasury check so that
+        # (a) the effect deltas used for cost calculation already reflect the amplified values, and
+        # (b) a crisis surcharge is added to total_cost, preserving resource scarcity.
         active_event_now = load_active_event()
         effect_data = apply_crisis_multiplier(effect_data, active_event_now)
+
+        # Re-check treasury with crisis surcharge when applicable.
+        if effect_data and effect_data.get("type") == "policy" and active_event_now.get("is_crisis"):
+            crisis_mult = float(active_event_now.get("crisis_multiplier", 1.5))
+            treasury = state_before.get("treasury", 0)
+            currency = state_before.get("currency", "Git Coins")
+            policy_cost = get_policy_cost(state_before)
+            total_cost_crisis = int(round((policy_cost + extra_cost) * crisis_mult))
+            if treasury < total_cost_crisis:
+                print(f"  #{number}: TREASURY BLOCKED (crisis) — needs {total_cost_crisis}, has {treasury}")
+                stats = read_stats()
+                stats["proposals_total"]    = stats.get("proposals_total", 0) + 1
+                stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
+                write_stats(stats)
+                run(["gh", "issue", "comment", str(number), "--repo", REPO,
+                     "--body",
+                     f"**Proposal blocked: insufficient treasury (crisis surcharge active).**\n\n"
+                     f"Crisis multiplier {crisis_mult}x raises cost to **{total_cost_crisis} {currency}**.\n"
+                     f"Current treasury: **{treasury} {currency}**."])
+                run(["gh", "issue", "edit", str(number), "--repo", REPO,
+                     "--add-label", "rejected", "--remove-label", "proposal"])
+                run(["gh", "issue", "close", str(number), "--repo", REPO])
+                return
+
         apply_effect(effect_data, law_number, extra_cost=extra_cost)
         world_changes = run_world_engine(law_number)
 
@@ -186,6 +213,11 @@ def process_issue(issue: dict):
         proposer = issue.get("author", {}).get("login") or ""
         proposer_display = f"@{proposer}" if proposer else "*(unknown)*"
         signatories_block = format_signatories(for_voters, against_voters)
+
+        # Persist laws_count and all state changes BEFORE writing the law file.
+        # This ensures the law number is atomically reserved even if the file write fails.
+        write_state(state)
+
         try:
             Path(f"world/laws/law-{law_number:03d}.md").write_text(
                 f"# Law {law_number:03d}: {clean_title}\n\n"
@@ -202,19 +234,22 @@ def process_issue(issue: dict):
                 encoding="utf-8",
             )
         except OSError as e:
-            print(f"  [ERROR] Failed to write law file for #{number}: {e} — aborting")
-            return
-        write_state(state)
+            # Log the error but do NOT return — laws_count is already persisted
+            # above, so this law number is consumed. The missing file can be
+            # re-created manually from the git history.
+            print(f"  [ERROR] Failed to write law file for #{number}: {e} — continuing")
 
         append_history(law_number, clean_title, number, for_votes, against_votes, True, today)
         update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
         track_citizen_activity(for_voters, against_voters)
         if proposer:
             track_citizen_proposal(proposer)
+        # Update cooldown BEFORE the git commit so that even if the push fails,
+        # the cooldown file is included in the committed state.
+        update_proposal_cooldown(effect_data, today)
         run(["git", "add", "-A"])
         run(["git", "commit", "-m",
              f"[LAW] law-{law_number:03d}: {clean_title} (#{number})"])
-        update_proposal_cooldown(effect_data, today)
         apply_tags(effect_data, state_before, state, law_number, clean_title, threshold_tags)
 
         world_note = ("\n\n**World changes:** " + ", ".join(world_changes)) if world_changes else ""
@@ -341,10 +376,9 @@ def process_ai_proposal(issue: dict):
     stats["proposals_passed"] = stats.get("proposals_passed", 0) + 1
     write_stats(stats)
 
-    # Close and relabel FIRST so a mid-processing error cannot cause re-processing.
-    run(["gh", "issue", "edit", str(number), "--repo", REPO,
-         "--add-label", "passed", "--remove-label", "ai-proposal"])
-    run(["gh", "issue", "close", str(number), "--repo", REPO])
+    # Persist state (laws_count) BEFORE writing the law file so the number is
+    # always reserved even if the file write fails.
+    write_state(state)
 
     try:
         Path(f"world/laws/law-{law_number:03d}.md").write_text(
@@ -360,12 +394,12 @@ def process_ai_proposal(issue: dict):
             encoding="utf-8",
         )
     except OSError as e:
-        print(f"  [ERROR] Failed to write law file for AI-proposal #{number}: {e} — aborting")
-        return
-    write_state(state)
+        print(f"  [ERROR] Failed to write law file for AI-proposal #{number}: {e} — continuing")
+
     generate_world_md(state, law_number, today)
     update_readme(state, stats, law_number, today)
     update_laws_index(law_number, clean_title, number, issue_url, state["era"], today)
+    # Cooldown before commit so the file is always included in the committed state.
     update_proposal_cooldown(effect_data, today)
     append_history(law_number, clean_title, number, 0, 0, True, today)
     run(["git", "add", "-A"])
@@ -377,6 +411,12 @@ def process_ai_proposal(issue: dict):
          "--body",
          f"**Law {law_number:03d} enacted** (AI proposal — no veto received).\n\n"
          f"{narrative}{world_note}"])
+    # Close and relabel LAST so that if any write above fails the issue stays
+    # open and can be re-processed on the next run.  The workflow concurrency
+    # group prevents concurrent re-processing.
+    run(["gh", "issue", "edit", str(number), "--repo", REPO,
+         "--add-label", "passed", "--remove-label", "ai-proposal"])
+    run(["gh", "issue", "close", str(number), "--repo", REPO])
 
 
 def process_feedback(issue: dict) -> bool:

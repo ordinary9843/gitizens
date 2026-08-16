@@ -103,12 +103,16 @@ def main():
         if process_feedback(feedback):
             feedbacks_applied += 1
 
+    # Snapshot the active event title BEFORE expiry check so we can reference
+    # the resolved event accurately in the commit message and dispatch.
     active_before = load_active_event()
     resolved_event_title = active_before.get("title", "") if active_before else ""
     event_resolved = check_event_expiry(laws_this_tick)
 
-    active_event_title = ""
-    if not load_active_event():
+    # After expiry/chain processing, determine the current (possibly new) event title.
+    active_after = load_active_event()
+    if not active_after:
+        # No active event — try to fire a new random one.
         state = read_state()
         new_event = fire_random_event(state)
         if new_event:
@@ -120,8 +124,11 @@ def main():
             new_event["issue_number"] = issue_num
             save_active_event(new_event)
             print(f"  Event issue #{issue_num} opened")
+        else:
+            active_event_title = ""
     else:
-        active_event_title = load_active_event().get("title", "")
+        # A chained or still-running event is active.
+        active_event_title = active_after.get("title", "")
 
     from auto_propose import should_generate, generate_ai_proposal, generate_feedbacks as gen_feedbacks
     should_prop, should_fb = should_generate(REPO)
@@ -167,13 +174,25 @@ def main():
         update_readme(state, stats, None, today)
         run(["git", "add", "-A"])
         if event_resolved and resolved_event_title:
-            commit_msg = f"[EVENT] resolved: {resolved_event_title[:50]}"
+            event_part = f"resolved: {resolved_event_title[:40]}"
         elif event_resolved:
-            commit_msg = "[EVENT] event resolved"
-        elif tick_changed:
+            event_part = "event resolved"
+        else:
+            event_part = ""
+
+        law_part = f"{laws_this_tick} law{'s' if laws_this_tick > 1 else ''} enacted" if laws_this_tick else ""
+        tick_part = "autonomous tick" if tick_changed else ""
+
+        parts = [p for p in [event_part, law_part, tick_part] if p]
+        if event_part:
+            commit_msg = f"[EVENT] {' + '.join(parts)}"
+        elif law_part:
+            commit_msg = f"[LAW] {' + '.join(parts)}"
+        elif tick_part:
             commit_msg = "[WORLD] autonomous tick"
         else:
             commit_msg = "[WORLD] state update"
+
         run(["git", "commit", "-m", commit_msg])
 
     if push_with_retry():

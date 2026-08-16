@@ -1,3 +1,4 @@
+import math
 import re
 import random
 from datetime import datetime, timedelta, timezone
@@ -211,6 +212,7 @@ def world_autonomous_tick() -> bool:
         ind = state.get("industry", 0)
         grn = state.get("green_policy", 0)
         wel = state.get("welfare", 0)
+        welfare_pre_tick = wel  # capture before potential bankruptcy reduction
         dfn = state.get("defense", 0)
         pol = state.get("pollution", 0)
         pop = state.get("population", 1000)
@@ -218,7 +220,6 @@ def world_autonomous_tick() -> bool:
         treasury = state.get("treasury", 0)
 
         # Pollution delta scales logarithmically with population
-        import math
         pop_scale = int(math.log10(max(1, pop / 1000))) if pop > 1000 else 0
         base_pol_delta = (ind - grn) // 20
         pol_delta = base_pol_delta + pop_scale
@@ -279,8 +280,9 @@ def world_autonomous_tick() -> bool:
         era_changed = new_era != state.get("era", "Founding Era")
         state["era"] = new_era
 
+        welfare_changed = state.get("welfare", 0) != welfare_pre_tick
         changed = (new_pol != pol or new_pop != pop or new_stb != stb or
-                   new_treasury != treasury or era_changed)
+                   new_treasury != treasury or era_changed or welfare_changed)
         if changed:
             any_changed = True
             write_state(state)
