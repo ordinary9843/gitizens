@@ -1,12 +1,5 @@
 [
   {
-    "tick": 701,
-    "date": "2026-08-15",
-    "narrative": "Tick 701: autonomous tick applied \u00b7 event: Asteroid Mining Opportunity.",
-    "changes": "autonomous tick applied \u00b7 event: Asteroid Mining Opportunity",
-    "metrics": "population 368 \u00b7 treasury 57.5M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 702,
     "date": "2026-08-15",
     "narrative": "Tick 702: autonomous tick applied \u00b7 event: Asteroid Mining Opportunity.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 710: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 469 \u00b7 treasury 54.2M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 711,
+    "date": "2026-08-16",
+    "narrative": "Tick 711: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 479 \u00b7 treasury 54.2M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
