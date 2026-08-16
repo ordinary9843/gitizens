@@ -47,7 +47,7 @@ def main():
     # Find existing health issues
     try:
         issues = gh_json([
-            "issue", "list", "--repo", REPO, "--label", "bug",
+            "gh", "issue", "list", "--repo", REPO, "--label", "bug",
             "--state", "open", "--search", "in:title [HEALTH]", "--json", "number,title"
         ])
     except Exception as e:
