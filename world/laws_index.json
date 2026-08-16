@@ -1,13 +1,5 @@
 [
   {
-    "number": 87,
-    "title": "Strengthen Industry",
-    "issue_number": 1178,
-    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1178",
-    "enacted_date": "2026-08-10",
-    "era": "Crisis Age"
-  },
-  {
     "number": 88,
     "title": "Strengthen Welfare",
     "issue_number": 1179,
@@ -156,6 +148,14 @@
     "title": "Strengthen Welfare",
     "issue_number": 1236,
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1236",
+    "enacted_date": "2026-08-16",
+    "era": "Industrial Era"
+  },
+  {
+    "number": 107,
+    "title": "Strengthen Industry",
+    "issue_number": 1237,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1237",
     "enacted_date": "2026-08-16",
     "era": "Industrial Era"
   }
