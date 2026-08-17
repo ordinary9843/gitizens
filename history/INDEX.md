@@ -116,3 +116,4 @@
 | 105 | [law-105](../world/laws/law-105.md) | [#1226](https://github.com/ordinary9843/gitizens/issues/1226) Strengthen Welfare | 0+1 0-1 | 2026-08-15 |
 | 106 | [law-106](../world/laws/law-106.md) | [#1236](https://github.com/ordinary9843/gitizens/issues/1236) Strengthen Welfare | 0+1 0-1 | 2026-08-16 |
 | 107 | [law-107](../world/laws/law-107.md) | [#1237](https://github.com/ordinary9843/gitizens/issues/1237) Strengthen Industry | 0+1 0-1 | 2026-08-16 |
+| 108 | [law-108](../world/laws/law-108.md) | [#1246](https://github.com/ordinary9843/gitizens/issues/1246) Strengthen Welfare | 0+1 0-1 | 2026-08-17 |
