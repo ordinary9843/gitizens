@@ -1,12 +1,5 @@
 [
   {
-    "tick": 726,
-    "date": "2026-08-16",
-    "narrative": "Tick 726: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 658 \u00b7 treasury 54.2M GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 727,
     "date": "2026-08-16",
     "narrative": "Tick 727: autonomous tick applied \u00b7 event: Billionaire Donates Entire Fortune.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 735: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 808 \u00b7 treasury 47.6M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 736,
+    "date": "2026-08-17",
+    "narrative": "Tick 736: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 821 \u00b7 treasury 47.6M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
