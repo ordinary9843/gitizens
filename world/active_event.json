@@ -1,1 +1,26 @@
-{}
+{
+  "id": "evt-immigration-wave",
+  "category": "social",
+  "rarity": "uncommon",
+  "title": "Surge in Immigration",
+  "description": "Unrest in a neighbouring country has sent a flood of refugees into the nation, straining social resources but also bringing a diverse workforce.",
+  "flavor": "The border checkpoint is backed up for miles; some citizens are welcoming, others are worried.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "population": 500,
+    "welfare": -5
+  },
+  "default_consequence": {
+    "stability": -8
+  },
+  "response_consequence": {
+    "welfare": 5,
+    "industry": 3,
+    "education": 3
+  },
+  "response_hint": "Passing an immigrant integration policy act can turn new arrivals into a positive social asset.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-17T13:38:38.142472+00:00",
+  "issue_number": 1251
+}
