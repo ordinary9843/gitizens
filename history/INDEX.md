@@ -118,3 +118,4 @@
 | 107 | [law-107](../world/laws/law-107.md) | [#1237](https://github.com/ordinary9843/gitizens/issues/1237) Strengthen Industry | 0+1 0-1 | 2026-08-16 |
 | 108 | [law-108](../world/laws/law-108.md) | [#1246](https://github.com/ordinary9843/gitizens/issues/1246) Strengthen Welfare | 0+1 0-1 | 2026-08-17 |
 | 109 | [law-109](../world/laws/law-109.md) | [#1247](https://github.com/ordinary9843/gitizens/issues/1247) Strengthen Green Policy | 0+1 0-1 | 2026-08-17 |
+| 110 | [law-110](../world/laws/law-110.md) | [#1248](https://github.com/ordinary9843/gitizens/issues/1248) Strengthen Defense | 0+1 0-1 | 2026-08-17 |
