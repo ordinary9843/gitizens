@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-17T14:26:31.271393+00:00",
+  "updated_at": "2026-08-17T15:24:06.430222+00:00",
   "pending": [
     {
       "name": "Heavy Industry Zone",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 1460,
+      "current": 1481,
       "target": 2000,
-      "gap": 540
+      "gap": 519
     }
   ],
   "milestones_achieved": [
