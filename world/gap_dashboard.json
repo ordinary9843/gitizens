@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-08-17T09:40:11.231230+00:00",
+  "updated_at": "2026-08-17T10:30:55.431955+00:00",
   "pending": [
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 68,
+      "current": 67,
       "target": 80,
-      "gap": 12
+      "gap": 13
     },
     {
       "name": "Academy of Sciences",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 842,
+      "current": 867,
       "target": 2000,
-      "gap": 1158
+      "gap": 1133
     }
   ],
   "milestones_achieved": [
