@@ -1,25 +1,26 @@
 {
   "era": "Industrial Era",
-  "laws_count": 108,
+  "laws_count": 109,
   "last_enacted": "2026-08-17",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 47624912,
+  "treasury": 47624264,
   "currency": "Git Coins",
   "stars_last_counted": 7,
   "education": 64,
   "industry": 63,
   "welfare": 65,
-  "green_policy": 60,
+  "green_policy": 65,
   "defense": 62,
-  "population": 746,
+  "population": 750,
   "pollution": 0,
   "stability": 61,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
     "milestone/welfare-state",
-    "milestone/industrial-age"
+    "milestone/industrial-age",
+    "milestone/green-era"
   ],
   "known_stargazers": [
     "DoddiC",
