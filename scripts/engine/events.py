@@ -40,7 +40,7 @@ def open_event_issue(event: dict) -> int:
         f"**Category:** {event.get('category', '?').title()}  ·  "
         f"**Rarity:** {event.get('rarity', '?').title()}\n\n"
         f"**Immediate effects (already applied):** {imm_str}\n\n"
-        f"**Response window:** 1 hour\n\n"
+        f"**Response window:** {event.get('duration_hours', 4)} hour(s)\n\n"
         f"**👍 React to mobilise** — response: {fmt_effects(event.get('response_consequence', {}))}\n\n"
         f"**👎 React to stand down** — default: {fmt_effects(event.get('default_consequence', {}))}\n\n"
         f"> Hint: {event.get('response_hint', 'React 👍 to trigger the response consequence.')}\n"
@@ -144,8 +144,11 @@ def apply_crisis_multiplier(effect_data: dict | None, active_event: dict) -> dic
         return effect_data
     multiplier = active_event.get("crisis_multiplier", 1.5)
     modified = dict(effect_data)
+    changes = effect_data.get("changes", {})
+    if not isinstance(changes, dict):
+        return effect_data
     modified["changes"] = {
-        k: int(round(v * multiplier)) for k, v in effect_data.get("changes", {}).items()
+        k: int(round(v * multiplier)) for k, v in changes.items()
     }
     print(f"  Crisis multiplier {multiplier}x applied to policy changes")
     return modified

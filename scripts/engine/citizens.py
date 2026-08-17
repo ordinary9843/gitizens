@@ -147,7 +147,10 @@ def check_proposal_cooldown(effect_data: dict | None) -> tuple[bool, str, int]:
     cooldowns = _load_cooldowns()
     today = datetime.now(timezone.utc).date()
     extra_cost = 0
-    for metric in effect_data.get("changes", {}):
+    changes = effect_data.get("changes", {})
+    if not isinstance(changes, dict):
+        return True, "", 0
+    for metric in changes:
         entry = cooldowns.get(metric)
         if not entry:
             continue
@@ -175,7 +178,10 @@ def update_proposal_cooldown(effect_data: dict | None, date: str):
         today = datetime.fromisoformat(date).date()
     except (ValueError, TypeError):
         today = datetime.now(timezone.utc).date()
-    for metric in effect_data.get("changes", {}):
+    changes = effect_data.get("changes", {})
+    if not isinstance(changes, dict):
+        return
+    for metric in changes:
         entry = cooldowns.get(metric)
         if entry:
             try:

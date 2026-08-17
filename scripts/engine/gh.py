@@ -55,7 +55,8 @@ def get_reactions(issue_number: int) -> tuple[int, int, list[str], list[str]]:
             continue
         try:
             r = json.loads(line)
-            user_votes[r["login"]] = r["content"]
+            if r["content"] in ("+1", "-1"):
+                user_votes[r["login"]] = r["content"]
         except (json.JSONDecodeError, KeyError):
             continue
     for_voters     = sorted(u for u, v in user_votes.items() if v == "+1")

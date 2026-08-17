@@ -2,13 +2,13 @@ name: "[PROPOSAL] Validate Proposal"
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 jobs:
   validate:
     if: >
       github.event.issue.user.login != 'github-actions[bot]' &&
-      startsWith(github.event.issue.title, '[PROPOSAL]')
+      (startsWith(github.event.issue.title, '[PROPOSAL]') || contains(github.event.issue.labels.*.name, 'proposal'))
     runs-on: ubuntu-latest
     permissions:
       contents: read

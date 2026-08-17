@@ -174,7 +174,9 @@ def validate():
                     fail(f"Policy change `{key}: {val}` exceeds the ±50 limit per proposal.")
 
         if effect_type == "evolve":
-            entity_id = effect_data.get("id", "")
+            entity_id = str(effect_data.get("id", ""))
+            if not entity_id or "/" in entity_id or "\\" in entity_id or ".." in entity_id:
+                fail(f"Invalid entity ID `{entity_id}`.")
             found = any(
                 Path(f"world/entities/{cat}/{entity_id}.json").exists()
                 for cat in ("buildings", "districts", "institutions", "sectors")
@@ -236,13 +238,23 @@ def validate():
                 elif key == "currency":
                     if not isinstance(val, str) or not val.strip() or len(val) > 30:
                         fail("state_patch `currency` must be a non-empty string (max 30 chars).")
-                elif key == "founded_date":
+                elif key in ("founded_date", "next_tick_at"):
                     if not isinstance(val, str):
-                        fail("state_patch `founded_date` must be a string (ISO date).")
+                        fail(f"state_patch `{key}` must be a string (ISO date).")
                     try:
-                        datetime.fromisoformat(val)
+                        datetime.fromisoformat(val.replace("Z", "+00:00"))
                     except ValueError:
-                        fail(f"state_patch `founded_date` must be a valid ISO date, got '{val}'.")
+                        fail(f"state_patch `{key}` must be a valid ISO date, got '{val}'.")
+                elif key == "era":
+                    if not isinstance(val, str) or len(val) > 50:
+                        fail("state_patch `era` must be a string (max 50 chars).")
+                elif key == "laws_count":
+                    try:
+                        v = int(val)
+                    except (TypeError, ValueError):
+                        fail("state_patch `laws_count` must be an integer.")
+                    if v < 0:
+                        fail("state_patch `laws_count` must be positive.")
 
     # LLM contextual validation — failures fall back to allowing through
     ctx = load_world_context()

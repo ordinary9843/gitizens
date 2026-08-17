@@ -344,17 +344,23 @@ def apply_effect(effect_data: dict | None, law_number: int, extra_cost: int = 0)
     elif etype == "policy":
         changes = effect_data.get("changes", {})
         state = read_state()
-        for metric, delta in changes.items():
-            if metric in POLICY_METRICS:
-                current = state.get(metric, 0)
-                state[metric] = max(0, min(100, current + int(delta)))
+        cost_before = get_policy_cost(state)
+        if isinstance(changes, dict):
+            for metric, delta in changes.items():
+                if metric in POLICY_METRICS:
+                    current = state.get(metric, 0)
+                    state[metric] = max(0, min(100, current + int(delta)))
         if state.get("treasury") is not None:
-            state["treasury"] = max(0, state["treasury"] - get_policy_cost(state) - max(0, int(extra_cost)))
+            state["treasury"] = max(0, state["treasury"] - cost_before - max(0, int(extra_cost)))
         write_state(state)
 
     elif etype == "evolve":
-        entity_id = effect_data.get("id", "")
+        entity_id = str(effect_data.get("id", ""))
+        if not entity_id or "/" in entity_id or "\\" in entity_id or ".." in entity_id:
+            return
         changes = effect_data.get("changes", {})
+        if not isinstance(changes, dict):
+            return
         safe_changes = {k: v for k, v in changes.items() if k not in _EVOLVE_BLOCKED}
         for cat in ("buildings", "districts", "institutions", "sectors"):
             path = Path(f"world/entities/{cat}/{entity_id}.json")

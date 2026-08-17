@@ -21,7 +21,10 @@ def run(cmd, check=False):
         return ""
 
 def gh_json(cmd):
-    return json.loads(run(cmd))
+    try:
+        return json.loads(run(cmd))
+    except json.JSONDecodeError:
+        return []
 
 def main():
     state_path = Path("world/state.json")

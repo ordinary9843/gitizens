@@ -30,6 +30,67 @@ def parse_effect(body: str) -> dict | None:
         return None
 
 
+def validate_effect_structure(effect_data: dict | None) -> bool:
+    """Validate effect_data structure to prevent TOCTOU bypasses during tally."""
+    if not effect_data or not isinstance(effect_data, dict):
+        return True  # If none, it's treated as declaration, which is safe.
+    etype = effect_data.get("type", "declaration")
+    if etype not in {"policy", "evolve", "state_patch", "declaration"}:
+        return False
+        
+    if etype == "policy":
+        changes = effect_data.get("changes")
+        if not isinstance(changes, dict) or not changes:
+            return False
+        _POLICY_METRICS = {"education", "industry", "welfare", "green_policy", "defense", "stability", "pollution"}
+        for k, v in changes.items():
+            if k not in _POLICY_METRICS: return False
+            try:
+                if abs(int(v)) > 50: return False
+            except (TypeError, ValueError): return False
+            
+    elif etype == "evolve":
+        eid = effect_data.get("id")
+        if not eid or not isinstance(eid, str) or "/" in eid or "\\" in eid or ".." in eid:
+            return False
+        changes = effect_data.get("changes")
+        if not isinstance(changes, dict) or not changes:
+            return False
+        _EVOLVE_BLOCKED = {"id", "name", "built_law", "built_at", "demolished_law", "demolished_at"}
+        for k, v in changes.items():
+            if k in _EVOLVE_BLOCKED: return False
+            if not isinstance(v, (str, int, float, bool)): return False
+            
+    elif etype == "state_patch":
+        patch = effect_data.get("patch")
+        if not isinstance(patch, dict) or not patch:
+            return False
+        _PATCH_0_100 = {"education", "industry", "welfare", "green_policy", "defense", "pollution", "stability"}
+        _PATCH_ALLOWED = _PATCH_0_100 | {"treasury", "currency", "founded_date", "population", "next_tick_at", "era"}
+        for k, v in patch.items():
+            if k not in _PATCH_ALLOWED: return False
+            if k in _PATCH_0_100:
+                try: 
+                    if not (0 <= int(v) <= 100): return False
+                except (TypeError, ValueError): return False
+            elif k == "population":
+                try: 
+                    if not (0 <= int(v) <= 10_000_000): return False
+                except (TypeError, ValueError): return False
+            elif k == "treasury":
+                try: 
+                    if not (0 <= int(v) <= 1_000_000_000): return False
+                except (TypeError, ValueError): return False
+            elif k == "currency":
+                if not isinstance(v, str) or not v.strip() or len(v) > 30: return False
+            elif k in ("founded_date", "next_tick_at"):
+                if not isinstance(v, str): return False
+            elif k == "era":
+                if not isinstance(v, str) or len(v) > 50: return False
+                
+    return True
+
+
 def next_law_number() -> int:
     return read_state().get("laws_count", 0) + 1
 
@@ -72,7 +133,7 @@ def process_issue(issue: dict):
             reps = json.loads(reps_path.read_text(encoding="utf-8")).get("representatives", [])
         except Exception:
             pass
-    proposer_login = issue.get("author", {}).get("login", "") or ""
+    proposer_login = (issue.get("author") or {}).get("login", "") or ""
     voting_hours = 12 if proposer_login in reps else VOTING_PERIOD_DAYS * 24
     if not SKIP_TIMING and (now - created_at) < timedelta(hours=voting_hours):
         print(f"  #{number}: voting period not over, skipping")
@@ -99,6 +160,14 @@ def process_issue(issue: dict):
         return
 
     effect_data = parse_effect(body)
+    if not validate_effect_structure(effect_data):
+        print(f"  #{number}: TOCTOU bypass detected (invalid structure). Rejecting.")
+        run(["gh", "issue", "comment", str(number), "--repo", REPO,
+             "--body", "**Proposal blocked: Validation failure at tally time.**\n\nThis proposal's data structure was altered after initial validation. It has been rejected."])
+        run(["gh", "issue", "edit", str(number), "--repo", REPO,
+             "--add-label", "invalid", "--remove-label", "proposal"])
+        run(["gh", "issue", "close", str(number), "--repo", REPO])
+        return
 
     if for_votes > against_votes:
         law_number   = next_law_number()
@@ -156,12 +225,13 @@ def process_issue(issue: dict):
         effect_data = apply_crisis_multiplier(effect_data, active_event_now)
 
         # Re-check treasury with crisis surcharge when applicable.
-        if effect_data and effect_data.get("type") == "policy" and active_event_now.get("is_crisis"):
+        if effect_data and effect_data.get("type") == "policy" and active_event_now and active_event_now.get("is_crisis"):
             crisis_mult = float(active_event_now.get("crisis_multiplier", 1.5))
             treasury = state_before.get("treasury", 0)
             currency = state_before.get("currency", "Git Coins")
             policy_cost = get_policy_cost(state_before)
             total_cost_crisis = int(round((policy_cost + extra_cost) * crisis_mult))
+            extra_cost = total_cost_crisis - policy_cost
             if treasury < total_cost_crisis:
                 print(f"  #{number}: TREASURY BLOCKED (crisis) — needs {total_cost_crisis}, has {treasury}")
                 stats = read_stats()
@@ -210,7 +280,7 @@ def process_issue(issue: dict):
                 f"(balance: {state.get('treasury', 0)} {currency})  \n"
             )
 
-        proposer = issue.get("author", {}).get("login") or ""
+        proposer = (issue.get("author") or {}).get("login") or ""
         proposer_display = f"@{proposer}" if proposer else "*(unknown)*"
         signatories_block = format_signatories(for_voters, against_voters)
 
@@ -315,6 +385,22 @@ def process_ai_proposal(issue: dict):
     state_before = read_state()
     effect_data  = parse_effect(body)
 
+    if not validate_effect_structure(effect_data):
+        print(f"  AI-proposal #{number}: invalid structure generated by AI. Rejecting.")
+        stats = read_stats()
+        stats["proposals_total"]    = stats.get("proposals_total", 0) + 1
+        stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
+        write_stats(stats)
+        run(["gh", "issue", "comment", str(number), "--repo", REPO,
+             "--body", "**AI proposal blocked: Validation failure.**\n\nThe AI generated an invalid proposal structure. It has been rejected."])
+        run(["gh", "issue", "edit", str(number), "--repo", REPO,
+             "--add-label", "rejected", "--remove-label", "ai-proposal"])
+        run(["gh", "issue", "close", str(number), "--repo", REPO])
+        return
+
+    active_event_now = load_active_event()
+    effect_data = apply_crisis_multiplier(effect_data, active_event_now)
+
     extra_cost = 0
     if effect_data and effect_data.get("type") == "policy":
         ok, reason, extra_cost = check_proposal_cooldown(effect_data)
@@ -334,7 +420,14 @@ def process_ai_proposal(issue: dict):
         treasury = state_before.get("treasury", 0)
         currency = state_before.get("currency", "Git Coins")
         policy_cost = get_policy_cost(state_before)
-        total_cost = policy_cost + extra_cost
+        
+        if active_event_now and active_event_now.get("is_crisis"):
+            crisis_mult = float(active_event_now.get("crisis_multiplier", 1.5))
+            total_cost = int(round((policy_cost + extra_cost) * crisis_mult))
+            extra_cost = total_cost - policy_cost
+        else:
+            total_cost = policy_cost + extra_cost
+
         if treasury < total_cost:
             print(f"  AI-proposal #{number}: TREASURY BLOCKED — needs {total_cost}, has {treasury}")
             stats = read_stats()
@@ -342,7 +435,7 @@ def process_ai_proposal(issue: dict):
             stats["proposals_rejected"] = stats.get("proposals_rejected", 0) + 1
             write_stats(stats)
             penalty_note = (
-                f" (base **{policy_cost}** + repeat-touch surcharge **{extra_cost}**)"
+                f" (base **{policy_cost}** + surcharge **{extra_cost}**)"
                 if extra_cost > 0 else ""
             )
             run(["gh", "issue", "comment", str(number), "--repo", REPO,
@@ -359,8 +452,6 @@ def process_ai_proposal(issue: dict):
 
     print(f"  AI-proposal #{number}: PASSED (no veto) -> law-{law_number:03d}")
     narrative = generate_narrative(clean_title, 0, 0, state_before)
-    active_event_now = load_active_event()
-    effect_data = apply_crisis_multiplier(effect_data, active_event_now)
     apply_effect(effect_data, law_number, extra_cost=extra_cost)
     world_changes = run_world_engine(law_number)
 
@@ -431,7 +522,6 @@ def process_feedback(issue: dict) -> bool:
         return False
 
     _, against_votes, for_voters, against_voters = get_reactions(number)
-    clean_title = re.sub(r"^\[FEEDBACK\]\s*", "", title).strip()
     track_citizen_activity(for_voters, against_voters)
 
     if against_votes > 0:
@@ -444,6 +534,15 @@ def process_feedback(issue: dict) -> bool:
         return False
 
     effect_data = parse_effect(body)
+    if not validate_effect_structure(effect_data):
+        print(f"  Feedback #{number}: invalid structure generated by AI. Rejecting.")
+        run(["gh", "issue", "comment", str(number), "--repo", REPO,
+             "--body", "**Feedback blocked: Validation failure.**\n\nThe AI generated an invalid feedback structure. It has been dismissed."])
+        run(["gh", "issue", "edit", str(number), "--repo", REPO,
+             "--add-label", "rejected", "--remove-label", "feedback"])
+        run(["gh", "issue", "close", str(number), "--repo", REPO])
+        return False
+
     active_event_now = load_active_event()
     effect_data = apply_crisis_multiplier(effect_data, active_event_now)
     if effect_data and effect_data.get("type") == "policy":
