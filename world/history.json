@@ -1,21 +1,5 @@
 [
   {
-    "tick": 630,
-    "date": "2026-08-11T17:55:42Z",
-    "laws_count": 92,
-    "era": "Modern Era",
-    "education": 67,
-    "industry": 65,
-    "welfare": 72,
-    "green_policy": 73,
-    "defense": 68,
-    "pollution": 33,
-    "population": 151,
-    "stability": 52,
-    "treasury": 59888040,
-    "active_event": "evt-water-recovery"
-  },
-  {
     "tick": 631,
     "date": "2026-08-11T19:01:53Z",
     "laws_count": 92,
@@ -1598,5 +1582,21 @@
     "stability": 61,
     "treasury": 47624404,
     "active_event": "evt-billionaire-donates"
+  },
+  {
+    "tick": 730,
+    "date": "2026-08-17T02:58:33Z",
+    "laws_count": 108,
+    "era": "Industrial Era",
+    "education": 64,
+    "industry": 63,
+    "welfare": 66,
+    "green_policy": 61,
+    "defense": 62,
+    "pollution": 0,
+    "population": 731,
+    "stability": 61,
+    "treasury": 47624657,
+    "active_event": null
   }
 ]
