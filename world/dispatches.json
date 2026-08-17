@@ -1,12 +1,5 @@
 [
   {
-    "tick": 723,
-    "date": "2026-08-16",
-    "narrative": "Tick 723: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 621 \u00b7 treasury 54.2M GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 724,
     "date": "2026-08-16",
     "narrative": "Tick 724: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 732: autonomous tick applied \u00b7 1 law enacted.",
     "changes": "autonomous tick applied \u00b7 1 law enacted",
     "metrics": "population 750 \u00b7 treasury 47.6M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 733,
+    "date": "2026-08-17",
+    "narrative": "Tick 733: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 777 \u00b7 treasury 47.6M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
