@@ -22,7 +22,7 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 
 <!-- WORLD-STATE-START -->
 ![Era](https://img.shields.io/badge/Era-Founding_Era-e3b341?style=flat-square&logo=github)
-![Population](https://img.shields.io/badge/Population-2,547-3fb950?style=flat-square)
+![Population](https://img.shields.io/badge/Population-2,550-3fb950?style=flat-square)
 ![Treasury](https://img.shields.io/badge/Treasury-34.5M_GC-388bfd?style=flat-square)
 ![Stability](https://img.shields.io/badge/Stability-60%2F100-bc8cff?style=flat-square)
 ![Pollution](https://img.shields.io/badge/Pollution-0%2F100-f85149?style=flat-square)
@@ -31,7 +31,7 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 
 <!-- STATE_START -->
 **Era:** Founding Era | **Laws enacted:** 114 | [World state](world/WORLD.md)  
-**Next tick:** 2026-08-18T18:00:00Z UTC
+**Next tick:** 2026-08-18T19:00:00Z UTC
 <!-- STATE_END -->
 
 ---
