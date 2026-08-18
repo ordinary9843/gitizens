@@ -1,12 +1,5 @@
 [
   {
-    "tick": 753,
-    "date": "2026-08-18",
-    "narrative": "Tick 753: autonomous tick applied \u00b7 event: Trade Embargo.",
-    "changes": "autonomous tick applied \u00b7 event: Trade Embargo",
-    "metrics": "population 1,781 \u00b7 treasury 34.5M GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 754,
     "date": "2026-08-18",
     "narrative": "Tick 754: autonomous tick applied \u00b7 event: Trade Embargo.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 762: autonomous tick applied \u00b7 event: Intense Solar Flare.",
     "changes": "autonomous tick applied \u00b7 event: Intense Solar Flare",
     "metrics": "population 2,240 \u00b7 treasury 34.5M GC \u00b7 stability 56/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 763,
+    "date": "2026-08-18",
+    "narrative": "Tick 763: autonomous tick applied \u00b7 event: Intense Solar Flare.",
+    "changes": "autonomous tick applied \u00b7 event: Intense Solar Flare",
+    "metrics": "population 2,306 \u00b7 treasury 34.5M GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
   }
 ]
