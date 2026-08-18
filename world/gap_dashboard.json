@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-18T14:32:24.795050+00:00",
+  "updated_at": "2026-08-18T15:30:29.441212+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -9,18 +9,18 @@
       "gap": 19
     },
     {
-      "name": "Eco-Research Center",
-      "metric": "green_policy",
-      "current": 60,
-      "target": 85,
-      "gap": 25
-    },
-    {
       "name": "Heavy Industry Zone",
       "metric": "industry",
       "current": 49,
       "target": 80,
       "gap": 31
+    },
+    {
+      "name": "Eco-Research Center",
+      "metric": "green_policy",
+      "current": 52,
+      "target": 85,
+      "gap": 33
     }
   ],
   "at_risk": [
@@ -29,6 +29,12 @@
       "metric": "industry",
       "current": 49,
       "removal_at": 45
+    },
+    {
+      "name": "Nature Reserve",
+      "metric": "green_policy",
+      "current": 52,
+      "removal_at": 52
     }
   ],
   "milestones_pending": [
