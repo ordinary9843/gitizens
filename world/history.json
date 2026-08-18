@@ -1,21 +1,5 @@
 [
   {
-    "tick": 668,
-    "date": "2026-08-14T06:12:29Z",
-    "laws_count": 102,
-    "era": "Modern Era",
-    "education": 69,
-    "industry": 71,
-    "welfare": 74,
-    "green_policy": 68,
-    "defense": 73,
-    "pollution": 2,
-    "population": 520,
-    "stability": 65,
-    "treasury": 59079870,
-    "active_event": null
-  },
-  {
     "tick": 669,
     "date": "2026-08-14T08:14:46Z",
     "laws_count": 102,
@@ -1597,6 +1581,22 @@
     "population": 2476,
     "stability": 60,
     "treasury": 34503624,
+    "active_event": "evt-drought"
+  },
+  {
+    "tick": 768,
+    "date": "2026-08-18T17:26:00Z",
+    "laws_count": 114,
+    "era": "Founding Era",
+    "education": 61,
+    "industry": 49,
+    "welfare": 56,
+    "green_policy": 52,
+    "defense": 64,
+    "pollution": 0,
+    "population": 2547,
+    "stability": 60,
+    "treasury": 34503780,
     "active_event": "evt-drought"
   }
 ]
