@@ -1,1 +1,24 @@
-{}
+{
+  "id": "evt-solar-flare",
+  "category": "cosmic",
+  "rarity": "uncommon",
+  "title": "Intense Solar Flare",
+  "description": "An X-class solar flare has struck Earth's magnetic field, causing widespread disruptions to communications systems and power grids.",
+  "flavor": "GPS has failed, satellite TV has gone silent; someone says their watch stopped too.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "industry": -5,
+    "treasury": -20
+  },
+  "default_consequence": {
+    "industry": -5
+  },
+  "response_consequence": {
+    "industry": 3
+  },
+  "response_hint": "Passing a power infrastructure protection act can strengthen resistance to electromagnetic pulses.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-18T09:31:47.588827+00:00",
+  "issue_number": 1260
+}
