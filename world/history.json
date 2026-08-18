@@ -1,21 +1,5 @@
 [
   {
-    "tick": 655,
-    "date": "2026-08-13T10:04:22Z",
-    "laws_count": 97,
-    "era": "Modern Era",
-    "education": 66,
-    "industry": 69,
-    "welfare": 78,
-    "green_policy": 67,
-    "defense": 70,
-    "pollution": 0,
-    "population": 405,
-    "stability": 64,
-    "treasury": 59077471,
-    "active_event": "evt-cultural-renaissance"
-  },
-  {
     "tick": 656,
     "date": "2026-08-13T11:44:57Z",
     "laws_count": 98,
@@ -1597,6 +1581,22 @@
     "population": 1805,
     "stability": 60,
     "treasury": 34515843,
+    "active_event": "evt-trade-embargo"
+  },
+  {
+    "tick": 755,
+    "date": "2026-08-18T04:34:25Z",
+    "laws_count": 113,
+    "era": "Founding Era",
+    "education": 62,
+    "industry": 59,
+    "welfare": 62,
+    "green_policy": 62,
+    "defense": 59,
+    "pollution": 0,
+    "population": 1859,
+    "stability": 59,
+    "treasury": 34503107,
     "active_event": "evt-trade-embargo"
   }
 ]

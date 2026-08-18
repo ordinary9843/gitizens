@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-18 — [Law 113](laws/law-113.md)*
+*Last updated: 2026-08-18*
 
 ---
 
