@@ -1,12 +1,5 @@
 [
   {
-    "tick": 760,
-    "date": "2026-08-18",
-    "narrative": "Tick 760: autonomous tick applied \u00b7 event: Intense Solar Flare.",
-    "changes": "autonomous tick applied \u00b7 event: Intense Solar Flare",
-    "metrics": "population 2,183 \u00b7 treasury 34.5M GC \u00b7 stability 54/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 761,
     "date": "2026-08-18",
     "narrative": "Tick 761: autonomous tick applied \u00b7 event: Intense Solar Flare.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 769: autonomous tick applied \u00b7 event: Year of Great Drought.",
     "changes": "autonomous tick applied \u00b7 event: Year of Great Drought",
     "metrics": "population 2,550 \u00b7 treasury 34.5M GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 770,
+    "date": "2026-08-18",
+    "narrative": "Tick 770: autonomous tick applied \u00b7 event: Year of Great Drought.",
+    "changes": "autonomous tick applied \u00b7 event: Year of Great Drought",
+    "metrics": "population 2,637 \u00b7 treasury 34.5M GC \u00b7 stability 60/100 \u00b7 pollution 0/100"
   }
 ]
