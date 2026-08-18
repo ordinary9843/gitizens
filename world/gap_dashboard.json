@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-18T12:42:38.711371+00:00",
+  "updated_at": "2026-08-18T13:41:33.211464+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -18,12 +18,19 @@
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 54,
+      "current": 49,
       "target": 80,
-      "gap": 26
+      "gap": 31
     }
   ],
-  "at_risk": [],
+  "at_risk": [
+    {
+      "name": "Industrial Complex",
+      "metric": "industry",
+      "current": 49,
+      "removal_at": 45
+    }
+  ],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",
