@@ -9,5 +9,21 @@
       "representative"
     ],
     "was_representative": true
+  },
+  "a": {
+    "total_votes": 1,
+    "total_proposals": 0,
+    "last_active": "2026-08-19T07:37:14.897224+00:00",
+    "achievements": [
+      "first_vote"
+    ]
+  },
+  "b": {
+    "total_votes": 1,
+    "total_proposals": 0,
+    "last_active": "2026-08-19T07:37:14.897224+00:00",
+    "achievements": [
+      "first_vote"
+    ]
   }
 }
