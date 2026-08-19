@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-19T12:43:41.597515+00:00",
+  "updated_at": "2026-08-19T13:43:01.508539+00:00",
   "pending": [
     {
       "name": "Heavy Industry Zone",
@@ -18,16 +18,16 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 56,
+      "current": 55,
       "target": 85,
-      "gap": 29
+      "gap": 30
     }
   ],
   "at_risk": [
     {
       "name": "Nature Reserve",
       "metric": "green_policy",
-      "current": 56,
+      "current": 55,
       "removal_at": 52
     }
   ],

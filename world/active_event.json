@@ -1,1 +1,23 @@
-{}
+{
+  "id": "evt-cultural-renaissance",
+  "category": "social",
+  "rarity": "common",
+  "title": "Cultural Renaissance",
+  "description": "A powerful wave of cultural creativity has swept the nation \u2014 music, art, and literature are flourishing in every corner.",
+  "flavor": "Coffee shops are full of poets; someone is playing guitar on every street corner.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "welfare": 8,
+    "stability": 5
+  },
+  "default_consequence": {},
+  "response_consequence": {
+    "education": 5,
+    "welfare": 8
+  },
+  "response_hint": "Passing a cultural arts funding act can sustain the wave and nurture the next generation of creators.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-19T13:43:00.893282+00:00",
+  "issue_number": 1274
+}
