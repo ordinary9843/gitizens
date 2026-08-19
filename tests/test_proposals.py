@@ -1487,3 +1487,143 @@ class TestEnsureLabels:
         assert "passed" in label_names
         assert "rejected" in label_names
         assert len(calls) == 8
+# ===========================================================================
+# validate_effect_structure
+# ===========================================================================
+
+class TestValidateEffectStructure:
+    def test_validate_effect_structure_edge_cases(self):
+        # evolve id bad
+        assert _engine_proposals.validate_effect_structure({"type": "evolve", "id": "../bad", "changes": {"name": "Test"}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "evolve", "id": 123, "changes": {"name": "Test"}}) is False
+        
+        # state_patch type errors
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"population": "abc"}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"treasury": "abc"}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"currency": 123}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"currency": "a"*31}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"founded_date": 123}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"era": 123}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"era": "a"*51}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "policy", "changes": {"education": 50}}) is True
+        assert _engine_proposals.validate_effect_structure({"type": "evolve", "id": "bld-001", "changes": {"description": "Test"}}) is True
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"treasury": 50}}) is True
+
+    def test_valid_effects(self):
+        assert _engine_proposals.validate_effect_structure({"type": "declaration"}) is True
+        assert _engine_proposals.validate_effect_structure({"type": "policy", "changes": {"education": 50}}) is True
+        assert _engine_proposals.validate_effect_structure({"type": "evolve", "id": "bld-001", "changes": {"description": "Test"}}) is True
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"treasury": 50}}) is True
+
+    def test_invalid_types(self):
+        assert _engine_proposals.validate_effect_structure(None) is True
+        assert _engine_proposals.validate_effect_structure([]) is True
+        assert _engine_proposals.validate_effect_structure("string") is True
+        assert _engine_proposals.validate_effect_structure({"type": "invalid_type"}) is False
+
+    def test_missing_required_fields(self):
+        assert _engine_proposals.validate_effect_structure({"type": "policy"}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "evolve", "id": "bld-001"}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch"}) is False
+
+    def test_invalid_policy_changes(self):
+        assert _engine_proposals.validate_effect_structure({"type": "policy", "changes": "not_a_dict"}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "policy", "changes": {"invalid_metric": 10}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "policy", "changes": {"education": "not_int"}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "policy", "changes": {"education": 51}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "policy", "changes": {"education": -51}}) is False
+
+    def test_invalid_evolve_changes(self):
+        assert _engine_proposals.validate_effect_structure({"type": "evolve", "id": "bld-001", "changes": "not_a_dict"}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "evolve", "id": "bld-001", "changes": {"id": "blocked_key"}}) is False
+
+    def test_invalid_state_patch(self):
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": "not_a_dict"}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"invalid_key": 10}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"education": "not_int"}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"education": -1}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"education": 101}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"population": -1}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"population": 10000001}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"treasury": -1}}) is False
+        assert _engine_proposals.validate_effect_structure({"type": "state_patch", "patch": {"treasury": 1000000001}}) is False
+
+class TestToctouRejection:
+    @patch.object(_engine_proposals, "read_stats", return_value={})
+    @patch.object(_engine_proposals, "write_stats")
+    def test_process_issue_toctou(self, mock_write, mock_read):
+        issue = {
+            "number": 1,
+            "title": "Bad Proposal",
+            "body": "## Effect\n```yaml\ntype: policy\nchanges:\n  education: 999\n```",
+            "createdAt": "2026-08-01T00:00:00Z"
+        }
+        with patch.object(_engine_proposals, "get_reactions", return_value=(2, 0, ["a", "b"], [])):
+            with patch.object(_engine_proposals, "run") as mock_run:
+                _engine_proposals.process_issue(issue)
+                mock_run.assert_any_call(["gh", "issue", "edit", "1", "--repo", _engine_gh.REPO, "--add-label", "invalid", "--remove-label", "proposal"])
+
+    @patch.object(_engine_proposals, "read_stats", return_value={})
+    @patch.object(_engine_proposals, "write_stats")
+    def test_process_ai_proposal_toctou(self, mock_write, mock_read):
+        issue = {
+            "number": 2,
+            "title": "[AI-PROPOSAL] Bad",
+            "body": "## Effect\n```yaml\ntype: policy\nchanges:\n  education: 999\n```",
+            "createdAt": "2026-08-01T00:00:00Z"
+        }
+        with patch.object(_engine_proposals, "get_reactions", return_value=(2, 0, ["a", "b"], [])):
+            with patch.object(_engine_proposals, "run") as mock_run:
+                _engine_proposals.process_ai_proposal(issue)
+                mock_run.assert_any_call(["gh", "issue", "edit", "2", "--repo", _engine_gh.REPO, "--add-label", "rejected", "--remove-label", "ai-proposal"])
+
+    def test_process_feedback_toctou(self):
+        issue = {
+            "number": 3,
+            "title": "[FEEDBACK] Bad",
+            "body": "## Effect\n```yaml\ntype: policy\nchanges:\n  education: 999\n```",
+            "createdAt": "2026-08-01T00:00:00Z"
+        }
+        with patch.object(_engine_proposals, "get_reactions", return_value=(2, 0, ["a", "b"], [])):
+            with patch.object(_engine_proposals, "run") as mock_run:
+                _engine_proposals.process_feedback(issue)
+                mock_run.assert_any_call(["gh", "issue", "edit", "3", "--repo", _engine_gh.REPO, "--add-label", "rejected", "--remove-label", "feedback"])
+class TestCrisisProposals:
+    def test_run_rejects_on_crisis_surcharge(self):
+        proposal = {
+            "number": 1,
+            "title": "[PROPOSAL] Policy",
+            "body": "## Description\nTesting crisis\n\n## Effect\n```yaml\ntype: policy\nchanges:\n  education: 1\n```\n",
+            "reactions": {"total_count": 0},
+            "createdAt": "2026-08-01T00:00:00Z"
+        }
+        state = {"treasury": 600, "currency": "GC", "laws_count": 0}
+        active_event = {"is_crisis": True, "crisis_multiplier": 1.5}
+        
+        with patch.object(_engine_proposals, "get_reactions", return_value=(2, 0, ["a", "b"], [])):
+            with patch.object(_engine_proposals, "read_state", return_value=state):
+                with patch.object(_engine_proposals, "load_active_event", return_value=active_event):
+                    with patch("subprocess.run") as mock_sub:
+                        with patch.object(_engine_proposals, "write_stats"):
+                            _engine_proposals.process_issue(proposal)
+                            assert any("insufficient treasury (crisis surcharge active)" in str(call) for call in mock_sub.mock_calls)
+                        
+    def test_draft_proposals_body_crisis(self):
+        proposal = {
+            "number": 1,
+            "title": "[AI-PROPOSAL] Policy",
+            "body": "## Description\nTesting crisis\n\n## Effect\n```yaml\ntype: policy\nchanges:\n  education: 1\n```\n",
+            "reactions": {"total_count": 0},
+            "createdAt": "2026-08-01T00:00:00Z"
+        }
+        state = {"treasury": 100, "currency": "GC", "laws_count": 0}
+        active_event = {"is_crisis": True, "crisis_multiplier": 1.5}
+        
+        with patch.object(_engine_proposals, "get_reactions", return_value=(2, 0, ["a", "b"], [])):
+            with patch.object(_engine_proposals, "read_state", return_value=state):
+                with patch.object(_engine_proposals, "load_active_event", return_value=active_event):
+                    with patch("subprocess.run") as mock_sub:
+                        with patch.object(_engine_proposals, "write_stats"):
+                            _engine_proposals.process_ai_proposal(proposal)
+                            # The AI proposal applies it successfully if treasury > 75 (100)
+                            assert any("gh" in str(call) and "issue" in str(call) for call in mock_sub.mock_calls)

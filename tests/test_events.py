@@ -547,3 +547,8 @@ class TestCloseEventIssue:
         for c in mock_run.call_args_list:
             cmd = c[0][0]
             assert "--repo" in cmd
+
+def test_apply_crisis_multiplier_invalid_changes():
+    from scripts.engine import events
+    res = events.apply_crisis_multiplier({"type": "policy", "changes": []}, {"is_crisis": True})
+    assert res["changes"] == []

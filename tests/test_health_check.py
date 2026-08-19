@@ -108,37 +108,68 @@ class TestHealthCheck:
         
         with pytest.raises(SystemExit) as exc:
             health_check.main()
-            
+        
         assert exc.value.code == 1
-        assert mock_run.call_count == 1
-        create_call = mock_run.call_args_list[0][0][0]
+        mock_run.assert_called_once()
+        create_call = mock_run.call_args[0][0]
+        assert "issue" in create_call
         assert "create" in create_call
         assert "--title" in create_call
-        
-        out = capsys.readouterr().out
-        assert "ALERT: World is" in out
-        assert "Created new health issue" in out
+        assert "[HEALTH] World tick overdue by 7h" in create_call
+        assert "Created new health issue:" in capsys.readouterr().out
 
     @patch("scripts.health_check.gh_json")
     @patch("scripts.health_check.run")
-    def test_overdue_world_deduplicates_issue(self, mock_run, mock_gh_json, tmp_path, monkeypatch, capsys):
+    def test_overdue_world_issue_exists(self, mock_run, mock_gh_json, tmp_path, monkeypatch, capsys):
         monkeypatch.chdir(tmp_path)
         # 7 hours ago (overdue)
         next_tick = (datetime.now(timezone.utc) - timedelta(hours=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
         self._setup_world(tmp_path, next_tick_at=next_tick)
         
-        mock_gh_json.return_value = [
-            {"number": 999, "title": "[HEALTH] World tick overdue"}
-        ]
+        mock_gh_json.return_value = [{"number": 123, "title": "[HEALTH] World tick overdue by 5h"}]
         
         with pytest.raises(SystemExit) as exc:
             health_check.main()
-            
+        
         assert exc.value.code == 1
         mock_run.assert_not_called()
+        assert "Health issue already exists" in capsys.readouterr().out
+
+    def test_run_success(self):
+        result = health_check.run(["python", "-c", "print('hello')"])
+        assert "hello" in result
+
+    def test_run_failure(self, capsys):
+        result = health_check.run(["python", "-c", "import sys; sys.stderr.write('error'); sys.exit(1)"])
+        assert result == ""
+        assert "[WARN] python -c:" in capsys.readouterr().out
+
+    def test_run_exception(self, capsys):
+        with patch("subprocess.run", side_effect=Exception("mocked error")):
+            result = health_check.run(["gh", "issue"])
+            assert result == ""
+            assert "[WARN] run(['gh', 'issue']): mocked error" in capsys.readouterr().out
+
+    def test_gh_json_success(self):
+        with patch("scripts.health_check.run", return_value='[{"id": 1}]'):
+            assert health_check.gh_json(["gh", "issue"]) == [{"id": 1}]
+
+    def test_gh_json_failure(self):
+        with patch("scripts.health_check.run", return_value='invalid json'):
+            assert health_check.gh_json(["gh", "issue"]) == []
+
+    @patch("scripts.health_check.gh_json")
+    @patch("scripts.health_check.run")
+    def test_healthy_world_closes_issues_error(self, mock_run, mock_gh_json, tmp_path, monkeypatch, capsys):
+        monkeypatch.chdir(tmp_path)
+        next_tick = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        self._setup_world(tmp_path, next_tick_at=next_tick)
         
-        out = capsys.readouterr().out
-        assert "Health issue already exists (#999)" in out
+        mock_gh_json.return_value = [{"number": 123, "title": "[HEALTH] error"}]
+        mock_run.side_effect = Exception("failed to close")
+        
+        health_check.main()
+        assert "Could not close health issue #123: failed to close" in capsys.readouterr().out
 
     def test_naive_datetime(self, tmp_path, monkeypatch, capsys):
         monkeypatch.chdir(tmp_path)

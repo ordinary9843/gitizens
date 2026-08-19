@@ -372,3 +372,23 @@ class TestGenerateFeedbacks:
                 auto_propose.generate_feedbacks(client, self._state(), "test/repo", count=1)
             body_arg = mock_post.call_args[0][2]
             assert metric in body_arg
+
+    @patch("random.random")
+    def test_generate_auto_policy_pollution(self, mock_random, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text(json.dumps({
+            "pollution": 50,
+            "education": 10
+        }))
+        (tmp_path / "world/entities").mkdir()
+        mock_random.return_value = 0.1
+        
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value.choices[0].message.content = "```json\n{\"title\": \"T\", \"desc\": \"D\", \"changes\": {\"green_policy\": 1}}\n```"
+        
+        with patch.object(auto_propose, "_post_issue", return_value=1) as mock_post:
+            auto_propose.generate_ai_proposal(mock_client, {"pollution": 50}, "test/repo")
+            
+        call_args = mock_client.chat.completions.create.call_args[1]
+        assert "reduce pollution" in call_args["messages"][0]["content"]

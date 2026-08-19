@@ -1410,3 +1410,33 @@ class TestAutonomousTickWelfareStabilityBonus:
         assert written
         new_stb = written[-1]["stability"]
         assert new_stb > state["stability"]
+
+# ===========================================================================
+# process_world_ticks edge cases
+# ===========================================================================
+class TestWorldEngineEdgeCases:
+    def test_treasury_negative_penalty(self):
+        state = {
+            "treasury": 0,
+            "population": 1000,
+            "welfare": 100, # costs 200
+            "stability": 50,
+            "pollution": 50,
+            "industry": 0
+        }
+        with patch.object(_engine_world, "read_state", return_value=state):
+            with patch.object(_engine_world, "write_state") as mock_write:
+                with patch.object(_engine_world, "_count_missed_ticks", return_value=1):
+                    _engine_world.world_autonomous_tick()
+                written = mock_write.call_args[0][0]
+                assert written["treasury"] == 0
+                assert written["stability"] < 50
+                assert written["welfare"] < 100
+
+    def test_apply_effect_evolve_invalid(self):
+        with patch.object(_engine_world, "read_json") as mock_read:
+            _engine_world.apply_effect({"type": "evolve", "id": "../bld-001", "changes": {"name": "test"}}, 1)
+            mock_read.assert_not_called()
+            
+            _engine_world.apply_effect({"type": "evolve", "id": "bld-001", "changes": "not_a_dict"}, 1)
+            mock_read.assert_not_called()

@@ -394,3 +394,19 @@ class TestSelectRepresentativesMoreEdges:
         with patch.object(tv, "get_or_create_dispatch_issue", return_value=1),              patch.object(tv, "run", return_value=""),              patch("engine.citizens._award_achievements",
                    side_effect=RuntimeError("boom")):
             tv.select_weekly_representatives()
+
+    def test_citizens_missing_lines(self):
+        from scripts.engine import citizens as eng_cit
+        # 152: check_proposal_cooldown returns True, "", 0 if changes is not dict
+        ok, reason, cost = eng_cit.check_proposal_cooldown({"type": "policy", "changes": ["not", "dict"]})
+        assert ok
+        # 183: update_proposal_cooldown returns early if changes not dict
+        eng_cit.update_proposal_cooldown({"type": "policy", "changes": []}, "2026-08-01")
+        # 231: select_weekly_representatives parses naive last_active string
+        with patch("pathlib.Path.exists", return_value=True):
+            with patch("pathlib.Path.read_text", side_effect=[
+                '{"selected_at": null}', # reps_path
+                '{"bob": {"total_votes": 5, "last_active": "2026-08-01T00:00:00"}}' # citizens_path
+            ]):
+                with patch("pathlib.Path.write_text"):
+                    eng_cit.select_weekly_representatives()

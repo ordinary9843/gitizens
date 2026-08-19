@@ -783,3 +783,11 @@ class TestCitizenNarratorNaiveDatetime:
         with patch.object(_engine_content, "client", mc):
             tv.generate_citizen_narrator()
         mc.chat.completions.create.assert_not_called()
+
+    def test_client_init_error(self):
+        import importlib
+        from scripts.engine import content
+        with patch("openai.OpenAI", side_effect=Exception("API limit")):
+            importlib.reload(content)
+            assert content.client is None
+        importlib.reload(content)

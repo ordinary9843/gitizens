@@ -465,3 +465,38 @@ class TestMainBranches:
         with patch.multiple(tv, **patches):
             tv.main()
         assert committed and committed[0] == "[WORLD] state update"
+
+    @patch("scripts.tally_votes.update_readme")
+    @patch("scripts.tally_votes.generate_citizen_narrator")
+    @patch("scripts.tally_votes.generate_world_md")
+    @patch("scripts.tally_votes.update_world_summary", return_value="mock_summary")
+    @patch("scripts.tally_votes.save_dispatch")
+    @patch("scripts.tally_votes.world_autonomous_tick", return_value=(False, False))
+    @patch("scripts.tally_votes.get_open_proposals")
+    @patch("scripts.tally_votes.get_ai_proposals", return_value=[])
+    @patch("scripts.tally_votes.get_feedbacks", return_value=[])
+    @patch("scripts.tally_votes.process_issue")
+    @patch("scripts.tally_votes.save_proposals_json")
+    @patch("scripts.tally_votes.select_weekly_representatives")
+    @patch("scripts.tally_votes.push_with_retry", return_value=True)
+    @patch("scripts.tally_votes.publish_dispatch")
+    @patch("subprocess.run")
+    def test_main_law_commit(self, mock_run, mock_pub, mock_push, mock_reps, mock_save, mock_pi, mock_gf, mock_gai, mock_gop, mock_tick, mock_narrative, mock_ws, mock_wmd, mock_cn, mock_ur, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text("{}")
+        
+        # We need laws_count to increase during process_issue to trigger the law commit message
+        def mock_process_issue(prop):
+            import json
+            state_file = tmp_path / "world/state.json"
+            state = json.loads(state_file.read_text()) if state_file.exists() else {}
+            state["laws_count"] = state.get("laws_count", 0) + 1
+            state_file.write_text(json.dumps(state))
+            
+        mock_pi.side_effect = mock_process_issue
+        mock_gop.return_value = [{"number": 1, "title": "test"}]
+        
+        tv.main()
+        commits = [call for call in mock_run.mock_calls if "commit" in str(call)]
+        assert any("[LAW] 1 law enacted" in str(c) for c in commits)
