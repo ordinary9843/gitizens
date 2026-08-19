@@ -41,7 +41,7 @@ _LLM_EXCLUDE = {"known_stargazers", "tags_applied"}
 _PATCH_ALLOWED = {
     "treasury", "currency", "founded_date",
     "education", "industry", "welfare", "green_policy", "defense",
-    "pollution", "stability", "population",
+    "pollution", "stability", "population", "era", "laws_count"
 }
 _PATCH_0_100 = {"education", "industry", "welfare", "green_policy",
                 "defense", "pollution", "stability"}
