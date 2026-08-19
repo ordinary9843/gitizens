@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-08-18T23:20:38.029797+00:00",
+  "updated_at": "2026-08-19T01:10:50.992764+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 61,
+      "current": 60,
       "target": 80,
-      "gap": 19
+      "gap": 20
     },
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 49,
+      "current": 54,
       "target": 80,
-      "gap": 31
+      "gap": 26
     },
     {
       "name": "Eco-Research Center",
@@ -24,12 +24,6 @@
     }
   ],
   "at_risk": [
-    {
-      "name": "Industrial Complex",
-      "metric": "industry",
-      "current": 49,
-      "removal_at": 45
-    },
     {
       "name": "Nature Reserve",
       "metric": "green_policy",
