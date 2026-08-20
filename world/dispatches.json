@@ -1,12 +1,5 @@
 [
   {
-    "tick": 802,
-    "date": "2026-08-20",
-    "narrative": "Tick 802: autonomous tick applied \u00b7 event: Government Building Haunting.",
-    "changes": "autonomous tick applied \u00b7 event: Government Building Haunting",
-    "metrics": "population 5,703 \u00b7 treasury 34.4M GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 803,
     "date": "2026-08-20",
     "narrative": "Tick 803: autonomous tick applied \u00b7 event: Government Building Haunting.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 811: autonomous tick applied \u00b7 event: Large-Scale Cyber Attack.",
     "changes": "autonomous tick applied \u00b7 event: Large-Scale Cyber Attack",
     "metrics": "population 6,300 \u00b7 treasury 34.4M GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 812,
+    "date": "2026-08-20",
+    "narrative": "Tick 812: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 6,346 \u00b7 treasury 34.4M GC \u00b7 stability 53/100 \u00b7 pollution 0/100"
   }
 ]
