@@ -1,20 +1,20 @@
 {
-  "era": "Industrial Era",
+  "era": "Founding Era",
   "laws_count": 118,
   "last_enacted": "2026-08-20",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 34432554,
+  "treasury": 34432792,
   "currency": "Git Coins",
   "stars_last_counted": 7,
   "education": 59,
-  "industry": 56,
+  "industry": 55,
   "welfare": 58,
   "green_policy": 56,
   "defense": 59,
-  "population": 6084,
+  "population": 6101,
   "pollution": 0,
-  "stability": 55,
+  "stability": 56,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -33,5 +33,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-08-20T15:00:00Z"
+  "next_tick_at": "2026-08-20T16:00:00Z"
 }
