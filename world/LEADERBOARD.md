@@ -2,6 +2,6 @@
 
 | Rank | Citizen | Votes | Proposals | Achievements |
 | --- | --- | --- | --- | --- |
-| 1 | @a | 17 | 0 | first_vote, civic_duty |
-| 2 | @b | 17 | 0 | first_vote, civic_duty |
+| 1 | @a [REP] | 18 | 0 | first_vote, civic_duty, representative |
+| 2 | @b [REP] | 18 | 0 | first_vote, civic_duty, representative |
 | 3 | @ordinary9843 [REP] | 1 | 1 | first_vote, legislator, representative |

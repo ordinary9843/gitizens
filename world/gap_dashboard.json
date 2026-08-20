@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-19T23:21:13.478148+00:00",
+  "updated_at": "2026-08-20T01:10:02.152409+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -18,19 +18,12 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 55,
+      "current": 60,
       "target": 85,
-      "gap": 30
+      "gap": 25
     }
   ],
-  "at_risk": [
-    {
-      "name": "Nature Reserve",
-      "metric": "green_policy",
-      "current": 55,
-      "removal_at": 52
-    }
-  ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",

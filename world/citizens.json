@@ -16,8 +16,10 @@
     "last_active": "2026-08-20T01:09:49.009112+00:00",
     "achievements": [
       "first_vote",
-      "civic_duty"
-    ]
+      "civic_duty",
+      "representative"
+    ],
+    "was_representative": true
   },
   "b": {
     "total_votes": 18,
@@ -25,7 +27,9 @@
     "last_active": "2026-08-20T01:09:49.009112+00:00",
     "achievements": [
       "first_vote",
-      "civic_duty"
-    ]
+      "civic_duty",
+      "representative"
+    ],
+    "was_representative": true
   }
 }
