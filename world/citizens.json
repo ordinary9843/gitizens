@@ -11,23 +11,25 @@
     "was_representative": true
   },
   "a": {
-    "total_votes": 24,
+    "total_votes": 25,
     "total_proposals": 0,
-    "last_active": "2026-08-20T07:40:01.196511+00:00",
+    "last_active": "2026-08-20T08:36:48.567534+00:00",
     "achievements": [
       "first_vote",
       "civic_duty",
+      "active_citizen",
       "representative"
     ],
     "was_representative": true
   },
   "b": {
-    "total_votes": 24,
+    "total_votes": 25,
     "total_proposals": 0,
-    "last_active": "2026-08-20T07:40:01.196511+00:00",
+    "last_active": "2026-08-20T08:36:48.567534+00:00",
     "achievements": [
       "first_vote",
       "civic_duty",
+      "active_citizen",
       "representative"
     ],
     "was_representative": true
