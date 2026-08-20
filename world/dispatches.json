@@ -1,12 +1,5 @@
 [
   {
-    "tick": 807,
-    "date": "2026-08-20",
-    "narrative": "Tick 807: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 6,025 \u00b7 treasury 34.4M GC \u00b7 stability 54/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 808,
     "date": "2026-08-20",
     "narrative": "Tick 808: autonomous tick applied \u00b7 event: Large-Scale Cyber Attack.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 816: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 6,634 \u00b7 treasury 34.4M GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 817,
+    "date": "2026-08-20",
+    "narrative": "Tick 817: autonomous tick applied \u00b7 event: Asteroid Mining Opportunity.",
+    "changes": "autonomous tick applied \u00b7 event: Asteroid Mining Opportunity",
+    "metrics": "population 6,607 \u00b7 treasury 34.4M GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
   }
 ]
