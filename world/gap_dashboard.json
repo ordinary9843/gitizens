@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-20T16:33:47.233682+00:00",
+  "updated_at": "2026-08-20T17:27:36.568650+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -18,22 +18,22 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 56,
+      "current": 55,
       "target": 85,
-      "gap": 29
+      "gap": 30
     }
   ],
   "at_risk": [
     {
       "name": "Nature Reserve",
       "metric": "green_policy",
-      "current": 56,
+      "current": 55,
       "removal_at": 52
     },
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 59,
+      "current": 58,
       "removal_at": 55
     }
   ],
