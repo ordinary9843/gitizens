@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-haunted-building",
+  "category": "weird",
+  "rarity": "rare",
+  "title": "Government Building Haunting",
+  "description": "Several officials have reported seeing unidentified figures in the Ministry of Finance building; rumours say it is the ghost of a former minister.",
+  "flavor": "The cleaning lady says she knew all along, because the photocopier on that floor keeps moving by itself.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "stability": -3,
+    "welfare": -2
+  },
+  "default_consequence": {
+    "stability": -5
+  },
+  "response_consequence": {
+    "stability": 3,
+    "welfare": 2
+  },
+  "response_hint": "Passing an 'administrative space psychological safety' audit act can help staff regain peace of mind at work.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-20T07:40:11.588636+00:00",
+  "issue_number": 1282
+}
