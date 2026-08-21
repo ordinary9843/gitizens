@@ -1,21 +1,5 @@
 [
   {
-    "tick": 722,
-    "date": "2026-08-16T17:18:35Z",
-    "laws_count": 107,
-    "era": "Industrial Era",
-    "education": 65,
-    "industry": 64,
-    "welfare": 59,
-    "green_policy": 63,
-    "defense": 65,
-    "pollution": 0,
-    "population": 600,
-    "stability": 60,
-    "treasury": 54175493,
-    "active_event": null
-  },
-  {
     "tick": 723,
     "date": "2026-08-16T18:27:24Z",
     "laws_count": 107,
@@ -1597,6 +1581,22 @@
     "population": 8895,
     "stability": 59,
     "treasury": 34327651,
+    "active_event": "evt-anti-aging-drug"
+  },
+  {
+    "tick": 822,
+    "date": "2026-08-21T08:38:59Z",
+    "laws_count": 121,
+    "era": "Industrial Era",
+    "education": 57,
+    "industry": 60,
+    "welfare": 65,
+    "green_policy": 60,
+    "defense": 62,
+    "pollution": 0,
+    "population": 8924,
+    "stability": 60,
+    "treasury": 34324534,
     "active_event": "evt-anti-aging-drug"
   }
 ]
