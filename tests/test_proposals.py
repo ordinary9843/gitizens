@@ -1551,7 +1551,9 @@ class TestValidateEffectStructure:
 class TestToctouRejection:
     @patch.object(_engine_proposals, "read_stats", return_value={})
     @patch.object(_engine_proposals, "write_stats")
-    def test_process_issue_toctou(self, mock_write, mock_read):
+    def test_process_issue_toctou(self, mock_write, mock_read, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
         issue = {
             "number": 1,
             "title": "Bad Proposal",
@@ -1565,7 +1567,9 @@ class TestToctouRejection:
 
     @patch.object(_engine_proposals, "read_stats", return_value={})
     @patch.object(_engine_proposals, "write_stats")
-    def test_process_ai_proposal_toctou(self, mock_write, mock_read):
+    def test_process_ai_proposal_toctou(self, mock_write, mock_read, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
         issue = {
             "number": 2,
             "title": "[AI-PROPOSAL] Bad",
@@ -1577,7 +1581,9 @@ class TestToctouRejection:
                 _engine_proposals.process_ai_proposal(issue)
                 mock_run.assert_any_call(["gh", "issue", "edit", "2", "--repo", _engine_gh.REPO, "--add-label", "rejected", "--remove-label", "ai-proposal"])
 
-    def test_process_feedback_toctou(self):
+    def test_process_feedback_toctou(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
         issue = {
             "number": 3,
             "title": "[FEEDBACK] Bad",
@@ -1589,7 +1595,9 @@ class TestToctouRejection:
                 _engine_proposals.process_feedback(issue)
                 mock_run.assert_any_call(["gh", "issue", "edit", "3", "--repo", _engine_gh.REPO, "--add-label", "rejected", "--remove-label", "feedback"])
 class TestCrisisProposals:
-    def test_run_rejects_on_crisis_surcharge(self):
+    def test_run_rejects_on_crisis_surcharge(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
         proposal = {
             "number": 1,
             "title": "[PROPOSAL] Policy",
@@ -1608,7 +1616,9 @@ class TestCrisisProposals:
                             _engine_proposals.process_issue(proposal)
                             assert any("insufficient treasury (crisis surcharge active)" in str(call) for call in mock_sub.mock_calls)
                         
-    def test_draft_proposals_body_crisis(self):
+    def test_draft_proposals_body_crisis(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / "world").mkdir()
         proposal = {
             "number": 1,
             "title": "[AI-PROPOSAL] Policy",
