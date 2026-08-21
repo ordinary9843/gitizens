@@ -9,32 +9,5 @@
       "representative"
     ],
     "was_representative": true
-<<<<<<< HEAD
-=======
-  },
-  "a": {
-    "total_votes": 45,
-    "total_proposals": 0,
-    "last_active": "2026-08-21T08:38:49.168830+00:00",
-    "achievements": [
-      "first_vote",
-      "civic_duty",
-      "active_citizen",
-      "representative"
-    ],
-    "was_representative": true
-  },
-  "b": {
-    "total_votes": 45,
-    "total_proposals": 0,
-    "last_active": "2026-08-21T08:38:49.168830+00:00",
-    "achievements": [
-      "first_vote",
-      "civic_duty",
-      "active_citizen",
-      "representative"
-    ],
-    "was_representative": true
->>>>>>> 5aefd113ace7bfd7b0a7513a8cb7803eb0b313e3
   }
 }
