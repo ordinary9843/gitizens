@@ -11,7 +11,7 @@
 | Era | Industrial Era |
 | Laws enacted | 120 |
 | Last enacted | 2026-08-21 |
-| Treasury | 34,327,379 Git Coins |
+| Treasury | 34,327,651 Git Coins |
 
 ### Policy
 
