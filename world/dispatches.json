@@ -1,12 +1,5 @@
 [
   {
-    "tick": 823,
-    "date": "2026-08-21",
-    "narrative": "Tick 823: autonomous tick applied \u00b7 event: Anti-Aging Drug Released.",
-    "changes": "autonomous tick applied \u00b7 event: Anti-Aging Drug Released",
-    "metrics": "population 9,075 \u00b7 treasury 34.3M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 824,
     "date": "2026-08-21",
     "narrative": "Tick 824: event: Anti-Aging Drug Released.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 832: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 10.6K \u00b7 treasury 34.3M GC \u00b7 stability 61/100 \u00b7 pollution 1/100"
+  },
+  {
+    "tick": 833,
+    "date": "2026-08-21",
+    "narrative": "Tick 833: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 10.8K \u00b7 treasury 34.3M GC \u00b7 stability 61/100 \u00b7 pollution 2/100"
   }
 ]
