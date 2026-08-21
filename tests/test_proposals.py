@@ -1597,7 +1597,7 @@ class TestCrisisProposals:
             "reactions": {"total_count": 0},
             "createdAt": "2026-08-01T00:00:00Z"
         }
-        state = {"treasury": 600, "currency": "GC", "laws_count": 0}
+        state = {"treasury": 150, "currency": "GC", "laws_count": 0}
         active_event = {"is_crisis": True, "crisis_multiplier": 1.5}
         
         with patch.object(_engine_proposals, "get_reactions", return_value=(2, 0, ["a", "b"], [])):
