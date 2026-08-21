@@ -1,12 +1,5 @@
 [
   {
-    "tick": 816,
-    "date": "2026-08-20",
-    "narrative": "Tick 816: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 6,634 \u00b7 treasury 34.4M GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 817,
     "date": "2026-08-20",
     "narrative": "Tick 817: autonomous tick applied \u00b7 event: Asteroid Mining Opportunity.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 825: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Anti-Aging Drug Released.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Anti-Aging Drug Released",
     "metrics": "population 9,126 \u00b7 treasury 34.3M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 826,
+    "date": "2026-08-21",
+    "narrative": "Tick 826: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 9,413 \u00b7 treasury 34.3M GC \u00b7 stability 61/100 \u00b7 pollution 0/100"
   }
 ]
