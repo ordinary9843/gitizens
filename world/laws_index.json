@@ -246,5 +246,29 @@
     "issue_url": "https://github.com/ordinary9843/gitizens/issues/1280",
     "enacted_date": "2026-08-20",
     "era": "Industrial Era"
+  },
+  {
+    "number": 119,
+    "title": "Strengthen Green Policy",
+    "issue_number": 1292,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1292",
+    "enacted_date": "2026-08-21",
+    "era": "Founding Era"
+  },
+  {
+    "number": 120,
+    "title": "Strengthen Industry",
+    "issue_number": 1293,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1293",
+    "enacted_date": "2026-08-21",
+    "era": "Industrial Era"
+  },
+  {
+    "number": 121,
+    "title": "Strengthen Defense",
+    "issue_number": 1295,
+    "issue_url": "https://github.com/ordinary9843/gitizens/issues/1295",
+    "enacted_date": "2026-08-21",
+    "era": "Industrial Era"
   }
 ]

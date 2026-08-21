@@ -1,42 +1,29 @@
 {
-  "updated_at": "2026-08-20T23:24:41.837573+00:00",
+  "updated_at": "2026-08-21T08:38:59.948304+00:00",
   "pending": [
-    {
-      "name": "Academy of Sciences",
-      "metric": "education",
-      "current": 59,
-      "target": 80,
-      "gap": 21
-    },
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 55,
+      "current": 60,
       "target": 80,
-      "gap": 25
+      "gap": 20
+    },
+    {
+      "name": "Academy of Sciences",
+      "metric": "education",
+      "current": 57,
+      "target": 80,
+      "gap": 23
     },
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 55,
+      "current": 60,
       "target": 85,
-      "gap": 30
+      "gap": 25
     }
   ],
-  "at_risk": [
-    {
-      "name": "Nature Reserve",
-      "metric": "green_policy",
-      "current": 55,
-      "removal_at": 52
-    },
-    {
-      "name": "Defense Ministry",
-      "metric": "defense",
-      "current": 58,
-      "removal_at": 55
-    }
-  ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",
