@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-21 — [Law 122](laws/law-122.md)*
+*Last updated: 2026-08-21*
 
 ---
 
