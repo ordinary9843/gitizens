@@ -1554,6 +1554,7 @@ class TestToctouRejection:
     def test_process_issue_toctou(self, mock_write, mock_read, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text('{"laws_count": 0}')
         issue = {
             "number": 1,
             "title": "Bad Proposal",
@@ -1570,6 +1571,7 @@ class TestToctouRejection:
     def test_process_ai_proposal_toctou(self, mock_write, mock_read, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text('{"laws_count": 0}')
         issue = {
             "number": 2,
             "title": "[AI-PROPOSAL] Bad",
@@ -1584,6 +1586,7 @@ class TestToctouRejection:
     def test_process_feedback_toctou(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "world").mkdir()
+        (tmp_path / "world/state.json").write_text('{"laws_count": 0}')
         issue = {
             "number": 3,
             "title": "[FEEDBACK] Bad",
