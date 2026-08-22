@@ -1,12 +1,5 @@
 [
   {
-    "tick": 840,
-    "date": "2026-08-22",
-    "narrative": "Tick 840: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 12.7K \u00b7 treasury 34.1M GC \u00b7 stability 58/100 \u00b7 pollution 6/100"
-  },
-  {
     "tick": 841,
     "date": "2026-08-22",
     "narrative": "Tick 841: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 849: autonomous tick applied \u00b7 event: Nationwide Spontaneous Dancing.",
     "changes": "autonomous tick applied \u00b7 event: Nationwide Spontaneous Dancing",
     "metrics": "population 14.9K \u00b7 treasury 34.1M GC \u00b7 stability 59/100 \u00b7 pollution 15/100"
+  },
+  {
+    "tick": 850,
+    "date": "2026-08-22",
+    "narrative": "Tick 850: autonomous tick applied \u00b7 event: Nationwide Spontaneous Dancing.",
+    "changes": "autonomous tick applied \u00b7 event: Nationwide Spontaneous Dancing",
+    "metrics": "population 15.3K \u00b7 treasury 34.1M GC \u00b7 stability 58/100 \u00b7 pollution 16/100"
   }
 ]
