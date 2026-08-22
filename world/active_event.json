@@ -1,1 +1,23 @@
-{}
+{
+  "id": "evt-mass-dancing",
+  "category": "weird",
+  "rarity": "common",
+  "title": "Nationwide Spontaneous Dancing",
+  "description": "With no one organising it, citizens in dozens of cities have spontaneously started dancing in public squares simultaneously, and it has continued for several days.",
+  "flavor": "A sociologist called it 'a spontaneous explosion of collective unconscious joy'; no one really understands why.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "welfare": 5,
+    "stability": 3
+  },
+  "default_consequence": {},
+  "response_consequence": {
+    "welfare": 8,
+    "stability": 5
+  },
+  "response_hint": "Passing a cultural festival promotion act can make this energy a part of the city's culture.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-22T10:21:25.773119+00:00",
+  "issue_number": 1305
+}
