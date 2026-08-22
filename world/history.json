@@ -1,21 +1,5 @@
 [
   {
-    "tick": 742,
-    "date": "2026-08-17T14:26:31Z",
-    "laws_count": 111,
-    "era": "Industrial Era",
-    "education": 63,
-    "industry": 66,
-    "welfare": 58,
-    "green_policy": 65,
-    "defense": 64,
-    "pollution": 0,
-    "population": 1460,
-    "stability": 60,
-    "treasury": 47619535,
-    "active_event": "evt-immigration-wave"
-  },
-  {
     "tick": 743,
     "date": "2026-08-17T15:24:06Z",
     "laws_count": 111,
@@ -1597,6 +1581,22 @@
     "population": 12988,
     "stability": 58,
     "treasury": 34124512,
+    "active_event": null
+  },
+  {
+    "tick": 842,
+    "date": "2026-08-22T04:31:36Z",
+    "laws_count": 124,
+    "era": "Industrial Era",
+    "education": 60,
+    "industry": 64,
+    "welfare": 62,
+    "green_policy": 64,
+    "defense": 61,
+    "pollution": 8,
+    "population": 13389,
+    "stability": 58,
+    "treasury": 34111808,
     "active_event": null
   }
 ]

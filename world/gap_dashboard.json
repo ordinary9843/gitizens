@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-22T03:40:22.292857+00:00",
+  "updated_at": "2026-08-22T04:31:36.068793+00:00",
   "pending": [
     {
       "name": "Heavy Industry Zone",
@@ -18,9 +18,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 59,
+      "current": 64,
       "target": 85,
-      "gap": 26
+      "gap": 21
     }
   ],
   "at_risk": [],
@@ -28,9 +28,9 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 7,
+      "current": 8,
       "target": 60,
-      "gap": 53
+      "gap": 52
     }
   ],
   "milestones_achieved": [
