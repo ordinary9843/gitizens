@@ -1,12 +1,5 @@
 [
   {
-    "tick": 851,
-    "date": "2026-08-22",
-    "narrative": "Tick 851: autonomous tick applied \u00b7 event: Nationwide Spontaneous Dancing.",
-    "changes": "autonomous tick applied \u00b7 event: Nationwide Spontaneous Dancing",
-    "metrics": "population 15.8K \u00b7 treasury 34.1M GC \u00b7 stability 57/100 \u00b7 pollution 17/100"
-  },
-  {
     "tick": 852,
     "date": "2026-08-22",
     "narrative": "Tick 852: autonomous tick applied \u00b7 event: Nationwide Spontaneous Dancing.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 860: autonomous tick applied \u00b7 event: Trade Embargo.",
     "changes": "autonomous tick applied \u00b7 event: Trade Embargo",
     "metrics": "population 17K \u00b7 treasury 34.1M GC \u00b7 stability 54/100 \u00b7 pollution 24/100"
+  },
+  {
+    "tick": 861,
+    "date": "2026-08-22",
+    "narrative": "Tick 861: autonomous tick applied \u00b7 event: Trade Embargo.",
+    "changes": "autonomous tick applied \u00b7 event: Trade Embargo",
+    "metrics": "population 17.5K \u00b7 treasury 34.1M GC \u00b7 stability 54/100 \u00b7 pollution 24/100"
   }
 ]
