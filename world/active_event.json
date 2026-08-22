@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-trade-embargo",
+  "category": "economic",
+  "rarity": "uncommon",
+  "title": "Trade Embargo",
+  "description": "A neighbouring country has imposed a trade embargo on the nation's core exports, dealing a heavy blow to foreign trade.",
+  "flavor": "Cargo ships are piling up in ports and exporters are crying foul.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "industry": -10,
+    "treasury": -50
+  },
+  "default_consequence": {
+    "stability": -8
+  },
+  "response_consequence": {
+    "industry": 5,
+    "treasury": 30
+  },
+  "response_hint": "Passing a trade diversification act can open new markets and reduce dependence.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-22T20:21:07.431393+00:00",
+  "issue_number": 1311
+}
