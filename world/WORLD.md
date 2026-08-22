@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-22*
+*Last updated: 2026-08-22 — [Law 126](laws/law-126.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Industrial Era |
-| Laws enacted | 125 |
+| Laws enacted | 126 |
 | Last enacted | 2026-08-22 |
-| Treasury | 34,112,760 Git Coins |
+| Treasury | 34,106,441 Git Coins |
 
 ### Policy
 
@@ -21,8 +21,8 @@
 | Industry | 64/100 |
 | Welfare | 62/100 |
 | Green Policy | 63/100 |
-| Defense | 61/100 |
-| Pollution *(derived)* | 12/100 |
+| Defense | 66/100 |
+| Pollution *(derived)* | 13/100 |
 
 ---
 
