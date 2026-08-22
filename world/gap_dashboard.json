@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-08-22T15:19:38.921984+00:00",
+  "updated_at": "2026-08-22T16:22:37.565053+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 63,
+      "current": 62,
       "target": 80,
-      "gap": 17
+      "gap": 18
     },
     {
       "name": "Heavy Industry Zone",
@@ -28,9 +28,9 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 19,
+      "current": 20,
       "target": 60,
-      "gap": 41
+      "gap": 40
     }
   ],
   "milestones_achieved": [
