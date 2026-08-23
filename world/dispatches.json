@@ -1,12 +1,5 @@
 [
   {
-    "tick": 872,
-    "date": "2026-08-23",
-    "narrative": "Tick 872: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 22K \u00b7 treasury 33.7M GC \u00b7 stability 53/100 \u00b7 pollution 24/100"
-  },
-  {
     "tick": 873,
     "date": "2026-08-23",
     "narrative": "Tick 873: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 881: autonomous tick applied \u00b7 event: Perfect Climate Year.",
     "changes": "autonomous tick applied \u00b7 event: Perfect Climate Year",
     "metrics": "population 24.7K \u00b7 treasury 33.7M GC \u00b7 stability 53/100 \u00b7 pollution 24/100"
+  },
+  {
+    "tick": 882,
+    "date": "2026-08-23",
+    "narrative": "Tick 882: autonomous tick applied \u00b7 event: Perfect Climate Year.",
+    "changes": "autonomous tick applied \u00b7 event: Perfect Climate Year",
+    "metrics": "population 25.3K \u00b7 treasury 33.7M GC \u00b7 stability 53/100 \u00b7 pollution 24/100"
   }
 ]
