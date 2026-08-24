@@ -137,3 +137,4 @@
 | 126 | [law-126](../world/laws/law-126.md) | [#1304](https://github.com/ordinary9843/gitizens/issues/1304) Strengthen Defense | 0+1 0-1 | 2026-08-22 |
 | 127 | [law-127](../world/laws/law-127.md) | [#1313](https://github.com/ordinary9843/gitizens/issues/1313) Strengthen Industry | 0+1 0-1 | 2026-08-23 |
 | 128 | [law-128](../world/laws/law-128.md) | [#1323](https://github.com/ordinary9843/gitizens/issues/1323) Strengthen Industry | 0+1 0-1 | 2026-08-24 |
+| 129 | [law-129](../world/laws/law-129.md) | [#1324](https://github.com/ordinary9843/gitizens/issues/1324) Strengthen Defense | 0+1 0-1 | 2026-08-24 |
