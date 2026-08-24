@@ -1,21 +1,5 @@
 [
   {
-    "tick": 802,
-    "date": "2026-08-20T08:36:56Z",
-    "laws_count": 118,
-    "era": "Industrial Era",
-    "education": 60,
-    "industry": 64,
-    "welfare": 59,
-    "green_policy": 57,
-    "defense": 59,
-    "pollution": 0,
-    "population": 5703,
-    "stability": 58,
-    "treasury": 34430821,
-    "active_event": "evt-haunted-building"
-  },
-  {
     "tick": 803,
     "date": "2026-08-20T09:33:45Z",
     "laws_count": 118,
@@ -1597,6 +1581,22 @@
     "population": 30731,
     "stability": 51,
     "treasury": 32855085,
+    "active_event": null
+  },
+  {
+    "tick": 902,
+    "date": "2026-08-24T20:29:04Z",
+    "laws_count": 131,
+    "era": "Industrial Era",
+    "education": 65,
+    "industry": 65,
+    "welfare": 65,
+    "green_policy": 67,
+    "defense": 62,
+    "pollution": 32,
+    "population": 30704,
+    "stability": 51,
+    "treasury": 32855480,
     "active_event": null
   }
 ]
