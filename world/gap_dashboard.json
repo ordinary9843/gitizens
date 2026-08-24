@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-24T12:48:09.260684+00:00",
+  "updated_at": "2026-08-24T13:50:54.250520+00:00",
   "pending": [
     {
       "name": "Heavy Industry Zone",
@@ -28,16 +28,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 29,
+      "current": 30,
       "target": 60,
-      "gap": 31
+      "gap": 30
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 29,
+      "current": 30,
       "target": 20,
-      "gap": 9
+      "gap": 10
     }
   ],
   "milestones_achieved": [
