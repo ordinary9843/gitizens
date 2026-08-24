@@ -1,12 +1,5 @@
 [
   {
-    "tick": 880,
-    "date": "2026-08-23",
-    "narrative": "Tick 880: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 24K \u00b7 treasury 33.7M GC \u00b7 stability 53/100 \u00b7 pollution 24/100"
-  },
-  {
     "tick": 881,
     "date": "2026-08-23",
     "narrative": "Tick 881: autonomous tick applied \u00b7 event: Perfect Climate Year.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 889: autonomous tick applied \u00b7 event: Foreign Direct Investment.",
     "changes": "autonomous tick applied \u00b7 event: Foreign Direct Investment",
     "metrics": "population 29.2K \u00b7 treasury 32.9M GC \u00b7 stability 54/100 \u00b7 pollution 24/100"
+  },
+  {
+    "tick": 890,
+    "date": "2026-08-24",
+    "narrative": "Tick 890: autonomous tick applied \u00b7 event: Foreign Direct Investment.",
+    "changes": "autonomous tick applied \u00b7 event: Foreign Direct Investment",
+    "metrics": "population 29.9K \u00b7 treasury 32.9M GC \u00b7 stability 54/100 \u00b7 pollution 25/100"
   }
 ]
