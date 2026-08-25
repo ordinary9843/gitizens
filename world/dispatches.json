@@ -1,12 +1,5 @@
 [
   {
-    "tick": 901,
-    "date": "2026-08-24",
-    "narrative": "Tick 901: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 30.7K \u00b7 treasury 32.9M GC \u00b7 stability 51/100 \u00b7 pollution 32/100"
-  },
-  {
     "tick": 902,
     "date": "2026-08-24",
     "narrative": "Tick 902: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 910: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Stock Market Crash.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Stock Market Crash",
     "metrics": "population 33.1K \u00b7 treasury 31.2M GC \u00b7 stability 34/100 \u00b7 pollution 32/100"
+  },
+  {
+    "tick": 911,
+    "date": "2026-08-25",
+    "narrative": "Tick 911: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Stock Market Crash.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Stock Market Crash",
+    "metrics": "population 33K \u00b7 treasury 31.2M GC \u00b7 stability 35/100 \u00b7 pollution 33/100"
   }
 ]
