@@ -140,3 +140,4 @@
 | 129 | [law-129](../world/laws/law-129.md) | [#1324](https://github.com/ordinary9843/gitizens/issues/1324) Strengthen Defense | 0+1 0-1 | 2026-08-24 |
 | 130 | [law-130](../world/laws/law-130.md) | [#1325](https://github.com/ordinary9843/gitizens/issues/1325) Strengthen Education | 0+1 0-1 | 2026-08-24 |
 | 131 | [law-131](../world/laws/law-131.md) | [#1327](https://github.com/ordinary9843/gitizens/issues/1327) Strengthen Green Policy | 0+1 0-1 | 2026-08-24 |
+| 132 | [law-132](../world/laws/law-132.md) | [#1334](https://github.com/ordinary9843/gitizens/issues/1334) Strengthen Defense | 0+1 0-1 | 2026-08-25 |
