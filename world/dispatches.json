@@ -1,12 +1,5 @@
 [
   {
-    "tick": 909,
-    "date": "2026-08-25",
-    "narrative": "Tick 909: autonomous tick applied \u00b7 event: Surge in Immigration.",
-    "changes": "autonomous tick applied \u00b7 event: Surge in Immigration",
-    "metrics": "population 32.9K \u00b7 treasury 32.8M GC \u00b7 stability 52/100 \u00b7 pollution 32/100"
-  },
-  {
     "tick": 910,
     "date": "2026-08-25",
     "narrative": "Tick 910: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Stock Market Crash.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 918: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 35.2K \u00b7 treasury 31.2M GC \u00b7 stability 42/100 \u00b7 pollution 36/100"
+  },
+  {
+    "tick": 919,
+    "date": "2026-08-25",
+    "narrative": "Tick 919: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 35.7K \u00b7 treasury 31.2M GC \u00b7 stability 43/100 \u00b7 pollution 36/100"
   }
 ]
