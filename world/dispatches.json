@@ -1,12 +1,5 @@
 [
   {
-    "tick": 914,
-    "date": "2026-08-25",
-    "narrative": "Tick 914: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 34K \u00b7 treasury 31.2M GC \u00b7 stability 38/100 \u00b7 pollution 36/100"
-  },
-  {
     "tick": 915,
     "date": "2026-08-25",
     "narrative": "Tick 915: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 923: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 36.6K \u00b7 treasury 31.2M GC \u00b7 stability 47/100 \u00b7 pollution 36/100"
+  },
+  {
+    "tick": 924,
+    "date": "2026-08-25",
+    "narrative": "Tick 924: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 37.2K \u00b7 treasury 31.2M GC \u00b7 stability 48/100 \u00b7 pollution 36/100"
   }
 ]
