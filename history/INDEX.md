@@ -144,3 +144,4 @@
 | 133 | [law-133](../world/laws/law-133.md) | [#1336](https://github.com/ordinary9843/gitizens/issues/1336) Strengthen Welfare | 0+1 0-1 | 2026-08-25 |
 | 134 | [law-134](../world/laws/law-134.md) | [#1337](https://github.com/ordinary9843/gitizens/issues/1337) Strengthen Industry | 0+1 0-1 | 2026-08-25 |
 | 135 | [law-135](../world/laws/law-135.md) | [#1339](https://github.com/ordinary9843/gitizens/issues/1339) Strengthen Education | 0+1 0-1 | 2026-08-25 |
+| 136 | [law-136](../world/laws/law-136.md) | [#1346](https://github.com/ordinary9843/gitizens/issues/1346) Strengthen Industry | 0+1 0-1 | 2026-08-26 |
