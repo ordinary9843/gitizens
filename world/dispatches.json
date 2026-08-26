@@ -1,12 +1,5 @@
 [
   {
-    "tick": 932,
-    "date": "2026-08-26",
-    "narrative": "Tick 932: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 37.1K \u00b7 treasury 27.9M GC \u00b7 stability 48/100 \u00b7 pollution 40/100"
-  },
-  {
     "tick": 933,
     "date": "2026-08-26",
     "narrative": "Tick 933: autonomous tick applied \u00b7 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 941: autonomous tick applied \u00b7 event: Nobel Peace Prize.",
     "changes": "autonomous tick applied \u00b7 event: Nobel Peace Prize",
     "metrics": "population 37.7K \u00b7 treasury 27.8M GC \u00b7 stability 67/100 \u00b7 pollution 41/100"
+  },
+  {
+    "tick": 942,
+    "date": "2026-08-26",
+    "narrative": "Tick 942: autonomous tick applied \u00b7 event: Nobel Peace Prize.",
+    "changes": "autonomous tick applied \u00b7 event: Nobel Peace Prize",
+    "metrics": "population 38.7K \u00b7 treasury 27.8M GC \u00b7 stability 65/100 \u00b7 pollution 41/100"
   }
 ]
