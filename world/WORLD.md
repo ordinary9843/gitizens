@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-28 — [Law 141](laws/law-141.md)*
+*Last updated: 2026-08-28*
 
 ---
 
