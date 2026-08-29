@@ -151,3 +151,4 @@
 | 140 | [law-140](../world/laws/law-140.md) | [#1355](https://github.com/ordinary9843/gitizens/issues/1355) Strengthen Industry | 0+1 0-1 | 2026-08-27 |
 | 141 | [law-141](../world/laws/law-141.md) | [#1356](https://github.com/ordinary9843/gitizens/issues/1356) Strengthen Green Policy | 0+1 0-1 | 2026-08-28 |
 | 142 | [law-142](../world/laws/law-142.md) | [#1358](https://github.com/ordinary9843/gitizens/issues/1358) Strengthen Welfare | 0+1 0-1 | 2026-08-28 |
+| 143 | [law-143](../world/laws/law-143.md) | [#1359](https://github.com/ordinary9843/gitizens/issues/1359) Strengthen Education | 0+1 0-1 | 2026-08-29 |
