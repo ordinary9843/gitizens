@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-social-media-revolution",
+  "category": "social",
+  "rarity": "uncommon",
+  "title": "Social Media Revolution",
+  "description": "A new generation of decentralised social platforms has risen, the influence of traditional media has plummeted, and information flows are increasingly hard to control.",
+  "flavor": "Politicians have discovered for the first time that they can no longer control public opinion.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "stability": -5,
+    "education": 3
+  },
+  "default_consequence": {
+    "stability": -5
+  },
+  "response_consequence": {
+    "education": 5,
+    "stability": 3
+  },
+  "response_hint": "Passing a digital civic literacy education act can boost society's immunity to misinformation.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-08-29T16:58:48.568533+00:00",
+  "issue_number": 1360
+}

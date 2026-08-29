@@ -21,17 +21,17 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 ## Current World Status
 
 <!-- WORLD-STATE-START -->
-![Era](https://img.shields.io/badge/Era-Industrial_Era-e3b341?style=flat-square&logo=github)
-![Population](https://img.shields.io/badge/Population-35.9K-3fb950?style=flat-square)
+![Era](https://img.shields.io/badge/Era-Founding_Era-e3b341?style=flat-square&logo=github)
+![Population](https://img.shields.io/badge/Population-35.4K-3fb950?style=flat-square)
 ![Treasury](https://img.shields.io/badge/Treasury-21.2M_GC-388bfd?style=flat-square)
-![Stability](https://img.shields.io/badge/Stability-43%2F100-bc8cff?style=flat-square)
+![Stability](https://img.shields.io/badge/Stability-38%2F100-bc8cff?style=flat-square)
 ![Pollution](https://img.shields.io/badge/Pollution-53%2F100-f85149?style=flat-square)
 ![Laws](https://img.shields.io/badge/Laws-143_enacted-8b949e?style=flat-square)
 <!-- WORLD-STATE-END -->
 
 <!-- STATE_START -->
-**Era:** Industrial Era | **Laws enacted:** 143 | [World state](world/WORLD.md)  
-**Next tick:** 2026-08-29T13:00:00Z UTC
+**Era:** Founding Era | **Laws enacted:** 143 | [World state](world/WORLD.md)  
+**Next tick:** 2026-08-29T17:00:00Z UTC
 <!-- STATE_END -->
 
 ---
