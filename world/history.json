@@ -1,21 +1,5 @@
 [
   {
-    "tick": 851,
-    "date": "2026-08-22T13:30:39Z",
-    "laws_count": 126,
-    "era": "Industrial Era",
-    "education": 63,
-    "industry": 63,
-    "welfare": 67,
-    "green_policy": 62,
-    "defense": 66,
-    "pollution": 17,
-    "population": 15829,
-    "stability": 57,
-    "treasury": 34107670,
-    "active_event": "evt-mass-dancing"
-  },
-  {
     "tick": 852,
     "date": "2026-08-22T14:19:58Z",
     "laws_count": 126,
@@ -1597,6 +1581,22 @@
     "population": 36180,
     "stability": 43,
     "treasury": 21183851,
+    "active_event": null
+  },
+  {
+    "tick": 951,
+    "date": "2026-08-29T12:21:19Z",
+    "laws_count": 143,
+    "era": "Industrial Era",
+    "education": 60,
+    "industry": 60,
+    "welfare": 62,
+    "green_policy": 65,
+    "defense": 62,
+    "pollution": 53,
+    "population": 35905,
+    "stability": 43,
+    "treasury": 21184837,
     "active_event": null
   }
 ]
