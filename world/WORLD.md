@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-08-29*
+*Last updated: 2026-08-30 — [Law 145](laws/law-145.md)*
 
 ---
 
@@ -9,20 +9,20 @@
 | Field | Value |
 |-------|-------|
 | Era | Industrial Era |
-| Laws enacted | 144 |
-| Last enacted | 2026-08-29 |
-| Treasury | 8,080,986 Git Coins |
+| Laws enacted | 145 |
+| Last enacted | 2026-08-30 |
+| Treasury | 7,876,966 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 62/100 |
-| Industry | 64/100 |
+| Education | 61/100 |
+| Industry | 63/100 |
 | Welfare | 61/100 |
-| Green Policy | 63/100 |
+| Green Policy | 68/100 |
 | Defense | 59/100 |
-| Pollution *(derived)* | 56/100 |
+| Pollution *(derived)* | 59/100 |
 
 ---
 
