@@ -1,18 +1,11 @@
 {
-  "updated_at": "2026-08-30T13:35:03.718258+00:00",
+  "updated_at": "2026-08-30T17:56:02.134895+00:00",
   "pending": [
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 62,
+      "current": 61,
       "target": 80,
-      "gap": 18
-    },
-    {
-      "name": "Eco-Research Center",
-      "metric": "green_policy",
-      "current": 66,
-      "target": 85,
       "gap": 19
     },
     {
@@ -20,6 +13,13 @@
       "metric": "education",
       "current": 60,
       "target": 80,
+      "gap": 20
+    },
+    {
+      "name": "Eco-Research Center",
+      "metric": "green_policy",
+      "current": 65,
+      "target": 85,
       "gap": 20
     }
   ],
