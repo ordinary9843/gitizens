@@ -1,12 +1,5 @@
 [
   {
-    "tick": 953,
-    "date": "2026-08-29",
-    "narrative": "Tick 953: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Social Media Revolution.",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Social Media Revolution",
-    "metrics": "population 35.2K \u00b7 treasury 8.1M GC \u00b7 stability 41/100 \u00b7 pollution 53/100"
-  },
-  {
     "tick": 954,
     "date": "2026-08-29",
     "narrative": "Tick 954: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 962: autonomous tick applied \u00b7 event: Surveillance Technology Emerges.",
     "changes": "autonomous tick applied \u00b7 event: Surveillance Technology Emerges",
     "metrics": "population 35.9K \u00b7 treasury 7.8M GC \u00b7 stability 35/100 \u00b7 pollution 59/100"
+  },
+  {
+    "tick": 963,
+    "date": "2026-08-31",
+    "narrative": "Tick 963: autonomous tick applied \u00b7 1 law enacted.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted",
+    "metrics": "population 35.6K \u00b7 treasury 7.8M GC \u00b7 stability 33/100 \u00b7 pollution 59/100"
   }
 ]
