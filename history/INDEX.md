@@ -156,3 +156,4 @@
 | 145 | [law-145](../world/laws/law-145.md) | [#1362](https://github.com/ordinary9843/gitizens/issues/1362) Strengthen Green Policy | 0+1 0-1 | 2026-08-30 |
 | 146 | [law-146](../world/laws/law-146.md) | [#1365](https://github.com/ordinary9843/gitizens/issues/1365) Strengthen Defense | 0+1 0-1 | 2026-08-31 |
 | 147 | [law-147](../world/laws/law-147.md) | [#1367](https://github.com/ordinary9843/gitizens/issues/1367) Strengthen Education | 0+1 0-1 | 2026-08-31 |
+| 148 | [law-148](../world/laws/law-148.md) | [#1370](https://github.com/ordinary9843/gitizens/issues/1370) Strengthen Green Policy | 0+1 0-1 | 2026-09-01 |
