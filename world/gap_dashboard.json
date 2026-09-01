@@ -1,26 +1,26 @@
 {
-  "updated_at": "2026-09-01T01:40:18.884139+00:00",
+  "updated_at": "2026-09-01T07:19:16.586661+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 62,
+      "current": 61,
       "target": 80,
-      "gap": 18
+      "gap": 19
     },
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 67,
+      "current": 66,
       "target": 85,
-      "gap": 18
+      "gap": 19
     },
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 57,
+      "current": 56,
       "target": 80,
-      "gap": 23
+      "gap": 24
     }
   ],
   "at_risk": [],
