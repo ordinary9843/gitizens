@@ -1,0 +1,7 @@
+{
+  "id": "sec-005",
+  "name": "Smog Zone",
+  "built_law": 150,
+  "built_at": "2026-09-02T20:33:17.799411+00:00",
+  "auto_trigger": "pollution >= 60"
+}
