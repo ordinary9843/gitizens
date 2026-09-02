@@ -1,23 +1,25 @@
 {
-  "id": "evt-perfect-climate",
+  "id": "evt-volcanic-winter",
   "category": "natural",
-  "rarity": "common",
-  "title": "Perfect Climate Year",
-  "description": "An unusually mild climate this year has produced a bumper harvest and filled city parks with active citizens.",
-  "flavor": "Farmers say this is the best year in thirty years.",
+  "rarity": "uncommon",
+  "title": "Volcanic Ash Winter",
+  "description": "A distant volcanic eruption has blanketed the sky in ash, causing temperatures to plummet and devastating agriculture.",
+  "flavor": "The sky has turned an eerie orange and citizens are unnerved.",
   "trigger_conditions": {},
   "immediate_effects": {
-    "green_policy": 5,
-    "welfare": 3
+    "pollution": 15,
+    "green_policy": -8
   },
-  "default_consequence": {},
+  "default_consequence": {
+    "welfare": -8,
+    "stability": -5
+  },
   "response_consequence": {
-    "population": 200,
-    "welfare": 3
+    "welfare": 5
   },
-  "response_hint": "Passing an agricultural promotion act can convert the bumper harvest into long-term population growth.",
+  "response_hint": "Passing an emergency civilian relief act can cushion the welfare impact.",
   "duration_hours": 4,
   "issue_label": "event",
-  "fired_at": "2026-09-02T08:25:34.519494+00:00",
-  "issue_number": 1374
+  "fired_at": "2026-09-02T13:15:50.983755+00:00",
+  "issue_number": 1376
 }
