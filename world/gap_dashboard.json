@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-03T06:53:26.457284+00:00",
+  "updated_at": "2026-09-03T11:56:52.782777+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -18,9 +18,9 @@
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 54,
+      "current": 52,
       "target": 80,
-      "gap": 26
+      "gap": 28
     }
   ],
   "at_risk": [
