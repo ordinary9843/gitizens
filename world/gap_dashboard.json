@@ -1,42 +1,29 @@
 {
-  "updated_at": "2026-09-04T14:48:24.205377+00:00",
+  "updated_at": "2026-09-04T18:07:38.616778+00:00",
   "pending": [
-    {
-      "name": "Academy of Sciences",
-      "metric": "education",
-      "current": 56,
-      "target": 80,
-      "gap": 24
-    },
-    {
-      "name": "Eco-Research Center",
-      "metric": "green_policy",
-      "current": 59,
-      "target": 85,
-      "gap": 26
-    },
-    {
-      "name": "Heavy Industry Zone",
-      "metric": "industry",
-      "current": 42,
-      "target": 80,
-      "gap": 38
-    }
-  ],
-  "at_risk": [
-    {
-      "name": "Industrial Complex",
-      "metric": "industry",
-      "current": 42,
-      "removal_at": 45
-    },
     {
       "name": "Defense Ministry",
       "metric": "defense",
       "current": 53,
-      "removal_at": 55
+      "target": 65,
+      "gap": 12
+    },
+    {
+      "name": "Industrial Complex",
+      "metric": "industry",
+      "current": 42,
+      "target": 55,
+      "gap": 13
+    },
+    {
+      "name": "Eco-Research Center",
+      "metric": "green_policy",
+      "current": 64,
+      "target": 85,
+      "gap": 21
     }
   ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "recovery/air-cleaned",
