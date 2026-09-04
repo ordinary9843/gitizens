@@ -1,0 +1,10 @@
+{
+  "id": "sec-002",
+  "name": "Industrial Complex",
+  "built_law": 15,
+  "built_at": "2026-06-15T06:23:43.148153+00:00",
+  "auto_trigger": "industry >= 55",
+  "demolished_law": 152,
+  "demolished_at": "2026-09-04T18:07:30.813641+00:00",
+  "auto_reason": "industry < 45"
+}
