@@ -1,12 +1,5 @@
 [
   {
-    "tick": 973,
-    "date": "2026-09-02",
-    "narrative": "Tick 973: autonomous tick applied \u00b7 event: Volcanic Ash Winter.",
-    "changes": "autonomous tick applied \u00b7 event: Volcanic Ash Winter",
-    "metrics": "population 32K \u00b7 treasury 6.6M GC \u00b7 stability 41/100 \u00b7 pollution 74/100"
-  },
-  {
     "tick": 974,
     "date": "2026-09-02",
     "narrative": "Tick 974: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 982: autonomous tick applied \u00b7 event: The Wealthy Vanish Overnight.",
     "changes": "autonomous tick applied \u00b7 event: The Wealthy Vanish Overnight",
     "metrics": "population 31.9K \u00b7 treasury 4.9M GC \u00b7 stability 18/100 \u00b7 pollution 74/100"
+  },
+  {
+    "tick": 983,
+    "date": "2026-09-04",
+    "narrative": "Tick 983: autonomous tick applied \u00b7 event: The Wealthy Vanish Overnight.",
+    "changes": "autonomous tick applied \u00b7 event: The Wealthy Vanish Overnight",
+    "metrics": "population 31.2K \u00b7 treasury 4.9M GC \u00b7 stability 20/100 \u00b7 pollution 74/100"
   }
 ]
