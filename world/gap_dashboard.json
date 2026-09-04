@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-04T21:15:22.452834+00:00",
+  "updated_at": "2026-09-04T23:44:46.049429+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -18,9 +18,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 64,
+      "current": 62,
       "target": 85,
-      "gap": 21
+      "gap": 23
     }
   ],
   "at_risk": [],
@@ -28,9 +28,9 @@
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 71,
+      "current": 69,
       "target": 20,
-      "gap": 51
+      "gap": 49
     }
   ],
   "milestones_achieved": [
