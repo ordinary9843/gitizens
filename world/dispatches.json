@@ -1,12 +1,5 @@
 [
   {
-    "tick": 982,
-    "date": "2026-09-03",
-    "narrative": "Tick 982: autonomous tick applied \u00b7 event: The Wealthy Vanish Overnight.",
-    "changes": "autonomous tick applied \u00b7 event: The Wealthy Vanish Overnight",
-    "metrics": "population 31.9K \u00b7 treasury 4.9M GC \u00b7 stability 18/100 \u00b7 pollution 74/100"
-  },
-  {
     "tick": 983,
     "date": "2026-09-04",
     "narrative": "Tick 983: autonomous tick applied \u00b7 event: The Wealthy Vanish Overnight.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 991: autonomous tick applied \u00b7 event: Mental Health Crisis.",
     "changes": "autonomous tick applied \u00b7 event: Mental Health Crisis",
     "metrics": "population 28K \u00b7 treasury 1.7M GC \u00b7 stability 27/100 \u00b7 pollution 69/100"
+  },
+  {
+    "tick": 992,
+    "date": "2026-09-05",
+    "narrative": "Tick 992: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 26.7K \u00b7 treasury 1.7M GC \u00b7 stability 23/100 \u00b7 pollution 69/100"
   }
 ]
