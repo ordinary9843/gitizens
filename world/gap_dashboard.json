@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-06T18:51:44.821144+00:00",
+  "updated_at": "2026-09-06T21:03:44.947723+00:00",
   "pending": [
     {
       "name": "Industrial Complex",
@@ -11,19 +11,26 @@
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 52,
+      "current": 51,
       "target": 65,
-      "gap": 13
+      "gap": 14
     },
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 58,
+      "current": 57,
       "target": 80,
-      "gap": 22
+      "gap": 23
     }
   ],
-  "at_risk": [],
+  "at_risk": [
+    {
+      "name": "Social Housing District",
+      "metric": "welfare",
+      "current": 52,
+      "removal_at": 48
+    }
+  ],
   "milestones_pending": [
     {
       "tag": "recovery/air-cleaned",
