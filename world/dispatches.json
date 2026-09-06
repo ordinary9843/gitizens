@@ -1,12 +1,5 @@
 [
   {
-    "tick": 994,
-    "date": "2026-09-05",
-    "narrative": "Tick 994: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 26K \u00b7 treasury 1.7M GC \u00b7 stability 28/100 \u00b7 pollution 69/100"
-  },
-  {
     "tick": 995,
     "date": "2026-09-05",
     "narrative": "Tick 995: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1003: autonomous tick applied \u00b7 event: Government Building Haunting.",
     "changes": "autonomous tick applied \u00b7 event: Government Building Haunting",
     "metrics": "population 27.1K \u00b7 treasury 1.7M GC \u00b7 stability 30/100 \u00b7 pollution 69/100"
+  },
+  {
+    "tick": 1004,
+    "date": "2026-09-06",
+    "narrative": "Tick 1004: autonomous tick applied \u00b7 event: Government Building Haunting.",
+    "changes": "autonomous tick applied \u00b7 event: Government Building Haunting",
+    "metrics": "population 27.1K \u00b7 treasury 1.7M GC \u00b7 stability 32/100 \u00b7 pollution 69/100"
   }
 ]
