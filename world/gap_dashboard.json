@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-05T22:39:16.213341+00:00",
+  "updated_at": "2026-09-06T00:36:03.147778+00:00",
   "pending": [
     {
       "name": "Industrial Complex",
       "metric": "industry",
-      "current": 47,
+      "current": 52,
       "target": 55,
-      "gap": 8
+      "gap": 3
     },
     {
       "name": "Defense Ministry",
