@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-07T08:57:28.886273+00:00",
+  "updated_at": "2026-09-07T14:55:58.871200+00:00",
   "pending": [
     {
       "name": "Industrial Complex",
@@ -27,7 +27,7 @@
     {
       "name": "Social Housing District",
       "metric": "welfare",
-      "current": 52,
+      "current": 51,
       "removal_at": 48
     }
   ],
