@@ -1,12 +1,5 @@
 [
   {
-    "tick": 998,
-    "date": "2026-09-06",
-    "narrative": "Tick 998: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 26.9K \u00b7 treasury 1.7M GC \u00b7 stability 33/100 \u00b7 pollution 69/100"
-  },
-  {
     "tick": 999,
     "date": "2026-09-06",
     "narrative": "Tick 999: autonomous tick applied \u00b7 event: Mass UFO Sighting.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1007: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 27.1K \u00b7 treasury 1.7M GC \u00b7 stability 31/100 \u00b7 pollution 69/100"
+  },
+  {
+    "tick": 1008,
+    "date": "2026-09-07",
+    "narrative": "Tick 1008: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 28.3K \u00b7 treasury 1.7M GC \u00b7 stability 31/100 \u00b7 pollution 69/100"
   }
 ]
