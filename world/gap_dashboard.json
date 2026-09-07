@@ -1,13 +1,6 @@
 {
-  "updated_at": "2026-09-07T19:01:05.853729+00:00",
+  "updated_at": "2026-09-07T22:31:24.940436+00:00",
   "pending": [
-    {
-      "name": "Industrial Complex",
-      "metric": "industry",
-      "current": 50,
-      "target": 55,
-      "gap": 5
-    },
     {
       "name": "Defense Ministry",
       "metric": "defense",
@@ -21,6 +14,13 @@
       "current": 56,
       "target": 80,
       "gap": 24
+    },
+    {
+      "name": "Heavy Industry Zone",
+      "metric": "industry",
+      "current": 55,
+      "target": 80,
+      "gap": 25
     }
   ],
   "at_risk": [
