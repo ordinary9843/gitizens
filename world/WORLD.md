@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-07*
+*Last updated: 2026-09-07 — [Law 155](laws/law-155.md)*
 
 ---
 
@@ -9,18 +9,18 @@
 | Field | Value |
 |-------|-------|
 | Era | Founding Era |
-| Laws enacted | 154 |
-| Last enacted | 2026-09-06 |
-| Treasury | 1,686,568 Git Coins |
+| Laws enacted | 155 |
+| Last enacted | 2026-09-07 |
+| Treasury | 1,686,855 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 56/100 |
-| Industry | 50/100 |
+| Industry | 55/100 |
 | Welfare | 51/100 |
-| Green Policy | 60/100 |
+| Green Policy | 59/100 |
 | Defense | 51/100 |
 | Pollution *(derived)* | 69/100 |
 
@@ -56,6 +56,7 @@
 |----|------|----------|---------|
 | `sec-001` | Manufacturing District | [Law 007](laws/law-007.md) | industry >= 25 |
 | `sec-005` | Smog Zone | [Law 150](laws/law-150.md) | pollution >= 60 |
+| `sec-006` | Industrial Complex | [Law 155](laws/law-155.md) | industry >= 55 |
 
 ---
 
