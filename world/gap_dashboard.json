@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-08T14:54:37.765466+00:00",
+  "updated_at": "2026-09-08T18:20:22.284857+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -9,18 +9,18 @@
       "gap": 9
     },
     {
+      "name": "Heavy Industry Zone",
+      "metric": "industry",
+      "current": 60,
+      "target": 80,
+      "gap": 20
+    },
+    {
       "name": "Academy of Sciences",
       "metric": "education",
       "current": 56,
       "target": 80,
       "gap": 24
-    },
-    {
-      "name": "Heavy Industry Zone",
-      "metric": "industry",
-      "current": 55,
-      "target": 80,
-      "gap": 25
     }
   ],
   "at_risk": [
