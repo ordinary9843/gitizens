@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-08T10:39:48.669917+00:00",
+  "updated_at": "2026-09-08T14:54:37.765466+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -25,10 +25,10 @@
   ],
   "at_risk": [
     {
-      "name": "Social Housing District",
-      "metric": "welfare",
-      "current": 51,
-      "removal_at": 48
+      "name": "Nature Reserve",
+      "metric": "green_policy",
+      "current": 56,
+      "removal_at": 52
     }
   ],
   "milestones_pending": [
