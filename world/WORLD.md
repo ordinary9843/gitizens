@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-08 — [Law 156](laws/law-156.md)*
+*Last updated: 2026-09-08*
 
 ---
 
