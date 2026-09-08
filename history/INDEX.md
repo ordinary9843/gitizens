@@ -164,3 +164,4 @@
 | 153 | [law-153](../world/laws/law-153.md) | [#1389](https://github.com/ordinary9843/gitizens/issues/1389) Strengthen Industry | 0+1 0-1 | 2026-09-05 |
 | 154 | [law-154](../world/laws/law-154.md) | [#1391](https://github.com/ordinary9843/gitizens/issues/1391) Strengthen Industry | 0+1 0-1 | 2026-09-06 |
 | 155 | [law-155](../world/laws/law-155.md) | [#1401](https://github.com/ordinary9843/gitizens/issues/1401) Strengthen Industry | 0+1 0-1 | 2026-09-07 |
+| 156 | [law-156](../world/laws/law-156.md) | [#1402](https://github.com/ordinary9843/gitizens/issues/1402) Strengthen Defense | 0+1 0-1 | 2026-09-08 |
