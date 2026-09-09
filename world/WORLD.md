@@ -11,7 +11,7 @@
 | Era | Crisis Age |
 | Laws enacted | 159 |
 | Last enacted | 2026-09-09 |
-| Treasury | 1,699,625 Git Coins |
+| Treasury | 1,700,082 Git Coins |
 
 ### Policy
 
