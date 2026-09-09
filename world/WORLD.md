@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-09*
+*Last updated: 2026-09-09 — [Law 159](laws/law-159.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 158 |
-| Last enacted | 2026-09-08 |
-| Treasury | 1,699,139 Git Coins |
+| Laws enacted | 159 |
+| Last enacted | 2026-09-09 |
+| Treasury | 1,699,625 Git Coins |
 
 ### Policy
 
@@ -21,7 +21,7 @@
 | Industry | 55/100 |
 | Welfare | 55/100 |
 | Green Policy | 55/100 |
-| Defense | 55/100 |
+| Defense | 60/100 |
 | Pollution *(derived)* | 90/100 |
 
 ---
