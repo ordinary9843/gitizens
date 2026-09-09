@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-09T08:40:28.132127+00:00",
+  "updated_at": "2026-09-09T13:26:42.770981+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -11,9 +11,9 @@
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 58,
+      "current": 57,
       "target": 80,
-      "gap": 22
+      "gap": 23
     },
     {
       "name": "Academy of Sciences",
@@ -35,9 +35,9 @@
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 83,
+      "current": 88,
       "target": 20,
-      "gap": 63
+      "gap": 68
     }
   ],
   "milestones_achieved": [
