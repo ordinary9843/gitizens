@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-08*
+*Last updated: 2026-09-09*
 
 ---
 
@@ -8,21 +8,21 @@
 
 | Field | Value |
 |-------|-------|
-| Era | Industrial Era |
+| Era | Crisis Age |
 | Laws enacted | 158 |
 | Last enacted | 2026-09-08 |
-| Treasury | 1,693,210 Git Coins |
+| Treasury | 1,694,739 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 56/100 |
-| Industry | 60/100 |
+| Education | 55/100 |
+| Industry | 59/100 |
 | Welfare | 56/100 |
 | Green Policy | 56/100 |
 | Defense | 56/100 |
-| Pollution *(derived)* | 74/100 |
+| Pollution *(derived)* | 78/100 |
 
 ---
 

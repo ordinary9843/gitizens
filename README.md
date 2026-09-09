@@ -21,17 +21,17 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 ## Current World Status
 
 <!-- WORLD-STATE-START -->
-![Era](https://img.shields.io/badge/Era-Industrial_Era-e3b341?style=flat-square&logo=github)
-![Population](https://img.shields.io/badge/Population-31.1K-3fb950?style=flat-square)
+![Era](https://img.shields.io/badge/Era-Crisis_Age-e3b341?style=flat-square&logo=github)
+![Population](https://img.shields.io/badge/Population-30.5K-3fb950?style=flat-square)
 ![Treasury](https://img.shields.io/badge/Treasury-1.7M_GC-388bfd?style=flat-square)
-![Stability](https://img.shields.io/badge/Stability-34%2F100-bc8cff?style=flat-square)
-![Pollution](https://img.shields.io/badge/Pollution-74%2F100-f85149?style=flat-square)
+![Stability](https://img.shields.io/badge/Stability-32%2F100-bc8cff?style=flat-square)
+![Pollution](https://img.shields.io/badge/Pollution-78%2F100-f85149?style=flat-square)
 ![Laws](https://img.shields.io/badge/Laws-158_enacted-8b949e?style=flat-square)
 <!-- WORLD-STATE-END -->
 
 <!-- STATE_START -->
-**Era:** Industrial Era | **Laws enacted:** 158 | [World state](world/WORLD.md)  
-**Next tick:** 2026-09-09T00:00:00Z UTC
+**Era:** Crisis Age | **Laws enacted:** 158 | [World state](world/WORLD.md)  
+**Next tick:** 2026-09-09T04:00:00Z UTC
 <!-- STATE_END -->
 
 ---
