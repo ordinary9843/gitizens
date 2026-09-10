@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10T10:42:12.964720+00:00",
+  "updated_at": "2026-09-10T14:50:55.909861+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -27,7 +27,7 @@
     {
       "name": "Nature Reserve",
       "metric": "green_policy",
-      "current": 55,
+      "current": 54,
       "removal_at": 52
     }
   ],
@@ -35,16 +35,16 @@
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 90,
+      "current": 88,
       "target": 20,
-      "gap": 70
+      "gap": 68
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 856,
+      "current": 504,
       "target": 2000,
-      "gap": 1144
+      "gap": 1496
     }
   ],
   "milestones_achieved": [
