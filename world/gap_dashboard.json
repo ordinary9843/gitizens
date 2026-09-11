@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-11T08:36:34.304399+00:00",
+  "updated_at": "2026-09-11T13:16:21.917334+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -11,9 +11,9 @@
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 58,
+      "current": 57,
       "target": 80,
-      "gap": 22
+      "gap": 23
     },
     {
       "name": "Eco-Research Center",
@@ -28,9 +28,9 @@
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 88,
+      "current": 83,
       "target": 20,
-      "gap": 68
+      "gap": 63
     },
     {
       "tag": "milestone/population-boom",
