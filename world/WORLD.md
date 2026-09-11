@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-11 — [Law 163](laws/law-163.md)*
+*Last updated: 2026-09-11*
 
 ---
 
@@ -17,9 +17,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Education | 60/100 |
+| Education | 63/100 |
 | Industry | 58/100 |
-| Welfare | 60/100 |
+| Welfare | 65/100 |
 | Green Policy | 57/100 |
 | Defense | 56/100 |
 | Pollution *(derived)* | 79/100 |
