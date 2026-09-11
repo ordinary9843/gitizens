@@ -169,3 +169,4 @@
 | 158 | [law-158](../world/laws/law-158.md) | [#1404](https://github.com/ordinary9843/gitizens/issues/1404) Strengthen Industry | 0+1 0-1 | 2026-09-08 |
 | 159 | [law-159](../world/laws/law-159.md) | [#1408](https://github.com/ordinary9843/gitizens/issues/1408) Strengthen Defense | 0+1 0-1 | 2026-09-09 |
 | 160 | [law-160](../world/laws/law-160.md) | [#1409](https://github.com/ordinary9843/gitizens/issues/1409) Strengthen Education | 0+1 0-1 | 2026-09-10 |
+| 161 | [law-161](../world/laws/law-161.md) | [#1413](https://github.com/ordinary9843/gitizens/issues/1413) Strengthen Green Policy | 0+1 0-1 | 2026-09-11 |
