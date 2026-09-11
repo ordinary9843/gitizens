@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-10*
+*Last updated: 2026-09-11*
 
 ---
 
@@ -11,7 +11,7 @@
 | Era | Crisis Age |
 | Laws enacted | 160 |
 | Last enacted | 2026-09-10 |
-| Treasury | 1,705,344 Git Coins |
+| Treasury | 1,706,184 Git Coins |
 
 ### Policy
 
