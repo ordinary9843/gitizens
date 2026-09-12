@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-11T22:59:36.637215+00:00",
+  "updated_at": "2026-09-12T01:01:51.359635+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 56,
+      "current": 61,
       "target": 65,
-      "gap": 9
+      "gap": 4
     },
     {
       "name": "Academy of Sciences",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 1024,
+      "current": 965,
       "target": 2000,
-      "gap": 976
+      "gap": 1035
     }
   ],
   "milestones_achieved": [
