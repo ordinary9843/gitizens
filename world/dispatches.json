@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1028,
-    "date": "2026-09-10",
-    "narrative": "Tick 1028: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 199 \u00b7 treasury 1.7M GC \u00b7 stability 0/100 \u00b7 pollution 88/100"
-  },
-  {
     "tick": 1029,
     "date": "2026-09-10",
     "narrative": "Tick 1029: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1037: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Rare Mineral Vein Discovered.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Rare Mineral Vein Discovered",
     "metrics": "population 840 \u00b7 treasury 1.7M GC \u00b7 stability 14/100 \u00b7 pollution 79/100"
+  },
+  {
+    "tick": 1038,
+    "date": "2026-09-12",
+    "narrative": "Tick 1038: autonomous tick applied \u00b7 1 law enacted.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted",
+    "metrics": "population 817 \u00b7 treasury 1.7M GC \u00b7 stability 19/100 \u00b7 pollution 74/100"
   }
 ]
