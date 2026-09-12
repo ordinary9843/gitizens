@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-12T21:13:58.316952+00:00",
+  "updated_at": "2026-09-12T23:46:05.721141+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 661,
+      "current": 644,
       "target": 2000,
-      "gap": 1339
+      "gap": 1356
     }
   ],
   "milestones_achieved": [
