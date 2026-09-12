@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-12 — [Law 165](laws/law-165.md)*
+*Last updated: 2026-09-12*
 
 ---
 
@@ -11,7 +11,7 @@
 | Era | Crisis Age |
 | Laws enacted | 165 |
 | Last enacted | 2026-09-12 |
-| Treasury | 1,710,182 Git Coins |
+| Treasury | 1,710,382 Git Coins |
 
 ### Policy
 

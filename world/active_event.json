@@ -1,23 +1,26 @@
 {
-  "id": "evt-medical-robots",
-  "category": "scientific",
-  "rarity": "common",
-  "title": "Medical Robots Go Mainstream",
-  "description": "Low-cost surgical robots have begun deployment in community medical facilities, dramatically improving healthcare efficiency.",
-  "flavor": "Surgeons are somewhat worried; patients are raving about shorter waiting times.",
-  "trigger_conditions": {},
+  "id": "evt-mineral-discovery",
+  "category": "natural",
+  "rarity": "legendary",
+  "title": "Rare Mineral Vein Discovered",
+  "description": "A geological survey has found a massive rare-earth vein within the nation's borders \u2014 a discovery of extraordinary economic value.",
+  "flavor": "The stock market soared on the news, and foreign envoys are queuing at the door.",
+  "trigger_conditions": {
+    "industry": {
+      "min": 20
+    }
+  },
   "immediate_effects": {
-    "welfare": 5,
-    "education": 3
+    "treasury": 200
   },
   "default_consequence": {},
   "response_consequence": {
-    "welfare": 8,
-    "population": 300
+    "industry": 5,
+    "treasury": 100
   },
-  "response_hint": "Passing a healthcare modernisation act can accelerate nationwide rollout and lower access costs.",
+  "response_hint": "Passing a mining development concession act can further expand the revenue.",
   "duration_hours": 4,
   "issue_label": "event",
-  "fired_at": "2026-09-11T22:59:30.963699+00:00",
-  "issue_number": 1417
+  "fired_at": "2026-09-12T06:54:00.446162+00:00",
+  "issue_number": 1420
 }
