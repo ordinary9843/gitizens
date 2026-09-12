@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-12*
+*Last updated: 2026-09-12 — [Law 165](laws/law-165.md)*
 
 ---
 
@@ -9,19 +9,19 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 164 |
+| Laws enacted | 165 |
 | Last enacted | 2026-09-12 |
-| Treasury | 1,709,300 Git Coins |
+| Treasury | 1,710,182 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 63/100 |
+| Education | 60/100 |
 | Industry | 58/100 |
 | Welfare | 65/100 |
-| Green Policy | 57/100 |
-| Defense | 61/100 |
+| Green Policy | 62/100 |
+| Defense | 60/100 |
 | Pollution *(derived)* | 79/100 |
 
 ---
