@@ -1,20 +1,20 @@
 {
-  "era": "Crisis Age",
+  "era": "Industrial Era",
   "laws_count": 166,
   "last_enacted": "2026-09-12",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 1710814,
+  "treasury": 1711625,
   "currency": "Git Coins",
   "stars_last_counted": 7,
   "education": 60,
-  "industry": 63,
+  "industry": 62,
   "welfare": 62,
-  "green_policy": 61,
+  "green_policy": 60,
   "defense": 59,
-  "population": 731,
+  "population": 694,
   "pollution": 74,
-  "stability": 23,
+  "stability": 26,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -33,5 +33,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-09-12T16:00:00Z"
+  "next_tick_at": "2026-09-12T19:00:00Z"
 }
