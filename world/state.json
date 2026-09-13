@@ -11,10 +11,10 @@
   "industry": 61,
   "welfare": 62,
   "green_policy": 60,
-  "defense": 64,
+  "defense": 69,
   "population": 659,
   "pollution": 74,
-  "stability": 35,
+  "stability": 15,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -33,5 +33,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-09-13T00:00:00Z"
+  "next_tick_at": "2026-09-13T04:00:00Z"
 }

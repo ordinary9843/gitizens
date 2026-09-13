@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-13 — [Law 167](laws/law-167.md)*
+*Last updated: 2026-09-13*
 
 ---
 
@@ -21,7 +21,7 @@
 | Industry | 61/100 |
 | Welfare | 62/100 |
 | Green Policy | 60/100 |
-| Defense | 64/100 |
+| Defense | 69/100 |
 | Pollution *(derived)* | 74/100 |
 
 ---
