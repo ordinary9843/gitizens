@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-13*
+*Last updated: 2026-09-13 — [Law 168](laws/law-168.md)*
 
 ---
 
@@ -8,20 +8,20 @@
 
 | Field | Value |
 |-------|-------|
-| Era | Industrial Era |
-| Laws enacted | 167 |
+| Era | Crisis Age |
+| Laws enacted | 168 |
 | Last enacted | 2026-09-13 |
-| Treasury | 1,713,448 Git Coins |
+| Treasury | 1,714,508 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 60/100 |
-| Industry | 61/100 |
+| Industry | 60/100 |
 | Welfare | 62/100 |
-| Green Policy | 60/100 |
-| Defense | 69/100 |
+| Green Policy | 64/100 |
+| Defense | 67/100 |
 | Pollution *(derived)* | 74/100 |
 
 ---
@@ -33,6 +33,7 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `ins-001` | National University | [Law 005](laws/law-005.md) | education >= 55 |
+| `ins-004` | Defense Ministry | [Law 168](laws/law-168.md) | defense >= 65 |
 
 ### Districts
 
