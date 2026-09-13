@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1035,
-    "date": "2026-09-11",
-    "narrative": "Tick 1035: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Medical Robots Go Mainstream.",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Medical Robots Go Mainstream",
-    "metrics": "population 1,024 \u00b7 treasury 1.7M GC \u00b7 stability 6/100 \u00b7 pollution 79/100"
-  },
-  {
     "tick": 1036,
     "date": "2026-09-12",
     "narrative": "Tick 1036: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Medical Robots Go Mainstream.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1044: autonomous tick applied \u00b7 1 law enacted.",
     "changes": "autonomous tick applied \u00b7 1 law enacted",
     "metrics": "population 586 \u00b7 treasury 1.7M GC \u00b7 stability 1/100 \u00b7 pollution 74/100"
+  },
+  {
+    "tick": 1045,
+    "date": "2026-09-13",
+    "narrative": "Tick 1045: autonomous tick applied \u00b7 event: Volcanic Ash Winter.",
+    "changes": "autonomous tick applied \u00b7 event: Volcanic Ash Winter",
+    "metrics": "population 536 \u00b7 treasury 1.7M GC \u00b7 stability 5/100 \u00b7 pollution 85/100"
   }
 ]

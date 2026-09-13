@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-13T13:46:31.852304+00:00",
+  "updated_at": "2026-09-13T17:17:28.036693+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -11,33 +11,40 @@
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 60,
+      "current": 59,
       "target": 80,
-      "gap": 20
+      "gap": 21
     },
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 64,
+      "current": 55,
       "target": 85,
-      "gap": 21
+      "gap": 30
     }
   ],
-  "at_risk": [],
+  "at_risk": [
+    {
+      "name": "Nature Reserve",
+      "metric": "green_policy",
+      "current": 55,
+      "removal_at": 52
+    }
+  ],
   "milestones_pending": [
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 74,
+      "current": 85,
       "target": 20,
-      "gap": 54
+      "gap": 65
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 586,
+      "current": 536,
       "target": 2000,
-      "gap": 1414
+      "gap": 1464
     }
   ],
   "milestones_achieved": [
