@@ -1,21 +1,5 @@
 [
   {
-    "tick": 948,
-    "date": "2026-08-28T13:49:21Z",
-    "laws_count": 141,
-    "era": "Industrial Era",
-    "education": 60,
-    "industry": 64,
-    "welfare": 57,
-    "green_policy": 69,
-    "defense": 63,
-    "pollution": 53,
-    "population": 38583,
-    "stability": 43,
-    "treasury": 21179711,
-    "active_event": null
-  },
-  {
     "tick": 949,
     "date": "2026-08-28T23:24:38Z",
     "laws_count": 142,
@@ -1597,6 +1581,22 @@
     "population": 298,
     "stability": 0,
     "treasury": 1716510,
+    "active_event": null
+  },
+  {
+    "tick": 1048,
+    "date": "2026-09-14T00:46:18Z",
+    "laws_count": 169,
+    "era": "Crisis Age",
+    "education": 58,
+    "industry": 59,
+    "welfare": 53,
+    "green_policy": 60,
+    "defense": 64,
+    "pollution": 85,
+    "population": 231,
+    "stability": 0,
+    "treasury": 1716502,
     "active_event": null
   }
 ]
