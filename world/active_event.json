@@ -1,1 +1,26 @@
-{}
+{
+  "id": "evt-spy-scandal",
+  "category": "political",
+  "rarity": "uncommon",
+  "title": "Spy Scandal",
+  "description": "Intelligence agencies have revealed that hostile forces have infiltrated core government departments for several years.",
+  "flavor": "Every ministry is vetting its own staff; all meetings have switched to face-to-face.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "defense": -5,
+    "stability": -8
+  },
+  "default_consequence": {
+    "defense": -8,
+    "treasury": -40
+  },
+  "response_consequence": {
+    "defense": 8,
+    "stability": 3
+  },
+  "response_hint": "Passing a national security strengthening act can rebuild the intelligence system and investigate internal leaks.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-09-15T05:52:11.207400+00:00",
+  "issue_number": 1434
+}
