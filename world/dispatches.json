@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1045,
-    "date": "2026-09-13",
-    "narrative": "Tick 1045: autonomous tick applied \u00b7 event: Volcanic Ash Winter.",
-    "changes": "autonomous tick applied \u00b7 event: Volcanic Ash Winter",
-    "metrics": "population 536 \u00b7 treasury 1.7M GC \u00b7 stability 5/100 \u00b7 pollution 85/100"
-  },
-  {
     "tick": 1046,
     "date": "2026-09-13",
     "narrative": "Tick 1046: autonomous tick applied \u00b7 event: Volcanic Ash Winter.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1054: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Spy Scandal.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Spy Scandal",
     "metrics": "population 100 \u00b7 treasury 1.7M GC \u00b7 stability 16/100 \u00b7 pollution 66/100"
+  },
+  {
+    "tick": 1055,
+    "date": "2026-09-15",
+    "narrative": "Tick 1055: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 100 \u00b7 treasury 1.7M GC \u00b7 stability 22/100 \u00b7 pollution 66/100"
   }
 ]

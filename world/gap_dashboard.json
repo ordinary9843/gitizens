@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-15T05:52:15.020068+00:00",
+  "updated_at": "2026-09-15T11:10:01.027160+00:00",
   "pending": [
     {
       "name": "Academy of Sciences",
@@ -33,11 +33,18 @@
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 56,
+      "current": 48,
       "removal_at": 55
     }
   ],
   "milestones_pending": [
+    {
+      "tag": "milestone/militarized-state",
+      "metric": "defense",
+      "current": 48,
+      "target": 50,
+      "gap": 2
+    },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
