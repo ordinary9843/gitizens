@@ -1,42 +1,29 @@
 {
-  "updated_at": "2026-09-15T11:10:01.027160+00:00",
+  "updated_at": "2026-09-15T16:21:33.398423+00:00",
   "pending": [
-    {
-      "name": "Academy of Sciences",
-      "metric": "education",
-      "current": 61,
-      "target": 80,
-      "gap": 19
-    },
-    {
-      "name": "Heavy Industry Zone",
-      "metric": "industry",
-      "current": 56,
-      "target": 80,
-      "gap": 24
-    },
-    {
-      "name": "Eco-Research Center",
-      "metric": "green_policy",
-      "current": 55,
-      "target": 85,
-      "gap": 30
-    }
-  ],
-  "at_risk": [
-    {
-      "name": "Nature Reserve",
-      "metric": "green_policy",
-      "current": 55,
-      "removal_at": 52
-    },
     {
       "name": "Defense Ministry",
       "metric": "defense",
       "current": 48,
-      "removal_at": 55
+      "target": 65,
+      "gap": 17
+    },
+    {
+      "name": "Academy of Sciences",
+      "metric": "education",
+      "current": 60,
+      "target": 80,
+      "gap": 20
+    },
+    {
+      "name": "Eco-Research Center",
+      "metric": "green_policy",
+      "current": 60,
+      "target": 85,
+      "gap": 25
     }
   ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "milestone/militarized-state",
