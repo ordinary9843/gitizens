@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1043,
-    "date": "2026-09-13",
-    "narrative": "Tick 1043: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Coup Attempt.",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Coup Attempt",
-    "metrics": "population 659 \u00b7 treasury 1.7M GC \u00b7 stability 15/100 \u00b7 pollution 74/100"
-  },
-  {
     "tick": 1044,
     "date": "2026-09-13",
     "narrative": "Tick 1044: autonomous tick applied \u00b7 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1052: autonomous tick applied \u00b7 1 law enacted.",
     "changes": "autonomous tick applied \u00b7 1 law enacted",
     "metrics": "population 100 \u00b7 treasury 1.7M GC \u00b7 stability 16/100 \u00b7 pollution 67/100"
+  },
+  {
+    "tick": 1053,
+    "date": "2026-09-15",
+    "narrative": "Tick 1053: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 100 \u00b7 treasury 1.7M GC \u00b7 stability 19/100 \u00b7 pollution 66/100"
   }
 ]
