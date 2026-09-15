@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-15*
+*Last updated: 2026-09-15 — [Law 172](laws/law-172.md)*
 
 ---
 
@@ -8,19 +8,19 @@
 
 | Field | Value |
 |-------|-------|
-| Era | Crisis Age |
-| Laws enacted | 171 |
+| Era | Founding Era |
+| Laws enacted | 172 |
 | Last enacted | 2026-09-15 |
-| Treasury | 1,722,354 Git Coins |
+| Treasury | 1,722,623 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 61/100 |
-| Industry | 56/100 |
+| Education | 60/100 |
+| Industry | 55/100 |
 | Welfare | 58/100 |
-| Green Policy | 55/100 |
+| Green Policy | 60/100 |
 | Defense | 48/100 |
 | Pollution *(derived)* | 66/100 |
 
@@ -33,7 +33,6 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `ins-001` | National University | [Law 005](laws/law-005.md) | education >= 55 |
-| `ins-004` | Defense Ministry | [Law 168](laws/law-168.md) | defense >= 65 |
 
 ### Districts
 
@@ -69,6 +68,7 @@
 | `dst-002` | Social Housing District | [Law 082](laws/law-082.md) | welfare < 48 |
 | `ins-002` | Defense Ministry | [Law 152](laws/law-152.md) | defense < 55 |
 | `ins-003` | Academy of Sciences | [Law 091](laws/law-091.md) | education < 70 |
+| `ins-004` | Defense Ministry | [Law 172](laws/law-172.md) | defense < 55 |
 | `sec-002` | Industrial Complex | [Law 152](laws/law-152.md) | industry < 45 |
 | `sec-003` | Heavy Industry Zone | [Law 085](laws/law-085.md) | industry < 70 |
 | `sec-004` | Smog Zone | [Law 090](laws/law-090.md) | pollution < 48 |

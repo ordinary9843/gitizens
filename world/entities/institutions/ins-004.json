@@ -1,7 +1,0 @@
-{
-  "id": "ins-004",
-  "name": "Defense Ministry",
-  "built_law": 168,
-  "built_at": "2026-09-13T13:46:19.751377+00:00",
-  "auto_trigger": "defense >= 65"
-}
