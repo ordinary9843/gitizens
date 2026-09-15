@@ -179,3 +179,4 @@
 | 168 | [law-168](../world/laws/law-168.md) | [#1426](https://github.com/ordinary9843/gitizens/issues/1426) Strengthen Green Policy | 0+1 0-1 | 2026-09-13 |
 | 169 | [law-169](../world/laws/law-169.md) | [#1430](https://github.com/ordinary9843/gitizens/issues/1430) Strengthen Green Policy | 0+1 0-1 | 2026-09-14 |
 | 170 | [law-170](../world/laws/law-170.md) | [#1432](https://github.com/ordinary9843/gitizens/issues/1432) Strengthen Welfare | 0+1 0-1 | 2026-09-14 |
+| 171 | [law-171](../world/laws/law-171.md) | [#1433](https://github.com/ordinary9843/gitizens/issues/1433) Strengthen Education | 0+1 0-1 | 2026-09-15 |
