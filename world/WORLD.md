@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-16*
+*Last updated: 2026-09-16 — [Law 174](laws/law-174.md)*
 
 ---
 
@@ -9,20 +9,20 @@
 | Field | Value |
 |-------|-------|
 | Era | Founding Era |
-| Laws enacted | 173 |
+| Laws enacted | 174 |
 | Last enacted | 2026-09-16 |
-| Treasury | 1,725,460 Git Coins |
+| Treasury | 1,725,383 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 58/100 |
+| Education | 57/100 |
 | Industry | 55/100 |
 | Welfare | 57/100 |
 | Green Policy | 67/100 |
-| Defense | 48/100 |
-| Pollution *(derived)* | 44/100 |
+| Defense | 53/100 |
+| Pollution *(derived)* | 40/100 |
 
 ---
 
@@ -55,7 +55,6 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `sec-001` | Manufacturing District | [Law 007](laws/law-007.md) | industry >= 25 |
-| `sec-005` | Smog Zone | [Law 150](laws/law-150.md) | pollution >= 60 |
 | `sec-006` | Industrial Complex | [Law 155](laws/law-155.md) | industry >= 55 |
 
 ---
@@ -72,3 +71,4 @@
 | `sec-002` | Industrial Complex | [Law 152](laws/law-152.md) | industry < 45 |
 | `sec-003` | Heavy Industry Zone | [Law 085](laws/law-085.md) | industry < 70 |
 | `sec-004` | Smog Zone | [Law 090](laws/law-090.md) | pollution < 48 |
+| `sec-005` | Smog Zone | [Law 174](laws/law-174.md) | pollution < 48 |
