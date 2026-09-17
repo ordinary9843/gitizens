@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-17T16:19:07.265427+00:00",
+  "updated_at": "2026-09-17T20:00:50.775595+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -18,9 +18,9 @@
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 56,
+      "current": 54,
       "target": 80,
-      "gap": 24
+      "gap": 26
     }
   ],
   "at_risk": [
@@ -35,16 +35,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 12,
+      "current": 8,
       "target": 60,
-      "gap": 48
+      "gap": 52
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 185,
+      "current": 200,
       "target": 2000,
-      "gap": 1815
+      "gap": 1800
     }
   ],
   "milestones_achieved": [
