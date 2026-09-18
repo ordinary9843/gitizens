@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-18T03:22:38.883149+00:00",
+  "updated_at": "2026-09-18T08:47:21.533870+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -23,28 +23,21 @@
       "gap": 26
     }
   ],
-  "at_risk": [
-    {
-      "name": "Industrial Complex",
-      "metric": "industry",
-      "current": 48,
-      "removal_at": 45
-    }
-  ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 1,
+      "current": 0,
       "target": 60,
-      "gap": 59
+      "gap": 60
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 230,
+      "current": 258,
       "target": 2000,
-      "gap": 1770
+      "gap": 1742
     }
   ],
   "milestones_achieved": [
