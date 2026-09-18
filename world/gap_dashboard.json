@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-18T17:30:33.576897+00:00",
+  "updated_at": "2026-09-18T20:27:21.741335+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -11,9 +11,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 64,
+      "current": 63,
       "target": 85,
-      "gap": 21
+      "gap": 22
     },
     {
       "name": "Academy of Sciences",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 304,
+      "current": 323,
       "target": 2000,
-      "gap": 1696
+      "gap": 1677
     }
   ],
   "milestones_achieved": [
