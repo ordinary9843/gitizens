@@ -185,3 +185,4 @@
 | 174 | [law-174](../world/laws/law-174.md) | [#1440](https://github.com/ordinary9843/gitizens/issues/1440) Strengthen Defense | 0+1 0-1 | 2026-09-16 |
 | 175 | [law-175](../world/laws/law-175.md) | [#1441](https://github.com/ordinary9843/gitizens/issues/1441) Strengthen Defense | 0+1 0-1 | 2026-09-17 |
 | 176 | [law-176](../world/laws/law-176.md) | [#1443](https://github.com/ordinary9843/gitizens/issues/1443) Strengthen Industry | 0+1 0-1 | 2026-09-17 |
+| 177 | [law-177](../world/laws/law-177.md) | [#1446](https://github.com/ordinary9843/gitizens/issues/1446) Strengthen Industry | 0+1 0-1 | 2026-09-18 |
