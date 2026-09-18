@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-17T23:22:47.048134+00:00",
+  "updated_at": "2026-09-18T03:22:38.883149+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -35,16 +35,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 5,
+      "current": 1,
       "target": 60,
-      "gap": 55
+      "gap": 59
     },
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 218,
+      "current": 230,
       "target": 2000,
-      "gap": 1782
+      "gap": 1770
     }
   ],
   "milestones_achieved": [
