@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1065,
-    "date": "2026-09-17",
-    "narrative": "Tick 1065: autonomous tick applied \u00b7 event: Trade Embargo.",
-    "changes": "autonomous tick applied \u00b7 event: Trade Embargo",
-    "metrics": "population 162 \u00b7 treasury 1.7M GC \u00b7 stability 48/100 \u00b7 pollution 29/100"
-  },
-  {
     "tick": 1066,
     "date": "2026-09-17",
     "narrative": "Tick 1066: autonomous tick applied \u00b7 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1074: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 323 \u00b7 treasury 1.7M GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 1075,
+    "date": "2026-09-18",
+    "narrative": "Tick 1075: autonomous tick applied \u00b7 1 law enacted.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted",
+    "metrics": "population 337 \u00b7 treasury 1.7M GC \u00b7 stability 57/100 \u00b7 pollution 0/100"
   }
 ]
