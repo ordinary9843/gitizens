@@ -4,15 +4,15 @@
   "last_enacted": "2026-09-18",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 1721480,
+  "treasury": 1722244,
   "currency": "Git Coins",
   "stars_last_counted": 7,
   "education": 58,
-  "industry": 53,
+  "industry": 52,
   "welfare": 53,
   "green_policy": 61,
   "defense": 56,
-  "population": 337,
+  "population": 356,
   "pollution": 0,
   "stability": 57,
   "tags_applied": [
@@ -34,5 +34,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-09-19T00:00:00Z"
+  "next_tick_at": "2026-09-19T04:00:00Z"
 }

@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-18*
+*Last updated: 2026-09-19*
 
 ---
 
@@ -11,14 +11,14 @@
 | Era | Founding Era |
 | Laws enacted | 178 |
 | Last enacted | 2026-09-18 |
-| Treasury | 1,721,480 Git Coins |
+| Treasury | 1,722,244 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 58/100 |
-| Industry | 53/100 |
+| Industry | 52/100 |
 | Welfare | 53/100 |
 | Green Policy | 61/100 |
 | Defense | 56/100 |
