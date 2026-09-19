@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-19T16:14:39.929146+00:00",
+  "updated_at": "2026-09-19T19:10:32.290296+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 54,
+      "current": 59,
       "target": 65,
-      "gap": 11
+      "gap": 6
     },
     {
       "name": "Heavy Industry Zone",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 448,
+      "current": 489,
       "target": 2000,
-      "gap": 1552
+      "gap": 1511
     }
   ],
   "milestones_achieved": [
