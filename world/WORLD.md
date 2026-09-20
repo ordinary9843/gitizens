@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-20*
+*Last updated: 2026-09-20 — [Law 183](laws/law-183.md)*
 
 ---
 
@@ -8,17 +8,17 @@
 
 | Field | Value |
 |-------|-------|
-| Era | Founding Era |
-| Laws enacted | 182 |
+| Era | Industrial Era |
+| Laws enacted | 183 |
 | Last enacted | 2026-09-20 |
-| Treasury | 1,706,890 Git Coins |
+| Treasury | 1,682,275 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 61/100 |
-| Industry | 57/100 |
+| Education | 60/100 |
+| Industry | 62/100 |
 | Welfare | 61/100 |
 | Green Policy | 58/100 |
 | Defense | 58/100 |
