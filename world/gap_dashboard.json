@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-09-21T13:39:31.094477+00:00",
+  "updated_at": "2026-09-21T19:04:58.997136+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 60,
+      "current": 59,
       "target": 65,
-      "gap": 5
+      "gap": 6
     },
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 65,
+      "current": 64,
       "target": 80,
-      "gap": 15
+      "gap": 16
     },
     {
       "name": "Heavy Industry Zone",
@@ -42,9 +42,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 517,
+      "current": 591,
       "target": 2000,
-      "gap": 1483
+      "gap": 1409
     }
   ],
   "milestones_achieved": [
