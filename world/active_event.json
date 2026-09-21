@@ -1,26 +1,23 @@
 {
-  "id": "evt-famine",
-  "category": "natural",
-  "rarity": "uncommon",
-  "title": "Famine Crisis",
-  "description": "The prolonged drought has drained grain reserves, and famine signals are spreading through rural provinces. Social order is fraying.",
-  "flavor": "Bread prices have quintupled overnight. Aid queues stretch around the block.",
+  "id": "evt-time-capsule",
+  "category": "cosmic",
+  "rarity": "rare",
+  "title": "Time Capsule Unearthed",
+  "description": "Construction workers have discovered a time capsule buried 100 years ago beneath the foundations of the old city hall, sparking widespread discussion.",
+  "flavor": "A few of the ancestors' prophecies are accurate enough to give you goosebumps.",
   "trigger_conditions": {},
   "immediate_effects": {
-    "welfare": -12,
-    "stability": -8
-  },
-  "default_consequence": {
-    "population": -500,
-    "welfare": -8
-  },
-  "response_consequence": {
-    "welfare": 5,
+    "education": 5,
     "stability": 3
   },
-  "response_hint": "Passing an emergency food relief act can mobilise reserves and request allied aid.",
+  "default_consequence": {},
+  "response_consequence": {
+    "education": 8,
+    "welfare": 3
+  },
+  "response_hint": "Passing a historical and cultural preservation act can turn this discovery into a nationwide educational resource.",
   "duration_hours": 4,
   "issue_label": "event",
-  "fired_at": "2026-09-21T01:00:34.856376+00:00",
-  "issue_number": 1460
+  "fired_at": "2026-09-21T06:10:03.711024+00:00",
+  "issue_number": 1462
 }

@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-21 — [Law 187](laws/law-187.md)*
+*Last updated: 2026-09-21*
 
 ---
 
@@ -17,9 +17,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Education | 61/100 |
+| Education | 66/100 |
 | Industry | 57/100 |
-| Welfare | 50/100 |
+| Welfare | 42/100 |
 | Green Policy | 59/100 |
 | Defense | 60/100 |
 | Pollution *(derived)* | 0/100 |

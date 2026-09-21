@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1080,
-    "date": "2026-09-19",
-    "narrative": "Tick 1080: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Billionaire Donates Entire Fortune.",
-    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Billionaire Donates Entire Fortune",
-    "metrics": "population 489 \u00b7 treasury 1.7M GC \u00b7 stability 58/100 \u00b7 pollution 0/100"
-  },
-  {
     "tick": 1081,
     "date": "2026-09-19",
     "narrative": "Tick 1081: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1089: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Famine Crisis.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Famine Crisis",
     "metrics": "population 843 \u00b7 treasury 1.7M GC \u00b7 stability 51/100 \u00b7 pollution 0/100"
+  },
+  {
+    "tick": 1090,
+    "date": "2026-09-21",
+    "narrative": "Tick 1090: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Time Capsule Unearthed.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Time Capsule Unearthed",
+    "metrics": "population 465 \u00b7 treasury 1.7M GC \u00b7 stability 59/100 \u00b7 pollution 0/100"
   }
 ]
