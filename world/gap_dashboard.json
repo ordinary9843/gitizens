@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-22T09:03:12.675363+00:00",
+  "updated_at": "2026-09-22T14:22:02.297842+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 58,
+      "current": 57,
       "target": 65,
-      "gap": 7
+      "gap": 8
     },
     {
       "name": "Social Housing District",
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 782,
+      "current": 853,
       "target": 2000,
-      "gap": 1218
+      "gap": 1147
     }
   ],
   "milestones_achieved": [
