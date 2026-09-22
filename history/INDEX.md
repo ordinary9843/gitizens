@@ -196,3 +196,4 @@
 | 185 | [law-185](../world/laws/law-185.md) | [#1457](https://github.com/ordinary9843/gitizens/issues/1457) Strengthen Green Policy | 0+1 0-1 | 2026-09-20 |
 | 186 | [law-186](../world/laws/law-186.md) | [#1459](https://github.com/ordinary9843/gitizens/issues/1459) Strengthen Education | 0+1 0-1 | 2026-09-21 |
 | 187 | [law-187](../world/laws/law-187.md) | [#1461](https://github.com/ordinary9843/gitizens/issues/1461) Strengthen Welfare | 0+1 0-1 | 2026-09-21 |
+| 188 | [law-188](../world/laws/law-188.md) | [#1465](https://github.com/ordinary9843/gitizens/issues/1465) Strengthen Welfare | 0+1 0-1 | 2026-09-22 |

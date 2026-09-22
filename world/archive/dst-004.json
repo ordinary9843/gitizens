@@ -1,0 +1,10 @@
+{
+  "id": "dst-004",
+  "name": "Social Housing District",
+  "built_law": 86,
+  "built_at": "2026-08-09T11:27:29.740386+00:00",
+  "auto_trigger": "welfare >= 60",
+  "demolished_law": 188,
+  "demolished_at": "2026-09-22T03:29:50.943129+00:00",
+  "auto_reason": "welfare < 48"
+}

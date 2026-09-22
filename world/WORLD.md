@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-21*
+*Last updated: 2026-09-22 — [Law 188](laws/law-188.md)*
 
 ---
 
@@ -9,17 +9,17 @@
 | Field | Value |
 |-------|-------|
 | Era | Founding Era |
-| Laws enacted | 187 |
-| Last enacted | 2026-09-21 |
-| Treasury | 1,674,244 Git Coins |
+| Laws enacted | 188 |
+| Last enacted | 2026-09-22 |
+| Treasury | 1,662,340 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 64/100 |
-| Industry | 57/100 |
-| Welfare | 42/100 |
+| Industry | 56/100 |
+| Welfare | 47/100 |
 | Green Policy | 59/100 |
 | Defense | 59/100 |
 | Pollution *(derived)* | 0/100 |
@@ -40,7 +40,6 @@
 |----|------|----------|---------|
 | `dst-001` | City Park | [Law 006](laws/law-006.md) | green_policy >= 35 |
 | `dst-003` | Nature Reserve | — | green_policy >= 65 |
-| `dst-004` | Social Housing District | [Law 086](laws/law-086.md) | welfare >= 60 |
 
 ### Buildings
 
@@ -65,6 +64,7 @@
 |----|------|---------------|--------|
 | `bld-004` | Eco-Research Center | [Law 083](laws/law-083.md) | green_policy < 75 |
 | `dst-002` | Social Housing District | [Law 082](laws/law-082.md) | welfare < 48 |
+| `dst-004` | Social Housing District | [Law 188](laws/law-188.md) | welfare < 48 |
 | `ins-002` | Defense Ministry | [Law 152](laws/law-152.md) | defense < 55 |
 | `ins-003` | Academy of Sciences | [Law 091](laws/law-091.md) | education < 70 |
 | `ins-004` | Defense Ministry | [Law 172](laws/law-172.md) | defense < 55 |
