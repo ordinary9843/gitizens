@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-09-22 — [Law 188](laws/law-188.md)*
+*Last updated: 2026-09-22*
 
 ---
 
