@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-23T15:18:02.745072+00:00",
+  "updated_at": "2026-09-23T19:27:40.946610+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -18,9 +18,9 @@
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 59,
+      "current": 58,
       "target": 80,
-      "gap": 21
+      "gap": 22
     }
   ],
   "at_risk": [],
@@ -35,9 +35,9 @@
     {
       "tag": "milestone/population-boom",
       "metric": "population",
-      "current": 1481,
+      "current": 1620,
       "target": 2000,
-      "gap": 519
+      "gap": 380
     }
   ],
   "milestones_achieved": [
