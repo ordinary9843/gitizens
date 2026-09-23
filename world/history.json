@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1000,
-    "date": "2026-09-06T13:57:02Z",
-    "laws_count": 154,
-    "era": "Founding Era",
-    "education": 58,
-    "industry": 51,
-    "welfare": 54,
-    "green_policy": 61,
-    "defense": 52,
-    "pollution": 69,
-    "population": 27037,
-    "stability": 31,
-    "treasury": 1677867,
-    "active_event": "evt-ufo-sighting"
-  },
-  {
     "tick": 1001,
     "date": "2026-09-06T16:46:07Z",
     "laws_count": 154,
@@ -1597,6 +1581,22 @@
     "population": 1087,
     "stability": 55,
     "treasury": 1667346,
+    "active_event": null
+  },
+  {
+    "tick": 1100,
+    "date": "2026-09-23T05:31:17Z",
+    "laws_count": 189,
+    "era": "Founding Era",
+    "education": 59,
+    "industry": 56,
+    "welfare": 52,
+    "green_policy": 57,
+    "defense": 56,
+    "pollution": 0,
+    "population": 1211,
+    "stability": 55,
+    "treasury": 1642845,
     "active_event": null
   }
 ]
