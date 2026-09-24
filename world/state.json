@@ -9,12 +9,12 @@
   "stars_last_counted": 7,
   "education": 58,
   "industry": 56,
-  "welfare": 56,
+  "welfare": 44,
   "green_policy": 55,
   "defense": 55,
   "population": 2131,
   "pollution": 0,
-  "stability": 55,
+  "stability": 47,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -34,5 +34,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-09-24T02:00:00Z"
+  "next_tick_at": "2026-09-24T08:00:00Z"
 }
