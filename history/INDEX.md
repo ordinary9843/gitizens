@@ -199,3 +199,4 @@
 | 188 | [law-188](../world/laws/law-188.md) | [#1465](https://github.com/ordinary9843/gitizens/issues/1465) Strengthen Welfare | 0+1 0-1 | 2026-09-22 |
 | 189 | [law-189](../world/laws/law-189.md) | [#1468](https://github.com/ordinary9843/gitizens/issues/1468) Strengthen Welfare | 0+1 0-1 | 2026-09-23 |
 | 190 | [law-190](../world/laws/law-190.md) | [#1473](https://github.com/ordinary9843/gitizens/issues/1473) Strengthen Welfare | 0+1 0-1 | 2026-09-24 |
+| 191 | [law-191](../world/laws/law-191.md) | [#1477](https://github.com/ordinary9843/gitizens/issues/1477) Strengthen Welfare | 0+1 0-1 | 2026-09-25 |
