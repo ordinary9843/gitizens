@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-25T00:26:54.046686+00:00",
+  "updated_at": "2026-09-25T05:52:11.622138+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -18,16 +18,16 @@
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 58,
+      "current": 57,
       "target": 80,
-      "gap": 22
+      "gap": 23
     }
   ],
   "at_risk": [
     {
       "name": "Nature Reserve",
       "metric": "green_policy",
-      "current": 55,
+      "current": 54,
       "removal_at": 52
     }
   ],
