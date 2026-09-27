@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1022,
-    "date": "2026-09-09T22:57:23Z",
-    "laws_count": 159,
-    "era": "Crisis Age",
-    "education": 55,
-    "industry": 55,
-    "welfare": 55,
-    "green_policy": 55,
-    "defense": 60,
-    "pollution": 90,
-    "population": 3858,
-    "stability": 0,
-    "treasury": 1700082,
-    "active_event": null
-  },
-  {
     "tick": 1023,
     "date": "2026-09-10T00:56:01Z",
     "laws_count": 160,
@@ -1598,5 +1582,21 @@
     "stability": 54,
     "treasury": 1306079,
     "active_event": "evt-bull-market"
+  },
+  {
+    "tick": 1122,
+    "date": "2026-09-27T06:16:34Z",
+    "laws_count": 193,
+    "era": "Founding Era",
+    "education": 55,
+    "industry": 55,
+    "welfare": 51,
+    "green_policy": 54,
+    "defense": 53,
+    "pollution": 0,
+    "population": 5388,
+    "stability": 54,
+    "treasury": 897913,
+    "active_event": null
   }
 ]
