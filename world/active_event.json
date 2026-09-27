@@ -1,1 +1,23 @@
-{}
+{
+  "id": "evt-bull-market",
+  "category": "economic",
+  "rarity": "common",
+  "title": "Bull Market Frenzy",
+  "description": "Stellar economic data has drawn massive foreign investment, driving the stock market to record highs.",
+  "flavor": "Taxi drivers are debating stock picks; analysts are warning of bubble risk.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "treasury": 80,
+    "industry": 3
+  },
+  "default_consequence": {},
+  "response_consequence": {
+    "treasury": 60,
+    "industry": 3
+  },
+  "response_hint": "Passing an investment environment optimisation act can channel capital into the real economy.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-09-27T00:16:25.591931+00:00",
+  "issue_number": 1484
+}
