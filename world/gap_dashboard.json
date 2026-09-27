@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-27T12:47:03.482811+00:00",
+  "updated_at": "2026-09-27T17:31:26.198034+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -16,8 +16,8 @@
       "gap": 12
     },
     {
-      "name": "Academy of Sciences",
-      "metric": "education",
+      "name": "Heavy Industry Zone",
+      "metric": "industry",
       "current": 55,
       "target": 80,
       "gap": 25
