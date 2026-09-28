@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-27T23:42:01.628269+00:00",
+  "updated_at": "2026-09-28T03:52:40.467891+00:00",
   "pending": [
     {
       "name": "Social Housing District",
       "metric": "welfare",
-      "current": 51,
+      "current": 56,
       "target": 60,
-      "gap": 9
+      "gap": 4
     },
     {
       "name": "Defense Ministry",
