@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-28T03:52:40.467891+00:00",
+  "updated_at": "2026-09-28T10:37:26.829521+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -11,9 +11,9 @@
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 53,
+      "current": 52,
       "target": 65,
-      "gap": 12
+      "gap": 13
     },
     {
       "name": "Heavy Industry Zone",
