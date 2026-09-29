@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-28T23:43:59.887943+00:00",
+  "updated_at": "2026-09-29T04:27:11.115016+00:00",
   "pending": [
     {
       "name": "Social Housing District",
       "metric": "welfare",
-      "current": 56,
+      "current": 55,
       "target": 60,
-      "gap": 4
+      "gap": 5
     },
     {
       "name": "Defense Ministry",
@@ -16,11 +16,11 @@
       "gap": 8
     },
     {
-      "name": "Heavy Industry Zone",
-      "metric": "industry",
-      "current": 54,
+      "name": "Academy of Sciences",
+      "metric": "education",
+      "current": 57,
       "target": 80,
-      "gap": 26
+      "gap": 23
     }
   ],
   "at_risk": [
@@ -35,9 +35,9 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 0,
+      "current": 1,
       "target": 60,
-      "gap": 60
+      "gap": 59
     }
   ],
   "milestones_achieved": [
