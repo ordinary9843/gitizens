@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-30T15:39:36.095905+00:00",
+  "updated_at": "2026-09-30T20:34:19.890042+00:00",
   "pending": [
     {
       "name": "Social Housing District",
       "metric": "welfare",
-      "current": 53,
+      "current": 52,
       "target": 60,
-      "gap": 7
+      "gap": 8
     },
     {
       "name": "Defense Ministry",
@@ -16,8 +16,8 @@
       "gap": 10
     },
     {
-      "name": "Academy of Sciences",
-      "metric": "education",
+      "name": "Heavy Industry Zone",
+      "metric": "industry",
       "current": 56,
       "target": 80,
       "gap": 24
