@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1035,
-    "date": "2026-09-11T22:59:36Z",
-    "laws_count": 163,
-    "era": "Crisis Age",
-    "education": 63,
-    "industry": 58,
-    "welfare": 65,
-    "green_policy": 57,
-    "defense": 56,
-    "pollution": 79,
-    "population": 1024,
-    "stability": 6,
-    "treasury": 1708925,
-    "active_event": "evt-medical-robots"
-  },
-  {
     "tick": 1036,
     "date": "2026-09-12T01:01:51Z",
     "laws_count": 164,
@@ -1597,6 +1581,22 @@
     "population": 12121,
     "stability": 53,
     "treasury": 93091,
+    "active_event": "evt-bull-market"
+  },
+  {
+    "tick": 1135,
+    "date": "2026-09-30T01:06:32Z",
+    "laws_count": 197,
+    "era": "Founding Era",
+    "education": 57,
+    "industry": 57,
+    "welfare": 54,
+    "green_policy": 57,
+    "defense": 56,
+    "pollution": 17,
+    "population": 12835,
+    "stability": 52,
+    "treasury": 94239,
     "active_event": "evt-bull-market"
   }
 ]
