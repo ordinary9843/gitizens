@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1037,
-    "date": "2026-09-12T06:54:05Z",
-    "laws_count": 165,
-    "era": "Crisis Age",
-    "education": 60,
-    "industry": 58,
-    "welfare": 65,
-    "green_policy": 62,
-    "defense": 60,
-    "pollution": 79,
-    "population": 840,
-    "stability": 14,
-    "treasury": 1710382,
-    "active_event": "evt-mineral-discovery"
-  },
-  {
     "tick": 1038,
     "date": "2026-09-12T11:29:10Z",
     "laws_count": 166,
@@ -1597,6 +1581,22 @@
     "population": 13713,
     "stability": 49,
     "treasury": 95969,
+    "active_event": null
+  },
+  {
+    "tick": 1137,
+    "date": "2026-09-30T15:39:36Z",
+    "laws_count": 197,
+    "era": "Founding Era",
+    "education": 56,
+    "industry": 56,
+    "welfare": 53,
+    "green_policy": 57,
+    "defense": 55,
+    "pollution": 21,
+    "population": 14063,
+    "stability": 49,
+    "treasury": 97684,
     "active_event": null
   }
 ]
