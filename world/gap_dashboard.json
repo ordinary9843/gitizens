@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-01T00:22:46.864612+00:00",
+  "updated_at": "2026-10-01T06:52:13.566305+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -27,7 +27,7 @@
     {
       "name": "Nature Reserve",
       "metric": "green_policy",
-      "current": 56,
+      "current": 55,
       "removal_at": 52
     }
   ],
@@ -35,16 +35,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 21,
+      "current": 23,
       "target": 60,
-      "gap": 39
+      "gap": 37
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 21,
+      "current": 23,
       "target": 20,
-      "gap": 1
+      "gap": 3
     }
   ],
   "milestones_achieved": [
