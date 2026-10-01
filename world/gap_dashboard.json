@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-30T20:34:19.890042+00:00",
+  "updated_at": "2026-10-01T00:22:46.864612+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -16,14 +16,21 @@
       "gap": 10
     },
     {
-      "name": "Heavy Industry Zone",
-      "metric": "industry",
-      "current": 56,
+      "name": "Academy of Sciences",
+      "metric": "education",
+      "current": 55,
       "target": 80,
-      "gap": 24
+      "gap": 25
     }
   ],
-  "at_risk": [],
+  "at_risk": [
+    {
+      "name": "Nature Reserve",
+      "metric": "green_policy",
+      "current": 56,
+      "removal_at": 52
+    }
+  ],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",
