@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1134,
-    "date": "2026-09-29",
-    "narrative": "Tick 1134: autonomous tick applied \u00b7 event: Bull Market Frenzy.",
-    "changes": "autonomous tick applied \u00b7 event: Bull Market Frenzy",
-    "metrics": "population 12.1K \u00b7 treasury 93.1K GC \u00b7 stability 53/100 \u00b7 pollution 13/100"
-  },
-  {
     "tick": 1135,
     "date": "2026-09-30",
     "narrative": "Tick 1135: autonomous tick applied \u00b7 event: Bull Market Frenzy.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1143: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 20.2K \u00b7 treasury 106.9K GC \u00b7 stability 40/100 \u00b7 pollution 39/100"
+  },
+  {
+    "tick": 1144,
+    "date": "2026-10-02",
+    "narrative": "Tick 1144: autonomous tick applied \u00b7 event: Social Media Revolution.",
+    "changes": "autonomous tick applied \u00b7 event: Social Media Revolution",
+    "metrics": "population 20.9K \u00b7 treasury 108.7K GC \u00b7 stability 35/100 \u00b7 pollution 45/100"
   }
 ]

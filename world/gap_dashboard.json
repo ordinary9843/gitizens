@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-02T00:32:33.545541+00:00",
+  "updated_at": "2026-10-02T06:43:55.517818+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -18,9 +18,9 @@
     {
       "name": "Academy of Sciences",
       "metric": "education",
-      "current": 56,
+      "current": 58,
       "target": 80,
-      "gap": 24
+      "gap": 22
     }
   ],
   "at_risk": [
@@ -35,16 +35,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 39,
+      "current": 45,
       "target": 60,
-      "gap": 21
+      "gap": 15
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 39,
+      "current": 45,
       "target": 20,
-      "gap": 19
+      "gap": 25
     }
   ],
   "milestones_achieved": [
