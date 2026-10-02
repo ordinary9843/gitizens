@@ -12,7 +12,7 @@ from .state import read_json, write_json, read_state, write_state
 from .gh import run, SKIP_TIMING
 
 
-TICK_INTERVAL_HOURS = 1
+TICK_INTERVAL_HOURS = 8
 
 # Population dynamics — fractional per-tick rates. New population is
 # pop + births - deaths + migration + noise, floored at POPULATION_FLOOR.
@@ -170,7 +170,7 @@ def auto_remove_entity(category: str, entity_id: str, law_number: int, reason: s
 # ── Autonomous world tick ────────────────────────────────────────────────────
 
 def _count_missed_ticks(state: dict) -> int:
-    """Return how many 2-h ticks are overdue (at least 1, capped at 6). Returns 0 if not yet due."""
+    """Return how many 8-h ticks are overdue (at least 1, capped at 6). Returns 0 if not yet due."""
     if SKIP_TIMING:
         return 1
     tick_str = state.get("next_tick_at", "")

@@ -3181,7 +3181,7 @@ function renderHeader(state) {
     try {
       const raw = state.next_tick_at.replace(' ', 'T');
       const nextTick = new Date((raw.includes('Z') || raw.includes('+')) ? raw : raw + 'Z');
-      const lastTick = new Date(nextTick.getTime() - 2 * 3600 * 1000);
+      const lastTick = new Date(nextTick.getTime() - 8 * 3600 * 1000);
       const minsAgo = Math.round((Date.now() - lastTick.getTime()) / 60000);
       const agoStr = minsAgo < 60
         ? `${minsAgo}m ago`

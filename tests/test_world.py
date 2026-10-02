@@ -879,13 +879,13 @@ class TestApplyTags:
 # ===========================================================================
 
 class TestComputeNextTickAt:
-    def test_advances_by_one_hour_at_top_of_hour(self):
+    def test_advances_by_eight_hours_at_top_of_hour(self):
         now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-06-14T19:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-06-15T02:00:00Z"
 
     def test_snaps_to_top_of_hour_when_now_is_mid_hour(self):
         now = datetime(2026, 6, 14, 18, 37, 42, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-06-14T19:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-06-15T02:00:00Z"
 
     def test_consecutive_calls_one_hour_apart_produce_different_values(self):
         # Regression: the old 4-hour boundary calculation made consecutive cron
@@ -894,27 +894,27 @@ class TestComputeNextTickAt:
         second = tv.compute_next_tick_at(datetime(2026, 6, 14, 19, 0, tzinfo=timezone.utc))
         third  = tv.compute_next_tick_at(datetime(2026, 6, 14, 20, 0, tzinfo=timezone.utc))
         assert first != second != third
-        assert first == "2026-06-14T19:00:00Z"
-        assert second == "2026-06-14T20:00:00Z"
-        assert third == "2026-06-14T21:00:00Z"
+        assert first == "2026-06-15T02:00:00Z"
+        assert second == "2026-06-15T03:00:00Z"
+        assert third == "2026-06-15T04:00:00Z"
 
     def test_crosses_day_boundary(self):
         now = datetime(2026, 6, 14, 23, 0, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-06-15T00:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-06-15T07:00:00Z"
 
     def test_crosses_month_boundary(self):
         now = datetime(2026, 6, 30, 23, 30, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-07-01T00:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-07-01T07:00:00Z"
 
     def test_crosses_year_boundary(self):
         now = datetime(2026, 12, 31, 23, 30, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2027-01-01T00:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2027-01-01T07:00:00Z"
 
     def test_naive_datetime_treated_as_utc(self):
         # Defensive: if a caller passes a naive datetime, treat it as UTC
         # rather than crashing or producing a localized timestamp.
         naive = datetime(2026, 6, 14, 18, 0, 0)
-        assert tv.compute_next_tick_at(naive) == "2026-06-14T19:00:00Z"
+        assert tv.compute_next_tick_at(naive) == "2026-06-15T02:00:00Z"
 
     def test_aware_non_utc_input(self):
         # Caller passes a tz-aware datetime in a non-UTC zone — the snap
@@ -922,16 +922,17 @@ class TestComputeNextTickAt:
         from datetime import timezone as _tz
         plus_eight = _tz(timedelta(hours=8))
         now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=plus_eight)
-        # 18:00+08 + 1h = 19:00+08; format() writes the local-clock string
+        # 18:00+08 + 8h = 02:00+08 (next day); format() writes the local-clock string
         # with a literal "Z" suffix. We accept this as documented behavior.
         result = tv.compute_next_tick_at(now)
-        assert result.startswith("2026-06-14T19:00:00")
+        assert result.startswith("2026-06-15T02:00:00")
 
     def test_midnight_input(self):
         now = datetime(2026, 6, 14, 0, 0, 0, tzinfo=timezone.utc)
-        assert tv.compute_next_tick_at(now) == "2026-06-14T01:00:00Z"
+        assert tv.compute_next_tick_at(now) == "2026-06-14T08:00:00Z"
 
     def test_format_is_iso_with_z_suffix(self):
+
         now = datetime(2026, 6, 14, 18, 0, 0, tzinfo=timezone.utc)
         result = tv.compute_next_tick_at(now)
         assert result.endswith("Z")
@@ -1129,7 +1130,7 @@ class TestCountMissedTicks:
 
     def test_two_intervals_overdue_returns_two(self):
         from datetime import datetime, timezone, timedelta
-        past = (datetime.now(timezone.utc) - timedelta(hours=1, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        past = (datetime.now(timezone.utc) - timedelta(hours=8, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
         orig = _world_mod.SKIP_TIMING
         try:
             _world_mod.SKIP_TIMING = False
@@ -1139,7 +1140,7 @@ class TestCountMissedTicks:
 
     def test_caps_at_six(self):
         from datetime import datetime, timezone, timedelta
-        past = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        past = (datetime.now(timezone.utc) - timedelta(hours=48)).strftime("%Y-%m-%dT%H:%M:%SZ")
         orig = _world_mod.SKIP_TIMING
         try:
             _world_mod.SKIP_TIMING = False
@@ -1188,7 +1189,7 @@ class TestMultiTickCatchup:
 
     def test_catchup_applies_two_ticks(self, monkeypatch):
         from datetime import datetime, timezone, timedelta
-        past = (datetime.now(timezone.utc) - timedelta(hours=1, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        past = (datetime.now(timezone.utc) - timedelta(hours=8, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
         base = self._base_state(past)
 
         states = [dict(base)]
@@ -1230,7 +1231,7 @@ class TestMultiTickCatchup:
         from datetime import datetime, timezone, timedelta
 
         past_1 = (datetime.now(timezone.utc) - timedelta(minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
-        past_3 = (datetime.now(timezone.utc) - timedelta(hours=4, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        past_3 = (datetime.now(timezone.utc) - timedelta(hours=16, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         def run_ticks(past_ts):
             base = {
@@ -1265,7 +1266,7 @@ class TestMultiTickCatchup:
         """Returns False when all N catchup ticks produce identical output (boundary state)."""
         from datetime import datetime, timezone, timedelta
         # State where all values are pinned at 0 — no change possible
-        past = (datetime.now(timezone.utc) - timedelta(hours=2, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        past = (datetime.now(timezone.utc) - timedelta(hours=16, minutes=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
         frozen_state = {
             "industry": 0, "green_policy": 0, "welfare": 0,
             "defense": 0, "pollution": 0, "population": 100,

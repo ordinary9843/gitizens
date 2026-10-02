@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Tally votes on all open proposal Issues and apply effects.
-Called by tally-votes.yml every 6 hours.
+Called by tally-votes.yml every 8 hours.
 """
 import json
 import os
