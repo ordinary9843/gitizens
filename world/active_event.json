@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-arms-cache",
+  "category": "security",
+  "rarity": "uncommon",
+  "title": "Illegal Arms Cache Discovered",
+  "description": "Police have discovered a large stockpile of illegal firearms in a remote mountain area, suspected of links to foreign forces.",
+  "flavor": "After the inventory, the weapons were enough to equip a small army.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "defense": 3,
+    "stability": -3
+  },
+  "default_consequence": {
+    "stability": -5
+  },
+  "response_consequence": {
+    "defense": 8,
+    "stability": 3
+  },
+  "response_hint": "Passing a border security strengthening act can plug the gaps and demonstrate counter-capability.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-10-03T18:53:07.651208+00:00",
+  "issue_number": 1505
+}
