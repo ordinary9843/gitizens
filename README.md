@@ -31,7 +31,7 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 
 <!-- STATE_START -->
 **Era:** Founding Era | **Laws enacted:** 198 | [World state](world/WORLD.md)  
-**Next tick:** 2026-10-03T04:00:00Z UTC
+**Next tick:** 2026-10-03T10:00:00Z UTC
 <!-- STATE_END -->
 
 ---
