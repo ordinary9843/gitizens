@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-03T02:47:00.148908+00:00",
+  "updated_at": "2026-10-03T12:50:08.268860+00:00",
   "pending": [
     {
       "name": "Social Housing District",
@@ -11,9 +11,9 @@
     {
       "name": "Defense Ministry",
       "metric": "defense",
-      "current": 55,
+      "current": 54,
       "target": 65,
-      "gap": 10
+      "gap": 11
     },
     {
       "name": "Academy of Sciences",
