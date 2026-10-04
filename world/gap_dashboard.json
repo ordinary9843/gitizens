@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-04T13:33:19.828055+00:00",
+  "updated_at": "2026-10-04T18:53:22.226580+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -23,7 +23,20 @@
       "gap": 23
     }
   ],
-  "at_risk": [],
+  "at_risk": [
+    {
+      "name": "Industrial Complex",
+      "metric": "industry",
+      "current": 44,
+      "removal_at": 45
+    },
+    {
+      "name": "Community Center",
+      "metric": "welfare",
+      "current": 21,
+      "removal_at": 22
+    }
+  ],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",

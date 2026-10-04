@@ -18,8 +18,8 @@
 | Metric | Value |
 |--------|-------|
 | Education | 57/100 |
-| Industry | 54/100 |
-| Welfare | 31/100 |
+| Industry | 44/100 |
+| Welfare | 21/100 |
 | Green Policy | 64/100 |
 | Defense | 57/100 |
 | Pollution *(derived)* | 47/100 |
