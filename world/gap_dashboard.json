@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-04T03:18:00.201228+00:00",
+  "updated_at": "2026-10-04T13:33:19.828055+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -9,18 +9,18 @@
       "gap": 8
     },
     {
-      "name": "Social Housing District",
-      "metric": "welfare",
-      "current": 51,
-      "target": 60,
-      "gap": 9
-    },
-    {
       "name": "Eco-Research Center",
       "metric": "green_policy",
       "current": 64,
       "target": 85,
       "gap": 21
+    },
+    {
+      "name": "Academy of Sciences",
+      "metric": "education",
+      "current": 57,
+      "target": 80,
+      "gap": 23
     }
   ],
   "at_risk": [],

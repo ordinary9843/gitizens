@@ -1,1 +1,30 @@
-{}
+{
+  "id": "evt-pandemic",
+  "category": "health",
+  "rarity": "legendary",
+  "title": "Global Pandemic",
+  "description": "A highly infectious new virus is spreading rapidly across the globe; its fatality rate far exceeds any known disease from the past.",
+  "flavor": "Borders closed, schools shut, streets empty. Humanity faces the most severe public health challenge in history.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "welfare": -20,
+    "stability": -20,
+    "population": -2000
+  },
+  "default_consequence": {
+    "population": -2000,
+    "welfare": -10,
+    "industry": -10
+  },
+  "response_consequence": {
+    "welfare": 10,
+    "stability": 5
+  },
+  "response_hint": "Passing a national pandemic mobilisation act can concentrate resources on treatment research and stabilise the social order.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "is_crisis": true,
+  "crisis_multiplier": 1.5,
+  "fired_at": "2026-10-04T13:33:14.837932+00:00",
+  "issue_number": 1508
+}
