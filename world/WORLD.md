@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-03*
+*Last updated: 2026-10-04 — [Law 199](laws/law-199.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Founding Era |
-| Laws enacted | 198 |
-| Last enacted | 2026-10-02 |
-| Treasury | 109,166 Git Coins |
+| Laws enacted | 199 |
+| Last enacted | 2026-10-04 |
+| Treasury | 108,941 Git Coins |
 
 ### Policy
 
@@ -20,7 +20,7 @@
 | Education | 57/100 |
 | Industry | 54/100 |
 | Welfare | 51/100 |
-| Green Policy | 59/100 |
+| Green Policy | 64/100 |
 | Defense | 57/100 |
 | Pollution *(derived)* | 47/100 |
 
