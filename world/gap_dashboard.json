@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-04T18:53:22.226580+00:00",
+  "updated_at": "2026-10-05T02:54:06.587355+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -9,34 +9,21 @@
       "gap": 8
     },
     {
-      "name": "Eco-Research Center",
-      "metric": "green_policy",
-      "current": 64,
-      "target": 85,
-      "gap": 21
+      "name": "Community Center",
+      "metric": "welfare",
+      "current": 21,
+      "target": 30,
+      "gap": 9
     },
-    {
-      "name": "Academy of Sciences",
-      "metric": "education",
-      "current": 57,
-      "target": 80,
-      "gap": 23
-    }
-  ],
-  "at_risk": [
     {
       "name": "Industrial Complex",
       "metric": "industry",
       "current": 44,
-      "removal_at": 45
-    },
-    {
-      "name": "Community Center",
-      "metric": "welfare",
-      "current": 21,
-      "removal_at": 22
+      "target": 55,
+      "gap": 11
     }
   ],
+  "at_risk": [],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",
