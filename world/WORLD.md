@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-04*
+*Last updated: 2026-10-05 — [Law 200](laws/law-200.md)*
 
 ---
 
@@ -8,10 +8,10 @@
 
 | Field | Value |
 |-------|-------|
-| Era | Founding Era |
-| Laws enacted | 199 |
-| Last enacted | 2026-10-04 |
-| Treasury | 109,226 Git Coins |
+| Era | Crisis Age |
+| Laws enacted | 200 |
+| Last enacted | 2026-10-05 |
+| Treasury | 108,773 Git Coins |
 
 ### Policy
 
@@ -20,7 +20,7 @@
 | Education | 57/100 |
 | Industry | 44/100 |
 | Welfare | 21/100 |
-| Green Policy | 64/100 |
+| Green Policy | 69/100 |
 | Defense | 57/100 |
 | Pollution *(derived)* | 47/100 |
 
@@ -46,7 +46,6 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `bld-001` | Public School | [Law 001](laws/law-001.md) | education >= 25 |
-| `bld-002` | Community Center | [Law 003](laws/law-003.md) | welfare >= 30 |
 | `bld-003` | Military Barracks | [Law 008](laws/law-008.md) | defense >= 30 |
 
 ### Sectors
@@ -54,7 +53,6 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `sec-001` | Manufacturing District | [Law 007](laws/law-007.md) | industry >= 25 |
-| `sec-006` | Industrial Complex | [Law 155](laws/law-155.md) | industry >= 55 |
 
 ---
 
@@ -62,6 +60,7 @@
 
 | ID | Name | Demolished by | Reason |
 |----|------|---------------|--------|
+| `bld-002` | Community Center | [Law 200](laws/law-200.md) | welfare < 22 |
 | `bld-004` | Eco-Research Center | [Law 083](laws/law-083.md) | green_policy < 75 |
 | `dst-002` | Social Housing District | [Law 082](laws/law-082.md) | welfare < 48 |
 | `dst-004` | Social Housing District | [Law 188](laws/law-188.md) | welfare < 48 |
@@ -72,3 +71,4 @@
 | `sec-003` | Heavy Industry Zone | [Law 085](laws/law-085.md) | industry < 70 |
 | `sec-004` | Smog Zone | [Law 090](laws/law-090.md) | pollution < 48 |
 | `sec-005` | Smog Zone | [Law 174](laws/law-174.md) | pollution < 48 |
+| `sec-006` | Industrial Complex | [Law 200](laws/law-200.md) | industry < 45 |

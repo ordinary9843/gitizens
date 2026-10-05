@@ -208,3 +208,4 @@
 | 197 | [law-197](../world/laws/law-197.md) | [#1491](https://github.com/ordinary9843/gitizens/issues/1491) Strengthen Green Policy | 0+1 0-1 | 2026-09-29 |
 | 198 | [law-198](../world/laws/law-198.md) | [#1502](https://github.com/ordinary9843/gitizens/issues/1502) Strengthen Green Policy | 0+1 0-1 | 2026-10-02 |
 | 199 | [law-199](../world/laws/law-199.md) | [#1506](https://github.com/ordinary9843/gitizens/issues/1506) Strengthen Green Policy | 0+1 0-1 | 2026-10-04 |
+| 200 | [law-200](../world/laws/law-200.md) | [#1509](https://github.com/ordinary9843/gitizens/issues/1509) Strengthen Green Policy | 0+1 0-1 | 2026-10-05 |
