@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-05T16:34:14.434867+00:00",
+  "updated_at": "2026-10-06T03:44:09.085697+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -28,16 +28,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 46,
+      "current": 45,
       "target": 60,
-      "gap": 14
+      "gap": 15
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 46,
+      "current": 45,
       "target": 20,
-      "gap": 26
+      "gap": 25
     }
   ],
   "milestones_achieved": [
