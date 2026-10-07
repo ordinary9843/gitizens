@@ -1,0 +1,7 @@
+{
+  "id": "bld-005",
+  "name": "Community Center",
+  "built_law": 202,
+  "built_at": "2026-10-07T03:11:19.248102+00:00",
+  "auto_trigger": "welfare >= 30"
+}
