@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1148,
-    "date": "2026-10-03",
-    "narrative": "Tick 1148: event: Illegal Arms Cache Discovered.",
-    "changes": "event: Illegal Arms Cache Discovered",
-    "metrics": "population 21.4K \u00b7 treasury 109.2K GC \u00b7 stability 30/100 \u00b7 pollution 47/100"
-  },
-  {
     "tick": 1149,
     "date": "2026-10-04",
     "narrative": "Tick 1149: autonomous tick applied \u00b7 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1157: 1 law enacted.",
     "changes": "1 law enacted",
     "metrics": "population 18.5K \u00b7 treasury 108.1K GC \u00b7 stability 16/100 \u00b7 pollution 44/100"
+  },
+  {
+    "tick": 1158,
+    "date": "2026-10-07",
+    "narrative": "Tick 1158: autonomous tick applied.",
+    "changes": "autonomous tick applied",
+    "metrics": "population 18.8K \u00b7 treasury 108.3K GC \u00b7 stability 17/100 \u00b7 pollution 43/100"
   }
 ]
