@@ -24,14 +24,14 @@ No admin. No server. Just a repo, some GitHub Actions, and the citizens who vote
 ![Era](https://img.shields.io/badge/Era-Crisis_Age-e3b341?style=flat-square&logo=github)
 ![Population](https://img.shields.io/badge/Population-18.8K-3fb950?style=flat-square)
 ![Treasury](https://img.shields.io/badge/Treasury-108.3K_GC-388bfd?style=flat-square)
-![Stability](https://img.shields.io/badge/Stability-17%2F100-bc8cff?style=flat-square)
+![Stability](https://img.shields.io/badge/Stability-7%2F100-bc8cff?style=flat-square)
 ![Pollution](https://img.shields.io/badge/Pollution-43%2F100-f85149?style=flat-square)
 ![Laws](https://img.shields.io/badge/Laws-202_enacted-8b949e?style=flat-square)
 <!-- WORLD-STATE-END -->
 
 <!-- STATE_START -->
 **Era:** Crisis Age | **Laws enacted:** 202 | [World state](world/WORLD.md)  
-**Next tick:** 2026-10-08T04:00:00Z UTC
+**Next tick:** 2026-10-08T11:00:00Z UTC
 <!-- STATE_END -->
 
 ---
