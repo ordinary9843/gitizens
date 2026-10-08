@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1151,
-    "date": "2026-10-04",
-    "narrative": "Tick 1151: quiet tick.",
-    "changes": "quiet tick",
-    "metrics": "population 18.4K \u00b7 treasury 109.2K GC \u00b7 stability 7/100 \u00b7 pollution 47/100"
-  },
-  {
     "tick": 1152,
     "date": "2026-10-05",
     "narrative": "Tick 1152: autonomous tick applied \u00b7 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1160: event: Mercenary Activity.",
     "changes": "event: Mercenary Activity",
     "metrics": "population 18.8K \u00b7 treasury 108.3K GC \u00b7 stability 7/100 \u00b7 pollution 43/100"
+  },
+  {
+    "tick": 1161,
+    "date": "2026-10-08",
+    "narrative": "Tick 1161: autonomous tick applied \u00b7 1 law enacted.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted",
+    "metrics": "population 19.1K \u00b7 treasury 108K GC \u00b7 stability 0/100 \u00b7 pollution 42/100"
   }
 ]
