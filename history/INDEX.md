@@ -213,3 +213,4 @@
 | 202 | [law-202](../world/laws/law-202.md) | [#1511](https://github.com/ordinary9843/gitizens/issues/1511) Strengthen Welfare | 0+1 0-1 | 2026-10-07 |
 | 203 | [law-203](../world/laws/law-203.md) | [#1514](https://github.com/ordinary9843/gitizens/issues/1514) Strengthen Welfare | 0+1 0-1 | 2026-10-08 |
 | 204 | [law-204](../world/laws/law-204.md) | [#1516](https://github.com/ordinary9843/gitizens/issues/1516) Strengthen Green Policy | 0+1 0-1 | 2026-10-09 |
+| 205 | [law-205](../world/laws/law-205.md) | [#1517](https://github.com/ordinary9843/gitizens/issues/1517) Strengthen Green Policy | 0+1 0-1 | 2026-10-10 |
