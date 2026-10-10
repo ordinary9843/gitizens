@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-10 — [Law 205](laws/law-205.md)*
+*Last updated: 2026-10-10*
 
 ---
 
