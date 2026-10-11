@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-11T02:45:35.176471+00:00",
+  "updated_at": "2026-10-11T14:28:59.957008+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -11,9 +11,9 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 80,
+      "current": 79,
       "target": 85,
-      "gap": 5
+      "gap": 6
     },
     {
       "name": "Industrial Complex",
@@ -28,16 +28,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 40,
+      "current": 39,
       "target": 60,
-      "gap": 20
+      "gap": 21
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 40,
+      "current": 39,
       "target": 20,
-      "gap": 20
+      "gap": 19
     }
   ],
   "milestones_achieved": [

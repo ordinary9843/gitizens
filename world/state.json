@@ -4,17 +4,17 @@
   "last_enacted": "2026-10-11",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 103192,
+  "treasury": 103386,
   "currency": "Git Coins",
   "stars_last_counted": 7,
   "education": 57,
   "industry": 49,
   "welfare": 44,
-  "green_policy": 80,
+  "green_policy": 79,
   "defense": 62,
-  "population": 18783,
-  "pollution": 40,
-  "stability": 7,
+  "population": 18960,
+  "pollution": 39,
+  "stability": 0,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -34,5 +34,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-10-11T10:00:00Z"
+  "next_tick_at": "2026-10-11T22:00:00Z"
 }
