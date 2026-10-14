@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1079,
-    "date": "2026-09-19T16:14:39Z",
-    "laws_count": 180,
-    "era": "Founding Era",
-    "education": 56,
-    "industry": 57,
-    "welfare": 63,
-    "green_policy": 58,
-    "defense": 54,
-    "pollution": 0,
-    "population": 448,
-    "stability": 61,
-    "treasury": 1709349,
-    "active_event": "evt-billionaire-donates"
-  },
-  {
     "tick": 1080,
     "date": "2026-09-19T19:10:31Z",
     "laws_count": 181,
@@ -1586,6 +1570,22 @@
   {
     "tick": 1178,
     "date": "2026-10-14T13:10:32Z",
+    "laws_count": 209,
+    "era": "Crisis Age",
+    "education": 56,
+    "industry": 54,
+    "welfare": 54,
+    "green_policy": 77,
+    "defense": 62,
+    "pollution": 34,
+    "population": 19693,
+    "stability": 5,
+    "treasury": 102851,
+    "active_event": null
+  },
+  {
+    "tick": 1179,
+    "date": "2026-10-14T19:49:57Z",
     "laws_count": 209,
     "era": "Crisis Age",
     "education": 56,
