@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1167,
-    "date": "2026-10-10",
-    "narrative": "Tick 1167: autonomous tick applied \u00b7 event: Billionaire Donates Entire Fortune.",
-    "changes": "autonomous tick applied \u00b7 event: Billionaire Donates Entire Fortune",
-    "metrics": "population 18.8K \u00b7 treasury 103.5K GC \u00b7 stability 7/100 \u00b7 pollution 40/100"
-  },
-  {
     "tick": 1168,
     "date": "2026-10-10",
     "narrative": "Tick 1168: quiet tick.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1176: quiet tick.",
     "changes": "quiet tick",
     "metrics": "population 19.6K \u00b7 treasury 103.3K GC \u00b7 stability 4/100 \u00b7 pollution 35/100"
+  },
+  {
+    "tick": 1177,
+    "date": "2026-10-14",
+    "narrative": "Tick 1177: 1 law enacted.",
+    "changes": "1 law enacted",
+    "metrics": "population 19.6K \u00b7 treasury 102.6K GC \u00b7 stability 4/100 \u00b7 pollution 35/100"
   }
 ]

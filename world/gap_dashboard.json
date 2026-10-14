@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-13T20:53:40.692831+00:00",
+  "updated_at": "2026-10-14T02:35:21.154646+00:00",
   "pending": [
     {
       "name": "Industrial Complex",
@@ -16,11 +16,11 @@
       "gap": 3
     },
     {
-      "name": "Eco-Research Center",
-      "metric": "green_policy",
-      "current": 78,
-      "target": 85,
-      "gap": 7
+      "name": "Social Housing District",
+      "metric": "welfare",
+      "current": 54,
+      "target": 60,
+      "gap": 6
     }
   ],
   "at_risk": [],
