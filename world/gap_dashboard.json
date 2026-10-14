@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T02:35:21.154646+00:00",
+  "updated_at": "2026-10-14T13:10:32.643747+00:00",
   "pending": [
     {
       "name": "Industrial Complex",
@@ -28,16 +28,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 35,
+      "current": 34,
       "target": 60,
-      "gap": 25
+      "gap": 26
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 35,
+      "current": 34,
       "target": 20,
-      "gap": 15
+      "gap": 14
     }
   ],
   "milestones_achieved": [
