@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-14*
+*Last updated: 2026-10-15 — [Law 210](laws/law-210.md)*
 
 ---
 
@@ -9,16 +9,16 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 209 |
-| Last enacted | 2026-10-14 |
-| Treasury | 102,851 Git Coins |
+| Laws enacted | 210 |
+| Last enacted | 2026-10-15 |
+| Treasury | 102,355 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
 | Education | 56/100 |
-| Industry | 54/100 |
+| Industry | 59/100 |
 | Welfare | 54/100 |
 | Green Policy | 77/100 |
 | Defense | 62/100 |
@@ -54,6 +54,7 @@
 | ID | Name | Built by | Trigger |
 |----|------|----------|---------|
 | `sec-001` | Manufacturing District | [Law 007](laws/law-007.md) | industry >= 25 |
+| `sec-007` | Industrial Complex | [Law 210](laws/law-210.md) | industry >= 55 |
 
 ---
 

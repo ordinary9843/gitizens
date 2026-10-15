@@ -1,7 +1,8 @@
 {
-  "next_seq": 7,
-  "count": 1,
+  "next_seq": 8,
+  "count": 2,
   "entities": [
-    "sec-001"
+    "sec-001",
+    "sec-007"
   ]
 }

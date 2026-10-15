@@ -1,0 +1,7 @@
+{
+  "id": "sec-007",
+  "name": "Industrial Complex",
+  "built_law": 210,
+  "built_at": "2026-10-15T02:15:39.946523+00:00",
+  "auto_trigger": "industry >= 55"
+}
