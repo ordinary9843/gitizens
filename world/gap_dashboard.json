@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-10-15T19:33:41.662534+00:00",
+  "updated_at": "2026-10-16T02:07:02.845699+00:00",
   "pending": [
+    {
+      "name": "Social Housing District",
+      "metric": "welfare",
+      "current": 59,
+      "target": 60,
+      "gap": 1
+    },
     {
       "name": "Defense Ministry",
       "metric": "defense",
       "current": 62,
       "target": 65,
       "gap": 3
-    },
-    {
-      "name": "Social Housing District",
-      "metric": "welfare",
-      "current": 54,
-      "target": 60,
-      "gap": 6
     },
     {
       "name": "Eco-Research Center",
