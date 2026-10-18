@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-18 — [Law 214](laws/law-214.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 213 |
+| Laws enacted | 214 |
 | Last enacted | 2026-10-18 |
-| Treasury | 101,091 Git Coins |
+| Treasury | 99,517 Git Coins |
 
 ### Policy
 
@@ -19,7 +19,7 @@
 |--------|-------|
 | Education | 61/100 |
 | Industry | 64/100 |
-| Welfare | 59/100 |
+| Welfare | 64/100 |
 | Green Policy | 77/100 |
 | Defense | 62/100 |
 | Pollution *(derived)* | 34/100 |
@@ -40,6 +40,7 @@
 |----|------|----------|---------|
 | `dst-001` | City Park | [Law 006](laws/law-006.md) | green_policy >= 35 |
 | `dst-003` | Nature Reserve | — | green_policy >= 65 |
+| `dst-005` | Social Housing District | [Law 214](laws/law-214.md) | welfare >= 60 |
 
 ### Buildings
 
