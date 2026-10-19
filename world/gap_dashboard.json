@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T02:17:06.402967+00:00",
+  "updated_at": "2026-10-19T15:06:56.124255+00:00",
   "pending": [
     {
       "name": "Defense Ministry",
@@ -11,16 +11,16 @@
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 76,
+      "current": 75,
       "target": 85,
-      "gap": 9
+      "gap": 10
     },
     {
-      "name": "Heavy Industry Zone",
-      "metric": "industry",
-      "current": 64,
+      "name": "Academy of Sciences",
+      "metric": "education",
+      "current": 66,
       "target": 80,
-      "gap": 16
+      "gap": 14
     }
   ],
   "at_risk": [],
