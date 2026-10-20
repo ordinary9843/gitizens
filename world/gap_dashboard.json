@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-20T13:07:59.331988+00:00",
+  "updated_at": "2026-10-20T19:43:24.720906+00:00",
   "pending": [
     {
       "name": "Eco-Research Center",
@@ -18,9 +18,9 @@
     {
       "name": "Heavy Industry Zone",
       "metric": "industry",
-      "current": 64,
+      "current": 56,
       "target": 80,
-      "gap": 16
+      "gap": 24
     }
   ],
   "at_risk": [],

@@ -1,1 +1,25 @@
-{}
+{
+  "id": "evt-earthquake",
+  "category": "natural",
+  "rarity": "uncommon",
+  "title": "Earthquake Disaster",
+  "description": "A magnitude 6.5 earthquake has struck the industrial zone, damaging factory equipment and severing roads.",
+  "flavor": "The strongest earthquake in the region in twenty years.",
+  "trigger_conditions": {},
+  "immediate_effects": {
+    "industry": -8,
+    "stability": -10
+  },
+  "default_consequence": {
+    "treasury": -80
+  },
+  "response_consequence": {
+    "industry": 3,
+    "treasury": 20
+  },
+  "response_hint": "Passing a post-disaster reconstruction fund act can accelerate recovery and attract foreign aid.",
+  "duration_hours": 4,
+  "issue_label": "event",
+  "fired_at": "2026-10-20T19:43:21.169652+00:00",
+  "issue_number": 1533
+}
