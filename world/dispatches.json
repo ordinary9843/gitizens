@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1188,
-    "date": "2026-10-17",
-    "narrative": "Tick 1188: quiet tick.",
-    "changes": "quiet tick",
-    "metrics": "population 19.7K \u00b7 treasury 101.8K GC \u00b7 stability 8/100 \u00b7 pollution 34/100"
-  },
-  {
     "tick": 1189,
     "date": "2026-10-18",
     "narrative": "Tick 1189: 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1197: event: Earthquake Disaster.",
     "changes": "event: Earthquake Disaster",
     "metrics": "population 19.5K \u00b7 treasury 99.8K GC \u00b7 stability 0/100 \u00b7 pollution 34/100"
+  },
+  {
+    "tick": 1198,
+    "date": "2026-10-21",
+    "narrative": "Tick 1198: 1 law enacted.",
+    "changes": "1 law enacted",
+    "metrics": "population 19.5K \u00b7 treasury 98.6K GC \u00b7 stability 0/100 \u00b7 pollution 34/100"
   }
 ]

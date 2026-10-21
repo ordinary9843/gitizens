@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-21 — [Law 217](laws/law-217.md)*
+*Last updated: 2026-10-21*
 
 ---
 
@@ -11,7 +11,7 @@
 | Era | Crisis Age |
 | Laws enacted | 217 |
 | Last enacted | 2026-10-21 |
-| Treasury | 98,661 Git Coins |
+| Treasury | 98,581 Git Coins |
 
 ### Policy
 
