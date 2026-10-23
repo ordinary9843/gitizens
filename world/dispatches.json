@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1196,
-    "date": "2026-10-20",
-    "narrative": "Tick 1196: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 19.5K \u00b7 treasury 99.8K GC \u00b7 stability 1/100 \u00b7 pollution 34/100"
-  },
-  {
     "tick": 1197,
     "date": "2026-10-20",
     "narrative": "Tick 1197: event: Earthquake Disaster.",
@@ -67,6 +60,13 @@
     "date": "2026-10-23",
     "narrative": "Tick 1205: autonomous tick applied \u00b7 1 law enacted.",
     "changes": "autonomous tick applied \u00b7 1 law enacted",
+    "metrics": "population 19.8K \u00b7 treasury 94.1K GC \u00b7 stability 3/100 \u00b7 pollution 34/100"
+  },
+  {
+    "tick": 1206,
+    "date": "2026-10-23",
+    "narrative": "Tick 1206: quiet tick.",
+    "changes": "quiet tick",
     "metrics": "population 19.8K \u00b7 treasury 94.1K GC \u00b7 stability 3/100 \u00b7 pollution 34/100"
   }
 ]
