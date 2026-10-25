@@ -229,3 +229,4 @@
 | 218 | [law-218](../world/laws/law-218.md) | [#1535](https://github.com/ordinary9843/gitizens/issues/1535) Strengthen Industry | 0+1 0-1 | 2026-10-22 |
 | 219 | [law-219](../world/laws/law-219.md) | [#1536](https://github.com/ordinary9843/gitizens/issues/1536) Strengthen Welfare | 0+1 0-1 | 2026-10-23 |
 | 220 | [law-220](../world/laws/law-220.md) | [#1537](https://github.com/ordinary9843/gitizens/issues/1537) Strengthen Education | 0+1 0-1 | 2026-10-24 |
+| 221 | [law-221](../world/laws/law-221.md) | [#1538](https://github.com/ordinary9843/gitizens/issues/1538) Strengthen Industry | 0+1 0-1 | 2026-10-25 |

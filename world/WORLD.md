@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-25*
+*Last updated: 2026-10-25 — [Law 221](laws/law-221.md)*
 
 ---
 
@@ -9,16 +9,16 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 220 |
-| Last enacted | 2026-10-24 |
-| Treasury | 94,188 Git Coins |
+| Laws enacted | 221 |
+| Last enacted | 2026-10-25 |
+| Treasury | 91,003 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 69/100 |
-| Industry | 65/100 |
+| Education | 68/100 |
+| Industry | 70/100 |
 | Welfare | 69/100 |
 | Green Policy | 73/100 |
 | Defense | 67/100 |
