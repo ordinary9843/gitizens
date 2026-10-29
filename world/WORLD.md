@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-29*
 
 ---
 
@@ -17,7 +17,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Education | 81/100 |
+| Education | 83/100 |
 | Industry | 79/100 |
 | Welfare | 69/100 |
 | Green Policy | 73/100 |

@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1212,
-    "date": "2026-10-25",
-    "narrative": "Tick 1212: quiet tick.",
-    "changes": "quiet tick",
-    "metrics": "population 19.6K \u00b7 treasury 91K GC \u00b7 stability 6/100 \u00b7 pollution 34/100"
-  },
-  {
     "tick": 1213,
     "date": "2026-10-26",
     "narrative": "Tick 1213: autonomous tick applied.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1221: event: AI Breakthrough.",
     "changes": "event: AI Breakthrough",
     "metrics": "population 18.9K \u00b7 treasury 84.6K GC \u00b7 stability 10/100 \u00b7 pollution 34/100"
+  },
+  {
+    "tick": 1222,
+    "date": "2026-10-29",
+    "narrative": "Tick 1222: event: Time Traveller Claims.",
+    "changes": "event: Time Traveller Claims",
+    "metrics": "population 18.9K \u00b7 treasury 84.6K GC \u00b7 stability 5/100 \u00b7 pollution 34/100"
   }
 ]
