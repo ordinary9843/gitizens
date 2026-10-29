@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-29 — [Law 225](laws/law-225.md)*
+*Last updated: 2026-10-29*
 
 ---
 
