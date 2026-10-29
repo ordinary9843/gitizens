@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-29 — [Law 225](laws/law-225.md)*
 
 ---
 
@@ -9,9 +9,9 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 224 |
-| Last enacted | 2026-10-28 |
-| Treasury | 84,626 Git Coins |
+| Laws enacted | 225 |
+| Last enacted | 2026-10-29 |
+| Treasury | 78,377 Git Coins |
 
 ### Policy
 
@@ -19,10 +19,10 @@
 |--------|-------|
 | Education | 83/100 |
 | Industry | 79/100 |
-| Welfare | 69/100 |
+| Welfare | 74/100 |
 | Green Policy | 73/100 |
 | Defense | 72/100 |
-| Pollution *(derived)* | 34/100 |
+| Pollution *(derived)* | 35/100 |
 
 ---
 
@@ -34,6 +34,7 @@
 |----|------|----------|---------|
 | `ins-001` | National University | [Law 005](laws/law-005.md) | education >= 55 |
 | `ins-005` | Defense Ministry | [Law 216](laws/law-216.md) | defense >= 65 |
+| `ins-006` | Academy of Sciences | [Law 225](laws/law-225.md) | education >= 80 |
 
 ### Districts
 
