@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1216,
-    "date": "2026-10-27",
-    "narrative": "Tick 1216: quiet tick.",
-    "changes": "quiet tick",
-    "metrics": "population 19.4K \u00b7 treasury 91.3K GC \u00b7 stability 8/100 \u00b7 pollution 34/100"
-  },
-  {
     "tick": 1217,
     "date": "2026-10-27",
     "narrative": "Tick 1217: autonomous tick applied \u00b7 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1225: 1 law enacted \u00b7 event: Cultural Renaissance.",
     "changes": "1 law enacted \u00b7 event: Cultural Renaissance",
     "metrics": "population 18.6K \u00b7 treasury 77.9K GC \u00b7 stability 5/100 \u00b7 pollution 35/100"
+  },
+  {
+    "tick": 1226,
+    "date": "2026-10-30",
+    "narrative": "Tick 1226: autonomous tick applied \u00b7 1 law enacted.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted",
+    "metrics": "population 18.9K \u00b7 treasury 78K GC \u00b7 stability 7/100 \u00b7 pollution 36/100"
   }
 ]
