@@ -236,3 +236,4 @@
 | 225 | [law-225](../world/laws/law-225.md) | [#1543](https://github.com/ordinary9843/gitizens/issues/1543) Strengthen Welfare | 0+1 0-1 | 2026-10-29 |
 | 226 | [law-226](../world/laws/law-226.md) | [#1545](https://github.com/ordinary9843/gitizens/issues/1545) Strengthen Defense | 0+1 0-1 | 2026-10-30 |
 | 227 | [law-227](../world/laws/law-227.md) | [#1547](https://github.com/ordinary9843/gitizens/issues/1547) Strengthen Green Policy | 0+1 0-1 | 2026-10-30 |
+| 228 | [law-228](../world/laws/law-228.md) | [#1548](https://github.com/ordinary9843/gitizens/issues/1548) Strengthen Defense | 0+1 0-1 | 2026-10-31 |
