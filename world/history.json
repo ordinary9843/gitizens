@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1135,
-    "date": "2026-09-30T01:06:32Z",
-    "laws_count": 197,
-    "era": "Founding Era",
-    "education": 57,
-    "industry": 57,
-    "welfare": 54,
-    "green_policy": 57,
-    "defense": 56,
-    "pollution": 17,
-    "population": 12835,
-    "stability": 52,
-    "treasury": 94239,
-    "active_event": "evt-bull-market"
-  },
-  {
     "tick": 1136,
     "date": "2026-09-30T08:03:12Z",
     "laws_count": 197,
@@ -1598,5 +1582,21 @@
     "stability": 12,
     "treasury": 65482,
     "active_event": "evt-anti-aging-drug"
+  },
+  {
+    "tick": 1235,
+    "date": "2026-11-02T17:33:30Z",
+    "laws_count": 231,
+    "era": "Crisis Age",
+    "education": 82,
+    "industry": 86,
+    "welfare": 87,
+    "green_policy": 81,
+    "defense": 83,
+    "pollution": 39,
+    "population": 19521,
+    "stability": 14,
+    "treasury": 64839,
+    "active_event": null
   }
 ]

@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-11-02T03:14:54.751103+00:00",
+  "updated_at": "2026-11-02T17:33:30.668357+00:00",
   "pending": [
     {
       "name": "Eco-Research Center",
       "metric": "green_policy",
-      "current": 82,
+      "current": 81,
       "target": 85,
-      "gap": 3
+      "gap": 4
     }
   ],
   "at_risk": [],
@@ -14,16 +14,16 @@
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 38,
+      "current": 39,
       "target": 60,
-      "gap": 22
+      "gap": 21
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 38,
+      "current": 39,
       "target": 20,
-      "gap": 18
+      "gap": 19
     }
   ],
   "milestones_achieved": [
