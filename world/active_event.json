@@ -1,23 +1,30 @@
 {
-  "id": "evt-bull-market",
-  "category": "economic",
-  "rarity": "common",
-  "title": "Bull Market Frenzy",
-  "description": "Stellar economic data has drawn massive foreign investment, driving the stock market to record highs.",
-  "flavor": "Taxi drivers are debating stock picks; analysts are warning of bubble risk.",
-  "trigger_conditions": {},
+  "id": "evt-anti-aging-drug",
+  "category": "scientific",
+  "rarity": "rare",
+  "title": "Anti-Aging Drug Released",
+  "description": "A pharmaceutical company has announced a drug that effectively slows aging, with mass production expected within five years.",
+  "flavor": "The pre-order list already runs to a million people; ethicists are beginning to discuss the social impact.",
+  "trigger_conditions": {
+    "education": {
+      "min": 50
+    },
+    "welfare": {
+      "min": 40
+    }
+  },
   "immediate_effects": {
-    "treasury": 80,
-    "industry": 3
+    "population": 1000,
+    "welfare": 8
   },
   "default_consequence": {},
   "response_consequence": {
-    "treasury": 60,
-    "industry": 3
+    "welfare": 10,
+    "education": 5
   },
-  "response_hint": "Passing an investment environment optimisation act can channel capital into the real economy.",
+  "response_hint": "Passing a universal healthcare access act can ensure the drug is not a privilege for the wealthy.",
   "duration_hours": 4,
   "issue_label": "event",
-  "fired_at": "2026-11-01T19:57:23.823428+00:00",
-  "issue_number": 1551
+  "fired_at": "2026-11-02T03:14:48.763472+00:00",
+  "issue_number": 1552
 }
