@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-11-02*
+*Last updated: 2026-11-03 — [Law 232](laws/law-232.md)*
 
 ---
 
@@ -9,20 +9,20 @@
 | Field | Value |
 |-------|-------|
 | Era | Crisis Age |
-| Laws enacted | 231 |
-| Last enacted | 2026-11-02 |
-| Treasury | 64,839 Git Coins |
+| Laws enacted | 232 |
+| Last enacted | 2026-11-03 |
+| Treasury | 64,782 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 82/100 |
+| Education | 81/100 |
 | Industry | 86/100 |
 | Welfare | 87/100 |
-| Green Policy | 81/100 |
+| Green Policy | 86/100 |
 | Defense | 83/100 |
-| Pollution *(derived)* | 39/100 |
+| Pollution *(derived)* | 40/100 |
 
 ---
 
@@ -51,6 +51,7 @@
 | `bld-001` | Public School | [Law 001](laws/law-001.md) | education >= 25 |
 | `bld-003` | Military Barracks | [Law 008](laws/law-008.md) | defense >= 30 |
 | `bld-005` | Community Center | [Law 202](laws/law-202.md) | welfare >= 30 |
+| `bld-006` | Eco-Research Center | [Law 232](laws/law-232.md) | green_policy >= 85 |
 
 ### Sectors
 
