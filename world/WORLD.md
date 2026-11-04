@@ -19,7 +19,7 @@
 |--------|-------|
 | Education | 82/100 |
 | Industry | 85/100 |
-| Welfare | 91/100 |
+| Welfare | 86/100 |
 | Green Policy | 89/100 |
 | Defense | 88/100 |
 | Pollution *(derived)* | 41/100 |
