@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1147,
-    "date": "2026-10-03T12:50:08Z",
-    "laws_count": 198,
-    "era": "Founding Era",
-    "education": 57,
-    "industry": 54,
-    "welfare": 51,
-    "green_policy": 59,
-    "defense": 54,
-    "pollution": 47,
-    "population": 21443,
-    "stability": 33,
-    "treasury": 109166,
-    "active_event": null
-  },
-  {
     "tick": 1148,
     "date": "2026-10-03T18:53:13Z",
     "laws_count": 198,
@@ -1598,5 +1582,21 @@
     "stability": 16,
     "treasury": 62431,
     "active_event": null
+  },
+  {
+    "tick": 1247,
+    "date": "2026-11-06T21:09:51Z",
+    "laws_count": 236,
+    "era": "Crisis Age",
+    "education": 86,
+    "industry": 85,
+    "welfare": 100,
+    "green_policy": 93,
+    "defense": 87,
+    "pollution": 41,
+    "population": 21258,
+    "stability": 16,
+    "treasury": 62431,
+    "active_event": "evt-super-vaccine"
   }
 ]
