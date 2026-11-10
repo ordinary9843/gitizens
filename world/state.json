@@ -1,20 +1,20 @@
 {
-  "era": "Crisis Age",
+  "era": "Modern Era",
   "laws_count": 239,
   "last_enacted": "2026-11-09",
   "founded_date": "2026-06-10",
   "world_summary": "",
-  "treasury": 32741,
+  "treasury": 33149,
   "currency": "Git Coins",
   "stars_last_counted": 7,
-  "education": 86,
-  "industry": 89,
-  "welfare": 98,
+  "education": 85,
+  "industry": 88,
+  "welfare": 97,
   "green_policy": 96,
-  "defense": 91,
-  "population": 21550,
+  "defense": 90,
+  "population": 21838,
   "pollution": 41,
-  "stability": 24,
+  "stability": 26,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -35,5 +35,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-11-10T01:00:00Z"
+  "next_tick_at": "2026-11-10T13:00:00Z"
 }
