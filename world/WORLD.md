@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-11-10 — [Law 240](laws/law-240.md)*
+*Last updated: 2026-11-10*
 
 ---
 
