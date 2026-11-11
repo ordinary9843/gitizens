@@ -249,3 +249,4 @@
 | 238 | [law-238](../world/laws/law-238.md) | [#1563](https://github.com/ordinary9843/gitizens/issues/1563) Strengthen Green Policy | 0+1 0-1 | 2026-11-08 |
 | 239 | [law-239](../world/laws/law-239.md) | [#1564](https://github.com/ordinary9843/gitizens/issues/1564) Strengthen Defense | 0+1 0-1 | 2026-11-09 |
 | 240 | [law-240](../world/laws/law-240.md) | [#1565](https://github.com/ordinary9843/gitizens/issues/1565) Strengthen Green Policy | 0+1 0-1 | 2026-11-10 |
+| 241 | [law-241](../world/laws/law-241.md) | [#1566](https://github.com/ordinary9843/gitizens/issues/1566) Strengthen Education | 0+1 0-1 | 2026-11-11 |
