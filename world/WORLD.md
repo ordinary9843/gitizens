@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-11-15 — [Law 244](laws/law-244.md)*
+*Last updated: 2026-11-15*
 
 ---
 
