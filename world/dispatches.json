@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1266,
-    "date": "2026-11-13",
-    "narrative": "Tick 1266: quiet tick.",
-    "changes": "quiet tick",
-    "metrics": "population 22.2K \u00b7 treasury 11.4K GC \u00b7 stability 36/100 \u00b7 pollution 41/100"
-  },
-  {
     "tick": 1267,
     "date": "2026-11-14",
     "narrative": "Tick 1267: quiet tick.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1275: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Surveillance Technology Emerges.",
     "changes": "autonomous tick applied \u00b7 1 law enacted \u00b7 event: Surveillance Technology Emerges",
     "metrics": "population 24.4K \u00b7 treasury 12.2K GC \u00b7 stability 43/100 \u00b7 pollution 41/100"
+  },
+  {
+    "tick": 1276,
+    "date": "2026-11-18",
+    "narrative": "Tick 1276: autonomous tick applied \u00b7 event: AI Breakthrough.",
+    "changes": "autonomous tick applied \u00b7 event: AI Breakthrough",
+    "metrics": "population 24.7K \u00b7 treasury 12.7K GC \u00b7 stability 37/100 \u00b7 pollution 41/100"
   }
 ]
