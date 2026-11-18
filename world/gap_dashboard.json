@@ -1,21 +1,21 @@
 {
-  "updated_at": "2026-11-18T05:00:54.841223+00:00",
+  "updated_at": "2026-11-18T16:48:19.127765+00:00",
   "pending": [],
   "at_risk": [],
   "milestones_pending": [
     {
       "tag": "crisis/pollution-crisis",
       "metric": "pollution",
-      "current": 41,
+      "current": 42,
       "target": 60,
-      "gap": 19
+      "gap": 18
     },
     {
       "tag": "recovery/air-cleaned",
       "metric": "pollution",
-      "current": 41,
+      "current": 42,
       "target": 20,
-      "gap": 21
+      "gap": 22
     }
   ],
   "milestones_achieved": [

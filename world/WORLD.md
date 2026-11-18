@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-11-18 — [Law 248](laws/law-248.md)*
+*Last updated: 2026-11-18*
 
 ---
 
