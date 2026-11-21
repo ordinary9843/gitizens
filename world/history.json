@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1182,
-    "date": "2026-10-15T19:33:41Z",
-    "laws_count": 210,
-    "era": "Crisis Age",
-    "education": 56,
-    "industry": 59,
-    "welfare": 54,
-    "green_policy": 77,
-    "defense": 62,
-    "pollution": 34,
-    "population": 19914,
-    "stability": 6,
-    "treasury": 102639,
-    "active_event": null
-  },
-  {
     "tick": 1183,
     "date": "2026-10-16T02:07:02Z",
     "laws_count": 211,
@@ -1598,5 +1582,21 @@
     "stability": 39,
     "treasury": 13713,
     "active_event": "evt-famine"
+  },
+  {
+    "tick": 1282,
+    "date": "2026-11-21T04:41:43Z",
+    "laws_count": 251,
+    "era": "Modern Era",
+    "education": 98,
+    "industry": 99,
+    "welfare": 73,
+    "green_policy": 100,
+    "defense": 96,
+    "pollution": 44,
+    "population": 27023,
+    "stability": 41,
+    "treasury": 13888,
+    "active_event": null
   }
 ]

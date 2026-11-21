@@ -9,10 +9,10 @@
   "stars_last_counted": 7,
   "education": 98,
   "industry": 99,
-  "welfare": 81,
+  "welfare": 73,
   "green_policy": 100,
   "defense": 96,
-  "population": 27523,
+  "population": 27023,
   "pollution": 44,
   "stability": 41,
   "tags_applied": [
@@ -35,5 +35,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-11-21T00:00:00Z"
+  "next_tick_at": "2026-11-21T12:00:00Z"
 }
