@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1280,
-    "date": "2026-11-20",
-    "narrative": "Tick 1280: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 27K \u00b7 treasury 13.8K GC \u00b7 stability 45/100 \u00b7 pollution 43/100"
-  },
-  {
     "tick": 1281,
     "date": "2026-11-20",
     "narrative": "Tick 1281: autonomous tick applied \u00b7 1 law enacted \u00b7 event: Famine Crisis.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1289: autonomous tick applied.",
     "changes": "autonomous tick applied",
     "metrics": "population 28.7K \u00b7 treasury 14.6K GC \u00b7 stability 44/100 \u00b7 pollution 44/100"
+  },
+  {
+    "tick": 1290,
+    "date": "2026-11-24",
+    "narrative": "Tick 1290: autonomous tick applied \u00b7 1 law enacted.",
+    "changes": "autonomous tick applied \u00b7 1 law enacted",
+    "metrics": "population 28.6K \u00b7 treasury 14.6K GC \u00b7 stability 45/100 \u00b7 pollution 44/100"
   }
 ]
