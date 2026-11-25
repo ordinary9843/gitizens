@@ -1,6 +1,6 @@
 # World State
 
-*Last updated: 2026-11-24*
+*Last updated: 2026-11-25 — [Law 255](laws/law-255.md)*
 
 ---
 
@@ -9,18 +9,18 @@
 | Field | Value |
 |-------|-------|
 | Era | Modern Era |
-| Laws enacted | 254 |
-| Last enacted | 2026-11-24 |
-| Treasury | 15,113 Git Coins |
+| Laws enacted | 255 |
+| Last enacted | 2026-11-25 |
+| Treasury | 14,858 Git Coins |
 
 ### Policy
 
 | Metric | Value |
 |--------|-------|
-| Education | 96/100 |
+| Education | 95/100 |
 | Industry | 96/100 |
 | Welfare | 78/100 |
-| Green Policy | 99/100 |
+| Green Policy | 100/100 |
 | Defense | 94/100 |
 | Pollution *(derived)* | 44/100 |
 
