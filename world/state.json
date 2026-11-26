@@ -14,7 +14,7 @@
   "defense": 93,
   "population": 29480,
   "pollution": 44,
-  "stability": 49,
+  "stability": 39,
   "tags_applied": [
     "era/founding-era",
     "milestone/educated-society",
@@ -36,5 +36,5 @@
     "tkersey"
   ],
   "last_narrator_date": "2026-07-30T03:15:03.509578+00:00",
-  "next_tick_at": "2026-11-26T02:00:00Z"
+  "next_tick_at": "2026-11-26T13:00:00Z"
 }
