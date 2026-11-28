@@ -1,12 +1,5 @@
 [
   {
-    "tick": 1289,
-    "date": "2026-11-23",
-    "narrative": "Tick 1289: autonomous tick applied.",
-    "changes": "autonomous tick applied",
-    "metrics": "population 28.7K \u00b7 treasury 14.6K GC \u00b7 stability 44/100 \u00b7 pollution 44/100"
-  },
-  {
     "tick": 1290,
     "date": "2026-11-24",
     "narrative": "Tick 1290: autonomous tick applied \u00b7 1 law enacted.",
@@ -68,5 +61,12 @@
     "narrative": "Tick 1298: autonomous tick applied \u00b7 1 law enacted.",
     "changes": "autonomous tick applied \u00b7 1 law enacted",
     "metrics": "population 30.1K \u00b7 treasury 12.2K GC \u00b7 stability 38/100 \u00b7 pollution 44/100"
+  },
+  {
+    "tick": 1299,
+    "date": "2026-11-28",
+    "narrative": "Tick 1299: autonomous tick applied \u00b7 event: Water Resource Recovery.",
+    "changes": "autonomous tick applied \u00b7 event: Water Resource Recovery",
+    "metrics": "population 30.6K \u00b7 treasury 12.7K GC \u00b7 stability 40/100 \u00b7 pollution 44/100"
   }
 ]

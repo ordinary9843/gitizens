@@ -1,21 +1,5 @@
 [
   {
-    "tick": 1199,
-    "date": "2026-10-21T13:18:45Z",
-    "laws_count": 217,
-    "era": "Crisis Age",
-    "education": 65,
-    "industry": 61,
-    "welfare": 64,
-    "green_policy": 74,
-    "defense": 67,
-    "pollution": 34,
-    "population": 19828,
-    "stability": 1,
-    "treasury": 98861,
-    "active_event": null
-  },
-  {
     "tick": 1200,
     "date": "2026-10-21T19:45:55Z",
     "laws_count": 217,
@@ -1598,5 +1582,21 @@
     "stability": 38,
     "treasury": 12160,
     "active_event": null
+  },
+  {
+    "tick": 1299,
+    "date": "2026-11-28T16:28:52Z",
+    "laws_count": 260,
+    "era": "Modern Era",
+    "education": 90,
+    "industry": 93,
+    "welfare": 96,
+    "green_policy": 100,
+    "defense": 89,
+    "pollution": 44,
+    "population": 30564,
+    "stability": 40,
+    "treasury": 12652,
+    "active_event": "evt-water-recovery"
   }
 ]
